@@ -183,7 +183,7 @@ class StockMove(models.Model):
                 move_to_link.add(move.id)
         if not aml_vals_list:
             return self.env['account.move']
-        account_move = self.env['account.move'].create({
+        account_move = self.env['account.move'].sudo().create({
             'journal_id': self.company_id.account_stock_journal_id.id,
             'line_ids': [Command.create(aml_vals) for aml_vals in aml_vals_list],
             'date': self.env.context.get('force_period_date') or fields.Date.context_today(self),
@@ -450,6 +450,9 @@ class StockMove(models.Model):
         std_price = std_price if std_price else self.product_id.standard_price
         if at_date and self.product_id.cost_method == 'standard':
             std_price = std_price or self.product_id._get_standard_price_at_date(at_date)
+        # If multiple lots keep standard_price from product
+        elif self.product_id.lot_valuated and len(self.lot_ids) == 1:
+            std_price = self.lot_ids.standard_price
         return {
             'value': std_price * quantity,
             'quantity': quantity,
