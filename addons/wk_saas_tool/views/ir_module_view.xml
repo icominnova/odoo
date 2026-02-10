@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+
+    <record id="view_module_filter_inherit" model="ir.ui.view">
+        <field name="name">ir.module.module.list.select.inherit</field>
+        <field name="model">ir.module.module</field>
+        <field name="inherit_id" ref="base.view_module_filter"/>
+        <field name="arch" type="xml">
+            <xpath expr="//filter[@name='app']" position="after">
+                <filter name="subscribed" string="Subscribed" domain="[('is_subscribed', '=', True)]" />
+            </xpath>
+        </field>
+    </record>
+
+
+    <record id="module_form_inherit" model="ir.ui.view">
+        <field name="name">ir.module.module.form.inherit</field>
+        <field name="model">ir.module.module</field>
+        <field name="inherit_id" ref="base.module_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//page[@name='technical_data']/group[1]/field[@name='state']" position="after">
+                <field name="is_subscribed" />
+            </xpath>
+        </field>
+    </record>
+
+    <record id="base.open_module_tree" model="ir.actions.act_window">
+        <field name="name">Apps</field>
+        <field name="res_model">ir.module.module</field>
+        <field name="view_mode">kanban,list,form</field>
+        <field name="context">{'search_default_app':1}</field>
+        <field name="domain">[('is_subscribed', '=', True)]</field>
+        <field name="search_view_id" ref="base.view_module_filter"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_empty_folder">
+            No module found!
+            </p><p>
+            You should try other search criteria.
+            </p>
+        </field>
+    </record>
+
+</odoo>

@@ -13,10 +13,10 @@ class CustomWebManifest(webmanifest.WebManifest):
     def _get_webmanifest(self):
         manifest = super()._get_webmanifest()
         # Remplace le nom de l'app par le nom de l'entreprise Sunsoft
-        manifest['name'] = 'Sunsoft'
-        manifest['description'] = 'Sunsoft ERP - Gestion commerciale, CRM, Comptabilité et plus'
-        manifest['background_color'] = '#714B67'
-        manifest['theme_color'] = '#714B67'
+        manifest['name'] = 'SunApp'
+        manifest['description'] = 'SunApp ERP - Gestion commerciale, CRM, Comptabilité et plus'
+        manifest['background_color'] = "#E56C09"
+        manifest['theme_color'] = "#081448"
         # Ajout des icônes générées par pwa-asset-generator
         manifest['icons'] = [
             {

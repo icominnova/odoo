@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<!-- Copyright (c) 2016-Present Webkul Software Pvt. Ltd. (<https://webkul.com/>) -->
+<!-- See LICENSE file for full copyright and licensing details. -->
+<!-- License URL : <https://store.webkul.com/license.html/> -->
+
+<odoo>
+    <data>
+        <record id="install_module_cron" model="ir.cron">
+            <field name="name">Install Module Cron</field>
+            <field name="model_id" ref="model_ir_config_parameter" />
+            <field name="state">code</field>
+            <field name="code">model.install_modules()</field>
+            <field name="interval_number">5</field>
+            <field name="interval_type">minutes</field>
+        </record>
+    </data>
+</odoo>
