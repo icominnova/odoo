@@ -1,0 +1,60 @@
+<odoo>
+    <record id="view_custom_pwa_manifest_form" model="ir.ui.view">
+        <field name="name">custom.pwa.appinfo.manifest.form</field>
+        <field name="model">custom.pwa.appinfo</field>
+        <field name="arch" type="xml">
+            <form string="Manifest PWA">
+                <sheet>
+                    <group>
+                        <field name="name"/>
+                        <field name="description"/>
+                        <field name="background_color"/>
+                        <field name="theme_color"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_custom_pwa_manifest_form" model="ir.ui.view">
+        <field name="name">custom.pwa.appinfo.manifest.form</field>
+        <field name="model">custom.pwa.appinfo</field>
+        <field name="arch" type="xml">
+            <form string="Manifest PWA">
+                <sheet>
+                    <group>
+                        <field name="name"/>
+                        <field name="description"/>
+                        <field name="background_color" widget="color"/>
+                        <field name="theme_color" widget="color"/>
+                    </group>
+                    <footer>
+                        <button name="action_reset_colors" type="object" string="Réinitialiser les couleurs" class="btn-secondary"/>
+                    </footer>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+
+    <record id="view_custom_pwa_manifest_list" model="ir.ui.view">
+        <field name="name">custom.pwa.appinfo.manifest.list</field>
+        <field name="model">custom.pwa.appinfo</field>
+        <field name="arch" type="xml">
+            <list string="Manifest PWA">
+                <field name="name"/>
+                <field name="description"/>
+                <field name="background_color"/>
+                <field name="theme_color"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="action_custom_pwa_manifest" model="ir.actions.act_window">
+        <field name="name">Manifest PWA</field>
+        <field name="res_model">custom.pwa.appinfo</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+    <menuitem id="menu_custom_pwa_manifest" name="Nom de l'application" parent="menu_custom_pwa_title_root" action="action_custom_pwa_manifest" sequence="40"/>
+</odoo>

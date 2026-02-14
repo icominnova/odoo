@@ -1,0 +1,43 @@
+<odoo>
+    <record id="view_custom_pwa_manifest_image_form" model="ir.ui.view">
+        <field name="name">custom.pwa.manifest.image.form</field>
+        <field name="model">custom.pwa.manifest.image</field>
+        <field name="arch" type="xml">
+            <form string="Icône Manifest PWA">
+                <sheet>
+                    <group>
+                        <field name="name" placeholder="Ex: 192x192 any"/>
+                        <field name="image" widget="image"/>
+                        <field name="sizes" placeholder="Ex: 192x192 ou 512x512"/>
+                        <field name="type" placeholder="image/png"/>
+                        <field name="purpose"/>
+                    </group>
+                    <div class="alert alert-info mt16">
+                        <ul>
+                            <li>Ajoutez une icône pour chaque combinaison : 192x192 any, 192x192 maskable, 512x512 any, 512x512 maskable…</li>
+                            <li>Le champ <b>purpose</b> doit être <b>any</b> ou <b>maskable</b> selon le besoin.</li>
+                            <li>Le champ <b>sizes</b> doit correspondre à la taille réelle de l'image.</li>
+                        </ul>
+                    </div>
+                </sheet>
+            </form>
+        </field>
+    </record>
+    <record id="view_custom_pwa_manifest_image_list" model="ir.ui.view">
+        <field name="name">custom.pwa.manifest.image.list</field>
+        <field name="model">custom.pwa.manifest.image</field>
+        <field name="arch" type="xml">
+            <list string="Icônes Manifest PWA">
+                <field name="name"/>
+                <field name="sizes"/>
+                <field name="purpose"/>
+            </list>
+        </field>
+    </record>
+    <record id="action_custom_pwa_manifest_image" model="ir.actions.act_window">
+        <field name="name">Icônes Manifest PWA</field>
+        <field name="res_model">custom.pwa.manifest.image</field>
+        <field name="view_mode">list,form</field>
+    </record>
+    <menuitem id="menu_custom_pwa_manifest_image" name="Icônes de l'application" parent="menu_custom_pwa_title_root" action="action_custom_pwa_manifest_image" sequence="50"/>
+</odoo>

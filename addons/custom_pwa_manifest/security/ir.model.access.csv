@@ -1,0 +1,6 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_custom_pwa_title_admin,custom.pwa.title admin,model_custom_pwa_title,base.group_system,1,1,1,1
+access_custom_pwa_image_admin,custom.pwa.image admin,model_custom_pwa_image,base.group_system,1,1,1,1
+access_custom_pwa_appinfo_admin,custom.pwa.appinfo admin,model_custom_pwa_appinfo,base.group_system,1,1,1,1
+access_custom_pwa_manifest_image_admin,custom.pwa.manifest.image admin,model_custom_pwa_manifest_image,base.group_system,1,1,1,1
+access_custom_pwa_manifest_screenshot_admin,custom.pwa.manifest.screenshot admin,model_custom_pwa_manifest_screenshot,base.group_system,1,1,1,1

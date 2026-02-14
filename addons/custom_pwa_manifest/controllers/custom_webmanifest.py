@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from odoo.addons.web.controllers import webmanifest
 from odoo import http
 
@@ -12,81 +11,38 @@ class CustomWebManifest(webmanifest.WebManifest):
 
     def _get_webmanifest(self):
         manifest = super()._get_webmanifest()
-        # Remplace le nom de l'app par le nom de l'entreprise Sunsoft
-        manifest['name'] = 'SunApp'
-        manifest['description'] = 'SunApp ERP - Gestion commerciale, CRM, Comptabilité et plus'
-        manifest['background_color'] = "#E56C09"
-        manifest['theme_color'] = "#081448"
-        # Ajout des icônes générées par pwa-asset-generator
-        manifest['icons'] = [
-            {
-                "src": "/custom_pwa_manifest/static/img/manifest-icon-192.maskable.png",
-                "sizes": "192x192",
-                "type": "image/png",
-                "purpose": "any"
-            },
-            {
-                "src": "/custom_pwa_manifest/static/img/manifest-icon-192.maskable.png",
-                "sizes": "192x192",
-                "type": "image/png",
-                "purpose": "maskable"
-            },
-            {
-                "src": "/custom_pwa_manifest/static/img/manifest-icon-512.maskable.png",
-                "sizes": "512x512",
-                "type": "image/png",
-                "purpose": "any"
-            },
-            {
-                "src": "/custom_pwa_manifest/static/img/manifest-icon-512.maskable.png",
-                "sizes": "512x512",
-                "type": "image/png",
-                "purpose": "maskable"
-            }
-        ]
+        appinfo = http.request.env['custom.pwa.appinfo'].sudo().search([], order='id desc', limit=1)
+        if appinfo:
+            if appinfo.name:
+                manifest['name'] = appinfo.name
+            if appinfo.description:
+                manifest['description'] = appinfo.description
+            if appinfo.background_color:
+                manifest['background_color'] = appinfo.background_color
+            if appinfo.theme_color:
+                manifest['theme_color'] = appinfo.theme_color
+        # Icônes dynamiques ou fallback statique
+        images = http.request.env['custom.pwa.manifest.image'].sudo().search([])
+        if images:
+            manifest['icons'] = []
+            for img in images:
+                manifest['icons'].append({
+                    "src": f"/web/image/custom.pwa.manifest.image/{img.id}/image",
+                    "sizes": img.sizes,
+                    "type": img.type,
+                    "purpose": img.purpose,
+                })
         
-        manifest['screenshots'] = [
-            {
-                "src": "/custom_pwa_manifest/static/img/acceuil_sunsoft.png",
-                "sizes": "1839x991",
-                "type": "image/png",
-                "form_factor": "wide",
-                "label": "Wonder Widgets"
-            },
-            {
-                "src": "/custom_pwa_manifest/static/img/acceuil.png",
-                "sizes": "1839x991",
-                "type": "image/png",
-                "form_factor": "wide",
-                "label": "Wonder Widgets"
-            },
-            {
-                "src": "/custom_pwa_manifest/static/img/Solution.png",
-                "sizes": "1839x991",
-                "type": "image/png",
-                "form_factor": "wide",
-                "label": "Wonder Widgets"
-            },
-            {
-                "src": "/custom_pwa_manifest/static/img/mobile1.png",
-                "sizes": "860x1746",
-                "type": "image/png",
-                "form_factor": "narrow",
-                "label": "Wonder Widgets"
-            },
-            {
-                "src": "/custom_pwa_manifest/static/img/mobile2.png",
-                "sizes": "860x1746",
-                "type": "image/png",
-                "form_factor": "narrow",
-                "label": "Wonder Widgets"
-            },
-            {
-                "src": "/custom_pwa_manifest/static/img/mobile3.png",
-                "sizes": "860x1746",
-                "type": "image/png",
-                "form_factor": "narrow",
-                "label": "Wonder Widgets"
-            }
-        ]
+        screenshots = http.request.env['custom.pwa.manifest.screenshot'].sudo().search([])
+        if screenshots:
+            manifest['screenshots'] = []
+            for shot in screenshots:
+                manifest['screenshots'].append({
+                    "src": f"/web/image/custom.pwa.manifest.screenshot/{shot.id}/image",
+                    "sizes": shot.sizes,
+                    "type": shot.type,
+                    "form_factor": shot.form_factor,
+                    "label": shot.label or shot.name,
+                })
+                
         return manifest

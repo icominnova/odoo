@@ -1,0 +1,10 @@
+<odoo>
+    <template id="custom_title" inherit_id="web.layout">
+        <xpath expr="//title" position="replace">
+            <t t-set="custom_title" t-value="request.env['custom.pwa.title'].sudo().search([], order='id desc', limit=1).name or 'Mon Application'"/>
+            <title>
+                <t t-esc="custom_title"/>
+            </title>
+        </xpath>
+    </template>
+</odoo>
