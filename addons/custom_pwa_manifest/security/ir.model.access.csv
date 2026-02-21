@@ -4,3 +4,9 @@ access_custom_pwa_image_admin,custom.pwa.image admin,model_custom_pwa_image,base
 access_custom_pwa_appinfo_admin,custom.pwa.appinfo admin,model_custom_pwa_appinfo,base.group_system,1,1,1,1
 access_custom_pwa_manifest_image_admin,custom.pwa.manifest.image admin,model_custom_pwa_manifest_image,base.group_system,1,1,1,1
 access_custom_pwa_manifest_screenshot_admin,custom.pwa.manifest.screenshot admin,model_custom_pwa_manifest_screenshot,base.group_system,1,1,1,1
+access_custom_pwa_title_user,custom.pwa.title user,model_custom_pwa_title,base.group_user,1,0,0,0
+access_custom_pwa_image_user,custom.pwa.image user,model_custom_pwa_image,base.group_user,1,0,0,0
+access_custom_pwa_appinfo_user,custom.pwa.appinfo user,model_custom_pwa_appinfo,base.group_user,1,0,0,0
+access_custom_pwa_manifest_image_user,custom.pwa.manifest.image user,model_custom_pwa_manifest_image,base.group_user,1,0,0,0
+access_custom_pwa_manifest_screenshot_user,custom.pwa.manifest.screenshot user,model_custom_pwa_manifest_screenshot,base.group_user,1,0,0,0
+access_custom_pwa_manifest_image_user,custom.pwa.manifest.image user,model_custom_pwa_manifest_image,base.group_user,1,0,0,0
