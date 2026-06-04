@@ -35,4 +35,7 @@
         </field>
     </record>
 
+    <!-- Menu item pour Parcourir Backups -->
+    <menuitem id="saas_backup_menu_browse" name="Parcourir Backups" parent="saas_backup_menu_root" action="saas_backup_browser_action" sequence="15"/>
+
 </odoo>
