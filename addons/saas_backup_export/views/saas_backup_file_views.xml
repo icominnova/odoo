@@ -75,11 +75,30 @@
                 Aucun fichier de sauvegarde trouvé.
             </p>
             <p>
-                Cliquez sur <b>Scanner les backups</b> (menu Action) pour parcourir
-                le dossier de stockage et lister les fichiers disponibles.
+                Cliquez sur <b>Nouveau</b> pour parcourir les backups disponibles
+                et les ajouter à la liste.
             </p>
         </field>
     </record>
+
+    <!-- ===== ACTION SERVEUR : Ouvrir le wizard depuis "Nouveau" ===== -->
+    <record id="saas_backup_file_action_new" model="ir.actions.server">
+        <field name="name">Nouveau fichier de sauvegarde</field>
+        <field name="model_id" ref="model_saas_backup_file"/>
+        <field name="binding_model_id" ref="model_saas_backup_file"/>
+        <field name="binding_view_types">list</field>
+        <field name="state">code</field>
+        <field name="code">
+action = {
+    'type': 'ir.actions.act_window',
+    'name': 'Ajouter des backups',
+    'res_model': 'saas.backup.browser',
+    'view_mode': 'form',
+    'target': 'new',
+}
+        </field>
+    </record>
+
 
     <!-- ===== ACTION SERVEUR : SCAN (disponible dans le menu Action de la liste) ===== -->
     <record id="saas_backup_scan_action" model="ir.actions.server">

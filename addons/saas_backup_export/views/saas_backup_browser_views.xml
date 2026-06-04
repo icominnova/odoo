@@ -12,34 +12,39 @@
         <field name="name">saas.backup.browser.form</field>
         <field name="model">saas.backup.browser</field>
         <field name="arch" type="xml">
-            <form string="Parcourir les backups">
+            <form string="Ajouter des fichiers de sauvegarde">
                 <sheet>
+                    <div class="alert alert-info" role="alert">
+                        <p>Sélectionnez une base pour voir les fichiers .zip disponibles, puis cliquez sur "Charger les fichiers".</p>
+                    </div>
                     <group>
-                        <field name="client_folder"/>
-                        <field name="recursive"/>
-                        <field name="include_filestore"/>
+                        <group string="Parcourir">
+                            <field name="client_folder" required="1"/>
+                            <field name="recursive" string="Parcourir les sous-dossiers"/>
+                            <field name="include_filestore" string="Inclure attachments (filestore)"/>
+                        </group>
                     </group>
                     <group>
-                        <button name="action_load_files" type="object" string="Charger les fichiers" class="btn-primary"/>
-                        <button name="action_import_selected" type="object" string="Importer sélection" class="btn-secondary"/>
+                        <button name="action_load_files" type="object" string="📁 Charger les fichiers" class="btn-primary"/>
                     </group>
-                    <group string="Fichiers">
-                        <field name="lines">
-                            <tree editable="bottom">
-                                <field name="selected"/>
-                                <field name="source"/>
+                    <group string="Fichiers disponibles">
+                        <field name="lines" nolabel="1">
+                            <tree editable="bottom" create="false" delete="false">
+                                <field name="selected" widget="boolean"/>
                                 <field name="name"/>
-                                <field name="file_size_mb"/>
+                                <field name="source" widget="badge"/>
+                                <field name="file_size_mb" string="Taille (Mo)"/>
                                 <field name="backup_date"/>
                             </tree>
                         </field>
                     </group>
+                    <footer>
+                        <button name="action_import_selected" type="object" string="✓ Importer sélection" class="btn btn-primary"/>
+                        <button string="Annuler" class="btn btn-secondary" special="cancel"/>
+                    </footer>
                 </sheet>
             </form>
         </field>
     </record>
-
-    <!-- Menu item pour Parcourir Backups -->
-    <menuitem id="saas_backup_menu_browse" name="Parcourir Backups" parent="saas_backup_menu_root" action="saas_backup_browser_action" sequence="15"/>
 
 </odoo>

@@ -153,12 +153,27 @@ class SaasBackupBrowser(models.TransientModel):
                 'download_token': token,
             })
             created += 1
-        return {
-            'type': 'ir.actions.client',
-            'tag': 'display_notification',
-            'params': {
-                'title': _('Import terminé'),
-                'message': _('%s fichier(s) importé(s).') % created,
-                'type': 'success',
-            },
-        }
+        
+        # Afficher le nombre de fichiers importés et fermer le wizard
+        if created > 0:
+            return {
+                'type': 'ir.actions.client',
+                'tag': 'display_notification',
+                'params': {
+                    'title': _('Import réussi'),
+                    'message': _('%s fichier(s) importé(s) avec succès.') % created,
+                    'type': 'success',
+                    'sticky': False,
+                },
+            }
+        else:
+            return {
+                'type': 'ir.actions.client',
+                'tag': 'display_notification',
+                'params': {
+                    'title': _('Aucun fichier importé'),
+                    'message': _('Les fichiers sélectionnés existent déjà ou aucun n\'a été sélectionné.'),
+                    'type': 'warning',
+                    'sticky': False,
+                },
+            }
