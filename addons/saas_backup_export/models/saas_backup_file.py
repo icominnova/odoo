@@ -120,6 +120,11 @@ class SaasBackupFile(models.Model):
                     })
                     created += 1
 
+        # Chercher également les ZIP stockés dans le filestore via ir.attachment
+        created, updated, found_paths = self._scan_filestore_zip_attachments(
+            found_paths, created, updated
+        )
+
         # Marquer comme manquants les fichiers qui n'existent plus
         missing = self.search([
             ('file_path', 'not in', list(found_paths)),
@@ -199,9 +204,12 @@ class SaasBackupFile(models.Model):
     # -------------------------------------------------------------------------
 
     def _scan_filestore_zip_attachments(self, found_paths, created, updated):
-        attachments = self.env['ir.attachment'].search([
-            '|', ('mimetype', '=', 'application/zip'), ('name', 'ilike', '%.zip'),
-            ('store_fname', '!=', False),
+        attachments = self.env['ir.attachment'].sudo().search([
+            '&', ('store_fname', '!=', False),
+            '|', '|',
+            ('mimetype', '=', 'application/zip'),
+            ('name', 'ilike', '%.zip'),
+            ('datas_fname', 'ilike', '%.zip'),
         ])
         for attach in attachments:
             store_fname = attach.store_fname
