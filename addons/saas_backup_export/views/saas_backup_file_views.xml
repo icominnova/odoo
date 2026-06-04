@@ -8,7 +8,7 @@
         <field name="arch" type="xml">
             <list string="Fichiers de sauvegarde SaaS" decoration-muted="state == 'missing'">
                 <header>
-                    <button name="action_scan_backups" type="object" string="Scanner les backups" class="btn-secondary"/>
+                    <button name="action_scan_backups" type="object" string="Scanner les backups" class="btn-secondary" display="always"/>
                 </header>
                 <field name="client_name"/>
                 <field name="name"/>
