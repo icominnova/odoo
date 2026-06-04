@@ -35,11 +35,4 @@
         </field>
     </record>
 
-    <record id="saas_backup_menu_browse" model="ir.ui.menu">
-        <field name="name">Parcourir Backups</field>
-        <field name="parent" ref="saas_backup_menu_root"/>
-        <field name="action" ref="saas_backup_browser_action"/>
-        <field name="sequence">15</field>
-    </record>
-
 </odoo>

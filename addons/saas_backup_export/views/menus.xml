@@ -7,6 +7,9 @@
     <!-- ===== MENU PRINCIPAL : Liste des fichiers ===== -->
     <menuitem id="saas_backup_menu_files" name="Fichiers de sauvegarde" parent="saas_backup_menu_root" action="saas_backup_file_action" sequence="10"/>
 
+    <!-- ===== MENU PARCOURIR ===== -->
+    <menuitem id="saas_backup_menu_browse" name="Parcourir Backups" parent="saas_backup_menu_root" action="saas_backup_browser_action" sequence="15"/>
+
     <!-- ===== MENU CONFIGURATION ===== -->
     <menuitem id="saas_backup_menu_config" name="Configuration" parent="saas_backup_menu_root" action="saas_backup_config_action" sequence="20" groups="base.group_system"/>
 
