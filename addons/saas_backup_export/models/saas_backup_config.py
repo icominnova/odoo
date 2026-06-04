@@ -15,9 +15,9 @@ class SaasBackupConfig(models.Model):
     base_path = fields.Char(
         string='Dossier racine des backups',
         required=True,
-        default='/opt/odoo/Odoo-SAAS-Data/',
+        default='/home/odoo/Odoo-SAAS-Data/',
         help="Chemin absolu sur le serveur où sont stockés les dossiers de sauvegarde "
-             "des clients SaaS. Ex: /opt/odoo/Odoo-SAAS-Data/",
+             "des clients SaaS. Ex: /home/odoo/Odoo-SAAS-Data/",
     )
     active = fields.Boolean(default=True)
     note = fields.Text(string='Notes')

@@ -31,7 +31,7 @@ class SaasBackupBrowser(models.TransientModel):
 
     def _get_client_folders(self):
         config = self.env['saas.backup.config'].search([], limit=1)
-        base = config.base_path.rstrip('/') if config else '/opt/odoo/Odoo-SAAS-Data'
+        base = config.base_path.rstrip('/') if config else '/home/odoo/Odoo-SAAS-Data'
         try:
             entries = sorted(os.listdir(base))
         except Exception:
@@ -93,7 +93,7 @@ class SaasBackupBrowser(models.TransientModel):
         if not self.client_folder and not self.include_filestore:
             raise UserError(_('Veuillez choisir une base à parcourir ou cocher Inclure le filestore.'))
         config = self.env['saas.backup.config'].search([], limit=1)
-        base = config.base_path.rstrip('/') if config else '/opt/odoo/Odoo-SAAS-Data'
+        base = config.base_path.rstrip('/') if config else '/home/odoo/Odoo-SAAS-Data'
 
         # vider les lignes existantes
         self.lines.unlink()

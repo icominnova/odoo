@@ -7,9 +7,6 @@
         <field name="model">saas.backup.file</field>
         <field name="arch" type="xml">
             <list string="Fichiers de sauvegarde SaaS" decoration-muted="state == 'missing'">
-                <header>
-                    <button name="action_scan_backups" type="object" string="Scanner les backups" class="btn-secondary" display="always"/>
-                </header>
                 <field name="client_name"/>
                 <field name="name"/>
                 <field name="file_size_mb" string="Taille (Mo)" optional="show"/>
