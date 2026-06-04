@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="saas_backup_browser_action" model="ir.actions.act_window">
+        <field name="name">Parcourir backups</field>
+        <field name="res_model">saas.backup.browser</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+
+    <record id="saas_backup_browser_view_form" model="ir.ui.view">
+        <field name="name">saas.backup.browser.form</field>
+        <field name="model">saas.backup.browser</field>
+        <field name="arch" type="xml">
+            <form string="Parcourir les backups">
+                <sheet>
+                    <group>
+                        <field name="client_folder"/>
+                        <button name="action_load_files" type="object" string="Charger les fichiers" class="btn-primary"/>
+                        <button name="action_import_selected" type="object" string="Importer sélection" class="btn-secondary"/>
+                    </group>
+                    <group string="Fichiers">
+                        <field name="lines">
+                            <tree editable="bottom">
+                                <field name="selected"/>
+                                <field name="name"/>
+                                <field name="file_size_mb"/>
+                                <field name="backup_date"/>
+                                <field name="full_path"/>
+                            </tree>
+                        </field>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="saas_backup_menu_browse" model="ir.ui.menu">
+        <field name="name">Parcourir Backups</field>
+        <field name="parent" ref="saas_backup_menu_root"/>
+        <field name="action" ref="saas_backup_browser_action"/>
+        <field name="sequence">15</field>
+    </record>
+
+</odoo>

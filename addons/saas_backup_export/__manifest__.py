@@ -16,6 +16,7 @@
     'data': [
         'security/ir.model.access.csv',
         'views/saas_backup_config_views.xml',
+        'views/saas_backup_browser_views.xml',
         'views/saas_backup_restore_wizard_views.xml',
         'views/saas_backup_file_views.xml',
         'views/menus.xml',
