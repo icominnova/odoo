@@ -2,6 +2,4 @@ id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
 access_saas_backup_config_admin,saas.backup.config admin,model_saas_backup_config,base.group_system,1,1,1,1
 access_saas_backup_file_admin,saas.backup.file admin,model_saas_backup_file,base.group_system,1,1,1,1
 access_saas_backup_file_user,saas.backup.file user,model_saas_backup_file,base.group_user,1,0,0,0
-access_saas_backup_browser_admin,saas.backup.browser admin,model_saas_backup_browser,base.group_system,1,1,1,1
-access_saas_backup_browser_line_admin,saas.backup.browser.line admin,model_saas_backup_browser_line,base.group_system,1,1,1,1
 access_saas_backup_restore_wizard_admin,saas.backup.restore.wizard admin,model_saas_backup_restore_wizard,base.group_system,1,1,1,1
