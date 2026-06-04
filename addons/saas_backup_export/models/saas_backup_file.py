@@ -198,6 +198,53 @@ class SaasBackupFile(models.Model):
     # Helpers
     # -------------------------------------------------------------------------
 
+    def _scan_filestore_zip_attachments(self, found_paths, created, updated):
+        attachments = self.env['ir.attachment'].search([
+            '|', ('mimetype', '=', 'application/zip'), ('name', 'ilike', '%.zip'),
+            ('store_fname', '!=', False),
+        ])
+        for attach in attachments:
+            store_fname = attach.store_fname
+            if not store_fname:
+                continue
+            try:
+                full_path = self.env['ir.attachment']._full_path(store_fname)
+            except Exception:
+                continue
+            if not os.path.isfile(full_path):
+                continue
+
+            name = attach.datas_fname or attach.name or os.path.basename(full_path)
+            client_name = attach.res_name or attach.res_model or 'Filestore'
+            stat = os.stat(full_path)
+            size_mb = stat.st_size / (1024 * 1024)
+            backup_date = datetime.fromtimestamp(stat.st_mtime)
+
+            found_paths.add(full_path)
+            existing = self.search([('file_path', '=', full_path)], limit=1)
+            if existing:
+                existing.write({
+                    'name': name,
+                    'client_name': client_name,
+                    'file_size_mb': size_mb,
+                    'backup_date': backup_date,
+                    'state': 'available',
+                })
+                updated += 1
+            else:
+                token = self._generate_token(full_path)
+                self.create({
+                    'name': name,
+                    'client_name': client_name,
+                    'file_path': full_path,
+                    'file_size_mb': size_mb,
+                    'backup_date': backup_date,
+                    'state': 'available',
+                    'download_token': token,
+                })
+                created += 1
+        return created, updated, found_paths
+
     @api.model
     def _generate_token(self, file_path):
         """Génère un token HMAC sécurisé unique pour chaque fichier."""
@@ -209,3 +256,5 @@ class SaasBackupFile(models.Model):
             file_path.encode(),
             digestmod=hashlib.sha256,
         ).hexdigest()
+
+
