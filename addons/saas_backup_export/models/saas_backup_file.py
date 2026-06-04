@@ -60,7 +60,6 @@ class SaasBackupFile(models.Model):
     # Actions
     # -------------------------------------------------------------------------
 
-    @api.model
     def action_scan_backups(self):
         """Scanne le dossier racine configuré et crée/met à jour les enregistrements
         pour chaque fichier ZIP trouvé dans les sous-dossiers clients.

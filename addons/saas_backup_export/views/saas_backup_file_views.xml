@@ -92,7 +92,7 @@
         <field name="binding_view_types">list</field>
         <field name="state">code</field>
         <field name="code">
-action = model.action_scan_backups()
+action = env['saas.backup.file'].action_scan_backups()
         </field>
     </record>
 
