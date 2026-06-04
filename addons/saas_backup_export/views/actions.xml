@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- ===== ACTION PRINCIPALE : Liste des fichiers ===== -->
+    <record id="saas_backup_file_action" model="ir.actions.act_window">
+        <field name="name">Fichiers de sauvegarde</field>
+        <field name="res_model">saas.backup.file</field>
+        <field name="view_mode">list,form</field>
+        <field name="context">{'search_default_available': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Aucun fichier de sauvegarde trouvé.
+            </p>
+            <p>
+                Cliquez sur <b>Nouveau</b> pour parcourir les backups disponibles
+                et les ajouter à la liste.
+            </p>
+        </field>
+    </record>
+
+    <!-- ===== ACTION SERVEUR : Ouvrir le wizard depuis "Nouveau" ===== -->
+    <record id="saas_backup_file_action_new" model="ir.actions.server">
+        <field name="name">Nouveau fichier de sauvegarde</field>
+        <field name="model_id" ref="model_saas_backup_file"/>
+        <field name="binding_model_id" ref="model_saas_backup_file"/>
+        <field name="binding_view_types">list</field>
+        <field name="state">code</field>
+        <field name="code">
+action = {
+    'type': 'ir.actions.act_window',
+    'name': 'Ajouter des backups',
+    'res_model': 'saas.backup.browser',
+    'view_mode': 'form',
+    'target': 'new',
+}
+        </field>
+    </record>
+
+    <!-- ===== ACTION CONFIG ===== -->
+    <record id="saas_backup_config_action" model="ir.actions.act_window">
+        <field name="name">Paramètres Backup</field>
+        <field name="res_model">saas.backup.config</field>
+        <field name="view_mode">form</field>
+        <field name="target">current</field>
+    </record>
+
+</odoo>

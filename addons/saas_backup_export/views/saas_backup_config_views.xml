@@ -21,11 +21,4 @@
         </field>
     </record>
 
-    <record id="saas_backup_config_action" model="ir.actions.act_window">
-        <field name="name">Paramètres Backup</field>
-        <field name="res_model">saas.backup.config</field>
-        <field name="view_mode">form</field>
-        <field name="target">current</field>
-    </record>
-
 </odoo>

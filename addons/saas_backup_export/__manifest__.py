@@ -15,6 +15,7 @@
     'depends': ['base', 'mail'],
     'data': [
         'security/ir.model.access.csv',
+        'views/actions.xml',
         'views/saas_backup_config_views.xml',
         'views/saas_backup_browser_views.xml',
         'views/saas_backup_restore_wizard_views.xml',
