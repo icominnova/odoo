@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="saas_backup_restore_wizard_view_form" model="ir.ui.view">
+        <field name="name">saas.backup.restore.wizard.form</field>
+        <field name="model">saas.backup.restore.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Restauration de sauvegarde">
+                <sheet>
+                    <!-- Informations du backup sélectionné -->
+                    <group string="Sauvegarde sélectionnée">
+                        <group>
+                            <field name="backup_client"/>
+                            <field name="backup_name"/>
+                        </group>
+                        <group>
+                            <field name="backup_date"/>
+                            <field name="backup_file_id" invisible="1"/>
+                        </group>
+                    </group>
+
+                    <separator/>
+
+                    <!-- Mode de restauration -->
+                    <group string="Options de restauration">
+                        <field name="mode" widget="radio"/>
+                    </group>
+
+                    <!-- Avertissement mode overwrite -->
+                    <div class="alert alert-danger" role="alert" invisible="mode != 'overwrite'">
+                        <strong>⚠️ Attention !</strong>
+                        La base de données spécifiée ci-dessous sera
+                        <strong>définitivement supprimée</strong> avant la restauration.
+                        Toutes les données actuelles seront perdues.
+                    </div>
+
+                    <group string="Base de données cible">
+                        <field name="db_name" placeholder="ex: client001_restaure"/>
+                        <field name="neutralize"/>
+                        <field name="confirm_overwrite" invisible="mode != 'overwrite'" required="mode == 'overwrite'"/>
+                    </group>
+
+                    <group string="Authentification">
+                        <field name="master_password" password="True" placeholder="Mot de passe maître (admin_passwd)"/>
+                    </group>
+                </sheet>
+                <footer>
+                    <button name="action_restore" string="Lancer la restauration" type="object" class="btn-danger" invisible="mode == 'overwrite' and not confirm_overwrite"/>
+                    <button string="Annuler" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+
+
+</odoo>
