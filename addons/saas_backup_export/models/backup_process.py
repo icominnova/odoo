@@ -41,6 +41,29 @@ class BackupProcess(models.Model):
         ('failed', 'Échec'),
     ], string='Dernier état', readonly=True)
     saas_last_backup_message = fields.Text(string='Dernier message', readonly=True)
+    saas_process_database_name = fields.Char(
+        string='Base',
+        compute='_compute_saas_process_info',
+    )
+    saas_process_storage_path = fields.Char(
+        string='Storage Path',
+        compute='_compute_saas_process_info',
+    )
+
+    def _compute_saas_process_info(self):
+        for process in self:
+            process.saas_process_database_name = process._saas_get_process_value((
+                'database_name',
+                'db_name',
+                'database',
+                'client_db_name',
+            ))
+            process.saas_process_storage_path = process._saas_get_process_value((
+                'storage_path',
+                'backup_path',
+                'path',
+                'local_path',
+            ))
 
     @api.onchange('saas_auto_backup', 'saas_backup_interval_number', 'saas_backup_interval_type', 'saas_backup_time')
     def _onchange_saas_schedule(self):
@@ -118,3 +141,14 @@ class BackupProcess(models.Model):
         if self.saas_backup_interval_type == 'months':
             return relativedelta(months=interval_number)
         return timedelta(days=interval_number)
+
+    def _saas_get_process_value(self, field_names):
+        self.ensure_one()
+        for field_name in field_names:
+            if field_name not in self._fields:
+                continue
+            value = self[field_name]
+            if hasattr(value, 'display_name'):
+                return value.display_name
+            return value
+        return False

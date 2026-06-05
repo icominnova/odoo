@@ -7,8 +7,8 @@
         <field name="arch" type="xml">
             <list string="Planification des backups" create="false">
                 <field name="name"/>
-                <field name="database_name"/>
-                <field name="storage_path"/>
+                <field name="saas_process_database_name"/>
+                <field name="saas_process_storage_path"/>
                 <field name="saas_auto_backup"/>
                 <field name="saas_backup_interval_number"/>
                 <field name="saas_backup_interval_type"/>
@@ -32,8 +32,8 @@
                     <group>
                         <group string="Backup Process">
                             <field name="name" readonly="1"/>
-                            <field name="database_name" readonly="1"/>
-                            <field name="storage_path" readonly="1"/>
+                            <field name="saas_process_database_name"/>
+                            <field name="saas_process_storage_path"/>
                         </group>
                         <group string="Planification">
                             <field name="saas_auto_backup"/>
@@ -60,7 +60,6 @@
         <field name="arch" type="xml">
             <search string="Rechercher une planification">
                 <field name="name"/>
-                <field name="database_name"/>
                 <filter string="Sauvegarde auto active" name="auto_enabled" domain="[('saas_auto_backup', '=', True)]"/>
                 <filter string="Dernier backup échoué" name="last_failed" domain="[('saas_last_backup_state', '=', 'failed')]"/>
             </search>
