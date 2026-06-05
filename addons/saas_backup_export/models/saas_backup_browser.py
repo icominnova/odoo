@@ -59,7 +59,8 @@ class SaasBackupBrowser(models.TransientModel):
             'file_size_mb': vals['file_size_mb'],
             'backup_date': vals['backup_date'],
             'selected': True,
-            'source': 'local',
+            'source': vals.get('source', 'local'),
+            'attachment_id': vals.get('attachment_id'),
         })
         return True
 
@@ -73,7 +74,7 @@ class SaasBackupBrowser(models.TransientModel):
             return False
         if not os.path.isfile(full_path):
             return False
-        name = attach.datas_fname or attach.name or os.path.basename(full_path)
+        name = attach.name or os.path.basename(full_path)
         stat = os.stat(full_path)
         size_mb = stat.st_size / (1024 * 1024)
         backup_date = datetime.fromtimestamp(stat.st_mtime)
@@ -101,17 +102,16 @@ class SaasBackupBrowser(models.TransientModel):
 
         if self.backup_process_id:
             self._refresh_process_info()
-            for vals in self._iter_process_zip_files():
+            for vals in self._iter_process_backup_files():
                 self._add_local_file(vals)
 
         # inclure les fichiers du filestore si demandé
         if self.include_filestore:
             attachments = self.env['ir.attachment'].sudo().search([
                 '&', ('store_fname', '!=', False),
-                '|', '|',
+                '|',
                 ('mimetype', '=', 'application/zip'),
                 ('name', 'ilike', '%.zip'),
-                ('datas_fname', 'ilike', '%.zip'),
             ])
             for attach in attachments:
                 self._add_filestore_attachment(attach)
@@ -196,9 +196,7 @@ class SaasBackupBrowser(models.TransientModel):
         self.ensure_one()
         scan_paths = self._get_process_scan_paths()
         if not scan_paths:
-            raise UserError(_(
-                "Aucun dossier accessible trouve pour le Storage Path : %s"
-            ) % self.storage_path)
+            return
 
         seen_paths = set()
         for scan_path in scan_paths:
@@ -215,6 +213,98 @@ class SaasBackupBrowser(models.TransientModel):
                     if os.path.isfile(full_path) and filename.lower().endswith('.zip') and full_path not in seen_paths:
                         seen_paths.add(full_path)
                         yield self._file_values_from_path(scan_path, full_path)
+
+    def _iter_process_backup_files(self):
+        seen_paths = set()
+
+        for attach in self._get_process_backup_attachments():
+            vals = self._file_values_from_attachment(attach)
+            if not vals or vals['file_path'] in seen_paths:
+                continue
+            seen_paths.add(vals['file_path'])
+            yield vals
+
+        for vals in self._iter_process_zip_files():
+            if vals['file_path'] in seen_paths:
+                continue
+            seen_paths.add(vals['file_path'])
+            yield vals
+
+    def _get_process_backup_attachments(self):
+        Attachment = self.env['ir.attachment'].sudo()
+        attachments = Attachment
+        process = self.backup_process_id.sudo()
+
+        attachments |= self._search_record_attachments(process)
+        attachments |= self._get_attachment_fields(process)
+
+        for record in self._get_process_detail_records(process):
+            attachments |= self._search_record_attachments(record)
+            attachments |= self._get_attachment_fields(record)
+
+        return attachments.filtered(self._is_backup_attachment)
+
+    def _search_record_attachments(self, record):
+        return self.env['ir.attachment'].sudo().search([
+            ('res_model', '=', record._name),
+            ('res_id', '=', record.id),
+            ('store_fname', '!=', False),
+        ])
+
+    def _get_attachment_fields(self, record):
+        attachments = self.env['ir.attachment'].sudo()
+        for field_name, field in record._fields.items():
+            if field.type == 'many2one' and field.comodel_name == 'ir.attachment':
+                if record[field_name]:
+                    attachments |= record[field_name]
+            elif field.type in ('many2many', 'one2many') and field.comodel_name == 'ir.attachment':
+                if record[field_name]:
+                    attachments |= record[field_name]
+        return attachments
+
+    def _get_process_detail_records(self, process):
+        detail_records = []
+        for field_name, field in process._fields.items():
+            if field.type not in ('one2many', 'many2many'):
+                continue
+            marker = '%s %s' % (field_name, field.comodel_name or '')
+            marker = marker.lower()
+            if not any(token in marker for token in ('backup', 'detail', 'line', 'log')):
+                continue
+            detail_records.extend(process[field_name])
+        return detail_records
+
+    def _is_backup_attachment(self, attach):
+        name = (attach.name or '').lower()
+        mimetype = (attach.mimetype or '').lower()
+        return name.endswith('.zip') or mimetype in (
+            'application/zip',
+            'application/x-zip-compressed',
+            'application/octet-stream',
+        )
+
+    def _file_values_from_attachment(self, attach):
+        if not attach.store_fname:
+            return False
+        try:
+            full_path = self.env['ir.attachment']._full_path(attach.store_fname)
+        except Exception:
+            return False
+        if not os.path.isfile(full_path):
+            return False
+
+        stat = os.stat(full_path)
+        return {
+            'name': attach.name or os.path.basename(full_path),
+            'client_name': self.database_name or self.backup_process_id.display_name,
+            'file_path': full_path,
+            'relative_path': attach.name or os.path.basename(full_path),
+            'file_size_mb': stat.st_size / (1024 * 1024),
+            'backup_date': datetime.fromtimestamp(stat.st_mtime),
+            'source': 'filestore',
+            'attachment_id': attach.id,
+            'state': 'available',
+        }
 
     def _get_process_scan_paths(self):
         storage_path = os.path.abspath(os.path.expanduser(self.storage_path or ''))

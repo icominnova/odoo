@@ -178,10 +178,9 @@ class SaasBackupFile(models.Model):
     def _scan_filestore_zip_attachments(self, found_paths, created, updated):
         attachments = self.env['ir.attachment'].sudo().search([
             '&', ('store_fname', '!=', False),
-            '|', '|',
+            '|',
             ('mimetype', '=', 'application/zip'),
             ('name', 'ilike', '%.zip'),
-            ('datas_fname', 'ilike', '%.zip'),
         ])
         for attach in attachments:
             store_fname = attach.store_fname
@@ -194,7 +193,7 @@ class SaasBackupFile(models.Model):
             if not os.path.isfile(full_path):
                 continue
 
-            name = attach.datas_fname or attach.name or os.path.basename(full_path)
+            name = attach.name or os.path.basename(full_path)
             client_name = attach.res_name or attach.res_model or 'Filestore'
             stat = os.stat(full_path)
             size_mb = stat.st_size / (1024 * 1024)
@@ -343,4 +342,3 @@ class SaasBackupFile(models.Model):
             'database.secret', default='odoo-secret'
         )
         return hmac.new(secret.encode(), payload.encode(), digestmod=hashlib.sha256).hexdigest()
-
