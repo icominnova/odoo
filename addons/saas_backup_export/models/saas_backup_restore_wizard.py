@@ -56,7 +56,6 @@ class SaasBackupRestoreWizard(models.TransientModel):
     )
     master_password = fields.Char(
         string='Mot de passe maître Odoo',
-        required=True,
         password=True,
         help="Le mot de passe maître du serveur Odoo (admin_passwd dans odoo.conf).",
     )
@@ -92,6 +91,8 @@ class SaasBackupRestoreWizard(models.TransientModel):
         self.ensure_one()
 
         # 1. Vérifier le mot de passe maître
+        if not self.master_password:
+            raise UserError(_("Le mot de passe maître Odoo est obligatoire."))
         try:
             db_service.check_super(self.master_password)
         except AccessDenied:
