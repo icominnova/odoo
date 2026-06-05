@@ -121,50 +121,6 @@ class SaasBackupController(http.Controller):
             direct_passthrough=True,
         )
 
-    @http.route(
-        '/saas/backup/download_browser_lines',
-        type='http',
-        auth='user',
-        methods=['GET'],
-        csrf=False,
-    )
-    def download_browser_lines(self, ids=None, token=None, **kwargs):
-        if not ids or not token:
-            return request.not_found()
-        if not request.env.user.has_group('base.group_system'):
-            return request.not_found()
-
-        try:
-            line_ids = [int(line_id) for line_id in ids.split(',') if line_id]
-        except ValueError:
-            return request.not_found()
-
-        lines = request.env['saas.backup.browser.line'].sudo().browse(line_ids).exists()
-        if len(lines) != len(set(line_ids)):
-            return request.not_found()
-
-        expected_token = self._generate_browser_lines_token(lines)
-        if not compare_digest(expected_token or '', token or ''):
-            _logger.warning("Tentative de téléchargement filestore avec un token invalide: %s", ids)
-            return request.not_found()
-
-        existing_lines = lines.filtered(lambda line: line.full_path and os.path.exists(line.full_path))
-        if not existing_lines:
-            return request.not_found()
-
-        archive_path = self._build_archive_from_browser_lines(existing_lines)
-        archive_name = datetime.now().strftime('saas_filestore_%Y%m%d_%H%M%S.zip')
-        headers = [
-            ('Content-Type', 'application/zip'),
-            ('Content-Disposition', content_disposition(archive_name)),
-            ('Content-Length', str(os.path.getsize(archive_path))),
-        ]
-        return Response(
-            self._file_iterator(archive_path, unlink=True),
-            headers=headers,
-            direct_passthrough=True,
-        )
-
     def _build_archive(self, backups):
         fd, archive_path = tempfile.mkstemp(prefix='saas_backups_', suffix='.zip')
         os.close(fd)
@@ -173,51 +129,6 @@ class SaasBackupController(http.Controller):
             for backup in backups.sorted(lambda record: (record.client_name or '', record.name or '')):
                 archive.write(backup.file_path, self._archive_name(backup, used_names))
         return archive_path
-
-    def _build_archive_from_browser_lines(self, lines):
-        fd, archive_path = tempfile.mkstemp(prefix='saas_filestore_', suffix='.zip')
-        os.close(fd)
-        used_names = set()
-        with zipfile.ZipFile(archive_path, mode='w', compression=zipfile.ZIP_STORED) as archive:
-            for line in lines.sorted(lambda record: (record.client_name or '', record.name or '')):
-                if os.path.isdir(line.full_path):
-                    self._write_folder_to_archive(archive, line.full_path, line.client_name or line.name, used_names)
-                elif os.path.isfile(line.full_path):
-                    archive.write(line.full_path, self._unique_archive_name(line.name, used_names))
-        return archive_path
-
-    def _write_folder_to_archive(self, archive, folder_path, root_name, used_names):
-        root_name = (root_name or os.path.basename(folder_path)).replace('\\', '/').strip('/')
-        for root, _dirs, files in os.walk(folder_path):
-            for filename in sorted(files, key=str.lower):
-                full_path = os.path.join(root, filename)
-                relative_path = os.path.relpath(full_path, folder_path).replace('\\', '/')
-                archive_name = self._unique_archive_name('%s/%s' % (root_name, relative_path), used_names)
-                archive.write(full_path, archive_name)
-
-    def _unique_archive_name(self, name, used_names):
-        name = (name or 'filestore').replace('\\', '/').lstrip('/')
-        if not name or name.startswith('../') or name == '..':
-            name = 'filestore'
-
-        base, extension = os.path.splitext(name)
-        candidate = name
-        counter = 2
-        while candidate in used_names:
-            candidate = '%s_%s%s' % (base, counter, extension)
-            counter += 1
-        used_names.add(candidate)
-        return candidate
-
-    def _generate_browser_lines_token(self, lines):
-        payload = '|'.join(
-            '%s:%s' % (line.id, line.full_path or '')
-            for line in lines.sorted('id')
-        )
-        secret = request.env['ir.config_parameter'].sudo().get_param(
-            'database.secret', default='odoo-secret'
-        )
-        return request.env['saas.backup.file']._generate_token(payload + secret)
 
     def _archive_name(self, backup, used_names):
         name = (backup.relative_path or backup.name or os.path.basename(backup.file_path)).replace('\\', '/')

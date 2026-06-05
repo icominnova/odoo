@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="1">
+
+    <record id="ir_cron_saas_backup_export_auto_backup" model="ir.cron">
+        <field name="name">SaaS Backup Export - Sauvegardes automatiques</field>
+        <field name="model_id" ref="model_saas_backup_file"/>
+        <field name="state">code</field>
+        <field name="code">model.cron_create_backups_for_all_processes()</field>
+        <field name="interval_number">1</field>
+        <field name="interval_type">days</field>
+        <field name="active">False</field>
+    </record>
+
+</odoo>

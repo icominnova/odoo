@@ -5,6 +5,7 @@ import logging
 import os
 from datetime import datetime
 
+import odoo.service.db as db_service
 from odoo import api, fields, models, _
 from odoo.exceptions import UserError
 
@@ -22,6 +23,14 @@ class SaasBackupFile(models.Model):
     _order = 'backup_date desc, client_name'
 
     name = fields.Char(string='Nom du fichier', readonly=True)
+    backup_process_id = fields.Many2one(
+        'backup.process',
+        string='Backup Process',
+        readonly=True,
+        index=True,
+        ondelete='set null',
+    )
+    database_name = fields.Char(string='Base de données', readonly=True, index=True)
     client_name = fields.Char(string='Client', readonly=True, index=True)
     file_path = fields.Char(string='Chemin complet', readonly=True)
     file_size_mb = fields.Float(string='Taille (Mo)', readonly=True, digits=(16, 2))
@@ -105,6 +114,99 @@ class SaasBackupFile(models.Model):
                 'sticky': False,
             },
         }
+
+    @api.model
+    def action_create_backup_for_process(self, process):
+        process = process.sudo()
+        database_name = self._get_backup_process_value(
+            process,
+            ('database_name', 'db_name', 'database', 'client_db_name'),
+        )
+        storage_path = self._get_backup_process_value(
+            process,
+            ('storage_path', 'backup_path', 'path', 'local_path'),
+        )
+        if not database_name:
+            raise UserError(_("Impossible de trouver le nom de base sur le Backup Process."))
+        if not storage_path:
+            raise UserError(_("Impossible de trouver le Storage Path sur le Backup Process."))
+
+        backup_dir = self._get_process_backup_dir(storage_path)
+        os.makedirs(backup_dir, exist_ok=True)
+
+        timestamp = datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
+        filename = '%s_%s.zip' % (database_name, timestamp)
+        full_path = os.path.join(backup_dir, filename)
+
+        try:
+            with open(full_path, 'wb') as stream:
+                db_service.dump_db(database_name, stream, backup_format='zip', with_filestore=True)
+        except Exception as error:
+            if os.path.exists(full_path):
+                try:
+                    os.unlink(full_path)
+                except OSError:
+                    pass
+            raise UserError(_("Erreur lors de la sauvegarde de %(db)s : %(error)s", db=database_name, error=error))
+
+        vals = self._backup_file_values(
+            full_path,
+            database_name=database_name,
+            client_name=database_name,
+            backup_process_id=process.id,
+            relative_root=backup_dir,
+        )
+        record, _created = self._upsert_backup_file(vals)
+        return record
+
+    @api.model
+    def action_scan_process_backups(self, process):
+        process = process.sudo()
+        database_name = self._get_backup_process_value(
+            process,
+            ('database_name', 'db_name', 'database', 'client_db_name'),
+        )
+        storage_path = self._get_backup_process_value(
+            process,
+            ('storage_path', 'backup_path', 'path', 'local_path'),
+        )
+        if not database_name:
+            raise UserError(_("Impossible de trouver le nom de base sur le Backup Process."))
+        if not storage_path:
+            raise UserError(_("Impossible de trouver le Storage Path sur le Backup Process."))
+
+        backup_dir = self._get_process_backup_dir(storage_path)
+        if not os.path.isdir(backup_dir):
+            return self
+
+        records = self
+        for filename in sorted(os.listdir(backup_dir), key=str.lower):
+            full_path = os.path.join(backup_dir, filename)
+            if not os.path.isfile(full_path) or not filename.lower().endswith('.zip'):
+                continue
+            vals = self._backup_file_values(
+                full_path,
+                database_name=database_name,
+                client_name=database_name,
+                backup_process_id=process.id,
+                relative_root=backup_dir,
+            )
+            record, _created = self._upsert_backup_file(vals)
+            records |= record
+        return records
+
+    @api.model
+    def cron_create_backups_for_all_processes(self):
+        processes = self.env['backup.process'].sudo().search([])
+        for process in processes:
+            try:
+                self.action_create_backup_for_process(process)
+            except Exception:
+                _logger.exception(
+                    "Erreur lors de la sauvegarde automatique du process %s",
+                    process.display_name,
+                )
+        return True
 
     def action_download(self):
         """Retourne l'URL de téléchargement sécurisée pour le fichier backup."""
@@ -204,6 +306,7 @@ class SaasBackupFile(models.Model):
             if existing:
                 existing.write({
                     'name': name,
+                    'database_name': client_name,
                     'client_name': client_name,
                     'file_size_mb': size_mb,
                     'backup_date': backup_date,
@@ -215,6 +318,7 @@ class SaasBackupFile(models.Model):
                 token = self._generate_token(full_path)
                 self.create({
                     'name': name,
+                    'database_name': client_name,
                     'client_name': client_name,
                     'file_path': full_path,
                     'file_size_mb': size_mb,
@@ -245,6 +349,43 @@ class SaasBackupFile(models.Model):
                 path=base_path,
             ))
         return base_path
+
+    @api.model
+    def _get_backup_process_value(self, process, field_names):
+        if not process:
+            return False
+        for field_name in field_names:
+            if field_name not in process._fields:
+                continue
+            value = process[field_name]
+            if hasattr(value, 'display_name'):
+                return value.display_name
+            return value
+        return False
+
+    @api.model
+    def _get_process_backup_dir(self, storage_path):
+        storage_path = os.path.abspath(os.path.expanduser(storage_path or ''))
+        if os.path.basename(storage_path.rstrip(os.sep)) == 'data-dir':
+            instance_path = os.path.dirname(storage_path)
+        else:
+            instance_path = storage_path
+        return os.path.join(instance_path, 'backups')
+
+    @api.model
+    def _backup_file_values(self, full_path, database_name=False, client_name=False, backup_process_id=False, relative_root=False):
+        stat = os.stat(full_path)
+        return {
+            'name': os.path.basename(full_path),
+            'backup_process_id': backup_process_id,
+            'database_name': database_name or client_name,
+            'client_name': client_name or database_name,
+            'file_path': full_path,
+            'file_size_mb': stat.st_size / (1024 * 1024),
+            'backup_date': datetime.fromtimestamp(stat.st_mtime),
+            'relative_path': os.path.relpath(full_path, relative_root) if relative_root else os.path.basename(full_path),
+            'state': 'available',
+        }
 
     @api.model
     def _iter_client_folders(self, base_path=None):
@@ -302,6 +443,7 @@ class SaasBackupFile(models.Model):
         stat = os.stat(full_path)
         return {
             'name': os.path.basename(full_path),
+            'database_name': client_name,
             'client_name': client_name,
             'file_path': full_path,
             'file_size_mb': stat.st_size / (1024 * 1024),

@@ -2,7 +2,7 @@
 <odoo>
 
     <record id="saas_backup_browser_action" model="ir.actions.act_window">
-        <field name="name">Exporter filestore</field>
+        <field name="name">Gérer les backups</field>
         <field name="res_model">saas.backup.browser</field>
         <field name="view_mode">form</field>
         <field name="target">current</field>
@@ -28,25 +28,24 @@
         <field name="name">saas.backup.browser.form</field>
         <field name="model">saas.backup.browser</field>
         <field name="arch" type="xml">
-            <form string="Exporter le filestore">
+            <form string="Gérer les backups SaaS">
                 <sheet>
                     <div class="alert alert-info" role="alert">
-                        <p>Sélectionnez un Backup Process pour charger son dossier filestore, puis exportez directement les éléments cochés.</p>
+                        <p>Sélectionnez un Backup Process, créez un backup complet ou chargez les backups existants, puis téléchargez les éléments cochés.</p>
                     </div>
                     <group>
                         <group string="Parcourir">
                             <field name="backup_process_id" options="{'no_create': True}"/>
                             <field name="database_name"/>
                             <field name="storage_path"/>
-                            <field name="recursive" string="Parcourir les sous-dossiers"/>
-                            <field name="include_filestore" string="Inclure attachments (filestore)"/>
                         </group>
                     </group>
                     <group>
-                        <button name="action_load_files" type="object" string="Charger le dossier filestore" class="btn-primary"/>
-                        <button name="action_export_selected" type="object" string="Exporter la sélection" class="btn-primary"/>
+                        <button name="action_create_backup_now" type="object" string="Sauvegarder maintenant" class="btn-primary"/>
+                        <button name="action_load_files" type="object" string="Charger les backups existants" class="btn-secondary"/>
+                        <button name="action_export_selected" type="object" string="Télécharger la sélection" class="btn-primary"/>
                     </group>
-                    <group string="Éléments disponibles">
+                    <group string="Backups disponibles">
                         <field name="lines" nolabel="1">
                             <list editable="bottom" create="false" delete="false">
                                 <field name="selected"/>

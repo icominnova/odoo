@@ -12,8 +12,8 @@
                 Aucun fichier de sauvegarde trouvé.
             </p>
             <p>
-                Utilisez le menu <b>Parcourir et exporter</b> pour choisir une base,
-                sélectionner les backups ZIP disponibles et les télécharger.
+                Utilisez le menu <b>Gérer les backups</b> pour choisir un Backup Process,
+                créer un backup complet et le télécharger.
             </p>
         </field>
     </record>
