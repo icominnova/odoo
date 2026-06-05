@@ -19,6 +19,7 @@
         'data/saas_backup_cron.xml',
         'views/actions.xml',
         'views/saas_backup_config_views.xml',
+        'views/backup_process_schedule_views.xml',
         'views/saas_backup_browser_views.xml',
         'views/saas_backup_restore_wizard_views.xml',
         'views/saas_backup_file_views.xml',

@@ -97,6 +97,24 @@ class SaasBackupBrowser(models.TransientModel):
             records |= record
         return records.action_download_archive()
 
+    def action_delete_selected(self):
+        selected_lines = self.lines.filtered(lambda line: line.selected)
+        if not selected_lines:
+            raise UserError(_('Aucun fichier selectionne.'))
+
+        records = self.env['saas.backup.file']
+        for line in selected_lines:
+            record, _was_created = self._upsert_line(line)
+            records |= record
+
+        records.action_delete_backup()
+        self.lines.unlink()
+        if self.backup_process_id:
+            backups = self.env['saas.backup.file'].action_scan_process_backups(self.backup_process_id)
+            for backup in backups:
+                self._add_backup_file(backup)
+        return self._reopen()
+
     def _upsert_line(self, line):
         vals = {
             'name': line.name,

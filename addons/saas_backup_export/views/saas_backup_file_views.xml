@@ -15,6 +15,7 @@
                 <field name="state" widget="badge" decoration-success="state == 'available'" decoration-danger="state == 'missing'"/>
                 <button name="action_download" string="Télécharger" type="object" icon="fa-download" invisible="state == 'missing'" class="btn-sm btn-primary"/>
                 <button name="action_open_restore_wizard" string="Restaurer" type="object" icon="fa-history" invisible="state == 'missing'" class="btn-sm btn-warning" groups="base.group_system"/>
+                <button name="action_delete_backup" string="Supprimer" type="object" icon="fa-trash" class="btn-sm btn-danger" groups="base.group_system" confirm="Ce backup sera supprimé du serveur. Continuer ?"/>
             </list>
         </field>
     </record>
@@ -28,6 +29,7 @@
                 <header>
                     <button name="action_download" string="Télécharger" type="object" class="btn-primary" invisible="state == 'missing'"/>
                     <button name="action_open_restore_wizard" string="Restaurer" type="object" class="btn-warning" invisible="state == 'missing'" groups="base.group_system"/>
+                    <button name="action_delete_backup" string="Supprimer" type="object" class="btn-danger" groups="base.group_system" confirm="Ce backup sera supprimé du serveur. Continuer ?"/>
                     <field name="state" widget="statusbar" statusbar_visible="available,missing"/>
                 </header>
                 <sheet>

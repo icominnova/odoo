@@ -44,6 +44,7 @@
                         <button name="action_create_backup_now" type="object" string="Sauvegarder maintenant" class="btn-primary"/>
                         <button name="action_load_files" type="object" string="Charger les backups existants" class="btn-secondary"/>
                         <button name="action_export_selected" type="object" string="Télécharger la sélection" class="btn-primary"/>
+                        <button name="action_delete_selected" type="object" string="Supprimer la sélection" class="btn-danger" confirm="Les backups cochés seront supprimés du serveur. Continuer ?"/>
                     </group>
                     <group string="Backups disponibles">
                         <field name="lines" nolabel="1">

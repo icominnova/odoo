@@ -3,6 +3,7 @@ import hashlib
 import hmac
 import logging
 import os
+import zipfile
 from datetime import datetime
 
 import odoo.service.db as db_service
@@ -139,8 +140,10 @@ class SaasBackupFile(models.Model):
         full_path = os.path.join(backup_dir, filename)
 
         try:
+            filestore_path = self._get_process_filestore_path(storage_path, database_name)
             with open(full_path, 'wb') as stream:
-                db_service.dump_db(database_name, stream, backup_format='zip', with_filestore=True)
+                db_service.dump_db(database_name, stream, backup_format='zip', with_filestore=False)
+            self._add_filestore_to_zip(full_path, filestore_path)
         except Exception as error:
             if os.path.exists(full_path):
                 try:
@@ -197,15 +200,21 @@ class SaasBackupFile(models.Model):
 
     @api.model
     def cron_create_backups_for_all_processes(self):
-        processes = self.env['backup.process'].sudo().search([])
-        for process in processes:
-            try:
-                self.action_create_backup_for_process(process)
-            except Exception:
-                _logger.exception(
-                    "Erreur lors de la sauvegarde automatique du process %s",
-                    process.display_name,
-                )
+        return self.env['backup.process'].saas_run_due_auto_backups()
+
+    @api.model
+    def _apply_process_retention(self, process):
+        retention = process.saas_backup_retention or 0
+        if retention <= 0:
+            return True
+
+        backups = self.search([
+            ('backup_process_id', '=', process.id),
+            ('state', '=', 'available'),
+        ], order='backup_date desc, id desc')
+        old_backups = backups[retention:]
+        if old_backups:
+            old_backups.action_delete_backup()
         return True
 
     def action_download(self):
@@ -234,6 +243,32 @@ class SaasBackupFile(models.Model):
             'type': 'ir.actions.act_url',
             'url': f'/saas/backup/download_archive?ids={ids}&token={token}',
             'target': 'self',
+        }
+
+    def action_delete_backup(self):
+        for record in self:
+            if record.file_path and os.path.isfile(record.file_path):
+                try:
+                    os.unlink(record.file_path)
+                except OSError as error:
+                    raise UserError(_(
+                        "Impossible de supprimer %(file)s : %(error)s",
+                        file=record.file_path,
+                        error=error,
+                    ))
+        self.unlink()
+        return {
+            'type': 'ir.actions.client',
+            'tag': 'display_notification',
+            'params': {
+                'title': _("Suppression terminée"),
+                'message': _(
+                    "%(count)s backup(s) supprimé(s) du serveur.",
+                    count=len(self),
+                ),
+                'type': 'success',
+                'sticky': False,
+            },
         }
 
     def action_open_restore_wizard(self):
@@ -371,6 +406,56 @@ class SaasBackupFile(models.Model):
         else:
             instance_path = storage_path
         return os.path.join(instance_path, 'backups')
+
+    @api.model
+    def _get_process_filestore_path(self, storage_path, database_name):
+        storage_path = os.path.abspath(os.path.expanduser(storage_path or ''))
+        storage_basename = os.path.basename(storage_path.rstrip(os.sep))
+        parent_basename = os.path.basename(os.path.dirname(storage_path).rstrip(os.sep))
+
+        candidates = []
+        if storage_basename == database_name and parent_basename == 'filestore':
+            candidates.append(storage_path)
+        if storage_basename == 'filestore':
+            candidates.append(os.path.join(storage_path, database_name))
+        if storage_basename == 'data-dir':
+            candidates.append(os.path.join(storage_path, 'filestore', database_name))
+
+        candidates.extend([
+            os.path.join(storage_path, 'data-dir', 'filestore', database_name),
+            os.path.join(storage_path, 'filestore', database_name),
+            os.path.join(os.path.dirname(storage_path), 'data-dir', 'filestore', database_name),
+        ])
+
+        checked = []
+        for candidate in candidates:
+            candidate = os.path.abspath(os.path.expanduser(candidate))
+            if candidate in checked:
+                continue
+            checked.append(candidate)
+            if os.path.isdir(candidate):
+                return candidate
+
+        raise UserError(_(
+            "Filestore introuvable pour %(db)s. Chemins vérifiés : %(paths)s",
+            db=database_name,
+            paths=', '.join(checked),
+        ))
+
+    @api.model
+    def _add_filestore_to_zip(self, zip_path, filestore_path):
+        filestore_root = os.path.realpath(filestore_path)
+        with zipfile.ZipFile(zip_path, mode='a', compression=zipfile.ZIP_DEFLATED, allowZip64=True) as archive:
+            archive.writestr('filestore/', '')
+            for root, _dirs, files in os.walk(filestore_root):
+                for filename in sorted(files, key=str.lower):
+                    full_path = os.path.realpath(os.path.join(root, filename))
+                    if not os.path.isfile(full_path):
+                        continue
+                    if os.path.commonpath([filestore_root, full_path]) != filestore_root:
+                        continue
+                    relative_path = os.path.relpath(full_path, filestore_root).replace('\\', '/')
+                    archive.write(full_path, 'filestore/%s' % relative_path)
 
     @api.model
     def _backup_file_values(self, full_path, database_name=False, client_name=False, backup_process_id=False, relative_root=False):

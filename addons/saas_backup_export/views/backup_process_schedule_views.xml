@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="saas_backup_process_schedule_view_list" model="ir.ui.view">
+        <field name="name">backup.process.saas.schedule.list</field>
+        <field name="model">backup.process</field>
+        <field name="arch" type="xml">
+            <list string="Planification des backups" create="false">
+                <field name="name"/>
+                <field name="database_name"/>
+                <field name="storage_path"/>
+                <field name="saas_auto_backup"/>
+                <field name="saas_backup_interval_number"/>
+                <field name="saas_backup_interval_type"/>
+                <field name="saas_backup_time" widget="float_time"/>
+                <field name="saas_next_backup_datetime"/>
+                <field name="saas_backup_retention"/>
+                <field name="saas_last_backup_state" widget="badge" decoration-success="saas_last_backup_state == 'success'" decoration-danger="saas_last_backup_state == 'failed'"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="saas_backup_process_schedule_view_form" model="ir.ui.view">
+        <field name="name">backup.process.saas.schedule.form</field>
+        <field name="model">backup.process</field>
+        <field name="arch" type="xml">
+            <form string="Planification des backups" create="false">
+                <header>
+                    <button name="action_saas_compute_next_backup" type="object" string="Recalculer prochaine sauvegarde" class="btn-secondary"/>
+                </header>
+                <sheet>
+                    <group>
+                        <group string="Backup Process">
+                            <field name="name" readonly="1"/>
+                            <field name="database_name" readonly="1"/>
+                            <field name="storage_path" readonly="1"/>
+                        </group>
+                        <group string="Planification">
+                            <field name="saas_auto_backup"/>
+                            <field name="saas_backup_interval_number" invisible="not saas_auto_backup"/>
+                            <field name="saas_backup_interval_type" invisible="not saas_auto_backup"/>
+                            <field name="saas_backup_time" widget="float_time" invisible="not saas_auto_backup"/>
+                            <field name="saas_next_backup_datetime" invisible="not saas_auto_backup"/>
+                            <field name="saas_backup_retention" invisible="not saas_auto_backup"/>
+                        </group>
+                    </group>
+                    <group string="Dernière exécution">
+                        <field name="saas_last_backup_datetime"/>
+                        <field name="saas_last_backup_state" widget="badge" decoration-success="saas_last_backup_state == 'success'" decoration-danger="saas_last_backup_state == 'failed'"/>
+                        <field name="saas_last_backup_message"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="saas_backup_process_schedule_view_search" model="ir.ui.view">
+        <field name="name">backup.process.saas.schedule.search</field>
+        <field name="model">backup.process</field>
+        <field name="arch" type="xml">
+            <search string="Rechercher une planification">
+                <field name="name"/>
+                <field name="database_name"/>
+                <filter string="Sauvegarde auto active" name="auto_enabled" domain="[('saas_auto_backup', '=', True)]"/>
+                <filter string="Dernier backup échoué" name="last_failed" domain="[('saas_last_backup_state', '=', 'failed')]"/>
+            </search>
+        </field>
+    </record>
+
+    <record id="saas_backup_process_schedule_action" model="ir.actions.act_window">
+        <field name="name">Planification</field>
+        <field name="res_model">backup.process</field>
+        <field name="view_mode">list,form</field>
+        <field name="views" eval="[(ref('saas_backup_process_schedule_view_list'), 'list'), (ref('saas_backup_process_schedule_view_form'), 'form')]"/>
+        <field name="search_view_id" ref="saas_backup_process_schedule_view_search"/>
+        <field name="context">{}</field>
+    </record>
+
+</odoo>
