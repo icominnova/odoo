@@ -2,7 +2,7 @@
 <odoo>
 
     <record id="saas_backup_browser_action" model="ir.actions.act_window">
-        <field name="name">Parcourir backups</field>
+        <field name="name">Exporter filestore</field>
         <field name="res_model">saas.backup.browser</field>
         <field name="view_mode">form</field>
         <field name="target">current</field>
@@ -28,7 +28,7 @@
         <field name="name">saas.backup.browser.form</field>
         <field name="model">saas.backup.browser</field>
         <field name="arch" type="xml">
-            <form string="Ajouter des fichiers de sauvegarde">
+            <form string="Exporter le filestore">
                 <sheet>
                     <div class="alert alert-info" role="alert">
                         <p>Sélectionnez un Backup Process pour charger son dossier filestore, puis exportez directement les éléments cochés.</p>
@@ -43,7 +43,8 @@
                         </group>
                     </group>
                     <group>
-                        <button name="action_load_files" type="object" string="Charger les fichiers" class="btn-primary"/>
+                        <button name="action_load_files" type="object" string="Charger le dossier filestore" class="btn-primary"/>
+                        <button name="action_export_selected" type="object" string="Exporter la sélection" class="btn-primary"/>
                     </group>
                     <group string="Éléments disponibles">
                         <field name="lines" nolabel="1">
@@ -58,11 +59,6 @@
                             </list>
                         </field>
                     </group>
-                    <footer>
-                        <button name="action_export_selected" type="object" string="Exporter selection" class="btn btn-primary"/>
-                        <button name="action_import_selected" type="object" string="Ajouter a la liste" class="btn btn-secondary"/>
-                        <button string="Annuler" class="btn btn-secondary" special="cancel"/>
-                    </footer>
                 </sheet>
             </form>
         </field>
