@@ -39,6 +39,20 @@
                             <field name="database_name"/>
                             <field name="storage_path"/>
                         </group>
+                        <group string="Sauvegarde automatique" invisible="not backup_process_id">
+                            <field name="saas_auto_backup"/>
+                            <field name="saas_backup_interval_number" invisible="not saas_auto_backup"/>
+                            <field name="saas_backup_interval_type" invisible="not saas_auto_backup"/>
+                            <field name="saas_backup_time" widget="float_time" invisible="not saas_auto_backup"/>
+                            <field name="saas_next_backup_datetime" invisible="not saas_auto_backup"/>
+                            <field name="saas_backup_retention" invisible="not saas_auto_backup"/>
+                            <button name="action_recompute_next_backup" type="object" string="Recalculer prochaine sauvegarde" class="btn-secondary" invisible="not saas_auto_backup"/>
+                        </group>
+                    </group>
+                    <group string="Dernière sauvegarde automatique" invisible="not backup_process_id or not saas_auto_backup">
+                        <field name="saas_last_backup_datetime"/>
+                        <field name="saas_last_backup_state" widget="badge" decoration-success="saas_last_backup_state == 'success'" decoration-danger="saas_last_backup_state == 'failed'"/>
+                        <field name="saas_last_backup_message"/>
                     </group>
                     <group>
                         <button name="action_create_backup_now" type="object" string="Sauvegarder maintenant" class="btn-primary"/>

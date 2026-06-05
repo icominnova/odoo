@@ -31,6 +31,49 @@ class SaasBackupBrowser(models.TransientModel):
     database_name = fields.Char(string='Database Name', readonly=True)
     storage_path = fields.Char(string='Storage Path', readonly=True)
     lines = fields.One2many('saas.backup.browser.line', 'wizard_id', string='Fichiers')
+    saas_auto_backup = fields.Boolean(
+        string='Sauvegarde auto',
+        related='backup_process_id.saas_auto_backup',
+        readonly=False,
+    )
+    saas_backup_interval_number = fields.Integer(
+        string='Tous les',
+        related='backup_process_id.saas_backup_interval_number',
+        readonly=False,
+    )
+    saas_backup_interval_type = fields.Selection(
+        related='backup_process_id.saas_backup_interval_type',
+        readonly=False,
+    )
+    saas_backup_time = fields.Float(
+        string='Heure de sauvegarde',
+        related='backup_process_id.saas_backup_time',
+        readonly=False,
+    )
+    saas_next_backup_datetime = fields.Datetime(
+        string='Prochaine sauvegarde',
+        related='backup_process_id.saas_next_backup_datetime',
+        readonly=False,
+    )
+    saas_backup_retention = fields.Integer(
+        string='Backups à garder',
+        related='backup_process_id.saas_backup_retention',
+        readonly=False,
+    )
+    saas_last_backup_datetime = fields.Datetime(
+        string='Dernière sauvegarde',
+        related='backup_process_id.saas_last_backup_datetime',
+        readonly=True,
+    )
+    saas_last_backup_state = fields.Selection(
+        related='backup_process_id.saas_last_backup_state',
+        readonly=True,
+    )
+    saas_last_backup_message = fields.Text(
+        string='Dernier message',
+        related='backup_process_id.saas_last_backup_message',
+        readonly=True,
+    )
 
     @api.onchange('backup_process_id')
     def _onchange_backup_process_id(self):
@@ -113,6 +156,12 @@ class SaasBackupBrowser(models.TransientModel):
             backups = self.env['saas.backup.file'].action_scan_process_backups(self.backup_process_id)
             for backup in backups:
                 self._add_backup_file(backup)
+        return self._reopen()
+
+    def action_recompute_next_backup(self):
+        if not self.backup_process_id:
+            raise UserError(_('Veuillez choisir un Backup Process.'))
+        self.backup_process_id.action_saas_compute_next_backup()
         return self._reopen()
 
     def _upsert_line(self, line):
