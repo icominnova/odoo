@@ -1,6 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
 
+    <record id="saas_backup_config_view_list" model="ir.ui.view">
+        <field name="name">saas.backup.config.list</field>
+        <field name="model">saas.backup.config</field>
+        <field name="arch" type="xml">
+            <list string="Configurations Backup SaaS">
+                <field name="base_path"/>
+                <field name="active"/>
+            </list>
+        </field>
+    </record>
+
     <!-- ===== CONFIGURATION ===== -->
     <record id="saas_backup_config_view_form" model="ir.ui.view">
         <field name="name">saas.backup.config.form</field>
@@ -11,6 +22,7 @@
                     <group>
                         <group string="Stockage local">
                             <field name="base_path" placeholder="/opt/odoo/Odoo-SAAS-Data/"/>
+                            <field name="active"/>
                         </group>
                     </group>
                     <group>

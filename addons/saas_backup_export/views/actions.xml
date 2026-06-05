@@ -12,8 +12,8 @@
                 Aucun fichier de sauvegarde trouvé.
             </p>
             <p>
-                Cliquez sur <b>Nouveau</b> pour parcourir les backups disponibles
-                et les ajouter à la liste.
+                Utilisez le menu <b>Parcourir et exporter</b> pour choisir une base,
+                sélectionner les backups ZIP disponibles et les télécharger.
             </p>
         </field>
     </record>
@@ -40,7 +40,7 @@ action = {
     <record id="saas_backup_config_action" model="ir.actions.act_window">
         <field name="name">Paramètres Backup</field>
         <field name="res_model">saas.backup.config</field>
-        <field name="view_mode">form</field>
+        <field name="view_mode">list,form</field>
         <field name="target">current</field>
     </record>
 

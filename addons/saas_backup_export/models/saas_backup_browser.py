@@ -2,7 +2,7 @@
 import os
 from datetime import datetime
 
-from odoo import api, fields, models, _
+from odoo import fields, models, _
 from odoo.exceptions import UserError
 
 
@@ -12,7 +12,9 @@ class SaasBackupBrowserLine(models.TransientModel):
 
     wizard_id = fields.Many2one('saas.backup.browser', ondelete='cascade')
     name = fields.Char(string='Nom du fichier')
+    client_name = fields.Char(string='Base')
     full_path = fields.Char(string='Chemin complet')
+    relative_path = fields.Char(string='Chemin relatif')
     file_size_mb = fields.Float(string='Taille (Mo)', digits=(16, 2))
     backup_date = fields.Datetime(string='Date de sauvegarde')
     selected = fields.Boolean(string='Sélectionner', default=True)
@@ -25,38 +27,25 @@ class SaasBackupBrowser(models.TransientModel):
     _description = 'Parcourir le dossier de backups'
 
     client_folder = fields.Selection(selection='_get_client_folders', string='Base')
-    recursive = fields.Boolean(string='Parcourir récursivement', default=False)
+    recursive = fields.Boolean(string='Parcourir récursivement', default=True)
     include_filestore = fields.Boolean(string='Inclure le filestore', default=False)
     lines = fields.One2many('saas.backup.browser.line', 'wizard_id', string='Fichiers')
 
     def _get_client_folders(self):
-        config = self.env['saas.backup.config'].search([], limit=1)
-        base = config.base_path.rstrip('/') if config else '/home/odoo/Odoo-SAAS-Data'
         try:
-            entries = sorted(os.listdir(base))
-        except Exception:
+            return self.env['saas.backup.file']._iter_client_folders()
+        except UserError:
             return []
-        choices = []
-        for name in entries:
-            path = os.path.join(base, name)
-            if os.path.isdir(path):
-                choices.append((name, name))
-        return choices
 
-    def _add_local_file(self, full_path, client_name=None):
-        try:
-            stat = os.stat(full_path)
-        except OSError:
-            return False
-        name = os.path.basename(full_path)
-        size_mb = stat.st_size / (1024 * 1024)
-        backup_date = datetime.fromtimestamp(stat.st_mtime)
+    def _add_local_file(self, vals):
         self.env['saas.backup.browser.line'].create({
             'wizard_id': self.id,
-            'name': name,
-            'full_path': full_path,
-            'file_size_mb': size_mb,
-            'backup_date': backup_date,
+            'name': vals['name'],
+            'client_name': vals['client_name'],
+            'full_path': vals['file_path'],
+            'relative_path': vals['relative_path'],
+            'file_size_mb': vals['file_size_mb'],
+            'backup_date': vals['backup_date'],
             'selected': True,
             'source': 'local',
         })
@@ -79,7 +68,9 @@ class SaasBackupBrowser(models.TransientModel):
         self.env['saas.backup.browser.line'].create({
             'wizard_id': self.id,
             'name': name,
+            'client_name': attach.res_name or attach.res_model or 'Filestore',
             'full_path': full_path,
+            'relative_path': name,
             'file_size_mb': size_mb,
             'backup_date': backup_date,
             'selected': True,
@@ -92,30 +83,20 @@ class SaasBackupBrowser(models.TransientModel):
         """Charge les fichiers .zip du dossier sélectionné dans les lignes."""
         if not self.client_folder and not self.include_filestore:
             raise UserError(_('Veuillez choisir une base à parcourir ou cocher Inclure le filestore.'))
-        config = self.env['saas.backup.config'].search([], limit=1)
-        base = config.base_path.rstrip('/') if config else '/home/odoo/Odoo-SAAS-Data'
+        backup_file = self.env['saas.backup.file']
+        base = backup_file._get_base_path()
 
         # vider les lignes existantes
         self.lines.unlink()
 
         # parcourir le dossier local (récursif si demandé)
         if self.client_folder:
-            folder = os.path.join(base, self.client_folder)
-            if not os.path.isdir(folder):
-                raise UserError(_('Le dossier %s n\'existe pas sur le serveur.') % folder)
-            if self.recursive:
-                for root, dirs, files in os.walk(folder):
-                    for filename in sorted(files):
-                        if not filename.lower().endswith('.zip'):
-                            continue
-                        full_path = os.path.join(root, filename)
-                        self._add_local_file(full_path)
-            else:
-                for filename in sorted(os.listdir(folder)):
-                    if not filename.lower().endswith('.zip'):
-                        continue
-                    full_path = os.path.join(folder, filename)
-                    self._add_local_file(full_path)
+            for vals in backup_file._iter_backup_files(
+                base,
+                client_folder=self.client_folder,
+                recursive=self.recursive,
+            ):
+                self._add_local_file(vals)
 
         # inclure les fichiers du filestore si demandé
         if self.include_filestore:
@@ -130,50 +111,60 @@ class SaasBackupBrowser(models.TransientModel):
                 # si client_folder spécifiée, on tente de limiter par res_model/res_name? non
                 self._add_filestore_attachment(attach)
 
-        return {
-            'type': 'ir.actions.client',
-            'tag': 'reload',
-        }
+        line_count = self.env['saas.backup.browser.line'].search_count([('wizard_id', '=', self.id)])
+        if not line_count:
+            raise UserError(_('Aucun fichier .zip trouve pour cette selection.'))
+
+        return self._reopen()
 
     def action_import_selected(self):
         """Crée des enregistrements `saas.backup.file` pour les fichiers sélectionnés."""
-        created = 0
+        imported_records = self.env['saas.backup.file']
         for line in self.lines.filtered(lambda l: l.selected):
-            existing = self.env['saas.backup.file'].search([('file_path', '=', line.full_path)], limit=1)
-            if existing:
-                continue
-            token = self.env['saas.backup.file']._generate_token(line.full_path)
-            self.env['saas.backup.file'].create({
-                'name': line.name,
-                'client_name': self.client_folder or (line.attachment_id.res_model if line.attachment_id else 'Filestore'),
-                'file_path': line.full_path,
-                'file_size_mb': line.file_size_mb,
-                'backup_date': line.backup_date,
-                'state': 'available',
-                'download_token': token,
-            })
-            created += 1
-        
-        # Afficher le nombre de fichiers importés et fermer le wizard
-        if created > 0:
+            record, _was_created = self._upsert_line(line)
+            imported_records |= record
+
+        if imported_records:
             return {
-                'type': 'ir.actions.client',
-                'tag': 'display_notification',
-                'params': {
-                    'title': _('Import réussi'),
-                    'message': _('%s fichier(s) importé(s) avec succès.') % created,
-                    'type': 'success',
-                    'sticky': False,
-                },
+                'type': 'ir.actions.act_window',
+                'name': _('Fichiers de sauvegarde importes'),
+                'res_model': 'saas.backup.file',
+                'view_mode': 'list,form',
+                'domain': [('id', 'in', imported_records.ids)],
+                'context': {'create': False},
             }
-        else:
-            return {
-                'type': 'ir.actions.client',
-                'tag': 'display_notification',
-                'params': {
-                    'title': _('Aucun fichier importé'),
-                    'message': _('Les fichiers sélectionnés existent déjà ou aucun n\'a été sélectionné.'),
-                    'type': 'warning',
-                    'sticky': False,
-                },
-            }
+
+        raise UserError(_('Aucun fichier selectionne.'))
+
+    def action_export_selected(self):
+        selected_lines = self.lines.filtered(lambda line: line.selected)
+        if not selected_lines:
+            raise UserError(_('Aucun fichier selectionne.'))
+
+        records = self.env['saas.backup.file']
+        for line in selected_lines:
+            record, _was_created = self._upsert_line(line)
+            records |= record
+        return records.action_download_archive()
+
+    def _upsert_line(self, line):
+        vals = {
+            'name': line.name,
+            'client_name': line.client_name or self.client_folder or 'Filestore',
+            'file_path': line.full_path,
+            'file_size_mb': line.file_size_mb,
+            'backup_date': line.backup_date,
+            'relative_path': line.relative_path or line.name,
+            'state': 'available',
+        }
+        return self.env['saas.backup.file']._upsert_backup_file(vals)
+
+    def _reopen(self):
+        return {
+            'type': 'ir.actions.act_window',
+            'name': _('Ajouter des backups'),
+            'res_model': self._name,
+            'view_mode': 'form',
+            'res_id': self.id,
+            'target': 'current',
+        }

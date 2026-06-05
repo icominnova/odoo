@@ -6,9 +6,10 @@
         <field name="name">saas.backup.file.list</field>
         <field name="model">saas.backup.file</field>
         <field name="arch" type="xml">
-            <list string="Fichiers de sauvegarde SaaS" decoration-muted="state == 'missing'">
+            <list string="Fichiers de sauvegarde SaaS" create="false" decoration-muted="state == 'missing'">
                 <field name="client_name"/>
                 <field name="name"/>
+                <field name="relative_path" optional="hide"/>
                 <field name="file_size_mb" string="Taille (Mo)" optional="show"/>
                 <field name="backup_date"/>
                 <field name="state" widget="badge" decoration-success="state == 'available'" decoration-danger="state == 'missing'"/>
@@ -38,6 +39,7 @@
                             <field name="file_size_mb"/>
                         </group>
                         <group string="Localisation">
+                            <field name="relative_path"/>
                             <field name="file_path"/>
                             <field name="download_url" widget="url" string="Lien"/>
                         </group>
@@ -73,6 +75,17 @@
         <field name="state">code</field>
         <field name="code">
 action = env['saas.backup.file'].action_scan_backups()
+        </field>
+    </record>
+
+    <record id="saas_backup_export_selected_action" model="ir.actions.server">
+        <field name="name">Exporter sélection</field>
+        <field name="model_id" ref="model_saas_backup_file"/>
+        <field name="binding_model_id" ref="model_saas_backup_file"/>
+        <field name="binding_view_types">list</field>
+        <field name="state">code</field>
+        <field name="code">
+action = records.action_download_archive()
         </field>
     </record>
 

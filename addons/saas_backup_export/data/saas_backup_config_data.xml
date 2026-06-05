@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="1">
+
+    <record id="saas_backup_default_config" model="saas.backup.config">
+        <field name="base_path">/home/odoo/Odoo-SAAS-Data/</field>
+        <field name="active">True</field>
+        <field name="note">Configuration par defaut du dossier des backups SaaS.</field>
+    </record>
+
+</odoo>

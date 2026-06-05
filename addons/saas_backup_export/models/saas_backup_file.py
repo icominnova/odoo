@@ -40,6 +40,7 @@ class SaasBackupFile(models.Model):
         string="Lien de téléchargement",
         compute='_compute_download_url',
     )
+    relative_path = fields.Char(string='Chemin relatif', readonly=True)
 
     # -------------------------------------------------------------------------
     # Compute
@@ -60,65 +61,21 @@ class SaasBackupFile(models.Model):
     # Actions
     # -------------------------------------------------------------------------
 
-    def action_scan_backups(self, domain=None):
+    def action_scan_backups(self):
         """Scanne le dossier racine configuré et crée/met à jour les enregistrements
         pour chaque fichier ZIP trouvé dans les sous-dossiers clients.
         """
-        config = self.env['saas.backup.config'].search([], limit=1)
-        if not config:
-            raise UserError(_(
-                "Aucune configuration trouvée. Veuillez d'abord configurer "
-                "le dossier racine des backups dans Configuration > Paramètres Backup."
-            ))
-
-        base_path = config.base_path.rstrip('/')
-        if not os.path.isdir(base_path):
-            raise UserError(_(
-                "Le dossier %(path)s n'existe pas ou n'est pas accessible.",
-                path=base_path,
-            ))
-
+        base_path = self._get_base_path()
         found_paths = set()
         created = updated = 0
 
-        # Parcourir les sous-dossiers (un par client)
-        for client_folder in sorted(os.listdir(base_path)):
-            client_path = os.path.join(base_path, client_folder)
-            if not os.path.isdir(client_path):
-                continue
-
-            # Chercher tous les fichiers ZIP dans le dossier client
-            for filename in sorted(os.listdir(client_path)):
-                if not filename.lower().endswith('.zip'):
-                    continue
-
-                full_path = os.path.join(client_path, filename)
-                found_paths.add(full_path)
-
-                stat = os.stat(full_path)
-                size_mb = stat.st_size / (1024 * 1024)
-                backup_date = datetime.fromtimestamp(stat.st_mtime)
-
-                existing = self.search([('file_path', '=', full_path)], limit=1)
-                if existing:
-                    existing.write({
-                        'file_size_mb': size_mb,
-                        'backup_date': backup_date,
-                        'state': 'available',
-                    })
-                    updated += 1
-                else:
-                    token = self._generate_token(full_path)
-                    self.create({
-                        'name': filename,
-                        'client_name': client_folder,
-                        'file_path': full_path,
-                        'file_size_mb': size_mb,
-                        'backup_date': backup_date,
-                        'state': 'available',
-                        'download_token': token,
-                    })
-                    created += 1
+        for vals in self._iter_backup_files(base_path, recursive=True):
+            found_paths.add(vals['file_path'])
+            record, was_created = self._upsert_backup_file(vals)
+            if was_created:
+                created += 1
+            else:
+                updated += 1
 
         # Chercher également les ZIP stockés dans le filestore via ir.attachment
         created, updated, found_paths = self._scan_filestore_zip_attachments(
@@ -159,6 +116,21 @@ class SaasBackupFile(models.Model):
         return {
             'type': 'ir.actions.act_url',
             'url': self.download_url,
+            'target': 'self',
+        }
+
+    def action_download_archive(self):
+        records = self.filtered(lambda record: record.state == 'available')
+        if not records:
+            raise UserError(_("Aucun fichier disponible à exporter."))
+        if len(records) == 1:
+            return records.action_download()
+
+        ids = ','.join(str(record.id) for record in records.sorted('id'))
+        token = self._generate_archive_token(records)
+        return {
+            'type': 'ir.actions.act_url',
+            'url': f'/saas/backup/download_archive?ids={ids}&token={token}',
             'target': 'self',
         }
 
@@ -236,6 +208,7 @@ class SaasBackupFile(models.Model):
                     'client_name': client_name,
                     'file_size_mb': size_mb,
                     'backup_date': backup_date,
+                    'relative_path': name,
                     'state': 'available',
                 })
                 updated += 1
@@ -247,11 +220,106 @@ class SaasBackupFile(models.Model):
                     'file_path': full_path,
                     'file_size_mb': size_mb,
                     'backup_date': backup_date,
+                    'relative_path': name,
                     'state': 'available',
                     'download_token': token,
                 })
                 created += 1
         return created, updated, found_paths
+
+    @api.model
+    def _get_config(self):
+        config = self.env['saas.backup.config'].search([('active', '=', True)], limit=1)
+        if not config:
+            raise UserError(_(
+                "Aucune configuration active trouvée. Configurez d'abord "
+                "le dossier racine des backups."
+            ))
+        return config
+
+    @api.model
+    def _get_base_path(self):
+        base_path = os.path.abspath(os.path.expanduser(self._get_config().base_path or ''))
+        if not os.path.isdir(base_path):
+            raise UserError(_(
+                "Le dossier %(path)s n'existe pas ou n'est pas accessible.",
+                path=base_path,
+            ))
+        return base_path
+
+    @api.model
+    def _iter_client_folders(self, base_path=None):
+        base_path = base_path or self._get_base_path()
+        try:
+            entries = sorted(os.listdir(base_path), key=str.lower)
+        except OSError as error:
+            raise UserError(_("Impossible de lire le dossier %(path)s : %(error)s", path=base_path, error=error))
+
+        folders = []
+        for name in entries:
+            full_path = os.path.join(base_path, name)
+            if os.path.isdir(full_path):
+                folders.append((name, name))
+        return folders
+
+    @api.model
+    def _safe_client_path(self, base_path, client_folder):
+        if not client_folder:
+            raise UserError(_("Veuillez choisir une base de donnees."))
+
+        base_real = os.path.realpath(base_path)
+        folder_real = os.path.realpath(os.path.join(base_real, client_folder))
+        if os.path.commonpath([base_real, folder_real]) != base_real:
+            raise UserError(_("Le dossier selectionne n'est pas valide."))
+        if not os.path.isdir(folder_real):
+            raise UserError(_("Le dossier %(path)s n'existe pas sur le serveur.", path=folder_real))
+        return folder_real
+
+    @api.model
+    def _iter_backup_files(self, base_path, client_folder=None, recursive=True):
+        if client_folder:
+            folders = [(client_folder, self._safe_client_path(base_path, client_folder))]
+        else:
+            folders = [
+                (name, os.path.join(base_path, name))
+                for name, _label in self._iter_client_folders(base_path)
+            ]
+
+        for client_name, client_path in folders:
+            if recursive:
+                walker = os.walk(client_path)
+                for root, _dirs, files in walker:
+                    for filename in sorted(files, key=str.lower):
+                        if filename.lower().endswith('.zip'):
+                            yield self._file_values(base_path, client_name, os.path.join(root, filename))
+            else:
+                for filename in sorted(os.listdir(client_path), key=str.lower):
+                    full_path = os.path.join(client_path, filename)
+                    if os.path.isfile(full_path) and filename.lower().endswith('.zip'):
+                        yield self._file_values(base_path, client_name, full_path)
+
+    @api.model
+    def _file_values(self, base_path, client_name, full_path):
+        stat = os.stat(full_path)
+        return {
+            'name': os.path.basename(full_path),
+            'client_name': client_name,
+            'file_path': full_path,
+            'file_size_mb': stat.st_size / (1024 * 1024),
+            'backup_date': datetime.fromtimestamp(stat.st_mtime),
+            'relative_path': os.path.relpath(full_path, base_path),
+            'state': 'available',
+        }
+
+    @api.model
+    def _upsert_backup_file(self, vals):
+        existing = self.search([('file_path', '=', vals['file_path'])], limit=1)
+        if existing:
+            existing.write(vals)
+            return existing, False
+
+        vals = dict(vals, download_token=self._generate_token(vals['file_path']))
+        return self.create(vals), True
 
     @api.model
     def _generate_token(self, file_path):
@@ -265,4 +333,14 @@ class SaasBackupFile(models.Model):
             digestmod=hashlib.sha256,
         ).hexdigest()
 
+    @api.model
+    def _generate_archive_token(self, records):
+        payload = '|'.join(
+            '%s:%s' % (record.id, record.download_token or '')
+            for record in records.sorted('id')
+        )
+        secret = self.env['ir.config_parameter'].sudo().get_param(
+            'database.secret', default='odoo-secret'
+        )
+        return hmac.new(secret.encode(), payload.encode(), digestmod=hashlib.sha256).hexdigest()
 
