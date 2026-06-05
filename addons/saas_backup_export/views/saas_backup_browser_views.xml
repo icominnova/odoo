@@ -35,7 +35,9 @@
                     </div>
                     <group>
                         <group string="Parcourir">
-                            <field name="client_folder"/>
+                            <field name="backup_process_id" options="{'no_create': True}"/>
+                            <field name="database_name"/>
+                            <field name="storage_path"/>
                             <field name="recursive" string="Parcourir les sous-dossiers"/>
                             <field name="include_filestore" string="Inclure attachments (filestore)"/>
                         </group>

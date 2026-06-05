@@ -2,7 +2,7 @@
 import os
 from datetime import datetime
 
-from odoo import fields, models, _
+from odoo import api, fields, models, _
 from odoo.exceptions import UserError
 
 
@@ -26,16 +26,28 @@ class SaasBackupBrowser(models.TransientModel):
     _name = 'saas.backup.browser'
     _description = 'Parcourir le dossier de backups'
 
-    client_folder = fields.Selection(selection='_get_client_folders', string='Base')
+    backup_process_id = fields.Many2one(
+        'backup.process',
+        string='Backup Process',
+        help="Processus de sauvegarde SaaS existant. Le module utilisera son Storage Path.",
+    )
+    database_name = fields.Char(string='Database Name', readonly=True)
+    storage_path = fields.Char(string='Storage Path', readonly=True)
     recursive = fields.Boolean(string='Parcourir récursivement', default=True)
     include_filestore = fields.Boolean(string='Inclure le filestore', default=False)
     lines = fields.One2many('saas.backup.browser.line', 'wizard_id', string='Fichiers')
 
-    def _get_client_folders(self):
-        try:
-            return self.env['saas.backup.file']._iter_client_folders()
-        except UserError:
-            return []
+    @api.onchange('backup_process_id')
+    def _onchange_backup_process_id(self):
+        self.lines = [(5, 0, 0)]
+        self.database_name = self._get_backup_process_value(
+            self.backup_process_id,
+            ('database_name', 'db_name', 'database', 'client_db_name'),
+        )
+        self.storage_path = self._get_backup_process_value(
+            self.backup_process_id,
+            ('storage_path', 'backup_path', 'path', 'local_path'),
+        )
 
     def _add_local_file(self, vals):
         self.env['saas.backup.browser.line'].create({
@@ -81,21 +93,15 @@ class SaasBackupBrowser(models.TransientModel):
 
     def action_load_files(self):
         """Charge les fichiers .zip du dossier sélectionné dans les lignes."""
-        if not self.client_folder and not self.include_filestore:
-            raise UserError(_('Veuillez choisir une base à parcourir ou cocher Inclure le filestore.'))
-        backup_file = self.env['saas.backup.file']
-        base = backup_file._get_base_path()
+        if not self.backup_process_id and not self.include_filestore:
+            raise UserError(_('Veuillez choisir un Backup Process ou cocher Inclure le filestore.'))
 
         # vider les lignes existantes
         self.lines.unlink()
 
-        # parcourir le dossier local (récursif si demandé)
-        if self.client_folder:
-            for vals in backup_file._iter_backup_files(
-                base,
-                client_folder=self.client_folder,
-                recursive=self.recursive,
-            ):
+        if self.backup_process_id:
+            self._refresh_process_info()
+            for vals in self._iter_process_zip_files():
                 self._add_local_file(vals)
 
         # inclure les fichiers du filestore si demandé
@@ -108,7 +114,6 @@ class SaasBackupBrowser(models.TransientModel):
                 ('datas_fname', 'ilike', '%.zip'),
             ])
             for attach in attachments:
-                # si client_folder spécifiée, on tente de limiter par res_model/res_name? non
                 self._add_filestore_attachment(attach)
 
         line_count = self.env['saas.backup.browser.line'].search_count([('wizard_id', '=', self.id)])
@@ -150,7 +155,7 @@ class SaasBackupBrowser(models.TransientModel):
     def _upsert_line(self, line):
         vals = {
             'name': line.name,
-            'client_name': line.client_name or self.client_folder or 'Filestore',
+            'client_name': line.client_name or self.database_name or 'Filestore',
             'file_path': line.full_path,
             'file_size_mb': line.file_size_mb,
             'backup_date': line.backup_date,
@@ -158,6 +163,90 @@ class SaasBackupBrowser(models.TransientModel):
             'state': 'available',
         }
         return self.env['saas.backup.file']._upsert_backup_file(vals)
+
+    def _refresh_process_info(self):
+        self.ensure_one()
+        self.database_name = self._get_backup_process_value(
+            self.backup_process_id,
+            ('database_name', 'db_name', 'database', 'client_db_name'),
+        )
+        self.storage_path = self._get_backup_process_value(
+            self.backup_process_id,
+            ('storage_path', 'backup_path', 'path', 'local_path'),
+        )
+        if not self.storage_path:
+            raise UserError(_(
+                "Impossible de trouver le Storage Path sur le modele backup.process. "
+                "Verifiez le nom technique du champ dans le menu développeur."
+            ))
+
+    def _get_backup_process_value(self, process, field_names):
+        if not process:
+            return False
+        for field_name in field_names:
+            if field_name not in process._fields:
+                continue
+            value = process[field_name]
+            if hasattr(value, 'display_name'):
+                return value.display_name
+            return value
+        return False
+
+    def _iter_process_zip_files(self):
+        self.ensure_one()
+        scan_paths = self._get_process_scan_paths()
+        if not scan_paths:
+            raise UserError(_(
+                "Aucun dossier accessible trouve pour le Storage Path : %s"
+            ) % self.storage_path)
+
+        seen_paths = set()
+        for scan_path in scan_paths:
+            if self.recursive:
+                for root, _dirs, files in os.walk(scan_path):
+                    for filename in sorted(files, key=str.lower):
+                        full_path = os.path.join(root, filename)
+                        if filename.lower().endswith('.zip') and full_path not in seen_paths:
+                            seen_paths.add(full_path)
+                            yield self._file_values_from_path(scan_path, full_path)
+            else:
+                for filename in sorted(os.listdir(scan_path), key=str.lower):
+                    full_path = os.path.join(scan_path, filename)
+                    if os.path.isfile(full_path) and filename.lower().endswith('.zip') and full_path not in seen_paths:
+                        seen_paths.add(full_path)
+                        yield self._file_values_from_path(scan_path, full_path)
+
+    def _get_process_scan_paths(self):
+        storage_path = os.path.abspath(os.path.expanduser(self.storage_path or ''))
+        candidates = [storage_path]
+
+        if os.path.basename(storage_path.rstrip(os.sep)) == 'data-dir':
+            candidates.append(os.path.dirname(storage_path))
+        else:
+            candidates.append(os.path.join(storage_path, 'data-dir'))
+
+        scan_paths = []
+        seen_real_paths = set()
+        for candidate in candidates:
+            real_path = os.path.realpath(candidate)
+            if real_path in seen_real_paths:
+                continue
+            seen_real_paths.add(real_path)
+            if os.path.isdir(real_path):
+                scan_paths.append(real_path)
+        return scan_paths
+
+    def _file_values_from_path(self, scan_path, full_path):
+        stat = os.stat(full_path)
+        return {
+            'name': os.path.basename(full_path),
+            'client_name': self.database_name or self.backup_process_id.display_name,
+            'file_path': full_path,
+            'relative_path': os.path.relpath(full_path, scan_path),
+            'file_size_mb': stat.st_size / (1024 * 1024),
+            'backup_date': datetime.fromtimestamp(stat.st_mtime),
+            'state': 'available',
+        }
 
     def _reopen(self):
         return {

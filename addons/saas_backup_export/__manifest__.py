@@ -12,7 +12,7 @@
         - Restaurer une sauvegarde dans une base existante ou nouvelle
     """,
     'author': 'Alain Gansonré',
-    'depends': ['base', 'mail'],
+    'depends': ['base', 'mail', 'wk_backup_restore'],
     'data': [
         'security/ir.model.access.csv',
         'data/saas_backup_config_data.xml',
