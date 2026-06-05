@@ -18,7 +18,11 @@ class SaasBackupBrowserLine(models.TransientModel):
     file_size_mb = fields.Float(string='Taille (Mo)', digits=(16, 2))
     backup_date = fields.Datetime(string='Date de sauvegarde')
     selected = fields.Boolean(string='Sélectionner', default=True)
-    source = fields.Selection([('local', 'Local'), ('filestore', 'Filestore')], string='Source', default='local')
+    source = fields.Selection([
+        ('local', 'Local'),
+        ('filestore', 'Filestore'),
+        ('folder', 'Dossier'),
+    ], string='Source', default='local')
     attachment_id = fields.Many2one('ir.attachment', string='Attachment')
 
 
@@ -93,7 +97,7 @@ class SaasBackupBrowser(models.TransientModel):
         return True
 
     def action_load_files(self):
-        """Charge les fichiers .zip du dossier sélectionné dans les lignes."""
+        """Charge le dossier filestore du Backup Process sélectionné."""
         if not self.backup_process_id and not self.include_filestore:
             raise UserError(_('Veuillez choisir un Backup Process ou cocher Inclure le filestore.'))
 
@@ -102,8 +106,7 @@ class SaasBackupBrowser(models.TransientModel):
 
         if self.backup_process_id:
             self._refresh_process_info()
-            for vals in self._iter_process_backup_files():
-                self._add_local_file(vals)
+            self._add_process_filestore_folder()
 
         # inclure les fichiers du filestore si demandé
         if self.include_filestore:
@@ -118,12 +121,15 @@ class SaasBackupBrowser(models.TransientModel):
 
         line_count = self.env['saas.backup.browser.line'].search_count([('wizard_id', '=', self.id)])
         if not line_count:
-            raise UserError(_('Aucun fichier .zip trouve pour cette selection.'))
+            raise UserError(_('Aucun dossier filestore accessible trouve pour cette selection.'))
 
         return self._reopen()
 
     def action_import_selected(self):
         """Crée des enregistrements `saas.backup.file` pour les fichiers sélectionnés."""
+        if self.lines.filtered(lambda line: line.selected and os.path.isdir(line.full_path)):
+            raise UserError(_('Les dossiers filestore doivent être exportés directement, pas ajoutés à la liste des fichiers.'))
+
         imported_records = self.env['saas.backup.file']
         for line in self.lines.filtered(lambda l: l.selected):
             record, _was_created = self._upsert_line(line)
@@ -147,7 +153,13 @@ class SaasBackupBrowser(models.TransientModel):
             raise UserError(_('Aucun fichier selectionne.'))
 
         records = self.env['saas.backup.file']
-        for line in selected_lines:
+        folder_lines = selected_lines.filtered(lambda line: os.path.isdir(line.full_path))
+        file_lines = selected_lines - folder_lines
+
+        if folder_lines:
+            return self._download_browser_lines(selected_lines)
+
+        for line in file_lines:
             record, _was_created = self._upsert_line(line)
             records |= record
         return records.action_download_archive()
@@ -163,6 +175,75 @@ class SaasBackupBrowser(models.TransientModel):
             'state': 'available',
         }
         return self.env['saas.backup.file']._upsert_backup_file(vals)
+
+    def _add_process_filestore_folder(self):
+        filestore_path = self._get_process_filestore_path()
+        if not filestore_path:
+            return False
+
+        stat = os.stat(filestore_path)
+        self.env['saas.backup.browser.line'].create({
+            'wizard_id': self.id,
+            'name': 'filestore',
+            'client_name': self.database_name or self.backup_process_id.display_name,
+            'full_path': filestore_path,
+            'relative_path': os.path.basename(filestore_path),
+            'file_size_mb': self._get_folder_size_mb(filestore_path),
+            'backup_date': datetime.fromtimestamp(stat.st_mtime),
+            'selected': True,
+            'source': 'folder',
+        })
+        return True
+
+    def _get_process_filestore_path(self):
+        storage_path = os.path.abspath(os.path.expanduser(self.storage_path or ''))
+        candidates = []
+
+        if os.path.basename(storage_path.rstrip(os.sep)) == 'data-dir':
+            candidates.append(os.path.join(storage_path, 'filestore'))
+        else:
+            candidates.append(os.path.join(storage_path, 'data-dir', 'filestore'))
+            candidates.append(os.path.join(storage_path, 'filestore'))
+
+        if self.database_name:
+            for candidate in list(candidates):
+                candidates.append(os.path.join(candidate, self.database_name))
+
+        for candidate in candidates:
+            real_path = os.path.realpath(candidate)
+            if os.path.isdir(real_path):
+                return real_path
+        return False
+
+    def _get_folder_size_mb(self, folder_path):
+        total_size = 0
+        for root, _dirs, files in os.walk(folder_path):
+            for filename in files:
+                full_path = os.path.join(root, filename)
+                try:
+                    total_size += os.path.getsize(full_path)
+                except OSError:
+                    continue
+        return total_size / (1024 * 1024)
+
+    def _download_browser_lines(self, lines):
+        token = self._generate_lines_token(lines)
+        ids = ','.join(str(line.id) for line in lines.sorted('id'))
+        return {
+            'type': 'ir.actions.act_url',
+            'url': f'/saas/backup/download_browser_lines?ids={ids}&token={token}',
+            'target': 'self',
+        }
+
+    def _generate_lines_token(self, lines):
+        payload = '|'.join(
+            '%s:%s' % (line.id, line.full_path or '')
+            for line in lines.sorted('id')
+        )
+        secret = self.env['ir.config_parameter'].sudo().get_param(
+            'database.secret', default='odoo-secret'
+        )
+        return self.env['saas.backup.file']._generate_token(payload + secret)
 
     def _refresh_process_info(self):
         self.ensure_one()

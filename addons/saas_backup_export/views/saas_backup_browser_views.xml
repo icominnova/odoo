@@ -31,7 +31,7 @@
             <form string="Ajouter des fichiers de sauvegarde">
                 <sheet>
                     <div class="alert alert-info" role="alert">
-                        <p>Sélectionnez une base pour voir les fichiers .zip disponibles, puis exportez directement les fichiers cochés.</p>
+                        <p>Sélectionnez un Backup Process pour charger son dossier filestore, puis exportez directement les éléments cochés.</p>
                     </div>
                     <group>
                         <group string="Parcourir">
@@ -45,7 +45,7 @@
                     <group>
                         <button name="action_load_files" type="object" string="Charger les fichiers" class="btn-primary"/>
                     </group>
-                    <group string="Fichiers disponibles">
+                    <group string="Éléments disponibles">
                         <field name="lines" nolabel="1">
                             <list editable="bottom" create="false" delete="false">
                                 <field name="selected"/>
