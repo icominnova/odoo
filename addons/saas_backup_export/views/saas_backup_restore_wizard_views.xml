@@ -36,6 +36,10 @@
 
                     <group string="Base de données cible">
                         <field name="db_name" placeholder="ex: client001_restaure"/>
+                        <div class="text-muted" colspan="2">
+                            En mode écrasement, utilisez le nom exact de la base existante.
+                            Exemple : testwk.odoo.sunsoftbf.com, pas seulement testwk.
+                        </div>
                         <field name="neutralize"/>
                         <field name="confirm_overwrite" invisible="mode != 'overwrite'" required="mode == 'overwrite'"/>
                     </group>

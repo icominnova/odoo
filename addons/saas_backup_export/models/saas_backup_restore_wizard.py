@@ -78,11 +78,11 @@ class SaasBackupRestoreWizard(models.TransientModel):
 
     @api.onchange('backup_file_id')
     def _onchange_backup_file_id(self):
-        if self.backup_file_id and self.backup_file_id.client_name:
-            # Proposer le nom du client comme nom de base par défaut
-            self.db_name = self.backup_file_id.client_name.replace(
-                '.odoo.sunsoftbf.com', ''
-            ).replace('.', '_').replace('-', '_').lower()
+        self._set_default_target_database_name()
+
+    @api.onchange('mode')
+    def _onchange_mode(self):
+        self._set_default_target_database_name()
 
     # -------------------------------------------------------------------------
     # Action principale
@@ -122,6 +122,18 @@ class SaasBackupRestoreWizard(models.TransientModel):
                     "Vous devez cocher la case de confirmation pour écraser une base existante."
                 ))
             existing_dbs = db_service.list_dbs(True)
+            if db_name not in existing_dbs:
+                suggested_db = self._get_backup_database_name()
+                message = _(
+                    "La base cible '%(db)s' n'existe pas, donc elle ne peut pas être écrasée.",
+                    db=db_name,
+                )
+                if suggested_db:
+                    message += _(
+                        "\n\nPour remplacer la base sauvegardée, utilisez exactement : %(db)s",
+                        db=suggested_db,
+                    )
+                raise UserError(message)
             if db_name in existing_dbs:
                 _logger.warning(
                     "Restauration SaaS : suppression de la base '%s' demandée par '%s'",
@@ -167,6 +179,28 @@ class SaasBackupRestoreWizard(models.TransientModel):
                 'sticky': True,
             },
         }
+
+    def _set_default_target_database_name(self):
+        for wizard in self:
+            if not wizard.backup_file_id:
+                continue
+            if wizard.mode == 'overwrite':
+                wizard.db_name = wizard._get_backup_database_name()
+            else:
+                wizard.db_name = wizard._get_suggested_new_database_name()
+
+    def _get_backup_database_name(self):
+        self.ensure_one()
+        return self.backup_file_id.database_name or self.backup_file_id.client_name or ''
+
+    def _get_suggested_new_database_name(self):
+        self.ensure_one()
+        source_name = self._get_backup_database_name()
+        if not source_name:
+            return ''
+        return source_name.replace(
+            '.odoo.sunsoftbf.com', ''
+        ).replace('.', '_').replace('-', '_').lower()
 
     def _check_restore_master_password(self, password):
         self.ensure_one()
