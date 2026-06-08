@@ -13,6 +13,7 @@
     """,
     'author': 'Alain Gansonré',
     'depends': ['base', 'mail', 'wk_backup_restore'],
+    'images': ['static/description/icon.png'],
     'data': [
         'security/ir.model.access.csv',
         'data/saas_backup_config_data.xml',
