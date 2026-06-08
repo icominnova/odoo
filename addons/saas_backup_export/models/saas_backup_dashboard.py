@@ -69,9 +69,6 @@ class SaasBackupDashboard(models.Model):
     def action_open_backups(self):
         return self.env.ref('saas_backup_export.saas_backup_file_action').read()[0]
 
-    def action_open_schedule(self):
-        return self.env.ref('saas_backup_export.saas_backup_active_schedule_action').read()[0]
-
     def action_open_due_schedule(self):
         now = fields.Datetime.now()
         action = self.env.ref('saas_backup_export.saas_backup_process_schedule_action').read()[0]
@@ -86,10 +83,6 @@ class SaasBackupDashboard(models.Model):
 
     def action_open_logs(self):
         return self.env.ref('saas_backup_export.saas_backup_log_action').read()[0]
-
-    def action_clear_logs(self):
-        self.env['saas.backup.log'].sudo().search([]).unlink()
-        return self.action_open_logs()
 
     def action_reactivate_cron(self):
         cron = self.env.ref(

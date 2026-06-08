@@ -6,6 +6,9 @@
         <field name="model">saas.backup.log</field>
         <field name="arch" type="xml">
             <list string="Historique des backups" create="false" edit="false" delete="true" decoration-success="state == 'success'" decoration-danger="state == 'failed'" decoration-info="state == 'running'">
+                <header>
+                    <button name="action_clear_all_logs" type="object" string="Vider l'historique" class="btn-danger" display="always" confirm="Vider tout l'historique des sauvegardes ? Cette action ne supprime pas les fichiers backup."/>
+                </header>
                 <field name="execution_datetime"/>
                 <field name="scheduled_datetime"/>
                 <field name="backup_process_id"/>

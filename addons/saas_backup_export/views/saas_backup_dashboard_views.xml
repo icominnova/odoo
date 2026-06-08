@@ -12,33 +12,35 @@
             <form string="Gérer les backups" create="false" edit="false" delete="false">
                 <sheet>
                     <group>
-                        <group string="Résumé">
-                            <field name="backup_count"/>
-                            <field name="auto_process_count"/>
-                            <field name="due_process_count"/>
-                            <field name="failed_log_count"/>
+                        <group>
+                            <group string="Résumé">
+                                <field name="backup_count"/>
+                                <field name="auto_process_count"/>
+                                <field name="due_process_count"/>
+                                <field name="failed_log_count"/>
+                            </group>
+                            <group string="Automatisation">
+                                <field name="cron_active"/>
+                                <field name="cron_nextcall"/>
+                                <field name="cron_lastcall"/>
+                                <button name="action_reactivate_cron" type="object" string="Réactiver le cron auto" class="btn-secondary"/>
+                            </group>
                         </group>
-                        <group string="Derniers repères">
-                            <field name="latest_backup_id"/>
-                            <field name="next_process_id"/>
-                            <field name="next_backup_datetime"/>
+                        <group>
+                            <group string="Derniers repères">
+                                <field name="latest_backup_id"/>
+                                <field name="next_process_id"/>
+                                <field name="next_backup_datetime"/>
+                            </group>
+                            <group string="Actions">
+                                <button name="action_open_backup_wizard" type="object" string="Créer ou gérer un backup" class="btn-primary"/>
+                                <button name="action_open_backups" type="object" string="Voir les backups" class="btn-secondary"/>
+                                <button name="action_open_logs" type="object" string="Voir l'historique" class="btn-secondary"/>
+                                <button name="action_open_due_schedule" type="object" string="Voir les sauvegardes dues" class="btn-secondary"/>
+                                <button name="action_run_due_auto_backups" type="object" string="Lancer les sauvegardes dues" class="btn-primary"/>
+                                <button name="action_open_failed_logs" type="object" string="Voir les échecs" class="btn-danger"/>
+                            </group>
                         </group>
-                        <group string="Automatisation">
-                            <field name="cron_active"/>
-                            <field name="cron_nextcall"/>
-                            <field name="cron_lastcall"/>
-                            <button name="action_reactivate_cron" type="object" string="Réactiver le cron auto" class="btn-secondary"/>
-                        </group>
-                    </group>
-                    <group string="Actions">
-                        <button name="action_open_backup_wizard" type="object" string="Créer ou gérer un backup" class="btn-primary"/>
-                        <button name="action_open_backups" type="object" string="Voir les backups" class="btn-secondary"/>
-                        <button name="action_open_schedule" type="object" string="Modifier les programmations actives" class="btn-secondary"/>
-                        <button name="action_open_logs" type="object" string="Voir l'historique" class="btn-secondary"/>
-                        <button name="action_clear_logs" type="object" string="Vider l'historique" class="btn-danger" confirm="Vider tout l'historique des sauvegardes ? Cette action ne supprime pas les fichiers backup."/>
-                        <button name="action_open_due_schedule" type="object" string="Voir les sauvegardes dues" class="btn-secondary"/>
-                        <button name="action_run_due_auto_backups" type="object" string="Lancer les sauvegardes dues" class="btn-primary"/>
-                        <button name="action_open_failed_logs" type="object" string="Voir les échecs" class="btn-danger"/>
                     </group>
                 </sheet>
             </form>

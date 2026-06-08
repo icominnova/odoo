@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from odoo import fields, models
+from odoo import fields, models, _
 
 
 class SaasBackupLog(models.Model):
@@ -39,3 +39,17 @@ class SaasBackupLog(models.Model):
     scheduled_datetime = fields.Datetime(string='Date programmée')
     execution_datetime = fields.Datetime(string='Date exécution', default=fields.Datetime.now)
     message = fields.Text(string='Message')
+
+    def action_clear_all_logs(self):
+        self.sudo().search([]).unlink()
+        return {
+            'type': 'ir.actions.client',
+            'tag': 'display_notification',
+            'params': {
+                'title': _("Historique vidé"),
+                'message': _("Tous les événements d'historique ont été supprimés."),
+                'type': 'success',
+                'sticky': False,
+                'next': {'type': 'ir.actions.client', 'tag': 'reload'},
+            },
+        }
