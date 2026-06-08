@@ -46,7 +46,9 @@
                             <field name="saas_backup_time" widget="float_time" invisible="not saas_auto_backup"/>
                             <field name="saas_next_backup_datetime" invisible="not saas_auto_backup"/>
                             <field name="saas_backup_retention" invisible="not saas_auto_backup"/>
+                            <button name="action_save_auto_backup_schedule" type="object" string="Enregistrer la programmation" class="btn-primary" invisible="not saas_auto_backup"/>
                             <button name="action_recompute_next_backup" type="object" string="Recalculer prochaine sauvegarde" class="btn-secondary" invisible="not saas_auto_backup"/>
+                            <button name="action_run_due_auto_backups" type="object" string="Lancer les sauvegardes dues" class="btn-secondary" invisible="not saas_auto_backup"/>
                         </group>
                     </group>
                     <group string="Dernière sauvegarde automatique" invisible="not backup_process_id or not saas_auto_backup">

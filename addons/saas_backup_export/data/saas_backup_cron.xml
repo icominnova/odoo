@@ -1,13 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
 
+    <function model="ir.model.data" name="write">
+        <function model="ir.model.data" name="search">
+            <value eval="[('module', '=', 'saas_backup_export'), ('name', '=', 'ir_cron_saas_backup_export_auto_backup')]"/>
+        </function>
+        <value eval="{'noupdate': False}"/>
+    </function>
+
     <record id="ir_cron_saas_backup_export_auto_backup" model="ir.cron">
         <field name="name">SaaS Backup Export - Sauvegardes automatiques</field>
         <field name="model_id" ref="model_saas_backup_file"/>
         <field name="state">code</field>
         <field name="code">model.cron_create_backups_for_all_processes()</field>
-        <field name="interval_number">1</field>
-        <field name="interval_type">hours</field>
+        <field name="interval_number">5</field>
+        <field name="interval_type">minutes</field>
         <field name="active">True</field>
     </record>
 

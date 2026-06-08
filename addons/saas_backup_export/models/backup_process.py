@@ -97,15 +97,34 @@ class BackupProcess(models.Model):
         ])
         backup_model = self.env['saas.backup.file'].sudo()
         for process in processes:
+            scheduled_datetime = process.saas_next_backup_datetime
+            process._saas_log_event(
+                'auto_started',
+                state='running',
+                scheduled_datetime=scheduled_datetime,
+                message=_('Sauvegarde automatique démarrée.'),
+            )
             try:
                 backup = backup_model.action_create_backup_for_process(process)
                 backup_model._apply_process_retention(process)
+                next_backup_datetime = process._saas_next_datetime(now)
                 process.write({
                     'saas_last_backup_datetime': now,
                     'saas_last_backup_state': 'success',
                     'saas_last_backup_message': _('Backup créé : %s') % backup.name,
-                    'saas_next_backup_datetime': process._saas_next_datetime(now),
+                    'saas_next_backup_datetime': next_backup_datetime,
                 })
+                process._saas_log_event(
+                    'auto_success',
+                    state='success',
+                    backup=backup,
+                    scheduled_datetime=scheduled_datetime,
+                    message=_(
+                        "Backup créé : %(backup)s. Prochaine sauvegarde : %(next)s",
+                        backup=backup.name,
+                        next=next_backup_datetime,
+                    ),
+                )
             except Exception as error:
                 _logger.exception(
                     "Erreur lors de la sauvegarde automatique du process %s",
@@ -116,6 +135,12 @@ class BackupProcess(models.Model):
                     'saas_last_backup_state': 'failed',
                     'saas_last_backup_message': str(error),
                 })
+                process._saas_log_event(
+                    'auto_failed',
+                    state='failed',
+                    scheduled_datetime=scheduled_datetime,
+                    message=str(error),
+                )
         return True
 
     def _saas_next_datetime(self, from_dt):
@@ -152,3 +177,30 @@ class BackupProcess(models.Model):
                 return value.display_name
             return value
         return False
+
+    def _saas_log_event(self, event_type, state='info', message=False, backup=False, scheduled_datetime=False):
+        self.ensure_one()
+        return self.env['saas.backup.log'].sudo().create({
+            'name': self._saas_log_name(event_type, state),
+            'backup_process_id': self.id,
+            'backup_file_id': backup.id if backup else False,
+            'database_name': self._saas_get_process_value((
+                'database_name',
+                'db_name',
+                'database',
+                'client_db_name',
+            )),
+            'event_type': event_type,
+            'state': state,
+            'scheduled_datetime': scheduled_datetime or self.saas_next_backup_datetime,
+            'execution_datetime': fields.Datetime.now(),
+            'message': message,
+        })
+
+    def _saas_log_name(self, event_type, state):
+        labels = dict(self.env['saas.backup.log']._fields['event_type'].selection)
+        state_labels = dict(self.env['saas.backup.log']._fields['state'].selection)
+        return '%s - %s' % (
+            labels.get(event_type, event_type),
+            state_labels.get(state, state),
+        )

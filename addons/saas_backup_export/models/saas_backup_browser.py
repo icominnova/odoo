@@ -31,49 +31,35 @@ class SaasBackupBrowser(models.TransientModel):
     database_name = fields.Char(string='Database Name', readonly=True)
     storage_path = fields.Char(string='Storage Path', readonly=True)
     lines = fields.One2many('saas.backup.browser.line', 'wizard_id', string='Fichiers')
-    saas_auto_backup = fields.Boolean(
-        string='Sauvegarde auto',
-        related='backup_process_id.saas_auto_backup',
-        readonly=False,
-    )
+    saas_auto_backup = fields.Boolean(string='Sauvegarde auto')
     saas_backup_interval_number = fields.Integer(
         string='Tous les',
-        related='backup_process_id.saas_backup_interval_number',
-        readonly=False,
+        default=1,
     )
     saas_backup_interval_type = fields.Selection(
-        related='backup_process_id.saas_backup_interval_type',
-        readonly=False,
+        selection=[
+            ('days', 'Jour(s)'),
+            ('weeks', 'Semaine(s)'),
+            ('months', 'Mois'),
+        ],
+        string='Période',
+        default='days',
     )
     saas_backup_time = fields.Float(
         string='Heure de sauvegarde',
-        related='backup_process_id.saas_backup_time',
-        readonly=False,
+        default=2.0,
     )
-    saas_next_backup_datetime = fields.Datetime(
-        string='Prochaine sauvegarde',
-        related='backup_process_id.saas_next_backup_datetime',
-        readonly=False,
-    )
+    saas_next_backup_datetime = fields.Datetime(string='Prochaine sauvegarde')
     saas_backup_retention = fields.Integer(
         string='Backups à garder',
-        related='backup_process_id.saas_backup_retention',
-        readonly=False,
+        default=5,
     )
-    saas_last_backup_datetime = fields.Datetime(
-        string='Dernière sauvegarde',
-        related='backup_process_id.saas_last_backup_datetime',
-        readonly=True,
-    )
-    saas_last_backup_state = fields.Selection(
-        related='backup_process_id.saas_last_backup_state',
-        readonly=True,
-    )
-    saas_last_backup_message = fields.Text(
-        string='Dernier message',
-        related='backup_process_id.saas_last_backup_message',
-        readonly=True,
-    )
+    saas_last_backup_datetime = fields.Datetime(string='Dernière sauvegarde', readonly=True)
+    saas_last_backup_state = fields.Selection([
+        ('success', 'Succès'),
+        ('failed', 'Échec'),
+    ], string='Dernier état', readonly=True)
+    saas_last_backup_message = fields.Text(string='Dernier message', readonly=True)
 
     @api.onchange('backup_process_id')
     def _onchange_backup_process_id(self):
@@ -86,6 +72,7 @@ class SaasBackupBrowser(models.TransientModel):
             self.backup_process_id,
             ('storage_path', 'backup_path', 'path', 'local_path'),
         )
+        self._load_schedule_from_process()
 
     def _add_backup_file(self, backup):
         self.env['saas.backup.browser.line'].create({
@@ -161,8 +148,91 @@ class SaasBackupBrowser(models.TransientModel):
     def action_recompute_next_backup(self):
         if not self.backup_process_id:
             raise UserError(_('Veuillez choisir un Backup Process.'))
-        self.backup_process_id.action_saas_compute_next_backup()
+        self._write_schedule_to_process(recompute_next=True)
+        self.backup_process_id._saas_log_event(
+            'schedule_recomputed',
+            state='info',
+            scheduled_datetime=self.backup_process_id.saas_next_backup_datetime,
+            message=_('Prochaine sauvegarde recalculée depuis l’écran Gérer les backups.'),
+        )
+        self._load_schedule_from_process()
         return self._reopen()
+
+    def action_save_auto_backup_schedule(self):
+        if not self.backup_process_id:
+            raise UserError(_('Veuillez choisir un Backup Process.'))
+        self._write_schedule_to_process()
+        self.backup_process_id._saas_log_event(
+            'schedule_saved',
+            state='info',
+            scheduled_datetime=self.backup_process_id.saas_next_backup_datetime,
+            message=_(
+                "Programmation enregistrée : tous les %(number)s %(period)s à %(time).2f, rétention %(retention)s.",
+                number=self.backup_process_id.saas_backup_interval_number,
+                period=self.backup_process_id.saas_backup_interval_type,
+                time=self.backup_process_id.saas_backup_time,
+                retention=self.backup_process_id.saas_backup_retention,
+            ),
+        )
+        self._load_schedule_from_process()
+        return self._reopen()
+
+    def action_run_due_auto_backups(self):
+        if self.backup_process_id:
+            self._write_schedule_to_process(recompute_past=False)
+            self.backup_process_id._saas_log_event(
+                'manual_due_check',
+                state='info',
+                scheduled_datetime=self.backup_process_id.saas_next_backup_datetime,
+                message=_('Vérification manuelle des sauvegardes dues lancée depuis Gérer les backups.'),
+            )
+        self.env['backup.process'].saas_run_due_auto_backups()
+        self._load_schedule_from_process()
+        return self._reopen()
+
+    def _load_schedule_from_process(self):
+        process = self.backup_process_id
+        if not process:
+            self.saas_auto_backup = False
+            self.saas_backup_interval_number = 1
+            self.saas_backup_interval_type = 'days'
+            self.saas_backup_time = 2.0
+            self.saas_next_backup_datetime = False
+            self.saas_backup_retention = 5
+            self.saas_last_backup_datetime = False
+            self.saas_last_backup_state = False
+            self.saas_last_backup_message = False
+            return
+
+        self.saas_auto_backup = process.saas_auto_backup
+        self.saas_backup_interval_number = process.saas_backup_interval_number or 1
+        self.saas_backup_interval_type = process.saas_backup_interval_type or 'days'
+        self.saas_backup_time = process.saas_backup_time or 2.0
+        self.saas_next_backup_datetime = process.saas_next_backup_datetime
+        self.saas_backup_retention = process.saas_backup_retention
+        self.saas_last_backup_datetime = process.saas_last_backup_datetime
+        self.saas_last_backup_state = process.saas_last_backup_state
+        self.saas_last_backup_message = process.saas_last_backup_message
+
+    def _write_schedule_to_process(self, recompute_next=False, recompute_past=True):
+        self.ensure_one()
+        now = fields.Datetime.now()
+        values = {
+            'saas_auto_backup': self.saas_auto_backup,
+            'saas_backup_interval_number': self.saas_backup_interval_number or 1,
+            'saas_backup_interval_type': self.saas_backup_interval_type or 'days',
+            'saas_backup_time': self.saas_backup_time or 0.0,
+            'saas_backup_retention': self.saas_backup_retention,
+        }
+        next_backup = self.saas_next_backup_datetime
+        if self.saas_auto_backup:
+            self.backup_process_id.write(values)
+            if recompute_next or not next_backup or (recompute_past and next_backup <= now):
+                next_backup = self.backup_process_id._saas_next_datetime(now)
+            self.backup_process_id.write({'saas_next_backup_datetime': next_backup})
+        else:
+            values['saas_next_backup_datetime'] = False
+            self.backup_process_id.write(values)
 
     def _upsert_line(self, line):
         vals = {

@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="saas_backup_dashboard_main" model="saas.backup.dashboard">
+        <field name="name">Tableau de bord backups</field>
+    </record>
+
+    <record id="saas_backup_dashboard_view_form" model="ir.ui.view">
+        <field name="name">saas.backup.dashboard.form</field>
+        <field name="model">saas.backup.dashboard</field>
+        <field name="arch" type="xml">
+            <form string="Gérer les backups" create="false" edit="false" delete="false">
+                <sheet>
+                    <group>
+                        <group string="Résumé">
+                            <field name="backup_count"/>
+                            <field name="auto_process_count"/>
+                            <field name="due_process_count"/>
+                            <field name="failed_log_count"/>
+                        </group>
+                        <group string="Derniers repères">
+                            <field name="latest_backup_id"/>
+                            <field name="next_process_id"/>
+                            <field name="next_backup_datetime"/>
+                        </group>
+                    </group>
+                    <group string="Actions">
+                        <button name="action_open_backup_wizard" type="object" string="Créer ou gérer un backup" class="btn-primary"/>
+                        <button name="action_open_backups" type="object" string="Voir les backups" class="btn-secondary"/>
+                        <button name="action_open_schedule" type="object" string="Modifier les programmations" class="btn-secondary"/>
+                        <button name="action_open_logs" type="object" string="Voir l'historique" class="btn-secondary"/>
+                        <button name="action_open_due_schedule" type="object" string="Voir les sauvegardes dues" class="btn-secondary"/>
+                        <button name="action_run_due_auto_backups" type="object" string="Lancer les sauvegardes dues" class="btn-primary"/>
+                        <button name="action_open_failed_logs" type="object" string="Voir les échecs" class="btn-danger"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="saas_backup_dashboard_action" model="ir.actions.act_window">
+        <field name="name">Gérer les backups</field>
+        <field name="res_model">saas.backup.dashboard</field>
+        <field name="view_mode">form</field>
+        <field name="res_id" ref="saas_backup_dashboard_main"/>
+        <field name="target">current</field>
+    </record>
+
+</odoo>
