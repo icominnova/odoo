@@ -86,6 +86,21 @@ class BackupProcess(models.Model):
             process.saas_next_backup_datetime = process._saas_next_datetime(fields.Datetime.now())
         return True
 
+    def action_saas_disable_auto_backup(self):
+        for process in self:
+            scheduled_datetime = process.saas_next_backup_datetime
+            process.write({
+                'saas_auto_backup': False,
+                'saas_next_backup_datetime': False,
+            })
+            process._saas_log_event(
+                'schedule_disabled',
+                state='info',
+                scheduled_datetime=scheduled_datetime,
+                message=_('Programmation automatique désactivée.'),
+            )
+        return {'type': 'ir.actions.client', 'tag': 'reload'}
+
     @api.model
     def saas_run_due_auto_backups(self):
         now = fields.Datetime.now()

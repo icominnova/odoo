@@ -5,7 +5,7 @@
         <field name="name">saas.backup.log.list</field>
         <field name="model">saas.backup.log</field>
         <field name="arch" type="xml">
-            <list string="Historique des backups" create="false" edit="false" delete="false" decoration-success="state == 'success'" decoration-danger="state == 'failed'" decoration-info="state == 'running'">
+            <list string="Historique des backups" create="false" edit="false" delete="true" decoration-success="state == 'success'" decoration-danger="state == 'failed'" decoration-info="state == 'running'">
                 <field name="execution_datetime"/>
                 <field name="scheduled_datetime"/>
                 <field name="backup_process_id"/>
@@ -22,7 +22,7 @@
         <field name="name">saas.backup.log.form</field>
         <field name="model">saas.backup.log</field>
         <field name="arch" type="xml">
-            <form string="Historique backup" create="false" edit="false" delete="false">
+            <form string="Historique backup" create="false" edit="false" delete="true">
                 <sheet>
                     <group>
                         <group string="Événement">

@@ -12,7 +12,7 @@
 
     <menuitem id="saas_backup_menu_logs" name="Historique" parent="saas_backup_menu_root" action="saas_backup_log_action" sequence="30" groups="base.group_system"/>
 
-    <menuitem id="saas_backup_menu_schedule" name="Planification" parent="saas_backup_menu_root" action="saas_backup_process_schedule_action" sequence="40" groups="base.group_system"/>
+    <menuitem id="saas_backup_menu_schedule" name="Programmations actives" parent="saas_backup_menu_root" action="saas_backup_active_schedule_action" sequence="40" groups="base.group_system"/>
 
     <!-- Ancien menu de configuration masqué dans le flux utilisateur courant. -->
     <menuitem id="saas_backup_menu_config" name="Configuration" parent="saas_backup_menu_root" action="saas_backup_config_action" sequence="100" groups="base.group_no_one"/>

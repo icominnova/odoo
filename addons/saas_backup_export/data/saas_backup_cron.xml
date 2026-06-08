@@ -13,8 +13,9 @@
         <field name="model_id" ref="model_saas_backup_file"/>
         <field name="state">code</field>
         <field name="code">model.cron_create_backups_for_all_processes()</field>
-        <field name="interval_number">5</field>
+        <field name="interval_number">1</field>
         <field name="interval_type">minutes</field>
+        <field name="nextcall" eval="DateTime.now().strftime('%Y-%m-%d %H:%M:%S')"/>
         <field name="active">True</field>
     </record>
 

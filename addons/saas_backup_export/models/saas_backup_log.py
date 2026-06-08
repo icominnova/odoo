@@ -24,6 +24,7 @@ class SaasBackupLog(models.Model):
     event_type = fields.Selection([
         ('schedule_saved', 'Programmation enregistrée'),
         ('schedule_recomputed', 'Prochaine sauvegarde recalculée'),
+        ('schedule_disabled', 'Programmation désactivée'),
         ('manual_due_check', 'Lancement manuel des sauvegardes dues'),
         ('auto_started', 'Sauvegarde automatique démarrée'),
         ('auto_success', 'Sauvegarde automatique réussie'),

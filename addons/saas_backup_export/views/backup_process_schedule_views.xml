@@ -5,7 +5,7 @@
         <field name="name">backup.process.saas.schedule.list</field>
         <field name="model">backup.process</field>
         <field name="arch" type="xml">
-            <list string="Planification des backups" create="false">
+            <list string="Planification des backups" create="false" delete="false">
                 <field name="name"/>
                 <field name="saas_process_database_name"/>
                 <field name="saas_process_storage_path"/>
@@ -16,6 +16,7 @@
                 <field name="saas_next_backup_datetime"/>
                 <field name="saas_backup_retention"/>
                 <field name="saas_last_backup_state" widget="badge" decoration-success="saas_last_backup_state == 'success'" decoration-danger="saas_last_backup_state == 'failed'"/>
+                <button name="action_saas_disable_auto_backup" type="object" string="Désactiver" class="btn-danger" invisible="not saas_auto_backup" confirm="Désactiver cette programmation automatique ? Le Backup Process ne sera pas supprimé."/>
             </list>
         </field>
     </record>
@@ -24,9 +25,10 @@
         <field name="name">backup.process.saas.schedule.form</field>
         <field name="model">backup.process</field>
         <field name="arch" type="xml">
-            <form string="Planification des backups" create="false">
+            <form string="Planification des backups" create="false" delete="false">
                 <header>
                     <button name="action_saas_compute_next_backup" type="object" string="Recalculer prochaine sauvegarde" class="btn-secondary"/>
+                    <button name="action_saas_disable_auto_backup" type="object" string="Désactiver la programmation" class="btn-danger" invisible="not saas_auto_backup" confirm="Désactiver cette programmation automatique ? Le Backup Process ne sera pas supprimé."/>
                 </header>
                 <sheet>
                     <group>
@@ -73,6 +75,16 @@
         <field name="views" eval="[(ref('saas_backup_process_schedule_view_list'), 'list'), (ref('saas_backup_process_schedule_view_form'), 'form')]"/>
         <field name="search_view_id" ref="saas_backup_process_schedule_view_search"/>
         <field name="context">{}</field>
+    </record>
+
+    <record id="saas_backup_active_schedule_action" model="ir.actions.act_window">
+        <field name="name">Programmations actives</field>
+        <field name="res_model">backup.process</field>
+        <field name="view_mode">list,form</field>
+        <field name="views" eval="[(ref('saas_backup_process_schedule_view_list'), 'list'), (ref('saas_backup_process_schedule_view_form'), 'form')]"/>
+        <field name="search_view_id" ref="saas_backup_process_schedule_view_search"/>
+        <field name="domain">[('saas_auto_backup', '=', True)]</field>
+        <field name="context">{'search_default_auto_enabled': 1}</field>
     </record>
 
 </odoo>
