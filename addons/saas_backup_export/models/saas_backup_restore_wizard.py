@@ -1,10 +1,12 @@
 # -*- coding: utf-8 -*-
 import logging
 import os
+from configparser import RawConfigParser
 
 import odoo.service.db as db_service
 from odoo import _, api, fields, models
 from odoo.exceptions import AccessDenied, UserError
+from odoo.tools.config import crypt_context
 
 _logger = logging.getLogger(__name__)
 
@@ -93,12 +95,11 @@ class SaasBackupRestoreWizard(models.TransientModel):
         # 1. Vérifier le mot de passe maître
         if not self.master_password:
             raise UserError(_("Le mot de passe maître Odoo est obligatoire."))
-        try:
-            db_service.check_super(self.master_password)
-        except AccessDenied:
+        if not self._check_restore_master_password(self.master_password):
             raise UserError(_(
-                "Mot de passe maître incorrect. "
-                "Vérifiez la valeur de 'admin_passwd' dans odoo.conf."
+                "Mot de passe maître incorrect. Vérifiez la valeur de 'admin_passwd' "
+                "dans la configuration Odoo principale ou dans le fichier "
+                "odoo-server.conf de l'instance sauvegardée."
             ))
 
         # 2. Vérifier le fichier backup
@@ -166,3 +167,82 @@ class SaasBackupRestoreWizard(models.TransientModel):
                 'sticky': True,
             },
         }
+
+    def _check_restore_master_password(self, password):
+        self.ensure_one()
+        try:
+            db_service.check_super(password)
+            return True
+        except AccessDenied:
+            pass
+
+        instance_admin_password = self._get_instance_admin_password()
+        if not instance_admin_password:
+            return False
+        try:
+            return bool(crypt_context.verify(password, instance_admin_password))
+        except Exception:
+            _logger.exception("Impossible de vérifier le mot de passe maître de l'instance SaaS.")
+            return False
+
+    def _get_instance_admin_password(self):
+        self.ensure_one()
+        for config_path in self._get_instance_config_paths():
+            admin_password = self._read_admin_password_from_config(config_path)
+            if admin_password:
+                return admin_password
+        return False
+
+    def _get_instance_config_paths(self):
+        self.ensure_one()
+        candidates = []
+
+        storage_path = self._get_backup_process_storage_path()
+        if storage_path:
+            instance_path = self._get_instance_path_from_storage(storage_path)
+            if instance_path:
+                candidates.append(os.path.join(instance_path, 'odoo-server.conf'))
+
+        file_path = self.backup_file_id.file_path
+        if file_path:
+            backup_dir = os.path.dirname(os.path.abspath(os.path.expanduser(file_path)))
+            if os.path.basename(backup_dir) == 'backups':
+                candidates.append(os.path.join(os.path.dirname(backup_dir), 'odoo-server.conf'))
+
+        seen = set()
+        paths = []
+        for path in candidates:
+            path = os.path.abspath(os.path.expanduser(path))
+            if path in seen:
+                continue
+            seen.add(path)
+            if os.path.isfile(path):
+                paths.append(path)
+        return paths
+
+    def _get_backup_process_storage_path(self):
+        self.ensure_one()
+        process = self.backup_file_id.backup_process_id
+        if not process:
+            return False
+        for field_name in ('storage_path', 'backup_path', 'path', 'local_path'):
+            if field_name in process._fields and process[field_name]:
+                return process[field_name]
+        return False
+
+    def _get_instance_path_from_storage(self, storage_path):
+        storage_path = os.path.abspath(os.path.expanduser(storage_path or ''))
+        if os.path.basename(storage_path.rstrip(os.sep)) == 'data-dir':
+            return os.path.dirname(storage_path)
+        return storage_path
+
+    def _read_admin_password_from_config(self, config_path):
+        parser = RawConfigParser()
+        try:
+            parser.read(config_path)
+        except Exception:
+            _logger.exception("Impossible de lire le fichier de configuration %s", config_path)
+            return False
+        if not parser.has_section('options') or not parser.has_option('options', 'admin_passwd'):
+            return False
+        return (parser.get('options', 'admin_passwd') or '').strip()
