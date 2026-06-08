@@ -2,7 +2,7 @@
 <odoo>
 
     <!-- ===== MENU RACINE ===== -->
-    <menuitem id="saas_backup_menu_root" name="SaaS Backups" sequence="90" groups="base.group_system"/>
+    <menuitem id="saas_backup_menu_root" name="SaaS Backups" sequence="90" groups="base.group_system" web_icon="saas_backup_export,static/description/icon.png"/>
 
     <!-- ===== MENU PRINCIPAL ===== -->
     <menuitem id="saas_backup_menu_browser" name="Gérer les backups" parent="saas_backup_menu_root" action="saas_backup_dashboard_action" sequence="10" groups="base.group_system"/>
