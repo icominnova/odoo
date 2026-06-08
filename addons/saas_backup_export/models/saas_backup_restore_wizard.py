@@ -1,12 +1,21 @@
 # -*- coding: utf-8 -*-
 import logging
 import os
+import shutil
+import subprocess
+import tempfile
+import uuid
+import zipfile
+from contextlib import closing
 from configparser import RawConfigParser
 
 import odoo.service.db as db_service
+import psycopg2
+from psycopg2.extensions import quote_ident
 from odoo import _, api, fields, models
 from odoo.exceptions import AccessDenied, UserError
 from odoo.tools.config import crypt_context
+from odoo.tools.misc import find_pg_tool
 
 _logger = logging.getLogger(__name__)
 
@@ -111,9 +120,19 @@ class SaasBackupRestoreWizard(models.TransientModel):
                 name=self.backup_file_id.name,
             ))
 
-        db_name = self.db_name.strip()
+        db_name = (self.db_name or '').strip()
         if not db_name:
             raise UserError(_("Le nom de la base cible est obligatoire."))
+
+        instance_db_config = self._get_instance_db_config()
+        existing_dbs = self._list_existing_databases(instance_db_config)
+
+        if self.mode == 'new' and db_name in existing_dbs:
+            raise UserError(_(
+                "La base cible '%(db)s' existe déjà. Choisissez un autre nom pour "
+                "créer une nouvelle base, ou utilisez le mode 'Écraser une base existante'.",
+                db=db_name,
+            ))
 
         # 3. Mode 'overwrite' : demander confirmation et supprimer l'existante
         if self.mode == 'overwrite':
@@ -121,7 +140,6 @@ class SaasBackupRestoreWizard(models.TransientModel):
                 raise UserError(_(
                     "Vous devez cocher la case de confirmation pour écraser une base existante."
                 ))
-            existing_dbs = db_service.list_dbs(True)
             if db_name not in existing_dbs:
                 suggested_db = self._get_backup_database_name()
                 message = _(
@@ -140,7 +158,10 @@ class SaasBackupRestoreWizard(models.TransientModel):
                     db_name, self.env.user.name,
                 )
                 try:
-                    db_service.exp_drop(db_name)
+                    if instance_db_config:
+                        self._drop_database_with_config(db_name, instance_db_config)
+                    else:
+                        db_service.exp_drop(db_name)
                 except Exception as e:
                     raise UserError(_(
                         "Impossible de supprimer la base '%(db)s' : %(error)s",
@@ -153,12 +174,15 @@ class SaasBackupRestoreWizard(models.TransientModel):
             self.backup_file_id.name, db_name, self.env.user.name,
         )
         try:
-            db_service.restore_db(
-                db_name,
-                file_path,
-                copy=self.neutralize,
-                neutralize_database=self.neutralize,
-            )
+            if instance_db_config:
+                self._restore_database_with_config(db_name, file_path, instance_db_config)
+            else:
+                db_service.restore_db(
+                    db_name,
+                    file_path,
+                    copy=self.neutralize,
+                    neutralize_database=self.neutralize,
+                )
         except Exception as e:
             raise UserError(_(
                 "Erreur lors de la restauration : %(error)s",
@@ -213,6 +237,8 @@ class SaasBackupRestoreWizard(models.TransientModel):
         instance_admin_password = self._get_instance_admin_password()
         if not instance_admin_password:
             return False
+        if instance_admin_password == password:
+            return True
         try:
             return bool(crypt_context.verify(password, instance_admin_password))
         except Exception:
@@ -225,6 +251,177 @@ class SaasBackupRestoreWizard(models.TransientModel):
             admin_password = self._read_admin_password_from_config(config_path)
             if admin_password:
                 return admin_password
+        return False
+
+    def _get_instance_db_config(self):
+        self.ensure_one()
+        for config_path in self._get_instance_config_paths():
+            parser = self._read_instance_config(config_path)
+            if not parser:
+                continue
+            options = parser['options']
+            db_user = (options.get('db_user') or '').strip()
+            if not db_user:
+                continue
+            return {
+                'host': (options.get('db_host') or 'localhost').strip(),
+                'port': (options.get('db_port') or '5432').strip(),
+                'user': db_user,
+                'password': (options.get('db_password') or '').strip(),
+                'data_dir': (options.get('data_dir') or '').strip(),
+                'config_path': config_path,
+            }
+        return False
+
+    def _list_existing_databases(self, db_config=False):
+        if not db_config:
+            return db_service.list_dbs(True)
+        with closing(self._pg_connect('postgres', db_config)) as connection:
+            with closing(connection.cursor()) as cursor:
+                cursor.execute("""
+                    SELECT datname
+                      FROM pg_database
+                     WHERE NOT datistemplate
+                       AND datallowconn
+                     ORDER BY datname
+                """)
+                return [row[0] for row in cursor.fetchall()]
+
+    def _pg_connect(self, database_name, db_config):
+        return psycopg2.connect(
+            dbname=database_name,
+            host=db_config.get('host') or None,
+            port=db_config.get('port') or None,
+            user=db_config.get('user') or None,
+            password=db_config.get('password') or None,
+        )
+
+    def _drop_database_with_config(self, db_name, db_config):
+        with closing(self._pg_connect('postgres', db_config)) as connection:
+            connection.autocommit = True
+            with closing(connection.cursor()) as cursor:
+                cursor.execute("""
+                    SELECT pg_terminate_backend(pid)
+                      FROM pg_stat_activity
+                     WHERE datname = %s
+                       AND pid <> pg_backend_pid()
+                """, (db_name,))
+                cursor.execute("DROP DATABASE %s" % quote_ident(db_name, cursor))
+        self._remove_instance_filestore(db_name)
+
+    def _restore_database_with_config(self, db_name, file_path, db_config):
+        self._create_database_with_config(db_name, db_config)
+        try:
+            self._load_dump_into_database(db_name, file_path, db_config)
+            if self.neutralize:
+                self._neutralize_database_uuid(db_name, db_config)
+        except Exception:
+            _logger.exception("Restauration SaaS : échec, suppression de la base incomplète %s", db_name)
+            try:
+                self._drop_database_with_config(db_name, db_config)
+            except Exception:
+                _logger.exception("Impossible de nettoyer la base restaurée partiellement %s", db_name)
+            raise
+
+    def _create_database_with_config(self, db_name, db_config):
+        with closing(self._pg_connect('postgres', db_config)) as connection:
+            connection.autocommit = True
+            with closing(connection.cursor()) as cursor:
+                cursor.execute(
+                    "CREATE DATABASE %s ENCODING 'unicode'"
+                    % quote_ident(db_name, cursor)
+                )
+
+    def _load_dump_into_database(self, db_name, file_path, db_config):
+        with tempfile.TemporaryDirectory(prefix='saas_restore_') as dump_dir:
+            dump_path = file_path
+            filestore_path = False
+            if zipfile.is_zipfile(file_path):
+                dump_path, filestore_path = self._extract_backup_zip(file_path, dump_dir)
+                command = [find_pg_tool('psql'), '--dbname=%s' % db_name, '-q', '-f', dump_path]
+            else:
+                command = [find_pg_tool('pg_restore'), '--no-owner', '--dbname=%s' % db_name, dump_path]
+
+            result = subprocess.run(
+                command,
+                env=self._pg_subprocess_env(db_config),
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+                check=False,
+            )
+            if result.returncode:
+                raise UserError(_(
+                    "La commande de restauration PostgreSQL a échoué : %(error)s",
+                    error=(result.stderr or result.stdout or b'').decode(errors='ignore').strip(),
+                ))
+
+            if filestore_path:
+                self._replace_instance_filestore(db_name, filestore_path)
+
+    def _extract_backup_zip(self, file_path, dump_dir):
+        with zipfile.ZipFile(file_path, 'r') as archive:
+            for member in archive.infolist():
+                normalized_name = os.path.normpath(member.filename)
+                if normalized_name.startswith('..') or os.path.isabs(normalized_name):
+                    continue
+                if normalized_name == 'dump.sql' or normalized_name.startswith('filestore/'):
+                    archive.extract(member, dump_dir)
+
+        dump_path = os.path.join(dump_dir, 'dump.sql')
+        if not os.path.isfile(dump_path):
+            raise UserError(_("Le fichier ZIP ne contient pas de dump.sql."))
+        filestore_path = os.path.join(dump_dir, 'filestore')
+        return dump_path, filestore_path if os.path.isdir(filestore_path) else False
+
+    def _pg_subprocess_env(self, db_config):
+        env = os.environ.copy()
+        if db_config.get('host'):
+            env['PGHOST'] = db_config['host']
+        if db_config.get('port'):
+            env['PGPORT'] = db_config['port']
+        if db_config.get('user'):
+            env['PGUSER'] = db_config['user']
+        if db_config.get('password'):
+            env['PGPASSWORD'] = db_config['password']
+        return env
+
+    def _neutralize_database_uuid(self, db_name, db_config):
+        with closing(self._pg_connect(db_name, db_config)) as connection:
+            with closing(connection.cursor()) as cursor:
+                cursor.execute("""
+                    UPDATE ir_config_parameter
+                       SET value = %s
+                     WHERE key = 'database.uuid'
+                """, (str(uuid.uuid4()),))
+            connection.commit()
+
+    def _replace_instance_filestore(self, db_name, source_filestore_path):
+        destination = self._get_instance_filestore_path(db_name)
+        if not destination:
+            _logger.warning("Restauration SaaS : chemin filestore introuvable pour %s", db_name)
+            return
+        os.makedirs(os.path.dirname(destination), exist_ok=True)
+        if os.path.isdir(destination):
+            shutil.rmtree(destination)
+        shutil.move(source_filestore_path, destination)
+
+    def _remove_instance_filestore(self, db_name):
+        destination = self._get_instance_filestore_path(db_name)
+        if destination and os.path.isdir(destination):
+            shutil.rmtree(destination)
+
+    def _get_instance_filestore_path(self, db_name):
+        storage_path = self._get_backup_process_storage_path()
+        if storage_path:
+            storage_path = os.path.abspath(os.path.expanduser(storage_path))
+            if os.path.basename(storage_path.rstrip(os.sep)) == 'data-dir':
+                return os.path.join(storage_path, 'filestore', db_name)
+            return os.path.join(storage_path, 'data-dir', 'filestore', db_name)
+
+        instance_config = self._get_instance_db_config()
+        data_dir = instance_config and instance_config.get('data_dir')
+        if data_dir and os.path.isabs(data_dir):
+            return os.path.join(data_dir, 'filestore', db_name)
         return False
 
     def _get_instance_config_paths(self):
@@ -271,12 +468,18 @@ class SaasBackupRestoreWizard(models.TransientModel):
         return storage_path
 
     def _read_admin_password_from_config(self, config_path):
+        parser = self._read_instance_config(config_path)
+        if not parser or not parser.has_option('options', 'admin_passwd'):
+            return False
+        return (parser.get('options', 'admin_passwd') or '').strip()
+
+    def _read_instance_config(self, config_path):
         parser = RawConfigParser()
         try:
             parser.read(config_path)
         except Exception:
             _logger.exception("Impossible de lire le fichier de configuration %s", config_path)
             return False
-        if not parser.has_section('options') or not parser.has_option('options', 'admin_passwd'):
+        if not parser.has_section('options'):
             return False
-        return (parser.get('options', 'admin_passwd') or '').strip()
+        return parser

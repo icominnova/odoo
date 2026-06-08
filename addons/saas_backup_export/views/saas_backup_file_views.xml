@@ -36,6 +36,7 @@
                     <group>
                         <group string="Informations">
                             <field name="client_name"/>
+                            <field name="existing_database_names"/>
                             <field name="name"/>
                             <field name="backup_date"/>
                             <field name="file_size_mb"/>

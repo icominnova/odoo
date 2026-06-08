@@ -4,9 +4,12 @@ import hmac
 import logging
 import os
 import zipfile
+from contextlib import closing
+from configparser import RawConfigParser
 from datetime import datetime
 
 import odoo.service.db as db_service
+import psycopg2
 from odoo import api, fields, models, _
 from odoo.exceptions import UserError
 
@@ -33,6 +36,10 @@ class SaasBackupFile(models.Model):
     )
     database_name = fields.Char(string='Base de données', readonly=True, index=True)
     client_name = fields.Char(string='Client', readonly=True, index=True)
+    existing_database_names = fields.Text(
+        string='Bases existantes pour ce client',
+        compute='_compute_existing_database_names',
+    )
     file_path = fields.Char(string='Chemin complet', readonly=True)
     file_size_mb = fields.Float(string='Taille (Mo)', readonly=True, digits=(16, 2))
     backup_date = fields.Datetime(string='Date de sauvegarde', readonly=True)
@@ -66,6 +73,21 @@ class SaasBackupFile(models.Model):
                 )
             else:
                 record.download_url = False
+
+    def _compute_existing_database_names(self):
+        for record in self:
+            try:
+                existing_db_set = set(record._list_databases_for_backup())
+                matches = record._match_existing_client_databases(existing_db_set)
+                record.existing_database_names = '\n'.join(matches) if matches else _(
+                    "Aucune base existante trouvée pour ce client."
+                )
+            except Exception as error:
+                _logger.exception("Impossible de lister les bases de données existantes.")
+                record.existing_database_names = _(
+                    "Impossible de lire la liste des bases : %s",
+                    error,
+                )
 
     # -------------------------------------------------------------------------
     # Actions
@@ -471,6 +493,117 @@ class SaasBackupFile(models.Model):
             'relative_path': os.path.relpath(full_path, relative_root) if relative_root else os.path.basename(full_path),
             'state': 'available',
         }
+
+    def _match_existing_client_databases(self, existing_db_set):
+        self.ensure_one()
+        candidates = self._client_database_candidates()
+        exact_matches = [db_name for db_name in candidates if db_name in existing_db_set]
+
+        prefix_matches = []
+        for candidate in candidates:
+            if not candidate:
+                continue
+            for db_name in existing_db_set:
+                if db_name in exact_matches or db_name in prefix_matches:
+                    continue
+                if db_name.startswith('%s_' % candidate):
+                    prefix_matches.append(db_name)
+
+        return sorted(exact_matches + prefix_matches, key=str.lower)
+
+    def _list_databases_for_backup(self):
+        self.ensure_one()
+        db_config = self._get_instance_db_config()
+        if not db_config:
+            return db_service.list_dbs(True)
+
+        with closing(psycopg2.connect(
+            dbname='postgres',
+            host=db_config.get('host') or None,
+            port=db_config.get('port') or None,
+            user=db_config.get('user') or None,
+            password=db_config.get('password') or None,
+        )) as connection:
+            with closing(connection.cursor()) as cursor:
+                cursor.execute("""
+                    SELECT datname
+                      FROM pg_database
+                     WHERE NOT datistemplate
+                       AND datallowconn
+                     ORDER BY datname
+                """)
+                return [row[0] for row in cursor.fetchall()]
+
+    def _get_instance_db_config(self):
+        self.ensure_one()
+        for config_path in self._get_instance_config_paths():
+            parser = RawConfigParser()
+            try:
+                parser.read(config_path)
+            except Exception:
+                _logger.exception("Impossible de lire le fichier de configuration %s", config_path)
+                continue
+            if not parser.has_section('options'):
+                continue
+            db_user = (parser.get('options', 'db_user', fallback='') or '').strip()
+            if not db_user:
+                continue
+            return {
+                'host': (parser.get('options', 'db_host', fallback='localhost') or 'localhost').strip(),
+                'port': (parser.get('options', 'db_port', fallback='5432') or '5432').strip(),
+                'user': db_user,
+                'password': (parser.get('options', 'db_password', fallback='') or '').strip(),
+            }
+        return False
+
+    def _get_instance_config_paths(self):
+        self.ensure_one()
+        candidates = []
+
+        storage_path = self._get_backup_process_value(
+            self.backup_process_id,
+            ('storage_path', 'backup_path', 'path', 'local_path'),
+        )
+        if storage_path:
+            storage_path = os.path.abspath(os.path.expanduser(storage_path))
+            if os.path.basename(storage_path.rstrip(os.sep)) == 'data-dir':
+                candidates.append(os.path.join(os.path.dirname(storage_path), 'odoo-server.conf'))
+            else:
+                candidates.append(os.path.join(storage_path, 'odoo-server.conf'))
+
+        if self.file_path:
+            backup_dir = os.path.dirname(os.path.abspath(os.path.expanduser(self.file_path)))
+            if os.path.basename(backup_dir) == 'backups':
+                candidates.append(os.path.join(os.path.dirname(backup_dir), 'odoo-server.conf'))
+
+        seen = set()
+        paths = []
+        for path in candidates:
+            if path in seen:
+                continue
+            seen.add(path)
+            if os.path.isfile(path):
+                paths.append(path)
+        return paths
+
+    def _client_database_candidates(self):
+        self.ensure_one()
+        names = []
+        for name in (self.database_name, self.client_name):
+            if name and name not in names:
+                names.append(name)
+            short_name = self._short_database_name(name)
+            if short_name and short_name not in names:
+                names.append(short_name)
+        return names
+
+    @api.model
+    def _short_database_name(self, name):
+        if not name:
+            return ''
+        return name.replace(
+            '.odoo.sunsoftbf.com', ''
+        ).replace('.', '_').replace('-', '_').lower()
 
     @api.model
     def _iter_client_folders(self, base_path=None):

@@ -36,7 +36,11 @@
 
                     <group string="Base de données cible">
                         <field name="db_name" placeholder="ex: client001_restaure"/>
-                        <div class="text-muted" colspan="2">
+                        <div class="text-muted" colspan="2" invisible="mode != 'new'">
+                            Saisissez ici le nom de la nouvelle base qui sera créée après la restauration.
+                            Exemple : testwk_restaure.
+                        </div>
+                        <div class="text-muted" colspan="2" invisible="mode != 'overwrite'">
                             En mode écrasement, utilisez le nom exact de la base existante.
                             Exemple : testwk.odoo.sunsoftbf.com, pas seulement testwk.
                         </div>
