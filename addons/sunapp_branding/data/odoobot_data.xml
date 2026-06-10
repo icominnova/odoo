@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="base.partner_root" model="res.partner">
+        <field name="name">SunAppBot</field>
+    </record>
+
+    <record id="base.user_root" model="res.users">
+        <field name="signature" type="html"><div>SunAppBot</div></field>
+    </record>
+
+    <function model="res.partner" name="_sunapp_apply_bot_branding"/>
+</odoo>

@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="layout_title_sunapp" inherit_id="web.layout" name="SunApp Layout Title">
+        <xpath expr="//title" position="replace">
+            <title t-esc="title or 'SunApp'"/>
+        </xpath>
+    </template>
+
+    <template id="login_layout_sunapp" inherit_id="web.login_layout" name="SunApp Login Footer">
+        <xpath expr="//a[contains(@href, 'odoo.com')]" position="replace">
+            <a href="/" target="_blank">Powered by <span>SunApp</span></a>
+        </xpath>
+    </template>
+
+    <template id="brand_promotion_message_sunapp" inherit_id="web.brand_promotion_message" name="SunApp Brand Promotion Message">
+        <xpath expr="//t[@t-set='odoo_logo']" position="replace">
+            <t t-set="odoo_logo">
+                <a href="/" class="badge text-bg-light text-decoration-none">
+                    <span>SunApp</span>
+                </a>
+            </t>
+        </xpath>
+    </template>
+
+    <template id="portal_record_sidebar_branding_sunapp" inherit_id="portal.portal_record_sidebar" name="SunApp Portal Record Sidebar Branding">
+        <xpath expr="//div[contains(@class, 'text-muted')][.//a[contains(@href, 'odoo.com')]]" position="replace">
+            <div class="d-none d-lg-block mt-5 small text-center text-muted">
+                Généré par <a href="/" class="badge text-bg-light text-decoration-none">SunApp</a>
+            </div>
+        </xpath>
+    </template>
+
+    <template id="website_brand_promotion_sunapp" inherit_id="website.brand_promotion" name="SunApp Website Brand Promotion">
+        <xpath expr="//t[@t-set='_message']" position="replace">
+            <t t-set="_message"></t>
+        </xpath>
+    </template>
+
+    <template id="footer_copyright_sunapp" inherit_id="website.layout" name="SunApp Footer Copyright" priority="100">
+        <xpath expr="//footer//span[hasclass('o_footer_copyright_name')]" position="replace">
+            <span class="o_footer_copyright_name me-2 small">Copyright &amp;copy; SunApp</span>
+        </xpath>
+    </template>
+
+    <template id="website_meta_generator_sunapp" inherit_id="website.layout" name="SunApp Website Meta Generator">
+        <xpath expr="//meta[@name='generator']" position="replace">
+            <meta name="generator" content="SunApp"/>
+        </xpath>
+    </template>
+
+    <template id="website_info_sunapp" inherit_id="website.show_website_info" name="SunApp Website Information">
+        <xpath expr="//small[contains(., 'Odoo Version')]" position="replace">
+            <small groups="base.group_no_one">SunApp Version <t t-out="version.get('server_version')"/></small>
+        </xpath>
+        <xpath expr="//p[contains(., 'instance of Odoo')]" position="replace">
+            <p>
+                Information about the <t t-out="res_company.name"/> instance of SunApp.
+            </p>
+        </xpath>
+    </template>
+</odoo>
