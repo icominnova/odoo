@@ -13,6 +13,11 @@
     "assets": {
         "web.assets_backend": [
             "sunapp_branding/static/src/xml/res_config_edition.xml",
+            (
+                "after",
+                "web/static/src/webclient/user_menu/user_menu_items.js",
+                "sunapp_branding/static/src/js/user_menu_branding.js",
+            ),
         ],
     },
     "installable": True,

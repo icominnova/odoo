@@ -2,6 +2,8 @@
 
 from odoo import api, models
 
+from .mail_bot import sunapp_replace_bot_branding
+
 
 SUNAPP_BOT_NAME = "SunAppBot"
 
@@ -42,8 +44,4 @@ class ResPartner(models.Model):
             ("body", "ilike", "Odoo"),
         ])
         for message in messages:
-            body = message.body or ""
-            body = body.replace("OdooBot", SUNAPP_BOT_NAME)
-            body = body.replace("Odoo's chat", "SunApp's chat")
-            body = body.replace("Le Chat d'Odoo", "Le Chat de SunApp")
-            message.body = body
+            message.body = sunapp_replace_bot_branding(message.body)
