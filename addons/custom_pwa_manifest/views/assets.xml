@@ -2,8 +2,10 @@
 <odoo>
     <template id="custom_favicon" inherit_id="web.layout">
         <xpath expr="//link[@rel='shortcut icon']" position="replace">
-            <t t-set="favicon" t-value="request.env['custom.pwa.image'].sudo().search([], order='id desc', limit=1)"/>
-            <link rel="shortcut icon" type="image/png" t-att-href="'/web/image/custom.pwa.image/%s/image' % favicon.id if favicon else '/web/image/website/1/favicon'"/>
+            <link rel="shortcut icon" type="image/png" href="/custom_pwa_manifest/static/src/img/pwa-icon-192.png"/>
+            <link rel="icon" type="image/png" sizes="192x192" href="/custom_pwa_manifest/static/src/img/pwa-icon-192.png"/>
+            <link rel="icon" type="image/png" sizes="512x512" href="/custom_pwa_manifest/static/src/img/pwa-icon-512.png"/>
+            <link rel="apple-touch-icon" sizes="192x192" href="/custom_pwa_manifest/static/src/img/pwa-icon-192.png"/>
         </xpath>
     </template>
 </odoo>

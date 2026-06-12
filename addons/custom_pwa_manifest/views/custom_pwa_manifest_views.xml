@@ -56,5 +56,4 @@
         <field name="view_mode">list,form</field>
     </record>
 
-    <menuitem id="menu_custom_pwa_manifest" name="Nom de l'application" parent="menu_custom_pwa_title_root" action="action_custom_pwa_manifest" sequence="40"/>
 </odoo>

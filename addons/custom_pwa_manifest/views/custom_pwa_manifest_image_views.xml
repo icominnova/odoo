@@ -39,5 +39,4 @@
         <field name="res_model">custom.pwa.manifest.image</field>
         <field name="view_mode">list,form</field>
     </record>
-    <menuitem id="menu_custom_pwa_manifest_image" name="Icônes de l'application" parent="menu_custom_pwa_title_root" action="action_custom_pwa_manifest_image" sequence="50"/>
 </odoo>

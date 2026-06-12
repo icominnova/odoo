@@ -29,7 +29,5 @@
         <field name="view_mode">list,form</field>
     </record>
 
-    <menuitem id="menu_custom_pwa_title_root" name="PWA Personnalisation" sequence="10"/>
-    <menuitem id="menu_custom_pwa_title" name="Titre Onglet" parent="menu_custom_pwa_title_root" action="action_custom_pwa_title" sequence="10"/>
     <menuitem id="menu_custom_pwa_title_root" name="PWA Personnalisation" sequence="10" web_icon="custom_pwa_manifest,static/description/icon.png"/>
 </odoo>
