@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <template id="customer_form_page" name="Formulaire client SunApp">
+        <t t-call="website.layout">
+            <t t-set="additional_title">Créer votre dossier client</t>
+            <main class="py-5 bg-light">
+                <div class="container" style="max-width: 760px;">
+                    <div class="bg-white border p-4 p-md-5">
+                        <h1 class="h2 text-center mb-4">Créer votre dossier client</h1>
+
+                        <div t-if="errors.get('_global')" class="alert alert-danger" role="alert">
+                            <t t-esc="errors['_global']"/>
+                        </div>
+
+                        <form action="/formulaire-client/envoyer" method="post" class="row g-3">
+                            <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                            <div class="d-none" aria-hidden="true">
+                                <label for="website_url">Site web</label>
+                                <input id="website_url" name="website_url" type="text" tabindex="-1" autocomplete="off"/>
+                            </div>
+
+                            <div class="col-12 col-md-6">
+                                <label class="form-label fw-semibold" for="full_name">Nom complet *</label>
+                                <input id="full_name" name="full_name" type="text" required="required" autocomplete="name"
+                                       t-attf-class="form-control #{errors.get('full_name') and 'is-invalid' or ''}"
+                                       t-att-value="values.get('full_name', '')"/>
+                                <div t-if="errors.get('full_name')" class="invalid-feedback" t-esc="errors['full_name']"/>
+                            </div>
+
+                            <div class="col-12 col-md-6">
+                                <label class="form-label fw-semibold" for="company_name">Nom de l'entreprise *</label>
+                                <input id="company_name" name="company_name" type="text" required="required" autocomplete="organization"
+                                       t-attf-class="form-control #{errors.get('company_name') and 'is-invalid' or ''}"
+                                       t-att-value="values.get('company_name', '')"/>
+                                <div t-if="errors.get('company_name')" class="invalid-feedback" t-esc="errors['company_name']"/>
+                            </div>
+
+                            <div class="col-12 col-md-6">
+                                <label class="form-label fw-semibold" for="email">Adresse email *</label>
+                                <input id="email" name="email" type="email" required="required" autocomplete="email"
+                                       t-attf-class="form-control #{errors.get('email') and 'is-invalid' or ''}"
+                                       t-att-value="values.get('email', '')"/>
+                                <div t-if="errors.get('email')" class="invalid-feedback" t-esc="errors['email']"/>
+                            </div>
+
+                            <div class="col-12 col-md-6">
+                                <label class="form-label fw-semibold" for="phone">Numéro de téléphone *</label>
+                                <input id="phone" name="phone" type="tel" required="required" autocomplete="tel"
+                                       t-attf-class="form-control #{errors.get('phone') and 'is-invalid' or ''}"
+                                       t-att-value="values.get('phone', '')"/>
+                                <div t-if="errors.get('phone')" class="invalid-feedback" t-esc="errors['phone']"/>
+                            </div>
+
+                            <div class="col-12">
+                                <label class="form-label fw-semibold" for="street">Adresse</label>
+                                <input id="street" name="street" type="text" class="form-control" autocomplete="street-address"
+                                       t-att-value="values.get('street', '')"/>
+                            </div>
+
+                            <div class="col-12 col-md-6">
+                                <label class="form-label fw-semibold" for="city">Ville</label>
+                                <input id="city" name="city" type="text" class="form-control" autocomplete="address-level2"
+                                       t-att-value="values.get('city', '')"/>
+                            </div>
+
+                            <div class="col-12 col-md-6">
+                                <label class="form-label fw-semibold" for="country_id">Pays</label>
+                                <select id="country_id" name="country_id" class="form-select" autocomplete="country">
+                                    <option value="">Sélectionner</option>
+                                    <t t-foreach="countries" t-as="country">
+                                        <option t-att-value="country.id"
+                                                t-att-selected="str(country.id) == values.get('country_id', '') or (not values.get('country_id') and country.id == default_country_id)">
+                                            <t t-esc="country.name"/>
+                                        </option>
+                                    </t>
+                                </select>
+                            </div>
+
+                            <div class="col-12 col-md-6">
+                                <label class="form-label fw-semibold" for="vat">N° TVA / IFU</label>
+                                <input id="vat" name="vat" type="text" class="form-control" t-att-value="values.get('vat', '')"/>
+                            </div>
+
+                            <div class="col-12">
+                                <label class="form-label fw-semibold" for="note">Informations complémentaires</label>
+                                <textarea id="note" name="note" rows="4" class="form-control"><t t-esc="values.get('note', '')"/></textarea>
+                            </div>
+
+                            <div class="col-12 pt-2">
+                                <button type="submit" class="btn btn-primary w-100 py-2">Continuer</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </main>
+        </t>
+    </template>
+
+    <template id="customer_form_success" name="Client enregistré">
+        <t t-call="website.layout">
+            <t t-set="additional_title">Dossier client enregistré</t>
+            <main class="py-5 bg-light">
+                <div class="container text-center" style="max-width: 680px;">
+                    <div class="bg-white border p-5">
+                        <h1 class="h2 mb-3">Dossier client enregistré</h1>
+                        <p class="mb-1">Vos informations ont bien été prises en compte.</p>
+                        <p t-if="sale_order_name" class="mb-0 fw-semibold">
+                            La commande <t t-esc="sale_order_name"/> a été créée et confirmée avec l'abonnement Standard.
+                        </p>
+                    </div>
+                </div>
+            </main>
+        </t>
+    </template>
+</odoo>

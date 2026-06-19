@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <template id="customer_form_domain" inherit_id="sunapp_customer_form.customer_form_page">
+        <xpath expr="//div[label[@for='company_name']]" position="after">
+            <div class="col-12">
+                <label class="form-label fw-semibold" for="saas_domain_name">Nom de domaine SunApp *</label>
+                <input id="saas_domain_name" name="saas_domain_name" type="text"
+                       required="required" inputmode="url" autocomplete="off"
+                       placeholder="monentreprise.odoo.sunsoftbf.com"
+                       t-attf-class="form-control #{errors.get('saas_domain_name') and 'is-invalid' or ''}"
+                       t-att-value="values.get('saas_domain_name', '')"/>
+                <div t-if="errors.get('saas_domain_name')" class="invalid-feedback"
+                     t-esc="errors['saas_domain_name']"/>
+            </div>
+        </xpath>
+    </template>
+</odoo>
