@@ -1,6 +1,9 @@
 import logging
+import re
+from urllib.parse import urlparse
 
 from odoo import api, fields, models
+from odoo.tools import html2plaintext
 
 
 _logger = logging.getLogger(__name__)
@@ -27,6 +30,13 @@ CONFIRM_METHODS = (
     "action_confirm",
 )
 CONFIRMED_STATES = {"confirm", "confirmed", "active", "running"}
+PASSWORD_FIELDS = (
+    "temporary_password",
+    "temp_password",
+    "admin_password",
+    "password",
+)
+URL_FIELDS = ("url", "instance_url", "client_url", "access_url", "base_url")
 
 
 class SaleOrder(models.Model):
@@ -142,10 +152,75 @@ class SaleOrder(models.Model):
                 return field_name
         return False
 
+    def _sunapp_prepare_contract(self, contract):
+        self.ensure_one()
+        values = {}
+        if "pricelist_id" in contract._fields and not contract.pricelist_id:
+            values["pricelist_id"] = self.pricelist_id.id
+        if "company_id" in contract._fields and not contract.company_id:
+            values["company_id"] = self.company_id.id
+        if "partner_id" in contract._fields and not contract.partner_id:
+            values["partner_id"] = self.partner_id.commercial_partner_id.id
+        if "invoice_product_id" in contract._fields and not contract.invoice_product_id:
+            product = self.order_line.filtered(lambda line: not line.display_type)[:1].product_id
+            if product:
+                values["invoice_product_id"] = product.id
+        if "journal_id" in contract._fields and not contract.journal_id:
+            journal = self.env["account.journal"].sudo().search(
+                [
+                    ("type", "=", "sale"),
+                    ("company_id", "=", self.company_id.id),
+                ],
+                order="sequence, id",
+                limit=1,
+            )
+            if journal:
+                values["journal_id"] = journal.id
+        if values:
+            contract.write(values)
+        return values
+
     def _sunapp_confirm_contract(self, contract):
         state = contract["state"] if "state" in contract._fields else False
         if state in CONFIRMED_STATES:
-            return "already_confirmed"
+            actions = []
+            if "user_data_error" in contract._fields and contract.user_data_error:
+                raise ValueError(
+                    "La configuration des données utilisateur a échoué. Une nouvelle tentative sera effectuée."
+                )
+            if "invitation_mail_error" in contract._fields and contract.invitation_mail_error:
+                raise ValueError(
+                    "L'envoi des identifiants a échoué. Une nouvelle tentative sera effectuée."
+                )
+            if (
+                "user_data_updated" in contract._fields
+                and not contract.user_data_updated
+                and not contract.user_data_error
+                and callable(getattr(contract, "update_user_data", None))
+            ):
+                contract.update_user_data()
+                actions.append("update_user_data")
+            if (
+                "user_data_updated" in contract._fields
+                and contract.user_data_updated
+                and "invitation_mail_sent" in contract._fields
+                and not contract.invitation_mail_sent
+                and callable(getattr(contract, "send_invitation_email", None))
+            ):
+                contract.send_invitation_email()
+                actions.append("send_invitation_email")
+            return ",".join(actions) or "already_confirmed"
+
+        if contract._name == "saas.contract" and "saas_client" in contract._fields:
+            if not contract.saas_client:
+                contract.create_saas_client()
+                return "create_saas_client"
+            if state == "draft" and callable(getattr(contract, "mark_confirmed", None)):
+                contract.mark_confirmed()
+                return "mark_confirmed"
+            if state == "open" and callable(getattr(contract, "send_credential_email", None)):
+                contract.send_credential_email()
+                return "send_credential_email"
         for method_name in CONFIRM_METHODS:
             method = getattr(contract, method_name, None)
             if callable(method):
@@ -181,6 +256,96 @@ class SaleOrder(models.Model):
                 return method_name
         return False
 
+    def _sunapp_contract_workflow_complete(self, contract, public_status):
+        complete = public_status["ready"]
+        if contract and "user_data_updated" in contract._fields:
+            complete = complete and contract.user_data_updated
+        if contract and "invitation_mail_sent" in contract._fields:
+            complete = complete and contract.invitation_mail_sent
+        return bool(complete)
+
+    def _sunapp_contract_client(self, contract):
+        if contract and "saas_client" in contract._fields:
+            return contract.saas_client.sudo()
+        return self.env["res.partner"].browse()
+
+    def _sunapp_instance_url(self, contract, client):
+        for record in (client, contract):
+            if not record:
+                continue
+            for field_name in URL_FIELDS:
+                if field_name in record._fields and record[field_name]:
+                    url = str(record[field_name]).strip()
+                    if not url.startswith(("http://", "https://")):
+                        url = f"https://{url}"
+                    if urlparse(url).scheme in ("http", "https"):
+                        return url
+        if self.sunapp_saas_domain_name:
+            return f"https://{self.sunapp_saas_domain_name}"
+        return False
+
+    def _sunapp_temporary_password(self, contract, client):
+        for record in (client, contract):
+            if not record:
+                continue
+            for field_name in PASSWORD_FIELDS:
+                if field_name in record._fields and record[field_name]:
+                    return str(record[field_name])
+        password_pattern = re.compile(
+            r"temporary\s+password\s+is\s*:\s*(\S+)", re.IGNORECASE
+        )
+        for record in (client, contract):
+            if not record or "message_ids" not in record._fields:
+                continue
+            for message in record.message_ids.sorted("date", reverse=True):
+                match = password_pattern.search(html2plaintext(message.body or ""))
+                if match:
+                    return match.group(1).strip()
+        return False
+
+    def sunapp_saas_public_status(self):
+        self.ensure_one()
+        contract = self._sunapp_find_linked_contract()
+        client = self._sunapp_contract_client(contract)
+        contract_state = (
+            contract.state if contract and "state" in contract._fields else False
+        )
+        client_state = client.state if client and "state" in client._fields else False
+        instance_url = self._sunapp_instance_url(contract, client)
+        instance_ready = bool(
+            contract
+            and contract_state in CONFIRMED_STATES
+            and client
+            and instance_url
+            and client_state not in ("draft", "inactive", "cancel")
+        )
+        ready = instance_ready
+        if contract and "user_data_updated" in contract._fields:
+            ready = ready and contract.user_data_updated
+        if contract and "invitation_mail_sent" in contract._fields:
+            ready = ready and contract.invitation_mail_sent
+        return {
+            "ready": bool(ready),
+            "instance_ready": instance_ready,
+            "contract_found": bool(contract),
+            "contract_confirmed": contract_state in CONFIRMED_STATES,
+            "client_created": bool(client),
+            "instance_url": instance_url if instance_ready else False,
+            "error": self.sunapp_saas_automation_error or False,
+        }
+
+    def sunapp_saas_credentials(self):
+        self.ensure_one()
+        contract = self._sunapp_find_linked_contract()
+        client = self._sunapp_contract_client(contract)
+        status = self.sunapp_saas_public_status()
+        return {
+            "ready": status["ready"],
+            "url": status["instance_url"],
+            "login": self.partner_id.email or "",
+            "password": self._sunapp_temporary_password(contract, client) or "",
+        }
+
     def sunapp_process_saas_contract(self):
         for order in self.sudo():
             if not order.sunapp_saas_domain_name or order.state not in ("sale", "done"):
@@ -198,6 +363,7 @@ class SaleOrder(models.Model):
                             }
                         )
                         continue
+                    order._sunapp_prepare_contract(contract)
                     domain_field = order._sunapp_set_contract_domain(contract)
                     if not domain_field:
                         raise ValueError(
@@ -210,9 +376,15 @@ class SaleOrder(models.Model):
                             "Aucune méthode de confirmation compatible trouvée sur "
                             f"{contract._name}."
                         )
+                public_status = order.sunapp_saas_public_status()
+                workflow_complete = order._sunapp_contract_workflow_complete(
+                    contract, public_status
+                )
                 order.write(
                     {
-                        "sunapp_saas_automation_state": "done",
+                        "sunapp_saas_automation_state": (
+                            "done" if workflow_complete else "pending"
+                        ),
                         "sunapp_saas_automation_error": False,
                         "sunapp_saas_contract_model": contract._name,
                         "sunapp_saas_contract_id": contract.id,
