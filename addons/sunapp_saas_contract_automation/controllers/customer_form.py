@@ -28,6 +28,19 @@ class SunAppSaaSCustomerForm(SunAppCustomerForm):
         )
         return values
 
+    @staticmethod
+    def _public_error_message(error):
+        if not error:
+            return False
+        lowered_error = error.lower()
+        if "pricelist" in lowered_error:
+            return "La liste de prix du contrat est en cours de configuration. Une nouvelle tentative sera effectuée automatiquement."
+        if "already exists" in lowered_error or "already exist" in lowered_error:
+            return "Un espace utilisant déjà ces informations existe. Vérifiez le nom de domaine ou contactez notre assistance."
+        if "database" in lowered_error and "exist" in lowered_error:
+            return "Ce nom de domaine est déjà associé à un espace existant. Choisissez un autre nom de domaine."
+        return error
+
     def _extra_form_errors(self, values):
         errors = super()._extra_form_errors(values)
         domain = values.get("saas_domain_name")
@@ -110,7 +123,7 @@ class SunAppSaaSCustomerForm(SunAppCustomerForm):
                     "credentials": saas_status["ready"],
                 },
                 "progress": round(completed_steps * 100 / 6),
-                "error": saas_status["error"],
+                "error": self._public_error_message(saas_status["error"]),
                 "instance_url": saas_status["instance_url"],
                 "download_url": (
                     "/formulaire-client/identifiants" if saas_status["ready"] else False

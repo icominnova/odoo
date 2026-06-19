@@ -156,7 +156,20 @@ class SaleOrder(models.Model):
         self.ensure_one()
         values = {}
         if "pricelist_id" in contract._fields and not contract.pricelist_id:
-            values["pricelist_id"] = self.pricelist_id.id
+            pricelist = self.pricelist_id
+            if not pricelist:
+                pricelist = self.env["product.pricelist"].sudo().search(
+                    [
+                        ("currency_id", "=", self.currency_id.id),
+                        "|",
+                        ("company_id", "=", False),
+                        ("company_id", "=", self.company_id.id),
+                    ],
+                    order="company_id desc, id",
+                    limit=1,
+                )
+            if pricelist:
+                values["pricelist_id"] = pricelist.id
         if "company_id" in contract._fields and not contract.company_id:
             values["company_id"] = self.company_id.id
         if "partner_id" in contract._fields and not contract.partner_id:
@@ -351,25 +364,26 @@ class SaleOrder(models.Model):
             if not order.sunapp_saas_domain_name or order.state not in ("sale", "done"):
                 continue
             try:
+                contract = order._sunapp_find_linked_contract()
+                if not contract:
+                    order.write(
+                        {
+                            "sunapp_saas_automation_state": "pending",
+                            "sunapp_saas_automation_error": (
+                                "Le contrat SaaS lié n'est pas encore disponible."
+                            ),
+                        }
+                    )
+                    continue
+                # Keep the contract configuration even if Webkul's next action fails.
+                order._sunapp_prepare_contract(contract)
+                domain_field = order._sunapp_set_contract_domain(contract)
+                if not domain_field:
+                    raise ValueError(
+                        "Aucun champ de domaine compatible trouvé sur "
+                        f"{contract._name}."
+                    )
                 with self.env.cr.savepoint():
-                    contract = order._sunapp_find_linked_contract()
-                    if not contract:
-                        order.write(
-                            {
-                                "sunapp_saas_automation_state": "pending",
-                                "sunapp_saas_automation_error": (
-                                    "Le contrat SaaS lié n'est pas encore disponible."
-                                ),
-                            }
-                        )
-                        continue
-                    order._sunapp_prepare_contract(contract)
-                    domain_field = order._sunapp_set_contract_domain(contract)
-                    if not domain_field:
-                        raise ValueError(
-                            "Aucun champ de domaine compatible trouvé sur "
-                            f"{contract._name}."
-                        )
                     method_name = order._sunapp_confirm_contract(contract)
                     if not method_name:
                         raise ValueError(

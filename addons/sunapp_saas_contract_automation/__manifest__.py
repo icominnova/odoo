@@ -1,6 +1,6 @@
 {
     "name": "SunApp SaaS Contract Automation",
-    "version": "19.0.1.0.4",
+    "version": "19.0.1.0.5",
     "category": "Sales",
     "summary": "Confirme automatiquement les contrats SaaS issus du formulaire client",
     "author": "Alain Gansonré",
