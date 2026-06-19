@@ -14,4 +14,60 @@
             </div>
         </xpath>
     </template>
+
+    <template id="customer_form_processing" inherit_id="sunapp_customer_form.customer_form_success">
+        <xpath expr="//main" position="replace">
+            <main class="py-5 bg-light">
+                <div class="container text-center" style="max-width: 680px;">
+                    <div id="sunapp_saas_progress" class="bg-white border p-5"
+                         data-status-url="/formulaire-client/statut">
+                        <div id="sunapp_saas_spinner" class="spinner-border text-primary mb-4" role="status">
+                            <span class="visually-hidden">Traitement en cours</span>
+                        </div>
+                        <h1 id="sunapp_saas_title" class="h2 mb-3">Préparation de votre espace SunApp</h1>
+                        <p id="sunapp_saas_message" class="mb-1">
+                            Votre commande a été confirmée. La création de votre domaine et de votre espace est en cours.
+                        </p>
+                        <p t-if="sale_order_name" class="mb-0 fw-semibold">
+                            Référence : <t t-esc="sale_order_name"/>
+                        </p>
+                    </div>
+                </div>
+                <script type="text/javascript">
+                    document.addEventListener("DOMContentLoaded", () => {
+                        const root = document.getElementById("sunapp_saas_progress");
+                        const title = document.getElementById("sunapp_saas_title");
+                        const message = document.getElementById("sunapp_saas_message");
+                        const spinner = document.getElementById("sunapp_saas_spinner");
+                        let attempts = 0;
+
+                        async function refreshStatus() {
+                            attempts += 1;
+                            try {
+                                const response = await fetch(root.dataset.statusUrl, {
+                                    cache: "no-store",
+                                    headers: {"Accept": "application/json"},
+                                });
+                                const result = await response.json();
+                                if (result.status === "ready") {
+                                    spinner.classList.add("d-none");
+                                    title.textContent = "Votre espace SunApp est prêt";
+                                    message.textContent = "Vos accès vous seront transmis par e-mail.";
+                                    return;
+                                }
+                            } catch (error) {
+                                // A temporary network error must not interrupt status polling.
+                            }
+                            if (attempts === 100) {
+                                message.textContent = "La préparation prend un peu plus de temps. Vous recevrez vos accès par e-mail dès qu'elle sera terminée.";
+                            }
+                            window.setTimeout(refreshStatus, 5000);
+                        }
+
+                        window.setTimeout(refreshStatus, 2000);
+                    });
+                </script>
+            </main>
+        </xpath>
+    </template>
 </odoo>

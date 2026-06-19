@@ -105,7 +105,7 @@
                         <h1 class="h2 mb-3">Dossier client enregistré</h1>
                         <p class="mb-1">Vos informations ont bien été prises en compte.</p>
                         <p t-if="sale_order_name" class="mb-0 fw-semibold">
-                            La commande <t t-esc="sale_order_name"/> a été créée et confirmée avec l'abonnement Standard.
+                            La commande <t t-esc="sale_order_name"/> a été créée et confirmée avec l'abonnement Standart.
                         </p>
                     </div>
                 </div>

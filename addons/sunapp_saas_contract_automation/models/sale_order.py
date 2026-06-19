@@ -17,6 +17,7 @@ DOMAIN_FIELDS = (
     "saas_domain_name",
 )
 CONFIRM_METHODS = (
+    "create_saas_client",
     "action_create_and_confirm_client",
     "create_and_confirm_client",
     "action_create_confirm_client",
@@ -119,14 +120,25 @@ class SaleOrder(models.Model):
 
     def _sunapp_set_contract_domain(self, contract):
         self.ensure_one()
+        domain_value = self.sunapp_saas_domain_name
+        if (
+            "use_separate_domain" in contract._fields
+            and not contract.use_separate_domain
+            and "saas_domain_url" in contract._fields
+            and contract.saas_domain_url
+        ):
+            base_domain = contract.saas_domain_url.strip().lower().strip(".")
+            suffix = f".{base_domain}"
+            if domain_value.lower().endswith(suffix):
+                domain_value = domain_value[: -len(suffix)].strip(".")
         for field_name in DOMAIN_FIELDS:
             field = contract._fields.get(field_name)
             if field and field.type in ("char", "text"):
-                contract.write({field_name: self.sunapp_saas_domain_name})
+                contract.write({field_name: domain_value})
                 return field_name
         for field_name, field in contract._fields.items():
             if "domain" in field_name.lower() and field.type in ("char", "text"):
-                contract.write({field_name: self.sunapp_saas_domain_name})
+                contract.write({field_name: domain_value})
                 return field_name
         return False
 
@@ -139,6 +151,24 @@ class SaleOrder(models.Model):
             if callable(method):
                 method()
                 return method_name
+        view_arch = contract.get_view(view_type="form").get("arch")
+        if view_arch is not None:
+            for button in view_arch.xpath("//button[@type='object'][@name]"):
+                label = (button.get("string") or "").lower()
+                if "confirm" not in label or not (
+                    "client" in label or "contract" in label
+                ):
+                    continue
+                method_name = button.get("name")
+                contract_with_context = contract.with_context(
+                    active_id=contract.id,
+                    active_ids=contract.ids,
+                    active_model=contract._name,
+                )
+                method = getattr(contract_with_context, method_name, None)
+                if callable(method):
+                    method()
+                    return method_name
         for method_name in dir(type(contract)):
             lowered_name = method_name.lower()
             if "confirm" not in lowered_name or not (

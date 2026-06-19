@@ -67,7 +67,32 @@ class SunAppSaaSCustomerForm(SunAppCustomerForm):
                 "sunapp_saas_automation_error": False,
             }
         )
-        sale_order.sunapp_process_saas_contract()
+
+    @http.route(
+        "/formulaire-client/statut",
+        type="http",
+        auth="public",
+        website=True,
+        methods=["GET"],
+        csrf=False,
+        sitemap=False,
+    )
+    def customer_form_status(self, **kwargs):
+        order = request.env["sale.order"].sudo().browse(
+            request.session.get("sunapp_sale_order_id")
+        ).exists()
+        if not order:
+            return request.make_json_response({"status": "missing"}, status=404)
+        return request.make_json_response(
+            {
+                "status": (
+                    "ready"
+                    if order.sunapp_saas_automation_state == "done"
+                    else "processing"
+                ),
+                "order_name": order.name,
+            }
+        )
 
     @http.route()
     def customer_form_submit(self, **post):

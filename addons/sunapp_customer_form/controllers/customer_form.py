@@ -103,19 +103,22 @@ class SunAppCustomerForm(http.Controller):
 
         company = request.website.company_id
         Product = request.env["product.product"].sudo()
+        product_domain = [
+            ("sale_ok", "=", True),
+            "|",
+            ("company_id", "=", False),
+            ("company_id", "=", company.id),
+        ]
         product = Product.search(
             [
-                ("name", "=ilike", "Abonnement Standard"),
-                ("sale_ok", "=", True),
-                "|",
-                ("company_id", "=", False),
-                ("company_id", "=", company.id),
+                ("name", "=ilike", "Abonnement Standart"),
+                *product_domain,
             ],
             limit=1,
         )
         if not product:
             errors["_global"] = (
-                "Le produit Abonnement Standard est indisponible. "
+                "Le produit Abonnement Standart est indisponible. "
                 "Contactez un administrateur."
             )
             return self._render_form(values=values, errors=errors)
