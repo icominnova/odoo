@@ -85,24 +85,44 @@ class SaasBulkRestartWizard(models.TransientModel):
         if not clients:
             raise UserError(_("Select at least one SaaS client."))
         clients._check_bulk_restart_access()
-        clients.write({
-            "auto_restart_enabled": enabled,
-            "auto_restart_intentional_stop": False if enabled else True,
-            "auto_restart_attempt_count": 0,
-            "consecutive_failure_count": 0,
-        })
+
+        success_clients = self.env["saas.client"]
+        failed = []
         for client in clients:
-            client._log_health_event(
-                "auto_restart_enabled" if enabled else "auto_restart_disabled",
-                message=_("Auto restart enabled.") if enabled else _("Auto restart disabled."),
-            )
+            try:
+                with self.env.cr.savepoint():
+                    client.write({
+                        "auto_restart_enabled": enabled,
+                        "auto_restart_intentional_stop": False if enabled else True,
+                        "auto_restart_attempt_count": 0,
+                        "consecutive_failure_count": 0,
+                    })
+                    client._log_health_event(
+                        "auto_restart_enabled" if enabled else "auto_restart_disabled",
+                        message=_("Auto restart enabled.") if enabled else _("Auto restart disabled."),
+                    )
+                    success_clients |= client
+            except Exception as error:
+                _logger.exception(
+                    "Auto restart flag update failed for SaaS client %s",
+                    client.display_name,
+                )
+                failed.append((client.display_name, str(error)))
+
+        message = _("Auto restart enabled.") if enabled else _("Auto restart disabled.")
+        message += "\n" + _("%s SaaS client(s) updated.") % len(success_clients)
+        if failed:
+            message += "\n" + _("%s client(s) failed:") % len(failed)
+            message += "\n" + "\n".join("- %s: %s" % item for item in failed)
+
         return {
             "type": "ir.actions.client",
             "tag": "display_notification",
             "params": {
                 "title": _("Auto Restart"),
-                "message": _("Auto restart enabled.") if enabled else _("Auto restart disabled."),
-                "type": "success",
+                "message": message,
+                "type": "warning" if failed else "success",
+                "sticky": bool(failed),
                 "next": {"type": "ir.actions.act_window_close"},
             },
         }
