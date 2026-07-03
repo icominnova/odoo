@@ -19,6 +19,18 @@
                 </group>
                 <footer>
                     <button
+                        name="action_enable_auto_restart"
+                        type="object"
+                        string="Enable Auto Restart"
+                        class="btn-secondary"
+                    />
+                    <button
+                        name="action_disable_auto_restart"
+                        type="object"
+                        string="Disable Auto Restart"
+                        class="btn-secondary"
+                    />
+                    <button
                         name="action_stop_clients"
                         type="object"
                         string="Stop"

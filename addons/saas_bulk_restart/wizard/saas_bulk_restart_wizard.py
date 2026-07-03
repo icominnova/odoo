@@ -73,6 +73,40 @@ class SaasBulkRestartWizard(models.TransientModel):
     def action_delete_clients(self):
         return self._execute_operation("delete")
 
+    def action_enable_auto_restart(self):
+        return self._set_auto_restart(True)
+
+    def action_disable_auto_restart(self):
+        return self._set_auto_restart(False)
+
+    def _set_auto_restart(self, enabled):
+        self.ensure_one()
+        clients = self._get_operation_clients()
+        if not clients:
+            raise UserError(_("Select at least one SaaS client."))
+        clients._check_bulk_restart_access()
+        clients.write({
+            "auto_restart_enabled": enabled,
+            "auto_restart_intentional_stop": False if enabled else True,
+            "auto_restart_attempt_count": 0,
+            "consecutive_failure_count": 0,
+        })
+        for client in clients:
+            client._log_health_event(
+                "auto_restart_enabled" if enabled else "auto_restart_disabled",
+                message=_("Auto restart enabled.") if enabled else _("Auto restart disabled."),
+            )
+        return {
+            "type": "ir.actions.client",
+            "tag": "display_notification",
+            "params": {
+                "title": _("Auto Restart"),
+                "message": _("Auto restart enabled.") if enabled else _("Auto restart disabled."),
+                "type": "success",
+                "next": {"type": "ir.actions.act_window_close"},
+            },
+        }
+
     def _execute_operation(self, operation):
         self.ensure_one()
         clients = self._get_operation_clients()
@@ -89,6 +123,27 @@ class SaasBulkRestartWizard(models.TransientModel):
         for client in clients:
             try:
                 with self.env.cr.savepoint():
+                    if operation == "stop":
+                        client.write({"auto_restart_intentional_stop": True})
+                        client._log_health_event(
+                            "manual_stop",
+                            message=_("Manual stop requested by %s.") % self.env.user.display_name,
+                        )
+                    elif operation == "restart":
+                        client.write({
+                            "auto_restart_intentional_stop": False,
+                            "auto_restart_attempt_count": 0,
+                        })
+                        client._log_health_event(
+                            "manual_restart",
+                            health_state="restarting",
+                            message=_("Manual restart requested by %s.") % self.env.user.display_name,
+                        )
+                    elif operation == "delete":
+                        client._log_health_event(
+                            "manual_delete",
+                            message=_("Manual deletion requested by %s.") % self.env.user.display_name,
+                        )
                     if method_name:
                         getattr(client, method_name)()
                     else:
@@ -293,6 +348,8 @@ class SaasBulkRestartWizard(models.TransientModel):
                 ("type", "in", ("list", "tree")),
             ], order="priority, id", limit=1)
         if not list_view:
+            self._install_or_update_form_fields()
+            self._install_or_update_history_menu()
             return
 
         root_tag = "list" if list_view.type == "list" else "tree"
@@ -313,13 +370,26 @@ class SaasBulkRestartWizard(models.TransientModel):
                                 class="btn-primary"
                                 display="always"
                             />
+                            <button
+                                name="action_health_check_now"
+                                type="object"
+                                string="Check Health"
+                                display="always"
+                            />
                         </header>
+                        <field name="auto_restart_enabled" optional="show"/>
+                        <field name="auto_restart_intentional_stop" optional="hide"/>
+                        <field name="health_state" optional="show"/>
+                        <field name="consecutive_failure_count" optional="hide"/>
+                        <field name="last_health_check" optional="hide"/>
                     </xpath>
                 </data>
             """ % root_tag,
         }
         if xmlid and xmlid.res_id:
             View.browse(xmlid.res_id).write(values)
+            self._install_or_update_form_fields()
+            self._install_or_update_history_menu()
             return
 
         inherited_view = View.create(values)
@@ -328,5 +398,126 @@ class SaasBulkRestartWizard(models.TransientModel):
             "name": "view_saas_client_bulk_restart_header",
             "model": "ir.ui.view",
             "res_id": inherited_view.id,
+            "noupdate": True,
+        })
+
+        self._install_or_update_form_fields()
+        self._install_or_update_history_menu()
+
+    @api.model
+    def _install_or_update_form_fields(self):
+        View = self.env["ir.ui.view"].sudo()
+        ModelData = self.env["ir.model.data"].sudo()
+        xmlid = ModelData.search([
+            ("module", "=", "saas_bulk_restart"),
+            ("name", "=", "view_saas_client_auto_restart_form"),
+        ], limit=1)
+
+        form_view = View.search([
+            ("model", "=", "saas.client"),
+            ("type", "=", "form"),
+            ("mode", "=", "primary"),
+        ], order="priority, id", limit=1)
+        if not form_view:
+            form_view = View.search([
+                ("model", "=", "saas.client"),
+                ("type", "=", "form"),
+            ], order="priority, id", limit=1)
+        if not form_view:
+            return
+
+        values = {
+            "name": "saas.client.auto.restart.form",
+            "model": "saas.client",
+            "type": "form",
+            "mode": "extension",
+            "inherit_id": form_view.id,
+            "arch_db": """
+                <data>
+                    <xpath expr="//sheet" position="inside">
+                        <group string="Auto Restart Monitor">
+                            <group>
+                                <field name="auto_restart_enabled"/>
+                                <field name="auto_restart_intentional_stop"/>
+                                <field name="health_state" readonly="1"/>
+                                <field name="consecutive_failure_count" readonly="1"/>
+                            </group>
+                            <group>
+                                <field name="last_health_check" readonly="1"/>
+                                <field name="last_auto_restart" readonly="1"/>
+                                <field name="auto_restart_attempt_count" readonly="1"/>
+                                <field name="health_message" readonly="1"/>
+                            </group>
+                        </group>
+                        <notebook>
+                            <page string="Health History">
+                                <field name="health_log_ids" readonly="1">
+                                    <list create="0" edit="0" delete="0">
+                                        <field name="event_date"/>
+                                        <field name="event_type"/>
+                                        <field name="health_state"/>
+                                        <field name="http_status"/>
+                                        <field name="failure_count"/>
+                                        <field name="auto_restart_attempt_count"/>
+                                        <field name="message"/>
+                                    </list>
+                                </field>
+                            </page>
+                        </notebook>
+                    </xpath>
+                </data>
+            """,
+        }
+        if xmlid and xmlid.res_id:
+            View.browse(xmlid.res_id).write(values)
+            return
+
+        inherited_view = View.create(values)
+        ModelData.create({
+            "module": "saas_bulk_restart",
+            "name": "view_saas_client_auto_restart_form",
+            "model": "ir.ui.view",
+            "res_id": inherited_view.id,
+            "noupdate": True,
+        })
+
+    @api.model
+    def _install_or_update_history_menu(self):
+        action = self.env.ref(
+            "saas_bulk_restart.action_saas_client_health_log",
+            raise_if_not_found=False,
+        )
+        if not action:
+            return
+
+        Menu = self.env["ir.ui.menu"].sudo()
+        ModelData = self.env["ir.model.data"].sudo()
+        xmlid = ModelData.search([
+            ("module", "=", "saas_bulk_restart"),
+            ("name", "=", "menu_saas_client_health_log"),
+        ], limit=1)
+        if xmlid and xmlid.res_id:
+            return
+
+        client_action = self.env["ir.actions.act_window"].sudo().search([
+            ("res_model", "=", "saas.client"),
+        ], limit=1)
+        parent_menu = Menu.search([
+            ("action", "=", "ir.actions.act_window,%s" % client_action.id),
+        ], limit=1) if client_action else Menu.browse()
+        if not parent_menu:
+            return
+
+        menu = Menu.create({
+            "name": "Health History",
+            "parent_id": parent_menu.parent_id.id or parent_menu.id,
+            "action": "ir.actions.act_window,%s" % action.id,
+            "sequence": parent_menu.sequence + 1,
+        })
+        ModelData.create({
+            "module": "saas_bulk_restart",
+            "name": "menu_saas_client_health_log",
+            "model": "ir.ui.menu",
+            "res_id": menu.id,
             "noupdate": True,
         })

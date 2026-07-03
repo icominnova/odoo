@@ -8,6 +8,8 @@
     "depends": ["odoo_saas_kit"],
     "data": [
         "security/ir.model.access.csv",
+        "data/saas_bulk_restart_cron.xml",
+        "views/saas_client_health_log_views.xml",
         "views/saas_bulk_restart_views.xml",
         "views/saas_client_actions.xml",
     ],
