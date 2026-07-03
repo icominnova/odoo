@@ -1,0 +1,2 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_saas_bulk_restart_wizard,access.saas.bulk.restart.wizard,model_saas_bulk_restart_wizard,,1,1,1,1
