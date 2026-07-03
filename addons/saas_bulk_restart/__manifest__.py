@@ -1,8 +1,8 @@
 {
-    "name": "SaaS Bulk Restart",
+    "name": "SaaS Bulk Operations",
     "version": "19.0.1.0.0",
     "category": "SaaS",
-    "summary": "Restart several SaaS clients from the list view",
+    "summary": "Stop, restart, or delete several SaaS clients from one wizard",
     "author": "Sunsoft",
     "license": "LGPL-3",
     "depends": ["odoo_saas_kit"],

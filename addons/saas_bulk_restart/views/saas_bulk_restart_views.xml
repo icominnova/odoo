@@ -4,17 +4,38 @@
         <field name="name">saas.bulk.restart.wizard.form</field>
         <field name="model">saas.bulk.restart.wizard</field>
         <field name="arch" type="xml">
-            <form string="Restart SaaS Clients">
+            <form string="SaaS Client Operations">
                 <group>
+                    <field name="all_clients"/>
+                    <field name="state_filter"/>
                     <field name="client_count" readonly="1"/>
-                    <field name="client_ids" widget="many2many_tags" options="{'no_create': True}"/>
+                    <field
+                        name="client_ids"
+                        widget="many2many_tags"
+                        options="{'no_create': True}"
+                        invisible="all_clients"
+                    />
+                    <field name="confirm_delete"/>
                 </group>
                 <footer>
                     <button
+                        name="action_stop_clients"
+                        type="object"
+                        string="Stop"
+                        class="btn-secondary"
+                    />
+                    <button
                         name="action_restart_clients"
                         type="object"
-                        string="Restart Selected"
+                        string="Restart"
                         class="btn-primary"
+                    />
+                    <button
+                        name="action_delete_clients"
+                        type="object"
+                        string="Delete"
+                        class="btn-danger"
+                        confirm="This will delete the selected SaaS clients from the server. Continue?"
                     />
                     <button string="Cancel" special="cancel" class="btn-secondary"/>
                 </footer>

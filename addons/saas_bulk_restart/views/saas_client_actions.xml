@@ -1,12 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <record id="action_saas_client_bulk_restart" model="ir.actions.server">
-        <field name="name">Restart Selected SaaS Clients</field>
+        <field name="name">SaaS Client Operations</field>
         <field name="model_id" ref="odoo_saas_kit.model_saas_client"/>
         <field name="binding_model_id" ref="odoo_saas_kit.model_saas_client"/>
         <field name="binding_type">action</field>
         <field name="binding_view_types">list</field>
         <field name="state">code</field>
-        <field name="code">action = records.action_open_bulk_restart_wizard()</field>
+        <field name="code">action = records.action_open_saas_operations_wizard()</field>
     </record>
+
+    <function model="saas.bulk.restart.wizard" name="_install_or_update_list_button"/>
 </odoo>

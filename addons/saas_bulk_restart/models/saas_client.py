@@ -5,10 +5,13 @@ class SaasClient(models.Model):
     _inherit = "saas.client"
 
     def action_open_bulk_restart_wizard(self):
+        return self.action_open_saas_operations_wizard()
+
+    def action_open_saas_operations_wizard(self):
         self._check_bulk_restart_access()
         return {
             "type": "ir.actions.act_window",
-            "name": _("Restart SaaS Clients"),
+            "name": _("SaaS Client Operations"),
             "res_model": "saas.bulk.restart.wizard",
             "view_mode": "form",
             "target": "new",
