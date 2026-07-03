@@ -6,7 +6,7 @@
         <field name="arch" type="xml">
             <list string="SaaS Health Summary" create="0" edit="0">
                 <field name="name"/>
-                <field name="url"/>
+                <field name="health_check_url"/>
                 <field name="health_summary"/>
                 <field name="health_state"/>
                 <field name="last_http_status"/>

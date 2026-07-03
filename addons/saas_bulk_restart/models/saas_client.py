@@ -67,6 +67,10 @@ class SaasClient(models.Model):
         string="Service",
         compute="_compute_health_summary",
     )
+    health_check_url = fields.Char(
+        string="URL",
+        compute="_compute_health_check_url",
+    )
     gateway_error_count = fields.Integer(
         string="502/503/504",
         compute="_compute_health_counters",
@@ -103,6 +107,10 @@ class SaasClient(models.Model):
                 client.health_summary = _("Stopped voluntarily")
             else:
                 client.health_summary = labels.get(client.health_state, _("Unknown"))
+
+    def _compute_health_check_url(self):
+        for client in self:
+            client.health_check_url = client._get_base_health_url() or False
 
     def _compute_health_counters(self):
         counters = {
@@ -369,16 +377,35 @@ class SaasClient(models.Model):
 
     def _get_health_url(self):
         self.ensure_one()
-        base_url = getattr(self, "url", False) or getattr(self, "client_url", False)
-        if not base_url:
-            database_name = getattr(self, "database_name", False)
-            if database_name:
-                base_url = "http://%s" % database_name
+        base_url = self._get_base_health_url()
         if not base_url:
             return False
-        if not base_url.startswith(("http://", "https://")):
-            base_url = "http://%s" % base_url
         return base_url.rstrip("/") + "/web/login"
+
+    def _get_base_health_url(self):
+        self.ensure_one()
+        base_url = False
+        for field_name in (
+            "url",
+            "client_url",
+            "server_url",
+            "web_url",
+            "instance_url",
+            "domain",
+            "domain_name",
+            "database_name",
+            "db_name",
+        ):
+            if field_name in self._fields:
+                base_url = self[field_name]
+                if base_url:
+                    break
+        if not base_url:
+            return False
+        base_url = str(base_url).strip()
+        if base_url.startswith(("http://", "https://")):
+            return base_url
+        return "http://%s" % base_url
 
     def _auto_restart_client(self):
         self.ensure_one()
