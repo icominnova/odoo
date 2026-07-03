@@ -60,10 +60,10 @@
                 <filter name="restarted" string="Restarts" domain="[('event_type','in',('auto_restart','manual_restart'))]"/>
                 <filter name="blocked" string="Blocked" domain="[('event_type','=','auto_restart_blocked')]"/>
                 <group expand="0" string="Group By">
-                    <filter name="group_client" string="Client" context="{'group_by': 'client_id'}"/>
-                    <filter name="group_event" string="Event" context="{'group_by': 'event_type'}"/>
-                    <filter name="group_status" string="Real Status" context="{'group_by': 'health_state'}"/>
-                    <filter name="group_date" string="Date" context="{'group_by': 'event_date:day'}"/>
+                    <filter name="group_client" string="Client" domain="[]" context="{'group_by': 'client_id'}"/>
+                    <filter name="group_event" string="Event" domain="[]" context="{'group_by': 'event_type'}"/>
+                    <filter name="group_status" string="Real Status" domain="[]" context="{'group_by': 'health_state'}"/>
+                    <filter name="group_date" string="Date" domain="[]" context="{'group_by': 'event_date'}"/>
                 </group>
             </search>
         </field>
