@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="1">
+    <record id="param_failure_threshold" model="ir.config_parameter">
+        <field name="key">saas_bulk_restart.failure_threshold</field>
+        <field name="value">2</field>
+    </record>
+    <record id="param_gateway_failure_threshold" model="ir.config_parameter">
+        <field name="key">saas_bulk_restart.gateway_failure_threshold</field>
+        <field name="value">1</field>
+    </record>
+    <record id="param_cooldown_minutes" model="ir.config_parameter">
+        <field name="key">saas_bulk_restart.cooldown_minutes</field>
+        <field name="value">5</field>
+    </record>
+    <record id="param_max_attempts" model="ir.config_parameter">
+        <field name="key">saas_bulk_restart.max_attempts</field>
+        <field name="value">3</field>
+    </record>
+</odoo>

@@ -1,5 +1,28 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
+    <record id="view_saas_client_health_summary_list" model="ir.ui.view">
+        <field name="name">saas.client.health.summary.list</field>
+        <field name="model">saas.client</field>
+        <field name="arch" type="xml">
+            <list string="SaaS Health Summary" create="0" edit="0">
+                <field name="name"/>
+                <field name="url"/>
+                <field name="health_summary"/>
+                <field name="health_state"/>
+                <field name="last_http_status"/>
+                <field name="last_health_check"/>
+                <field name="auto_restart_enabled"/>
+                <field name="auto_restart_intentional_stop"/>
+                <field name="gateway_error_count"/>
+                <field name="inaccessible_count"/>
+                <field name="manual_stop_count"/>
+                <field name="restart_count"/>
+                <field name="blocked_count"/>
+                <field name="health_message"/>
+            </list>
+        </field>
+    </record>
+
     <record id="view_saas_client_health_log_list" model="ir.ui.view">
         <field name="name">saas.client.health.log.list</field>
         <field name="model">saas.client.health.log</field>
@@ -48,9 +71,10 @@
     </record>
 
     <record id="action_saas_client_health_log" model="ir.actions.act_window">
-        <field name="name">SaaS Health History</field>
-        <field name="res_model">saas.client.health.log</field>
+        <field name="name">SaaS Health Summary</field>
+        <field name="res_model">saas.client</field>
         <field name="view_mode">list,form</field>
+        <field name="view_id" ref="view_saas_client_health_summary_list"/>
         <field name="context">{}</field>
     </record>
 </odoo>

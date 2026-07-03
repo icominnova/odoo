@@ -96,6 +96,8 @@ class SaasBulkRestartWizard(models.TransientModel):
                         "auto_restart_intentional_stop": False if enabled else True,
                         "auto_restart_attempt_count": 0,
                         "consecutive_failure_count": 0,
+                        "health_state": "unknown" if enabled else client.health_state,
+                        "health_message": False if enabled else client.health_message,
                     })
                     client._log_health_event(
                         "auto_restart_enabled" if enabled else "auto_restart_disabled",
@@ -227,6 +229,11 @@ class SaasBulkRestartWizard(models.TransientModel):
         raise UserError(_("Unsupported operation."))
 
     def _find_restart_method_name(self, clients):
+        for method_name in self._find_restart_methods_from_views():
+            method = getattr(clients[:1], method_name, None)
+            if callable(method):
+                return method_name
+
         candidate_names = (
             "action_restart",
             "button_restart",
@@ -245,11 +252,6 @@ class SaasBulkRestartWizard(models.TransientModel):
             "action_restart_odoo",
         )
         for method_name in candidate_names:
-            method = getattr(clients[:1], method_name, None)
-            if callable(method):
-                return method_name
-
-        for method_name in self._find_restart_methods_from_views():
             method = getattr(clients[:1], method_name, None)
             if callable(method):
                 return method_name
@@ -396,10 +398,18 @@ class SaasBulkRestartWizard(models.TransientModel):
                                 string="Check Health"
                                 display="always"
                             />
+                            <button
+                                name="action_auto_restart_check_now"
+                                type="object"
+                                string="Run Auto Restart Check"
+                                display="always"
+                            />
                         </header>
                         <field name="auto_restart_enabled" optional="show"/>
                         <field name="auto_restart_intentional_stop" optional="hide"/>
+                        <field name="health_summary" optional="show"/>
                         <field name="health_state" optional="show"/>
+                        <field name="last_http_status" optional="show"/>
                         <field name="consecutive_failure_count" optional="hide"/>
                         <field name="last_health_check" optional="hide"/>
                     </xpath>
@@ -457,15 +467,33 @@ class SaasBulkRestartWizard(models.TransientModel):
                     <xpath expr="//sheet" position="inside">
                         <group string="Auto Restart Monitor">
                             <group>
+                                <button
+                                    name="action_auto_restart_check_now"
+                                    type="object"
+                                    string="Run Auto Restart Check"
+                                    class="btn-primary"
+                                />
+                                <button
+                                    name="action_reset_auto_restart_block"
+                                    type="object"
+                                    string="Reset Auto Restart Block"
+                                />
                                 <field name="auto_restart_enabled"/>
                                 <field name="auto_restart_intentional_stop"/>
+                                <field name="health_summary" readonly="1"/>
                                 <field name="health_state" readonly="1"/>
+                                <field name="last_http_status" readonly="1"/>
                                 <field name="consecutive_failure_count" readonly="1"/>
                             </group>
                             <group>
                                 <field name="last_health_check" readonly="1"/>
                                 <field name="last_auto_restart" readonly="1"/>
                                 <field name="auto_restart_attempt_count" readonly="1"/>
+                                <field name="gateway_error_count" readonly="1"/>
+                                <field name="inaccessible_count" readonly="1"/>
+                                <field name="manual_stop_count" readonly="1"/>
+                                <field name="restart_count" readonly="1"/>
+                                <field name="blocked_count" readonly="1"/>
                                 <field name="health_message" readonly="1"/>
                             </group>
                         </group>

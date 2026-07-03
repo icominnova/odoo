@@ -1,10 +1,12 @@
 import logging
 
 import requests
+from urllib3.exceptions import InsecureRequestWarning
 
 from odoo import _, api, fields, models
 
 _logger = logging.getLogger(__name__)
+requests.packages.urllib3.disable_warnings(category=InsecureRequestWarning)
 
 
 class SaasClient(models.Model):
@@ -23,6 +25,7 @@ class SaasClient(models.Model):
             ("unknown", "Unknown"),
             ("online", "Online"),
             ("offline", "Offline"),
+            ("gateway_error", "Gateway Error"),
             ("restarting", "Restarting"),
             ("blocked", "Blocked"),
         ],
@@ -36,6 +39,10 @@ class SaasClient(models.Model):
     )
     health_message = fields.Char(
         string="Health Message",
+        copy=False,
+    )
+    last_http_status = fields.Integer(
+        string="Last HTTP Status",
         copy=False,
     )
     consecutive_failure_count = fields.Integer(
@@ -56,6 +63,88 @@ class SaasClient(models.Model):
         string="Health History",
         readonly=True,
     )
+    health_summary = fields.Char(
+        string="Service",
+        compute="_compute_health_summary",
+    )
+    gateway_error_count = fields.Integer(
+        string="502/503/504",
+        compute="_compute_health_counters",
+    )
+    inaccessible_count = fields.Integer(
+        string="Inaccessible",
+        compute="_compute_health_counters",
+    )
+    manual_stop_count = fields.Integer(
+        string="Stopped",
+        compute="_compute_health_counters",
+    )
+    restart_count = fields.Integer(
+        string="Restarted",
+        compute="_compute_health_counters",
+    )
+    blocked_count = fields.Integer(
+        string="Blocked",
+        compute="_compute_health_counters",
+    )
+
+    @api.depends("health_state", "auto_restart_intentional_stop")
+    def _compute_health_summary(self):
+        labels = {
+            "online": _("Accessible"),
+            "gateway_error": _("Gateway Error"),
+            "offline": _("Inaccessible"),
+            "restarting": _("Restarting"),
+            "blocked": _("Blocked"),
+            "unknown": _("Unknown"),
+        }
+        for client in self:
+            if client.auto_restart_intentional_stop:
+                client.health_summary = _("Stopped voluntarily")
+            else:
+                client.health_summary = labels.get(client.health_state, _("Unknown"))
+
+    def _compute_health_counters(self):
+        counters = {
+            client.id: {
+                "gateway_error_count": 0,
+                "inaccessible_count": 0,
+                "manual_stop_count": 0,
+                "restart_count": 0,
+                "blocked_count": 0,
+            }
+            for client in self
+        }
+        if counters:
+            groups = self.env["saas.client.health.log"].sudo().read_group(
+                [("client_id", "in", list(counters))],
+                ["client_id", "event_type"],
+                ["client_id", "event_type"],
+                lazy=False,
+            )
+            for group in groups:
+                client_id = group["client_id"][0]
+                event_type = group["event_type"]
+                count = group["__count"]
+                if event_type == "gateway_error":
+                    counters[client_id]["gateway_error_count"] += count
+                    counters[client_id]["inaccessible_count"] += count
+                elif event_type == "health_offline":
+                    counters[client_id]["inaccessible_count"] += count
+                elif event_type == "manual_stop":
+                    counters[client_id]["manual_stop_count"] += count
+                elif event_type in ("auto_restart", "manual_restart"):
+                    counters[client_id]["restart_count"] += count
+                elif event_type == "auto_restart_blocked":
+                    counters[client_id]["blocked_count"] += count
+
+        for client in self:
+            values = counters.get(client.id, {})
+            client.gateway_error_count = values.get("gateway_error_count", 0)
+            client.inaccessible_count = values.get("inaccessible_count", 0)
+            client.manual_stop_count = values.get("manual_stop_count", 0)
+            client.restart_count = values.get("restart_count", 0)
+            client.blocked_count = values.get("blocked_count", 0)
 
     def action_open_bulk_restart_wizard(self):
         return self.action_open_saas_operations_wizard()
@@ -94,22 +183,67 @@ class SaasClient(models.Model):
             },
         }
 
+    def action_auto_restart_check_now(self):
+        messages = []
+        for client in self:
+            result = client._health_check_and_auto_restart()
+            messages.append("%s: %s" % (client.display_name, result))
+        return {
+            "type": "ir.actions.client",
+            "tag": "display_notification",
+            "params": {
+                "title": _("Auto Restart Check"),
+                "message": "\n".join(messages),
+                "type": "success",
+                "sticky": True,
+            },
+        }
+
+    def action_reset_auto_restart_block(self):
+        for client in self:
+            client.write({
+                "health_state": "unknown",
+                "health_message": False,
+                "consecutive_failure_count": 0,
+                "auto_restart_attempt_count": 0,
+                "last_auto_restart": False,
+                "auto_restart_intentional_stop": False,
+            })
+            client._log_health_event(
+                "auto_restart_reset",
+                health_state="unknown",
+                message=_("Auto restart block reset by %s.") % self.env.user.display_name,
+            )
+        return {
+            "type": "ir.actions.client",
+            "tag": "display_notification",
+            "params": {
+                "title": _("Auto Restart"),
+                "message": _("Auto restart counters reset."),
+                "type": "success",
+            },
+        }
+
     @classmethod
-    def _bulk_restart_safe_int(cls, value, default):
+    def _bulk_restart_safe_int(cls, value, default, minimum=False):
         try:
-            return int(value)
+            result = int(value)
         except (TypeError, ValueError):
-            return default
+            result = default
+        if minimum is not False:
+            result = max(minimum, result)
+        return result
 
     @api.model
-    def _cron_auto_restart_unreachable_clients(self, limit=50):
+    def _cron_auto_restart_unreachable_clients(self, limit=200):
         clients = self.search([
             ("auto_restart_enabled", "=", True),
             ("auto_restart_intentional_stop", "=", False),
         ], limit=limit)
         for client in clients:
             try:
-                client._health_check_and_auto_restart()
+                result = client._health_check_and_auto_restart()
+                _logger.info("Auto restart monitor result for %s: %s", client.display_name, result)
             except Exception:
                 _logger.exception("Auto restart monitor failed for SaaS client %s", client.display_name)
 
@@ -117,13 +251,16 @@ class SaasClient(models.Model):
         self.ensure_one()
         config = self.env["ir.config_parameter"].sudo()
         failure_threshold = self._bulk_restart_safe_int(
-            config.get_param("saas_bulk_restart.failure_threshold"), 2
+            config.get_param("saas_bulk_restart.failure_threshold"), 2, minimum=1
+        )
+        gateway_failure_threshold = self._bulk_restart_safe_int(
+            config.get_param("saas_bulk_restart.gateway_failure_threshold"), 1, minimum=1
         )
         cooldown_minutes = self._bulk_restart_safe_int(
-            config.get_param("saas_bulk_restart.cooldown_minutes"), 15
+            config.get_param("saas_bulk_restart.cooldown_minutes"), 5, minimum=0
         )
         max_attempts = self._bulk_restart_safe_int(
-            config.get_param("saas_bulk_restart.max_attempts"), 3
+            config.get_param("saas_bulk_restart.max_attempts"), 3, minimum=1
         )
 
         is_online = self._check_client_health()
@@ -132,12 +269,20 @@ class SaasClient(models.Model):
                 "auto_restart_attempt_count": 0,
                 "auto_restart_intentional_stop": False,
             })
-            return
+            return _("online")
 
         if self.auto_restart_intentional_stop:
-            return
-        if self.consecutive_failure_count < failure_threshold:
-            return
+            return _("skipped: voluntarily stopped")
+        required_failures = (
+            gateway_failure_threshold
+            if self.health_state == "gateway_error"
+            else failure_threshold
+        )
+        if self.consecutive_failure_count < required_failures:
+            return _("waiting: %s/%s failure(s)") % (
+                self.consecutive_failure_count,
+                required_failures,
+            )
         if self.auto_restart_attempt_count >= max_attempts:
             self.write({
                 "health_state": "blocked",
@@ -147,13 +292,15 @@ class SaasClient(models.Model):
                 "auto_restart_blocked",
                 message=_("Auto restart blocked after %s failed attempt(s).") % max_attempts,
             )
-            return
+            return _("blocked: max attempts reached")
         if self.last_auto_restart:
             elapsed = fields.Datetime.now() - self.last_auto_restart
             if elapsed.total_seconds() < cooldown_minutes * 60:
-                return
+                remaining = int((cooldown_minutes * 60 - elapsed.total_seconds()) / 60) + 1
+                return _("cooldown: retry in about %s minute(s)") % remaining
 
         self._auto_restart_client()
+        return _("restart requested")
 
     def _check_client_health(self):
         self.ensure_one()
@@ -164,6 +311,7 @@ class SaasClient(models.Model):
             self.write({
                 "health_state": "unknown",
                 "last_health_check": fields.Datetime.now(),
+                "last_http_status": 0,
                 "health_message": _("No URL configured."),
             })
             if previous_health_state != "unknown":
@@ -175,11 +323,12 @@ class SaasClient(models.Model):
             return False
 
         try:
-            response = requests.get(url, timeout=10, allow_redirects=True)
+            response = requests.get(url, timeout=10, allow_redirects=True, verify=False)
             if response.status_code < 500:
                 self.write({
                     "health_state": "online",
                     "last_health_check": fields.Datetime.now(),
+                    "last_http_status": response.status_code,
                     "health_message": _("HTTP %s") % response.status_code,
                     "consecutive_failure_count": 0,
                 })
@@ -194,19 +343,24 @@ class SaasClient(models.Model):
                 return True
             message = _("HTTP %s") % response.status_code
             http_status = response.status_code
+            health_state = "gateway_error" if response.status_code in (502, 503, 504) else "offline"
+            event_type = "gateway_error" if health_state == "gateway_error" else "health_offline"
         except requests.RequestException as error:
             message = str(error)[:250]
             http_status = 0
+            health_state = "offline"
+            event_type = "health_offline"
 
         self.write({
-            "health_state": "offline",
+            "health_state": health_state,
             "last_health_check": fields.Datetime.now(),
+            "last_http_status": http_status,
             "health_message": message,
             "consecutive_failure_count": self.consecutive_failure_count + 1,
         })
         self._log_health_event(
-            "health_offline",
-            health_state="offline",
+            event_type,
+            health_state=health_state,
             http_status=http_status,
             url=url,
             message=message,

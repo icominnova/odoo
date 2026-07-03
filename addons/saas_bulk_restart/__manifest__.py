@@ -3,11 +3,12 @@
     "version": "19.0.1.0.0",
     "category": "SaaS",
     "summary": "Stop, restart, or delete several SaaS clients from one wizard",
-    "author": "Alain Gansonré",
+    "author": "Sunsoft",
     "license": "LGPL-3",
     "depends": ["odoo_saas_kit"],
     "data": [
         "security/ir.model.access.csv",
+        "data/saas_bulk_restart_config.xml",
         "data/saas_bulk_restart_cron.xml",
         "views/saas_client_health_log_views.xml",
         "views/saas_bulk_restart_views.xml",
