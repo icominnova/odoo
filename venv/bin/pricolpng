@@ -1,4 +1,4 @@
-#!/opt/odoo/odoo/venv/bin/python3
+#!/home/sougrinooma/Projects/odoo/venv/bin/python3
 
 # http://www.python.org/doc/2.4.4/lib/module-itertools.html
 import itertools

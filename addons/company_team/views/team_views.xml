@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<odoo>
+
+    <!--liste vue-->
+
+    <record id="view_company_team_list" model="ir.ui.view">
+        <field name="name">company.team.list</field>
+        <field name="model">company.team</field>
+        <field name="arch" type="xml">
+
+            <list>
+                <field name="name"/>
+                <field name="description"/>
+                <field name="active"/>
+            </list>
+
+        </field>
+    </record>
+
+
+    <record id="view_company_team_form" model="ir.ui.view">
+        <field name="name">company.team.form</field>
+        <field name="model">company.team</field>
+        <field name="arch" type="xml">
+
+            <form>
+                <sheet>
+                    <group>
+                        <field name="name"/>
+                        <field name="description"/>
+                        <field name="active"/>
+                    </group>
+                </sheet>
+            </form>
+
+        </field>
+    </record> 
+
+</odoo>
+

@@ -1,4 +1,4 @@
-#!/opt/odoo/odoo/venv/bin/python3
+#!/home/sougrinooma/Projects/odoo/venv/bin/python3
 
 # Copyright: This module has been placed in the public domain.
 

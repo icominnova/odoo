@@ -1,4 +1,4 @@
-#!/opt/odoo/odoo/venv/bin/python3
+#!/home/sougrinooma/Projects/odoo/venv/bin/python3
 # :Copyright: © 2015 Günter Milde.
 # :License: Released under the terms of the `2-Clause BSD license`_, in short:
 #

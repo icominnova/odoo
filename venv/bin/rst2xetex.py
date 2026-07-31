@@ -1,4 +1,4 @@
-#!/opt/odoo/odoo/venv/bin/python3
+#!/home/sougrinooma/Projects/odoo/venv/bin/python3
 
 # $Id: rst2xetex.py 9115 2022-07-28 17:06:24Z milde $
 # Author: Guenter Milde
