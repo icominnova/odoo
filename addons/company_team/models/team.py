@@ -6,7 +6,7 @@ class CompanyTeam(models.Model):
 
 
     name = fields.Char(
-        string="Nom de l'équipe",
+        string="Nom Equipe",
         required=True
     )
 
@@ -21,4 +21,10 @@ class CompanyTeam(models.Model):
 
     creation_date = fields.Date(
         string="Date de création"
+    )
+
+    department_id = fields.Many2one(
+        "company.department",
+        string="Département",
+        required=True
     )

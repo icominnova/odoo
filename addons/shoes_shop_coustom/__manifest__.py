@@ -1,38 +1,47 @@
 {
-    'name': "company_team",
+    'name': "shoes_shop_coustom",
 
     'summary': "Short (1 phrase/line) summary of the module's purpose",
 
-    'description': "Ce module sert à maintenir et gérer correctement une équipe en entreprise",
+    'description': """
+Facture de chaussures
+    """,
 
     'author': "Sougrinooma",
-    'license':"LGPL-3",
-    'website': "",
+    'website': "https://www.yourcompany.com",
 
     # Categories can be used to filter modules in modules listing
     # Check https://github.com/odoo/odoo/blob/15.0/odoo/addons/base/data/ir_module_category_data.xml
     # for the full list
     'category': 'Uncategorized',
-    'version': '19.0.1.0.0',
+    'version': '19.0.1.0.1',
     'application':True,
     'installable':True,
+    'license':'LGPL-3',
 
     # any module necessary for this one to work correctly
-    'depends': ['base'],
+    'depends': [
+        "account",
+        "web"
+        ],
 
     # always loaded
     'data': [
         'security/ir.model.access.csv',
-        'data/sequence.xml',
-        'views/team_views.xml',
-        'views/employee_views.xml',
-        'views/department_views.xml',
-        'views/menu.xml',
-        
+        'views/invoice_report_views.xml',
+        'views/templates.xml',
+        'data/report_layout.xml',
     ],
     # only loaded in demonstration mode
     'demo': [
         'demo/demo.xml',
     ],
+
+    'assets' : {
+       'web.report_assets_common' : [
+            'shoes_shop_coustom/static/src/css/invoice_style.css'
+        ]
+    },
+
 }
 

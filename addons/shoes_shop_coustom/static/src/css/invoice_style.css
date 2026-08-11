@@ -1,0 +1,48 @@
+
+.footer .flex-grow-1 {
+    display: none ;
+}
+
+.shoes_logo {
+    background-color: #f87509;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    border-radius: 0 25px 0 25px;
+    padding: 16px;
+    display: inline-block;
+}
+
+.shoes_logo .o_company_logo_big {
+    max-width: 100%;
+    display: block;
+}
+
+.footer .border-top  {
+    border-top: 10px solid #f87509 !important;
+    border-radius: 10px;
+}
+
+.footer_message {
+    text-align: center;
+    width: 100%;
+}
+
+.o_company_logo_big {
+    border-radius:20px;
+}
+
+.shoes_invoice_header_row {
+    background-color: rgb(177, 174, 174);
+}
+
+.shoes_invoice_header_row th {
+    padding: 8px;
+}
+.shoes_invoice_total_label {
+    background-color: rgb(245, 129, 129) !important;
+    color:white !important;
+}
+
+.shoes_invoice_total_amount {
+    background-color: rgb(147, 230, 147) !important;
+    color: rgb(245, 238, 238) !important;
+}

@@ -7,6 +7,18 @@
         <field name="view_mode">list,form</field>
     </record>
 
+    <record id="action_company_employee" model="ir.actions.act_window">
+        <field name="name">Employees</field>
+        <field name="res_model">company.employee</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+    <record id="action_company_department" model="ir.actions.act_window">
+        <field name="name">Departments</field>
+        <field name="res_model">company.department</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
     <menuitem
         id="menu_company_root"
         name="Entreprise"/>
@@ -16,5 +28,17 @@
         name="Teams"
         parent="menu_company_root"
         action="action_company_team"/>
+    
+    <menuitem
+        id="menu_company_employee"
+        name="Employees"
+        parent="menu_company_root"
+        action="action_company_employee"/>
+    
+    <menuitem
+        id="menu_company_department"
+        name="Departments"
+        parent="menu_company_root"
+        action="action_company_department"/>
 
 </odoo>

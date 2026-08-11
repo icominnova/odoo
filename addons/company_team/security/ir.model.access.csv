@@ -1,2 +1,5 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+
 access_company_team,access.company.team,model_company_team,base.group_user,1,1,1,1
+access_company_employee,access.company.employee,model_company_employee,base.group_user,1,1,1,1
+access_company_department,access.company.department,model_company_department,base.group_user,1,1,1,1

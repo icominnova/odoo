@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<odoo>
+
+    <!--liste vue-->
+    <record id="view_company_employee_list" model="ir.ui.view">
+        <field name="name">company.employee.list</field>
+        <field name="model">company.employee</field>
+        <field name="arch" type="xml">
+
+            <list>
+                <field name="first_name"/>
+                <field name="last_name"/>
+                <field name="full_name"/> 
+                <field name="role"/>
+                <field name="attendance"/>
+                <field name="matricule"/>
+                <field name="numero_tel"/>
+                <field name="email"/>
+            </list>
+            
+        </field>
+    </record>
+
+    <!--formulaire vue-->
+
+    <record id="view_company_employee_form" model="ir.ui.view">
+        <field name="name">company.employee.form</field>
+        <field name="model">company.employee</field>
+        <field name="arch" type="xml">
+
+            <form>
+                <sheet>
+                    <group>
+                        <field name="first_name"/>
+                        <field name="last_name"/>
+                        <field name="full_name"/>
+                    </group>
+
+                    <group>
+                        <field name="attendance"/>
+                        <field name="role"/>
+                    </group>
+
+                    <group>
+                        <field name="matricule"/>
+                        <field name="numero_tel"/>
+                        <field name="email"/>
+                    </group>
+
+                    <group>
+                        <field name="department_id"/>
+                        <field name="team_id"
+                               domain="[('department_id', '=', department_id)]"/>
+                    </group>
+                    
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+</odoo>

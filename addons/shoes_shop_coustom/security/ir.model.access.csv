@@ -1,0 +1,3 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+
+access_shoes_shop_coustom,access.shoes.shop.coustom,model_shoes_shop_coustom,base.group_user,1,1,1,1

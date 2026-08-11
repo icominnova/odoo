@@ -2,46 +2,44 @@
 
 <odoo>
 
-    <!--liste vue-->
+    <!--liste-->
 
-    <record id="view_company_team_list" model="ir.ui.view">
-        <field name="name">company.team.list</field>
-        <field name="model">company.team</field>
+    <record id="view_company_department_list" model="ir.ui.view">
+        <field name="name">company.department.list</field>
+        <field name="model">company.department</field>
         <field name="arch" type="xml">
 
             <list>
                 <field name="name"/>
                 <field name="description"/>
+                <field name="creation_date"/>
                 <field name="active"/>
             </list>
-
         </field>
     </record>
 
+    <!--formulaire-->
 
-    <record id="view_company_team_form" model="ir.ui.view">
-        <field name="name">company.team.form</field>
-        <field name="model">company.team</field>
+    <record id="view_company_department_form" model="ir.ui.view">
+        <field name="name">company.department.form</field>
+        <field name="model">company.department</field>
         <field name="arch" type="xml">
 
             <form>
                 <sheet>
-
                     <group>
                         <field name="name"/>
-                        <field name="department_id"/>
-                    </group>
-
-                    <group>
                         <field name="description"/>
-                        <field name="active"/>
                     </group>
                     
+                    <group>
+                        <field name="creation_date"/>
+                        <field name="active"/>
+                    </group>
                 </sheet>
             </form>
 
         </field>
-    </record> 
-
+    </record>
+    
 </odoo>
-

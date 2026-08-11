@@ -6,16 +6,7 @@
         </t>
     </template>
 
-    <template id="report_invoice_document_preview" inherit_id="account.report_invoice_document" primary="True">
-        <xpath expr="//div[@id='qrcode']" position="replace">
-            <t t-if="qr_code" t-call="account.report_invoice_qr_code_preview"/>
-        </xpath>
-        <xpath expr="//p[@name='payment_communication']//t[@t-if='o.partner_bank_id']" position="replace">
-            <t t-if="account_number">
-                <br/> on this account: <span t-out="account_number" class="fw-bold"/>
-            </t>
-        </xpath>
-    </template>
+   
 
     <template id="report_invoice_wizard_preview_inherit_account" inherit_id="web.report_invoice_wizard_preview">
         <xpath expr="//div[@id='payment_term']" position="inside">

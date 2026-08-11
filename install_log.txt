@@ -1,0 +1,305 @@
+2026-08-06 12:28:15,183 74526 DEBUG ? odoo.netsvc: logger level set: "odoo.http.rpc.request:INFO" 
+2026-08-06 12:28:15,184 74526 DEBUG ? odoo.netsvc: logger level set: "odoo.http.rpc.response:INFO" 
+2026-08-06 12:28:15,186 74526 DEBUG ? odoo.netsvc: logger level set: ":INFO" 
+2026-08-06 12:28:15,186 74526 DEBUG ? odoo.netsvc: logger level set: "odoo:DEBUG" 
+2026-08-06 12:28:15,187 74526 DEBUG ? odoo.netsvc: logger level set: "odoo.sql_db:INFO" 
+2026-08-06 12:28:15,187 74526 DEBUG ? odoo.netsvc: logger level set: ":INFO" 
+2026-08-06 12:28:15,187 74526 INFO ? odoo: Odoo version 19.0 
+2026-08-06 12:28:15,187 74526 INFO ? odoo: Using configuration file at /home/sougrinooma/Projects/odoo/odoo.conf 
+2026-08-06 12:28:15,187 74526 INFO ? odoo: addons paths: _NamespacePath(['/home/sougrinooma/Projects/odoo/odoo/addons', '/home/sougrinooma/snap/code/254/.local/share/Odoo/addons/19.0', '/home/sougrinooma/Projects/odoo/addons']) 
+2026-08-06 12:28:15,188 74526 INFO ? odoo: database: sougrinooma@default:default 
+2026-08-06 12:28:16,476 74526 DEBUG ? odoo.service.server: Setting signal handlers 
+2026-08-06 12:28:16,503 74526 DEBUG odoo_first odoo.registry: Multiprocess load registry signaling: [Registry: 55] [Cache default: 3] [Cache assets: 2] [Cache stable: 1] [Cache templates: 2] [Cache routing: 1] [Cache groups: 1] 
+2026-08-06 12:28:16,541 74526 INFO odoo_first odoo.modules.loading: loading 1 modules... 
+2026-08-06 12:28:16,542 74526 DEBUG odoo_first odoo.modules.loading: Loading module base (1/1) 
+2026-08-06 12:28:16,552 74526 DEBUG odoo_first odoo.modules.loading: Module base loaded in 0.01s, 0 queries 
+2026-08-06 12:28:16,552 74526 INFO odoo_first odoo.modules.loading: 1 modules loaded in 0.01s, 0 queries (+0 extra) 
+2026-08-06 12:28:16,622 74526 INFO odoo_first odoo.modules.loading: updating modules list 
+2026-08-06 12:28:16,627 74526 INFO odoo_first odoo.addons.base.models.ir_module: ALLOW access to module.update_list on [] to user __system__ #1 via n/a 
+2026-08-06 12:28:17,074 74526 WARNING odoo_first odoo.modules.module: Missing `license` key in manifest for 'custom_pwa_manifest', defaulting to LGPL-3 
+2026-08-06 12:28:17,075 74526 WARNING odoo_first odoo.modules.module: Missing `license` key in manifest for 'custom_pwa_manifest', defaulting to LGPL-3 
+2026-08-06 12:28:18,920 74526 INFO odoo_first odoo.addons.base.models.ir_module: ALLOW access to module.button_install on ['shoes_shop_coustom'] to user __system__ #1 via n/a 
+2026-08-06 12:28:19,962 74526 DEBUG odoo_first odoo.modules.loading: Updating graph with 96 more modules 
+2026-08-06 12:28:19,963 74526 INFO odoo_first odoo.modules.loading: loading 97 modules... 
+2026-08-06 12:28:19,963 74526 DEBUG odoo_first odoo.modules.loading: Loading module company_team (2/97) 
+2026-08-06 12:28:19,980 74526 WARNING odoo_first odoo.registry: Model attribute '_sql_constraints' is no longer supported, please define model.Constraint on the model. 
+2026-08-06 12:28:19,980 74526 DEBUG odoo_first odoo.modules.loading: Module company_team loaded in 0.02s, 0 queries 
+2026-08-06 12:28:19,980 74526 DEBUG odoo_first odoo.modules.loading: Loading module rpc (3/97) 
+2026-08-06 12:28:19,980 74526 DEBUG odoo_first odoo.modules.loading: Module rpc loaded in 0.00s, 0 queries 
+2026-08-06 12:28:19,980 74526 DEBUG odoo_first odoo.modules.loading: Loading module social_media (4/97) 
+2026-08-06 12:28:19,985 74526 DEBUG odoo_first odoo.modules.loading: Module social_media loaded in 0.00s, 0 queries 
+2026-08-06 12:28:19,985 74526 DEBUG odoo_first odoo.modules.loading: Loading module uom (5/97) 
+2026-08-06 12:28:20,003 74526 DEBUG odoo_first odoo.modules.loading: Module uom loaded in 0.01s, 0 queries 
+2026-08-06 12:28:20,003 74526 DEBUG odoo_first odoo.modules.loading: Loading module web (6/97) 
+2026-08-06 12:28:20,023 74526 DEBUG odoo_first odoo.modules.loading: Module web loaded in 0.02s, 0 queries 
+2026-08-06 12:28:20,023 74526 DEBUG odoo_first odoo.modules.loading: Loading module api_doc (7/97) 
+2026-08-06 12:28:20,050 74526 DEBUG odoo_first odoo.modules.loading: Module api_doc loaded in 0.03s, 0 queries 
+2026-08-06 12:28:20,051 74526 DEBUG odoo_first odoo.modules.loading: Loading module auth_totp (8/97) 
+2026-08-06 12:28:20,100 74526 DEBUG odoo_first odoo.modules.loading: Module auth_totp loaded in 0.05s, 0 queries 
+2026-08-06 12:28:20,101 74526 DEBUG odoo_first odoo.modules.loading: Loading module barcodes (9/97) 
+2026-08-06 12:28:20,106 74526 DEBUG odoo_first odoo.modules.loading: Module barcodes loaded in 0.01s, 0 queries 
+2026-08-06 12:28:20,106 74526 DEBUG odoo_first odoo.modules.loading: Loading module base_import (10/97) 
+2026-08-06 12:28:20,113 74526 DEBUG odoo_first odoo.modules.loading: Module base_import loaded in 0.01s, 0 queries 
+2026-08-06 12:28:20,113 74526 DEBUG odoo_first odoo.modules.loading: Loading module base_import_module (11/97) 
+2026-08-06 12:28:20,121 74526 DEBUG odoo_first odoo.modules.loading: Module base_import_module loaded in 0.01s, 0 queries 
+2026-08-06 12:28:20,121 74526 DEBUG odoo_first odoo.modules.loading: Loading module base_setup (12/97) 
+2026-08-06 12:28:20,129 74526 DEBUG odoo_first odoo.modules.loading: Module base_setup loaded in 0.01s, 0 queries 
+2026-08-06 12:28:20,129 74526 DEBUG odoo_first odoo.modules.loading: Loading module bus (13/97) 
+2026-08-06 12:28:20,153 74526 DEBUG odoo_first odoo.modules.loading: Module bus loaded in 0.02s, 0 queries 
+2026-08-06 12:28:20,153 74526 DEBUG odoo_first odoo.modules.loading: Loading module google_address_autocomplete (14/97) 
+2026-08-06 12:28:20,156 74526 DEBUG odoo_first odoo.modules.loading: Module google_address_autocomplete loaded in 0.00s, 0 queries 
+2026-08-06 12:28:20,156 74526 DEBUG odoo_first odoo.modules.loading: Loading module http_routing (15/97) 
+2026-08-06 12:28:20,161 74526 DEBUG odoo_first odoo.modules.loading: Module http_routing loaded in 0.00s, 0 queries 
+2026-08-06 12:28:20,161 74526 DEBUG odoo_first odoo.modules.loading: Loading module iot_base (16/97) 
+2026-08-06 12:28:20,163 74526 DEBUG odoo_first odoo.modules.loading: Module iot_base loaded in 0.00s, 0 queries 
+2026-08-06 12:28:20,164 74526 DEBUG odoo_first odoo.modules.loading: Loading module onboarding (17/97) 
+2026-08-06 12:28:20,168 74526 DEBUG odoo_first odoo.modules.loading: Module onboarding loaded in 0.00s, 0 queries 
+2026-08-06 12:28:20,169 74526 DEBUG odoo_first odoo.modules.loading: Loading module resource (18/97) 
+2026-08-06 12:28:20,184 74526 DEBUG odoo_first odoo.modules.loading: Module resource loaded in 0.02s, 0 queries 
+2026-08-06 12:28:20,184 74526 DEBUG odoo_first odoo.modules.loading: Loading module utm (19/97) 
+2026-08-06 12:28:20,197 74526 DEBUG odoo_first odoo.modules.loading: Module utm loaded in 0.01s, 0 queries 
+2026-08-06 12:28:20,197 74526 DEBUG odoo_first odoo.modules.loading: Loading module web_tour (20/97) 
+2026-08-06 12:28:20,202 74526 DEBUG odoo_first odoo.modules.loading: Module web_tour loaded in 0.01s, 0 queries 
+2026-08-06 12:28:20,202 74526 DEBUG odoo_first odoo.modules.loading: Loading module auth_passkey (21/97) 
+2026-08-06 12:28:20,270 74526 DEBUG odoo_first odoo.modules.loading: Module auth_passkey loaded in 0.07s, 0 queries 
+2026-08-06 12:28:20,270 74526 DEBUG odoo_first odoo.modules.loading: Loading module barcodes_gs1_nomenclature (22/97) 
+2026-08-06 12:28:20,273 74526 DEBUG odoo_first odoo.modules.loading: Module barcodes_gs1_nomenclature loaded in 0.00s, 0 queries 
+2026-08-06 12:28:20,273 74526 DEBUG odoo_first odoo.modules.loading: Loading module google_recaptcha (23/97) 
+2026-08-06 12:28:20,275 74526 DEBUG odoo_first odoo.modules.loading: Module google_recaptcha loaded in 0.00s, 0 queries 
+2026-08-06 12:28:20,275 74526 DEBUG odoo_first odoo.modules.loading: Loading module html_editor (24/97) 
+2026-08-06 12:28:21,005 74526 DEBUG odoo_first odoo.modules.loading: Module html_editor loaded in 0.73s, 0 queries 
+2026-08-06 12:28:21,007 74526 DEBUG odoo_first odoo.modules.loading: Loading module iap (25/97) 
+2026-08-06 12:28:21,008 74526 DEBUG odoo_first odoo.modules.loading: Module iap loaded in 0.00s, 0 queries 
+2026-08-06 12:28:21,008 74526 DEBUG odoo_first odoo.modules.loading: Loading module mail (26/97) 
+2026-08-06 12:28:21,052 74526 DEBUG odoo_first odoo.modules.loading: Module mail loaded in 0.04s, 0 queries 
+2026-08-06 12:28:21,052 74526 DEBUG odoo_first odoo.modules.loading: Loading module web_unsplash (27/97) 
+2026-08-06 12:28:21,073 74526 DEBUG odoo_first odoo.modules.loading: Module web_unsplash loaded in 0.02s, 0 queries 
+2026-08-06 12:28:21,081 74526 DEBUG odoo_first odoo.modules.loading: Loading module analytic (28/97) 
+2026-08-06 12:28:21,125 74526 DEBUG odoo_first odoo.modules.loading: Module analytic loaded in 0.04s, 0 queries 
+2026-08-06 12:28:21,125 74526 DEBUG odoo_first odoo.modules.loading: Loading module auth_signup (29/97) 
+2026-08-06 12:28:21,154 74526 DEBUG odoo_first odoo.modules.loading: Module auth_signup loaded in 0.03s, 0 queries 
+2026-08-06 12:28:21,156 74526 DEBUG odoo_first odoo.modules.loading: Loading module auth_totp_mail (30/97) 
+2026-08-06 12:28:21,176 74526 DEBUG odoo_first odoo.modules.loading: Module auth_totp_mail loaded in 0.02s, 0 queries 
+2026-08-06 12:28:21,181 74526 DEBUG odoo_first odoo.modules.loading: Loading module base_install_request (31/97) 
+2026-08-06 12:28:21,198 74526 DEBUG odoo_first odoo.modules.loading: Module base_install_request loaded in 0.02s, 0 queries 
+2026-08-06 12:28:21,198 74526 DEBUG odoo_first odoo.modules.loading: Loading module gamification (32/97) 
+2026-08-06 12:28:21,257 74526 DEBUG odoo_first odoo.modules.loading: Module gamification loaded in 0.06s, 0 queries 
+2026-08-06 12:28:21,257 74526 DEBUG odoo_first odoo.modules.loading: Loading module google_gmail (33/97) 
+2026-08-06 12:28:21,287 74526 DEBUG odoo_first odoo.modules.loading: Module google_gmail loaded in 0.03s, 0 queries 
+2026-08-06 12:28:21,287 74526 DEBUG odoo_first odoo.modules.loading: Loading module html_builder (34/97) 
+2026-08-06 12:28:21,290 74526 DEBUG odoo_first odoo.modules.loading: Module html_builder loaded in 0.00s, 0 queries 
+2026-08-06 12:28:21,290 74526 DEBUG odoo_first odoo.modules.loading: Loading module iap_mail (35/97) 
+2026-08-06 12:28:21,297 74526 DEBUG odoo_first odoo.modules.loading: Module iap_mail loaded in 0.01s, 0 queries 
+2026-08-06 12:28:21,298 74526 DEBUG odoo_first odoo.modules.loading: Loading module mail_bot (36/97) 
+2026-08-06 12:28:21,322 74526 DEBUG odoo_first odoo.modules.loading: Module mail_bot loaded in 0.02s, 0 queries 
+2026-08-06 12:28:21,322 74526 DEBUG odoo_first odoo.modules.loading: Loading module microsoft_outlook (37/97) 
+2026-08-06 12:28:21,340 74526 DEBUG odoo_first odoo.modules.loading: Module microsoft_outlook loaded in 0.02s, 0 queries 
+2026-08-06 12:28:21,349 74526 DEBUG odoo_first odoo.modules.loading: Loading module phone_validation (38/97) 
+2026-08-06 12:28:21,421 74526 DEBUG odoo_first odoo.modules.loading: Module phone_validation loaded in 0.07s, 0 queries 
+2026-08-06 12:28:21,421 74526 DEBUG odoo_first odoo.modules.loading: Loading module privacy_lookup (39/97) 
+2026-08-06 12:28:21,444 74526 DEBUG odoo_first odoo.modules.loading: Module privacy_lookup loaded in 0.02s, 0 queries 
+2026-08-06 12:28:21,444 74526 DEBUG odoo_first odoo.modules.loading: Loading module product (40/97) 
+2026-08-06 12:28:21,552 74526 DEBUG odoo_first odoo.modules.loading: Module product loaded in 0.11s, 0 queries 
+2026-08-06 12:28:21,552 74526 DEBUG odoo_first odoo.modules.loading: Loading module rating (41/97) 
+2026-08-06 12:28:21,626 74526 DEBUG odoo_first odoo.modules.loading: Module rating loaded in 0.07s, 0 queries 
+2026-08-06 12:28:21,626 74526 DEBUG odoo_first odoo.modules.loading: Loading module resource_mail (42/97) 
+2026-08-06 12:28:21,631 74526 DEBUG odoo_first odoo.modules.loading: Module resource_mail loaded in 0.01s, 0 queries 
+2026-08-06 12:28:21,631 74526 DEBUG odoo_first odoo.modules.loading: Loading module sales_team (43/97) 
+2026-08-06 12:28:21,651 74526 DEBUG odoo_first odoo.modules.loading: Module sales_team loaded in 0.02s, 0 queries 
+2026-08-06 12:28:21,651 74526 DEBUG odoo_first odoo.modules.loading: Loading module partner_autocomplete (44/97) 
+2026-08-06 12:28:21,705 74526 DEBUG odoo_first odoo.modules.loading: Module partner_autocomplete loaded in 0.05s, 0 queries 
+2026-08-06 12:28:21,705 74526 DEBUG odoo_first odoo.modules.loading: Loading module portal (45/97) 
+2026-08-06 12:28:21,709 74526 DEBUG odoo_first odoo.modules.loading: Module portal loaded in 0.00s, 0 queries 
+2026-08-06 12:28:21,709 74526 DEBUG odoo_first odoo.modules.loading: Loading module sms (46/97) 
+2026-08-06 12:28:21,770 74526 DEBUG odoo_first odoo.modules.loading: Module sms loaded in 0.06s, 0 queries 
+2026-08-06 12:28:21,770 74526 DEBUG odoo_first odoo.modules.loading: Loading module snailmail (47/97) 
+2026-08-06 12:28:21,933 74526 DEBUG odoo_first odoo.modules.loading: Module snailmail loaded in 0.16s, 0 queries 
+2026-08-06 12:28:21,933 74526 DEBUG odoo_first odoo.modules.loading: Loading module wk_saas_tool (48/97) 
+2026-08-06 12:28:21,937 74526 DEBUG odoo_first odoo.modules.loading: Module wk_saas_tool loaded in 0.00s, 0 queries 
+2026-08-06 12:28:21,937 74526 DEBUG odoo_first odoo.modules.loading: Loading module auth_passkey_portal (49/97) 
+2026-08-06 12:28:21,938 74526 DEBUG odoo_first odoo.modules.loading: Module auth_passkey_portal loaded in 0.00s, 0 queries 
+2026-08-06 12:28:21,938 74526 DEBUG odoo_first odoo.modules.loading: Loading module auth_totp_portal (50/97) 
+2026-08-06 12:28:21,942 74526 DEBUG odoo_first odoo.modules.loading: Module auth_totp_portal loaded in 0.00s, 0 queries 
+2026-08-06 12:28:21,942 74526 DEBUG odoo_first odoo.modules.loading: Loading module digest (51/97) 
+2026-08-06 12:28:21,952 74526 DEBUG odoo_first odoo.modules.loading: Module digest loaded in 0.01s, 0 queries 
+2026-08-06 12:28:21,952 74526 DEBUG odoo_first odoo.modules.loading: Loading module payment (52/97) 
+2026-08-06 12:28:21,983 74526 DEBUG odoo_first odoo.modules.loading: Module payment loaded in 0.03s, 0 queries 
+2026-08-06 12:28:21,983 74526 DEBUG odoo_first odoo.modules.loading: Loading module portal_rating (53/97) 
+2026-08-06 12:28:21,987 74526 DEBUG odoo_first odoo.modules.loading: Module portal_rating loaded in 0.00s, 0 queries 
+2026-08-06 12:28:21,987 74526 DEBUG odoo_first odoo.modules.loading: Loading module spreadsheet (54/97) 
+2026-08-06 12:28:21,994 74526 DEBUG odoo_first odoo.modules.loading: Module spreadsheet loaded in 0.01s, 0 queries 
+2026-08-06 12:28:21,995 74526 DEBUG odoo_first odoo.modules.loading: Loading module account (55/97) 
+2026-08-06 12:28:22,162 74526 DEBUG odoo_first odoo.modules.loading: Module account loaded in 0.17s, 0 queries 
+2026-08-06 12:28:22,162 74526 DEBUG odoo_first odoo.modules.loading: Loading module payment_custom (56/97) 
+2026-08-06 12:28:22,166 74526 DEBUG odoo_first odoo.modules.loading: Module payment_custom loaded in 0.00s, 0 queries 
+2026-08-06 12:28:22,166 74526 DEBUG odoo_first odoo.modules.loading: Loading module spreadsheet_dashboard (57/97) 
+2026-08-06 12:28:22,177 74526 DEBUG odoo_first odoo.modules.loading: Module spreadsheet_dashboard loaded in 0.01s, 0 queries 
+2026-08-06 12:28:22,178 74526 DEBUG odoo_first odoo.modules.loading: Loading module stock (58/97) 
+2026-08-06 12:28:22,302 74526 DEBUG odoo_first odoo.modules.loading: Module stock loaded in 0.12s, 0 queries 
+2026-08-06 12:28:22,302 74526 DEBUG odoo_first odoo.modules.loading: Loading module website (59/97) 
+2026-08-06 12:28:22,394 74526 DEBUG odoo_first odoo.modules.loading: Module website loaded in 0.09s, 0 queries 
+2026-08-06 12:28:22,394 74526 DEBUG odoo_first odoo.modules.loading: Loading module account_add_gln (60/97) 
+2026-08-06 12:28:22,396 74526 DEBUG odoo_first odoo.modules.loading: Module account_add_gln loaded in 0.00s, 0 queries 
+2026-08-06 12:28:22,396 74526 DEBUG odoo_first odoo.modules.loading: Loading module account_edi_ubl_cii (61/97) 
+2026-08-06 12:28:22,439 74526 DEBUG odoo_first odoo.modules.loading: Module account_edi_ubl_cii loaded in 0.04s, 0 queries 
+2026-08-06 12:28:22,440 74526 DEBUG odoo_first odoo.modules.loading: Loading module account_payment (62/97) 
+2026-08-06 12:28:22,455 74526 DEBUG odoo_first odoo.modules.loading: Module account_payment loaded in 0.01s, 0 queries 
+2026-08-06 12:28:22,455 74526 DEBUG odoo_first odoo.modules.loading: Loading module l10n_syscohada (63/97) 
+2026-08-06 12:28:22,459 74526 DEBUG odoo_first odoo.modules.loading: Module l10n_syscohada loaded in 0.00s, 0 queries 
+2026-08-06 12:28:22,461 74526 DEBUG odoo_first odoo.modules.loading: Loading module snailmail_account (64/97) 
+2026-08-06 12:28:22,486 74526 DEBUG odoo_first odoo.modules.loading: Module snailmail_account loaded in 0.03s, 0 queries 
+2026-08-06 12:28:22,487 74526 DEBUG odoo_first odoo.modules.loading: Loading module spreadsheet_account (65/97) 
+2026-08-06 12:28:22,493 74526 DEBUG odoo_first odoo.modules.loading: Module spreadsheet_account loaded in 0.01s, 0 queries 
+2026-08-06 12:28:22,493 74526 DEBUG odoo_first odoo.modules.loading: Loading module spreadsheet_dashboard_account (66/97) 
+2026-08-06 12:28:22,494 74526 DEBUG odoo_first odoo.modules.loading: Module spreadsheet_dashboard_account loaded in 0.00s, 0 queries 
+2026-08-06 12:28:22,498 74526 DEBUG odoo_first odoo.modules.loading: Loading module stock_account (67/97) 
+2026-08-06 12:28:22,569 74526 DEBUG odoo_first odoo.modules.loading: Module stock_account loaded in 0.07s, 0 queries 
+2026-08-06 12:28:22,570 74526 DEBUG odoo_first odoo.modules.loading: Loading module stock_sms (68/97) 
+2026-08-06 12:28:22,581 74526 DEBUG odoo_first odoo.modules.loading: Module stock_sms loaded in 0.01s, 0 queries 
+2026-08-06 12:28:22,584 74526 DEBUG odoo_first odoo.modules.loading: Loading module theme_default (69/97) 
+2026-08-06 12:28:22,588 74526 DEBUG odoo_first odoo.modules.loading: Module theme_default loaded in 0.00s, 0 queries 
+2026-08-06 12:28:22,589 74526 DEBUG odoo_first odoo.modules.loading: Loading module website_mail (70/97) 
+2026-08-06 12:28:22,598 74526 DEBUG odoo_first odoo.modules.loading: Module website_mail loaded in 0.01s, 0 queries 
+2026-08-06 12:28:22,599 74526 DEBUG odoo_first odoo.modules.loading: Loading module website_partner (71/97) 
+2026-08-06 12:28:22,602 74526 DEBUG odoo_first odoo.modules.loading: Module website_partner loaded in 0.00s, 0 queries 
+2026-08-06 12:28:22,603 74526 DEBUG odoo_first odoo.modules.loading: Loading module website_sms (72/97) 
+2026-08-06 12:28:22,608 74526 DEBUG odoo_first odoo.modules.loading: Module website_sms loaded in 0.01s, 0 queries 
+2026-08-06 12:28:22,609 74526 DEBUG odoo_first odoo.modules.loading: Loading module l10n_bf (73/97) 
+2026-08-06 12:28:22,614 74526 DEBUG odoo_first odoo.modules.loading: Module l10n_bf loaded in 0.00s, 0 queries 
+2026-08-06 12:28:22,614 74526 DEBUG odoo_first odoo.modules.loading: Loading module point_of_sale (74/97) 
+2026-08-06 12:28:22,702 74526 DEBUG odoo_first odoo.modules.loading: Module point_of_sale loaded in 0.09s, 0 queries 
+2026-08-06 12:28:22,703 74526 DEBUG odoo_first odoo.modules.loading: Loading module sale (75/97) 
+2026-08-06 12:28:22,760 74526 DEBUG odoo_first odoo.modules.loading: Module sale loaded in 0.06s, 0 queries 
+2026-08-06 12:28:22,762 74526 DEBUG odoo_first odoo.modules.loading: Loading module website_payment (76/97) 
+2026-08-06 12:28:22,767 74526 DEBUG odoo_first odoo.modules.loading: Module website_payment loaded in 0.01s, 0 queries 
+2026-08-06 12:28:22,770 74526 DEBUG odoo_first odoo.modules.loading: Loading module website_profile (77/97) 
+2026-08-06 12:28:22,774 74526 DEBUG odoo_first odoo.modules.loading: Module website_profile loaded in 0.00s, 0 queries 
+2026-08-06 12:28:22,774 74526 DEBUG odoo_first odoo.modules.loading: Loading module delivery (78/97) 
+2026-08-06 12:28:22,807 74526 DEBUG odoo_first odoo.modules.loading: Module delivery loaded in 0.03s, 0 queries 
+2026-08-06 12:28:22,809 74526 DEBUG odoo_first odoo.modules.loading: Loading module pos_online_payment (79/97) 
+2026-08-06 12:28:22,826 74526 DEBUG odoo_first odoo.modules.loading: Module pos_online_payment loaded in 0.02s, 0 queries 
+2026-08-06 12:28:22,833 74526 DEBUG odoo_first odoo.modules.loading: Loading module sale_edi_ubl (80/97) 
+2026-08-06 12:28:22,843 74526 DEBUG odoo_first odoo.modules.loading: Module sale_edi_ubl loaded in 0.01s, 0 queries 
+2026-08-06 12:28:22,846 74526 DEBUG odoo_first odoo.modules.loading: Loading module sale_management (81/97) 
+2026-08-06 12:28:22,879 74526 DEBUG odoo_first odoo.modules.loading: Module sale_management loaded in 0.03s, 0 queries 
+2026-08-06 12:28:22,881 74526 DEBUG odoo_first odoo.modules.loading: Loading module sale_sms (82/97) 
+2026-08-06 12:28:22,882 74526 DEBUG odoo_first odoo.modules.loading: Module sale_sms loaded in 0.00s, 0 queries 
+2026-08-06 12:28:22,882 74526 DEBUG odoo_first odoo.modules.loading: Loading module sale_stock (83/97) 
+2026-08-06 12:28:22,918 74526 DEBUG odoo_first odoo.modules.loading: Module sale_stock loaded in 0.04s, 0 queries 
+2026-08-06 12:28:22,918 74526 DEBUG odoo_first odoo.modules.loading: Loading module spreadsheet_dashboard_sale (84/97) 
+2026-08-06 12:28:22,919 74526 DEBUG odoo_first odoo.modules.loading: Module spreadsheet_dashboard_sale loaded in 0.00s, 0 queries 
+2026-08-06 12:28:22,919 74526 DEBUG odoo_first odoo.modules.loading: Loading module website_forum (85/97) 
+2026-08-06 12:28:22,962 74526 DEBUG odoo_first odoo.modules.loading: Module website_forum loaded in 0.04s, 0 queries 
+2026-08-06 12:28:22,964 74526 DEBUG odoo_first odoo.modules.loading: Loading module pos_sale (86/97) 
+2026-08-06 12:28:22,980 74526 DEBUG odoo_first odoo.modules.loading: Module pos_sale loaded in 0.02s, 0 queries 
+2026-08-06 12:28:22,980 74526 DEBUG odoo_first odoo.modules.loading: Loading module sale_pdf_quote_builder (87/97) 
+2026-08-06 12:28:22,991 74526 DEBUG odoo_first odoo.modules.loading: Module sale_pdf_quote_builder loaded in 0.01s, 0 queries 
+2026-08-06 12:28:22,994 74526 DEBUG odoo_first odoo.modules.loading: Loading module stock_delivery (88/97) 
+2026-08-06 12:28:23,024 74526 DEBUG odoo_first odoo.modules.loading: Module stock_delivery loaded in 0.03s, 0 queries 
+2026-08-06 12:28:23,027 74526 DEBUG odoo_first odoo.modules.loading: Loading module website_sale (89/97) 
+2026-08-06 12:28:23,099 74526 DEBUG odoo_first odoo.modules.loading: Module website_sale loaded in 0.07s, 0 queries 
+2026-08-06 12:28:23,099 74526 DEBUG odoo_first odoo.modules.loading: Loading module spreadsheet_dashboard_website_sale (90/97) 
+2026-08-06 12:28:23,100 74526 DEBUG odoo_first odoo.modules.loading: Module spreadsheet_dashboard_website_sale loaded in 0.00s, 0 queries 
+2026-08-06 12:28:23,101 74526 DEBUG odoo_first odoo.modules.loading: Loading module website_sale_autocomplete (91/97) 
+2026-08-06 12:28:23,103 74526 DEBUG odoo_first odoo.modules.loading: Module website_sale_autocomplete loaded in 0.00s, 0 queries 
+2026-08-06 12:28:23,106 74526 DEBUG odoo_first odoo.modules.loading: Loading module website_sale_comparison (92/97) 
+2026-08-06 12:28:23,121 74526 DEBUG odoo_first odoo.modules.loading: Module website_sale_comparison loaded in 0.01s, 0 queries 
+2026-08-06 12:28:23,121 74526 DEBUG odoo_first odoo.modules.loading: Loading module website_sale_stock (93/97) 
+2026-08-06 12:28:23,149 74526 DEBUG odoo_first odoo.modules.loading: Module website_sale_stock loaded in 0.03s, 0 queries 
+2026-08-06 12:28:23,150 74526 DEBUG odoo_first odoo.modules.loading: Loading module website_sale_wishlist (94/97) 
+2026-08-06 12:28:23,162 74526 DEBUG odoo_first odoo.modules.loading: Module website_sale_wishlist loaded in 0.01s, 0 queries 
+2026-08-06 12:28:23,169 74526 DEBUG odoo_first odoo.modules.loading: Loading module website_sale_comparison_wishlist (95/97) 
+2026-08-06 12:28:23,170 74526 DEBUG odoo_first odoo.modules.loading: Module website_sale_comparison_wishlist loaded in 0.00s, 0 queries 
+2026-08-06 12:28:23,170 74526 DEBUG odoo_first odoo.modules.loading: Loading module website_sale_stock_wishlist (96/97) 
+2026-08-06 12:28:23,182 74526 DEBUG odoo_first odoo.modules.loading: Module website_sale_stock_wishlist loaded in 0.01s, 0 queries 
+2026-08-06 12:28:23,182 74526 INFO odoo_first odoo.modules.loading: Loading module shoes_shop_coustom (97/97) 
+2026-08-06 12:28:23,400 74526 DEBUG odoo_first odoo.registry: Patching res.partner.bank.partner_country_name with translate=True 
+2026-08-06 12:28:23,403 74526 DEBUG odoo_first odoo.registry: Patching res.config.settings.report_footer with translate=True 
+2026-08-06 12:28:23,405 74526 DEBUG odoo_first odoo.registry: Patching res.config.settings.invoice_terms with translate=True 
+2026-08-06 12:28:23,406 74526 DEBUG odoo_first odoo.registry: Patching res.config.settings.invoice_terms_html with translate=True 
+2026-08-06 12:28:23,419 74526 DEBUG odoo_first odoo.registry: Patching res.config.settings.website_sale_contact_us_button_url with translate=True 
+2026-08-06 12:28:23,465 74526 DEBUG odoo_first odoo.registry: Patching base.document.layout.report_header with translate=True 
+2026-08-06 12:28:23,469 74526 DEBUG odoo_first odoo.registry: Patching base.document.layout.report_footer with translate=True 
+2026-08-06 12:28:23,470 74526 DEBUG odoo_first odoo.registry: Patching base.document.layout.company_details with translate=True 
+2026-08-06 12:28:23,489 74526 DEBUG odoo_first odoo.registry: Patching iap.account.description with translate=True 
+2026-08-06 12:28:23,569 74526 DEBUG odoo_first odoo.registry: Patching gamification.badge.user.badge_name with translate=True 
+2026-08-06 12:28:23,573 74526 DEBUG odoo_first odoo.registry: Patching gamification.challenge.line.name with translate=True 
+2026-08-06 12:28:23,577 74526 DEBUG odoo_first odoo.registry: Patching gamification.challenge.line.definition_suffix with translate=True 
+2026-08-06 12:28:23,594 74526 DEBUG odoo_first odoo.registry: Patching product.template.uom_name with translate=True 
+2026-08-06 12:28:23,624 74526 DEBUG odoo_first odoo.registry: Patching product.pricelist.item.product_uom_name with translate=True 
+2026-08-06 12:28:23,630 74526 DEBUG odoo_first odoo.registry: Patching product.template.attribute.value.name with translate=True 
+2026-08-06 12:28:23,683 74526 DEBUG odoo_first odoo.registry: Patching account.move.line.account_name with translate=True 
+2026-08-06 12:28:23,785 74526 DEBUG odoo_first odoo.registry: Patching account.report.expression.report_line_name with translate=True 
+2026-08-06 12:28:23,816 74526 DEBUG odoo_first odoo.registry: Patching spreadsheet.dashboard.share.name with translate=True 
+2026-08-06 12:28:23,885 74526 DEBUG odoo_first odoo.registry: Patching stock.replenishment.option.uom with translate=True 
+2026-08-06 12:28:23,953 74526 DEBUG odoo_first odoo.registry: Patching delivery.carrier.website_description with translate=True 
+2026-08-06 12:28:23,984 74526 DEBUG odoo_first odoo.registry: Patching website.sale.extra.field.label with translate=True 
+2026-08-06 12:28:24,380 74526 INFO odoo_first odoo.modules.loading: loading shoes_shop_coustom/security/ir.model.access.csv 
+2026-08-06 12:28:24,442 74526 DEBUG odoo_first odoo.registry: Invalidating stable model caches from call_cache_clearing_methods /home/sougrinooma/Projects/odoo/odoo/addons/base/models/ir_model.py:2179 
+2026-08-06 12:28:24,550 74526 ERROR odoo_first odoo.sql_db: bad query: b'INSERT INTO "ir_model_access" ("active", "create_date", "create_uid", "group_id", "name", "perm_create", "perm_read", "perm_unlink", "perm_write", "write_date", "write_uid") VALUES (true, \'2026-08-06T12:28:16.513158\'::timestamp, 1, 1, \'shoes_shop_coustom.shoes_shop_coustom\', true, true, true, true, \'2026-08-06T12:28:16.513158\'::timestamp, 1) RETURNING "id"'
+ERROR: null value in column "model_id" of relation "ir_model_access" violates not-null constraint
+DETAIL:  Failing row contains (959, null, 1, 1, 1, shoes_shop_coustom.shoes_shop_coustom, t, t, t, t, t, 2026-08-06 12:28:16.513158, 2026-08-06 12:28:16.513158).
+ 
+2026-08-06 12:28:24,552 74526 DEBUG odoo_first odoo.registry: Invalidating stable model caches from call_cache_clearing_methods /home/sougrinooma/Projects/odoo/odoo/addons/base/models/ir_model.py:2179 
+2026-08-06 12:28:24,555 74526 ERROR odoo_first odoo.sql_db: bad query: b'INSERT INTO "ir_model_access" ("active", "create_date", "create_uid", "group_id", "name", "perm_create", "perm_read", "perm_unlink", "perm_write", "write_date", "write_uid") VALUES (true, \'2026-08-06T12:28:16.513158\'::timestamp, 1, 1, \'shoes_shop_coustom.shoes_shop_coustom\', true, true, true, true, \'2026-08-06T12:28:16.513158\'::timestamp, 1) RETURNING "id"'
+ERROR: null value in column "model_id" of relation "ir_model_access" violates not-null constraint
+DETAIL:  Failing row contains (960, null, 1, 1, 1, shoes_shop_coustom.shoes_shop_coustom, t, t, t, t, t, 2026-08-06 12:28:16.513158, 2026-08-06 12:28:16.513158).
+ 
+2026-08-06 12:28:24,664 74526 DEBUG odoo_first odoo.registry: Patching res.partner.bank.partner_country_name with translate=True 
+2026-08-06 12:28:24,666 74526 DEBUG odoo_first odoo.registry: Patching res.config.settings.report_footer with translate=True 
+2026-08-06 12:28:24,669 74526 DEBUG odoo_first odoo.registry: Patching res.config.settings.invoice_terms with translate=True 
+2026-08-06 12:28:24,672 74526 DEBUG odoo_first odoo.registry: Patching res.config.settings.invoice_terms_html with translate=True 
+2026-08-06 12:28:24,690 74526 DEBUG odoo_first odoo.registry: Patching res.config.settings.website_sale_contact_us_button_url with translate=True 
+2026-08-06 12:28:24,745 74526 DEBUG odoo_first odoo.registry: Patching base.document.layout.report_header with translate=True 
+2026-08-06 12:28:24,747 74526 DEBUG odoo_first odoo.registry: Patching base.document.layout.report_footer with translate=True 
+2026-08-06 12:28:24,747 74526 DEBUG odoo_first odoo.registry: Patching base.document.layout.company_details with translate=True 
+2026-08-06 12:28:24,783 74526 DEBUG odoo_first odoo.registry: Patching iap.account.description with translate=True 
+2026-08-06 12:28:24,875 74526 DEBUG odoo_first odoo.registry: Patching gamification.badge.user.badge_name with translate=True 
+2026-08-06 12:28:24,881 74526 DEBUG odoo_first odoo.registry: Patching gamification.challenge.line.name with translate=True 
+2026-08-06 12:28:24,881 74526 DEBUG odoo_first odoo.registry: Patching gamification.challenge.line.definition_suffix with translate=True 
+2026-08-06 12:28:24,895 74526 DEBUG odoo_first odoo.registry: Patching product.template.uom_name with translate=True 
+2026-08-06 12:28:24,944 74526 DEBUG odoo_first odoo.registry: Patching product.pricelist.item.product_uom_name with translate=True 
+2026-08-06 12:28:24,951 74526 DEBUG odoo_first odoo.registry: Patching product.template.attribute.value.name with translate=True 
+2026-08-06 12:28:25,057 74526 DEBUG odoo_first odoo.registry: Patching account.move.line.account_name with translate=True 
+2026-08-06 12:28:25,104 74526 DEBUG odoo_first odoo.registry: Patching account.report.expression.report_line_name with translate=True 
+2026-08-06 12:28:25,116 74526 DEBUG odoo_first odoo.registry: Patching spreadsheet.dashboard.share.name with translate=True 
+2026-08-06 12:28:25,156 74526 DEBUG odoo_first odoo.registry: Patching stock.replenishment.option.uom with translate=True 
+2026-08-06 12:28:25,212 74526 DEBUG odoo_first odoo.registry: Patching delivery.carrier.website_description with translate=True 
+2026-08-06 12:28:25,249 74526 DEBUG odoo_first odoo.registry: Patching website.sale.extra.field.label with translate=True 
+2026-08-06 12:28:25,478 74526 WARNING odoo_first odoo.modules.loading: Transient module states were reset 
+2026-08-06 12:28:25,478 74526 ERROR odoo_first odoo.registry: Failed to load registry 
+2026-08-06 12:28:25,479 74526 CRITICAL odoo_first odoo.service.server: Failed to initialize database `odoo_first`. 
+Traceback (most recent call last):
+  File "/home/sougrinooma/Projects/odoo/odoo/service/server.py", line 1510, in preload_registries
+    registry = Registry.new(dbname, update_module=update_module, install_modules=config['init'], upgrade_modules=config['update'], reinit_modules=config['reinit'])
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/sougrinooma/Projects/odoo/odoo/tools/func.py", line 88, in locked
+    return func(inst, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/sougrinooma/Projects/odoo/odoo/orm/registry.py", line 199, in new
+    load_modules(
+  File "/home/sougrinooma/Projects/odoo/odoo/modules/loading.py", line 456, in load_modules
+    load_module_graph(
+  File "/home/sougrinooma/Projects/odoo/odoo/modules/loading.py", line 209, in load_module_graph
+    load_data(env, idref, 'init', kind='data', package=package)
+  File "/home/sougrinooma/Projects/odoo/odoo/modules/loading.py", line 59, in load_data
+    convert_file(env, package.name, filename, idref, mode, noupdate=kind == 'demo')
+  File "/home/sougrinooma/Projects/odoo/odoo/tools/convert.py", line 689, in convert_file
+    convert_csv_import(env, module, pathname, fp.read(), idref, mode, noupdate)
+  File "/home/sougrinooma/Projects/odoo/odoo/tools/convert.py", line 754, in convert_csv_import
+    raise Exception(env._(
+Exception: Module loading shoes_shop_coustom failed: file shoes_shop_coustom/security/ir.model.access.csv could not be processed:
+No matching record found for external id 'model_shoes_shop_coustom_shoes_shop_coustom' in field 'Model'
+Missing required value for the field 'Model' (model_id).
+Model: 'Model Access' (ir.model.access)
+- create/update: a mandatory field is not set
+- delete: another model requires the record being deleted, you can archive it instead
+
+2026-08-06 12:28:25,571 74526 INFO odoo_first odoo.service.server: Initiating shutdown 
+2026-08-06 12:28:25,571 74526 INFO odoo_first odoo.service.server: Hit CTRL-C again or send a second signal to force the shutdown. 
+2026-08-06 12:28:25,571 74526 DEBUG odoo_first odoo.service.server: on_close call <bound method Event.set of <threading.Event at 0x7ab30a703230: unset>> 
+2026-08-06 12:28:25,571 74526 DEBUG odoo_first odoo.service.server: on_close call <function _kick_all at 0x7ab3094365c0> 
+2026-08-06 12:28:25,572 74526 DEBUG odoo_first odoo.service.server: current thread: <_MainThread(MainThread, started 134909507252352)> 
+2026-08-06 12:28:25,572 74526 DEBUG odoo_first odoo.service.server: process <_MainThread(MainThread, started 134909507252352)> (False) 
+2026-08-06 12:28:25,575 74526 INFO odoo_first odoo.sql_db: ConnectionPool(read/write;used=0/count=0/max=64): Closed 2 connections  
+2026-08-06 12:28:25,625 74526 DEBUG odoo_first odoo.service.server: -- 

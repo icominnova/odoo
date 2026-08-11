@@ -1,0 +1,25 @@
+                                          Table "public.company_employee"
+    Column     |            Type             | Collation | Nullable |                   Default                    
+---------------+-----------------------------+-----------+----------+----------------------------------------------
+ id            | integer                     |           | not null | nextval('company_employee_id_seq'::regclass)
+ create_uid    | integer                     |           |          | 
+ write_uid     | integer                     |           |          | 
+ first_name    | character varying           |           | not null | 
+ last_name     | character varying           |           | not null | 
+ role          | character varying           |           | not null | 
+ create_date   | timestamp without time zone |           |          | 
+ write_date    | timestamp without time zone |           |          | 
+ attendance    | double precision            |           |          | 
+ department_id | integer                     |           |          | 
+ team_id       | integer                     |           |          | 
+ matricule     | character varying           |           | not null | 
+ numero_tel    | character varying           |           | not null | 
+ email         | character varying           |           | not null | 
+Indexes:
+    "company_employee_pkey" PRIMARY KEY, btree (id)
+Foreign-key constraints:
+    "company_employee_create_uid_fkey" FOREIGN KEY (create_uid) REFERENCES res_users(id) ON DELETE SET NULL
+    "company_employee_department_id_fkey" FOREIGN KEY (department_id) REFERENCES company_department(id) ON DELETE SET NULL
+    "company_employee_team_id_fkey" FOREIGN KEY (team_id) REFERENCES company_team(id) ON DELETE SET NULL
+    "company_employee_write_uid_fkey" FOREIGN KEY (write_uid) REFERENCES res_users(id) ON DELETE SET NULL
+
