@@ -383,13 +383,12 @@ class SaleOrder(models.Model):
                         "Aucun champ de domaine compatible trouvé sur "
                         f"{contract._name}."
                     )
-                with self.env.cr.savepoint():
-                    method_name = order._sunapp_confirm_contract(contract)
-                    if not method_name:
-                        raise ValueError(
-                            "Aucune méthode de confirmation compatible trouvée sur "
-                            f"{contract._name}."
-                        )
+                method_name = order._sunapp_confirm_contract(contract)
+                if not method_name:
+                    raise ValueError(
+                        "Aucune méthode de confirmation compatible trouvée sur "
+                        f"{contract._name}."
+                    )
                 public_status = order.sunapp_saas_public_status()
                 workflow_complete = order._sunapp_contract_workflow_complete(
                     contract, public_status
