@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- ===== VUE LISTE ===== -->
+    <record id="saas_backup_file_view_list" model="ir.ui.view">
+        <field name="name">saas.backup.file.list</field>
+        <field name="model">saas.backup.file</field>
+        <field name="arch" type="xml">
+            <list string="Fichiers de sauvegarde SaaS" create="false" decoration-muted="state == 'missing'">
+                <field name="client_name"/>
+                <field name="name"/>
+                <field name="relative_path" optional="hide"/>
+                <field name="file_size_mb" string="Taille (Mo)" optional="show"/>
+                <field name="backup_date"/>
+                <field name="state" widget="badge" decoration-success="state == 'available'" decoration-danger="state == 'missing'"/>
+                <button name="action_download" string="Télécharger" type="object" icon="fa-download" invisible="state == 'missing'" class="btn-sm btn-primary"/>
+                <button name="action_open_restore_wizard" string="Restaurer" type="object" icon="fa-history" invisible="state == 'missing'" class="btn-sm btn-warning" groups="base.group_system"/>
+                <button name="action_delete_backup" string="Supprimer" type="object" icon="fa-trash" class="btn-sm btn-danger" groups="base.group_system" confirm="Ce backup sera supprimé du serveur. Continuer ?"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- ===== VUE FORMULAIRE ===== -->
+    <record id="saas_backup_file_view_form" model="ir.ui.view">
+        <field name="name">saas.backup.file.form</field>
+        <field name="model">saas.backup.file</field>
+        <field name="arch" type="xml">
+            <form string="Fichier de sauvegarde" create="false" edit="false">
+                <header>
+                    <button name="action_download" string="Télécharger" type="object" class="btn-primary" invisible="state == 'missing'"/>
+                    <button name="action_open_restore_wizard" string="Restaurer" type="object" class="btn-warning" invisible="state == 'missing'" groups="base.group_system"/>
+                    <button name="action_delete_backup" string="Supprimer" type="object" class="btn-danger" groups="base.group_system" confirm="Ce backup sera supprimé du serveur. Continuer ?"/>
+                    <field name="state" widget="statusbar" statusbar_visible="available,missing"/>
+                </header>
+                <sheet>
+                    <group>
+                        <group string="Informations">
+                            <field name="client_name"/>
+                            <field name="existing_database_names"/>
+                            <field name="name"/>
+                            <field name="backup_date"/>
+                            <field name="file_size_mb"/>
+                        </group>
+                        <group string="Localisation">
+                            <field name="relative_path"/>
+                            <field name="file_path"/>
+                            <field name="download_url" widget="url" string="Lien"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- ===== RECHERCHE ===== -->
+    <record id="saas_backup_file_view_search" model="ir.ui.view">
+        <field name="name">saas.backup.file.search</field>
+        <field name="model">saas.backup.file</field>
+        <field name="arch" type="xml">
+            <search string="Rechercher un backup">
+                <field name="client_name" string="Client"/>
+                <field name="name" string="Nom du fichier"/>
+                <filter string="Disponibles" name="available" domain="[('state', '=', 'available')]"/>
+                <filter string="Fichiers manquants" name="missing" domain="[('state', '=', 'missing')]"/>
+                <separator/>
+                <filter string="Grouper par Client" name="group_client" context="{'group_by': 'client_name'}"/>
+                <filter string="Grouper par Mois" name="group_month" context="{'group_by': 'backup_date:month'}"/>
+            </search>
+        </field>
+    </record>
+
+    <!-- ===== ACTION SERVEUR : SCAN (disponible dans le menu Action de la liste) ===== -->
+    <record id="saas_backup_scan_action" model="ir.actions.server">
+        <field name="name">Scanner les backups</field>
+        <field name="model_id" ref="model_saas_backup_file"/>
+        <field name="binding_model_id" ref="model_saas_backup_file"/>
+        <field name="binding_view_types">list</field>
+        <field name="state">code</field>
+        <field name="code">
+action = env['saas.backup.file'].action_scan_backups()
+        </field>
+    </record>
+
+    <record id="saas_backup_export_selected_action" model="ir.actions.server">
+        <field name="name">Exporter sélection</field>
+        <field name="model_id" ref="model_saas_backup_file"/>
+        <field name="binding_model_id" ref="model_saas_backup_file"/>
+        <field name="binding_view_types">list</field>
+        <field name="state">code</field>
+        <field name="code">
+action = records.action_download_archive()
+        </field>
+    </record>
+
+</odoo>
