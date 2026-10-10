@@ -6,6 +6,7 @@ import shutil
 import subprocess
 import tarfile
 import tempfile
+import time
 import zipfile
 from contextlib import closing
 from datetime import datetime
@@ -27,6 +28,10 @@ class SaasBackupMigration(models.Model):
     _description = 'Migration de sauvegarde vers client SaaS'
     _order = 'id desc'
     _inherit = ['mail.thread', 'mail.activity.mixin']
+
+    _POST_RESTORE_UPGRADE_MODULES = (
+        'muk_web_theme',
+    )
 
     name = fields.Char(string='Migration', readonly=True, copy=False)
     backup_file_id = fields.Many2one('saas.backup.file', string='Sauvegarde', required=True, readonly=True, ondelete='restrict')
@@ -380,6 +385,133 @@ class SaasBackupMigration(models.Model):
         self._append_log(_('Auto-restart neutralisé et conteneur arrêté.'))
         self.env.cr.commit()
 
+    def _post_restore_upgrade_modules(self, db_server):
+        """Aligne le schéma des modules sensibles après restauration."""
+        self.ensure_one()
+
+        database = self.client_id.database_name
+        container_id = self.client_id.container_id
+
+        if not container_id:
+            raise UserError(
+                _('Le client cible ne possède pas de conteneur Docker.')
+            )
+
+        with closing(self._pg_connect(database, db_server)) as connection:
+            with closing(connection.cursor()) as cursor:
+                cursor.execute(
+                    """
+                    SELECT name
+                    FROM ir_module_module
+                    WHERE state = 'installed'
+                      AND name = ANY(%s)
+                    """,
+                    (list(self._POST_RESTORE_UPGRADE_MODULES),),
+                )
+                installed = {row[0] for row in cursor.fetchall()}
+
+        modules = [
+            module
+            for module in self._POST_RESTORE_UPGRADE_MODULES
+            if module in installed
+        ]
+
+        if not modules:
+            self._append_log(
+                _('Aucun module de réconciliation post-restauration détecté.')
+            )
+            return False
+
+        module_arg = ','.join(modules)
+
+        docker = shutil.which('docker')
+        if not docker:
+            raise UserError(
+                _('Commande Docker introuvable sur le serveur SaaS.')
+            )
+
+        self._append_log(
+            _('Mise à niveau post-restauration : %s') % module_arg
+        )
+        self.env.cr.commit()
+
+        result = subprocess.run(
+            [
+                docker,
+                'exec',
+                str(container_id),
+                'python3',
+                '/opt/odoo/odoo-bin',
+                '-c',
+                '/etc/odoo/odoo-server.conf',
+                '-d',
+                database,
+                '-u',
+                module_arg,
+                '--stop-after-init',
+                '--no-http',
+                '--logfile=/opt/data-dir/post-restore-upgrade.log',
+            ],
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            check=False,
+            timeout=900,
+        )
+
+        if result.returncode:
+            output = (
+                result.stderr
+                or result.stdout
+                or b''
+            ).decode(errors='ignore')[-4000:]
+
+            raise UserError(
+                _(
+                    'Mise à niveau post-restauration impossible '
+                    'pour %(modules)s : %(error)s',
+                    modules=module_arg,
+                    error=output,
+                )
+            )
+
+        self._append_log(
+            _('Mise à niveau post-restauration terminée : %s') % module_arg
+        )
+        self.env.cr.commit()
+
+        restart = subprocess.run(
+            [
+                docker,
+                'restart',
+                str(container_id),
+            ],
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            check=False,
+            timeout=120,
+        )
+
+        if restart.returncode:
+            output = (
+                restart.stderr
+                or restart.stdout
+                or b''
+            ).decode(errors='ignore')[-2000:]
+
+            raise UserError(
+                _('Redémarrage du client après upgrade impossible : %s')
+                % output
+            )
+
+        self._append_log(
+            _('Conteneur redémarré après réconciliation des modules.')
+        )
+
+        # Laisser quelques secondes à Odoo pour reconstruire son registry.
+        time.sleep(8)
+
+        return True
+
     def _start_client(self, host_server, db_server):
         client = self.client_id
         if client.container_id:
@@ -425,6 +557,7 @@ class SaasBackupMigration(models.Model):
             self._neutralize_restored_database(db_server)
             self._reconcile_module_status(db_server)
             self._start_client(host_server, db_server)
+            self._post_restore_upgrade_modules(db_server)
             self._check_http()
             self.write({'state': 'validation'})
             self._append_log(_('Migration restaurée. Validation utilisateur requise avant finalisation.'))

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 {
     'name': 'SaaS Backup Export',
-    'version': '19.0.2.1.0',
+    'version': '19.0.2.2.0',
     'category': 'Technical',
     'summary': 'Liste et téléchargement des fichiers de sauvegarde SaaS',
     'description': """
