@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 {
     'name': 'SaaS Backup Export',
-    'version': '19.0.1.0.1',
+    'version': '19.0.2.1.0',
     'category': 'Technical',
     'summary': 'Liste et téléchargement des fichiers de sauvegarde SaaS',
     'description': """
@@ -12,7 +12,7 @@
         - Restaurer une sauvegarde dans une base existante ou nouvelle
     """,
     'author': 'Alain Gansonré',
-    'depends': ['base', 'mail', 'wk_backup_restore'],
+    'depends': ['base', 'mail', 'wk_backup_restore', 'odoo_saas_kit', 'saas_kit_custom_plans'],
     'images': ['static/description/icon.png'],
     'data': [
         'security/ir.model.access.csv',
@@ -23,6 +23,8 @@
         'views/saas_backup_dashboard_views.xml',
         'views/backup_process_schedule_views.xml',
         'views/saas_backup_browser_views.xml',
+        'views/saas_backup_import_wizard_views.xml',
+        'views/saas_backup_migration_views.xml',
         'views/saas_backup_restore_wizard_views.xml',
         'views/saas_backup_file_views.xml',
         'views/saas_backup_log_views.xml',

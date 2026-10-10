@@ -1,26 +1,31 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
 
-    <!-- ===== VUE LISTE ===== -->
     <record id="saas_backup_file_view_list" model="ir.ui.view">
         <field name="name">saas.backup.file.list</field>
         <field name="model">saas.backup.file</field>
         <field name="arch" type="xml">
             <list string="Fichiers de sauvegarde SaaS" create="false" decoration-muted="state == 'missing'">
+                <header>
+                    <button name="%(saas_backup_import_wizard_action)d" string="Importer ZIP" type="action" class="btn-primary" groups="base.group_system"/>
+                </header>
                 <field name="client_name"/>
                 <field name="name"/>
                 <field name="relative_path" optional="hide"/>
                 <field name="file_size_mb" string="Taille (Mo)" optional="show"/>
                 <field name="backup_date"/>
+                <field name="source_type" optional="show"/>
+                <field name="analysis_state" widget="badge" optional="show"/>
                 <field name="state" widget="badge" decoration-success="state == 'available'" decoration-danger="state == 'missing'"/>
                 <button name="action_download" string="Télécharger" type="object" icon="fa-download" invisible="state == 'missing'" class="btn-sm btn-primary"/>
+                <button name="action_analyze_backup" string="Analyser" type="object" icon="fa-search" invisible="state == 'missing'" class="btn-sm btn-info" groups="base.group_system"/>
+                <button name="action_open_saas_migration" string="Migrer SaaS" type="object" icon="fa-exchange" invisible="state == 'missing' or analysis_state != 'valid'" class="btn-sm btn-success" groups="base.group_system"/>
                 <button name="action_open_restore_wizard" string="Restaurer" type="object" icon="fa-history" invisible="state == 'missing'" class="btn-sm btn-warning" groups="base.group_system"/>
                 <button name="action_delete_backup" string="Supprimer" type="object" icon="fa-trash" class="btn-sm btn-danger" groups="base.group_system" confirm="Ce backup sera supprimé du serveur. Continuer ?"/>
             </list>
         </field>
     </record>
 
-    <!-- ===== VUE FORMULAIRE ===== -->
     <record id="saas_backup_file_view_form" model="ir.ui.view">
         <field name="name">saas.backup.file.form</field>
         <field name="model">saas.backup.file</field>
@@ -28,6 +33,8 @@
             <form string="Fichier de sauvegarde" create="false" edit="false">
                 <header>
                     <button name="action_download" string="Télécharger" type="object" class="btn-primary" invisible="state == 'missing'"/>
+                    <button name="action_analyze_backup" string="Analyser" type="object" class="btn-info" invisible="state == 'missing'" groups="base.group_system"/>
+                    <button name="action_open_saas_migration" string="Migrer vers client SaaS" type="object" class="btn-success" invisible="state == 'missing' or analysis_state != 'valid'" groups="base.group_system"/>
                     <button name="action_open_restore_wizard" string="Restaurer" type="object" class="btn-warning" invisible="state == 'missing'" groups="base.group_system"/>
                     <button name="action_delete_backup" string="Supprimer" type="object" class="btn-danger" groups="base.group_system" confirm="Ce backup sera supprimé du serveur. Continuer ?"/>
                     <field name="state" widget="statusbar" statusbar_visible="available,missing"/>
@@ -40,19 +47,29 @@
                             <field name="name"/>
                             <field name="backup_date"/>
                             <field name="file_size_mb"/>
+                            <field name="source_type"/>
+                            <field name="analysis_state" widget="badge"/>
                         </group>
-                        <group string="Localisation">
+                        <group string="Analyse / localisation">
                             <field name="relative_path"/>
                             <field name="file_path"/>
                             <field name="download_url" widget="url" string="Lien"/>
+                            <field name="sha256"/>
+                            <field name="manifest_version"/>
+                            <field name="manifest_database"/>
+                            <field name="manifest_module_count"/>
+                            <field name="has_dump"/>
+                            <field name="has_filestore"/>
                         </group>
+                    </group>
+                    <group string="Rapport d'analyse">
+                        <field name="analysis_message" nolabel="1"/>
                     </group>
                 </sheet>
             </form>
         </field>
     </record>
 
-    <!-- ===== RECHERCHE ===== -->
     <record id="saas_backup_file_view_search" model="ir.ui.view">
         <field name="name">saas.backup.file.search</field>
         <field name="model">saas.backup.file</field>
@@ -62,6 +79,8 @@
                 <field name="name" string="Nom du fichier"/>
                 <filter string="Disponibles" name="available" domain="[('state', '=', 'available')]"/>
                 <filter string="Fichiers manquants" name="missing" domain="[('state', '=', 'missing')]"/>
+                <filter string="Imports externes" name="imported" domain="[('source_type', '=', 'imported')]"/>
+                <filter string="Analysés valides" name="analysis_valid" domain="[('analysis_state', '=', 'valid')]"/>
                 <separator/>
                 <filter string="Grouper par Client" name="group_client" context="{'group_by': 'client_name'}"/>
                 <filter string="Grouper par Mois" name="group_month" context="{'group_by': 'backup_date:month'}"/>
@@ -69,7 +88,6 @@
         </field>
     </record>
 
-    <!-- ===== ACTION SERVEUR : SCAN (disponible dans le menu Action de la liste) ===== -->
     <record id="saas_backup_scan_action" model="ir.actions.server">
         <field name="name">Scanner les backups</field>
         <field name="model_id" ref="model_saas_backup_file"/>

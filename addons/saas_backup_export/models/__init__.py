@@ -6,3 +6,6 @@ from . import saas_backup_log
 from . import saas_backup_file
 from . import saas_backup_browser
 from . import saas_backup_restore_wizard
+
+from . import saas_backup_import
+from . import saas_backup_migration

@@ -118,6 +118,7 @@ class SaasBackupFile(models.Model):
         missing = self.search([
             ('file_path', 'not in', list(found_paths)),
             ('state', '=', 'available'),
+            ('source_type', '!=', 'imported'),
         ])
         missing.write({'state': 'missing'})
 

@@ -67,7 +67,6 @@ class SaasBackupRestoreWizard(models.TransientModel):
     )
     master_password = fields.Char(
         string='Mot de passe maître Odoo',
-        password=True,
         help="Le mot de passe maître du serveur Odoo (admin_passwd dans odoo.conf).",
     )
     neutralize = fields.Boolean(

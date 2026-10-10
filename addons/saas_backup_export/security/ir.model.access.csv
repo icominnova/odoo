@@ -6,3 +6,5 @@ access_saas_backup_log_admin,saas.backup.log admin,model_saas_backup_log,base.gr
 access_saas_backup_browser_admin,saas.backup.browser admin,model_saas_backup_browser,base.group_system,1,1,1,1
 access_saas_backup_browser_line_admin,saas.backup.browser.line admin,model_saas_backup_browser_line,base.group_system,1,1,1,1
 access_saas_backup_restore_wizard_admin,saas.backup.restore.wizard admin,model_saas_backup_restore_wizard,base.group_system,1,1,1,1
+access_saas_backup_import_wizard_admin,saas.backup.import.wizard admin,model_saas_backup_import_wizard,base.group_system,1,1,1,1
+access_saas_backup_migration_admin,saas.backup.migration admin,model_saas_backup_migration,base.group_system,1,1,1,1

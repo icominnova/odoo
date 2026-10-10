@@ -1,0 +1,446 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- ========================================================= -->
+    <!-- LISTE DES MIGRATIONS                                      -->
+    <!-- ========================================================= -->
+
+    <record id="saas_backup_migration_view_list" model="ir.ui.view">
+        <field name="name">saas.backup.migration.list</field>
+        <field name="model">saas.backup.migration</field>
+        <field name="arch" type="xml">
+
+            <list string="Migrations SaaS"
+                  create="false"
+                  decoration-danger="state == 'failed'"
+                  decoration-warning="state == 'blocked'"
+                  decoration-success="state == 'done'">
+
+                <header>
+                    <button name="%(saas_backup_import_wizard_action)d"
+                            string="Importer une sauvegarde ZIP"
+                            type="action"
+                            class="btn-primary"
+                            display="always"
+                            groups="base.group_system"/>
+                </header>
+
+                <field name="name"
+                       string="Migration"/>
+
+                <field name="backup_file_id"
+                       string="Sauvegarde"/>
+
+                <field name="client_id"
+                       string="Client SaaS cible"/>
+
+                <field name="target_database"
+                       string="Base cible"
+                       optional="show"/>
+
+                <field name="state"
+                       string="État"
+                       widget="badge"
+                       decoration-info="state in ('draft','running')"
+                       decoration-warning="state in ('blocked','validation')"
+                       decoration-primary="state == 'analyzed'"
+                       decoration-success="state == 'done'"
+                       decoration-danger="state == 'failed'"/>
+
+                <field name="backup_module_count"
+                       string="Modules"
+                       optional="show"/>
+
+                <field name="runtime_missing_count"
+                       string="Manquants"
+                       optional="show"
+                       decoration-success="runtime_missing_count == 0"
+                       decoration-danger="runtime_missing_count &gt; 0"/>
+
+                <field name="http_status"
+                       string="HTTP"
+                       optional="show"/>
+
+            </list>
+
+        </field>
+    </record>
+
+
+    <!-- ========================================================= -->
+    <!-- RECHERCHE                                                 -->
+    <!-- ========================================================= -->
+
+    <record id="saas_backup_migration_view_search" model="ir.ui.view">
+        <field name="name">saas.backup.migration.search</field>
+        <field name="model">saas.backup.migration</field>
+        <field name="arch" type="xml">
+
+            <search string="Rechercher une migration">
+
+                <field name="name"/>
+                <field name="backup_file_id"/>
+                <field name="client_id"/>
+                <field name="target_database"/>
+
+                <separator/>
+
+                <filter string="Brouillons"
+                        name="draft"
+                        domain="[('state', '=', 'draft')]"/>
+
+                <filter string="Bloquées"
+                        name="blocked"
+                        domain="[('state', '=', 'blocked')]"/>
+
+                <filter string="Prêtes"
+                        name="ready"
+                        domain="[('state', '=', 'analyzed')]"/>
+
+                <filter string="En cours"
+                        name="running"
+                        domain="[('state', '=', 'running')]"/>
+
+                <filter string="À valider"
+                        name="validation"
+                        domain="[('state', '=', 'validation')]"/>
+
+                <filter string="Finalisées"
+                        name="done"
+                        domain="[('state', '=', 'done')]"/>
+
+                <filter string="Échecs"
+                        name="failed"
+                        domain="[('state', '=', 'failed')]"/>
+
+                <separator/>
+
+                <filter string="Grouper par état"
+                        name="group_state"
+                        context="{'group_by': 'state'}"/>
+
+                <filter string="Grouper par client"
+                        name="group_client"
+                        context="{'group_by': 'client_id'}"/>
+
+            </search>
+
+        </field>
+    </record>
+
+
+    <!-- ========================================================= -->
+    <!-- FICHE MIGRATION                                           -->
+    <!-- ========================================================= -->
+
+    <record id="saas_backup_migration_view_form" model="ir.ui.view">
+        <field name="name">saas.backup.migration.form</field>
+        <field name="model">saas.backup.migration</field>
+        <field name="arch" type="xml">
+
+            <form string="Migration SaaS">
+
+                <header>
+
+                    <button name="action_analyze_target"
+                            string="1. Analyser la cible"
+                            type="object"
+                            class="btn-primary"
+                            invisible="state in ('running','validation','done')"/>
+
+                    <button name="action_sync_contract_modules"
+                            string="2. Synchroniser les modules"
+                            type="object"
+                            class="btn-secondary"
+                            invisible="not client_id or state in ('running','done')"/>
+
+                    <button name="action_launch_migration"
+                            string="3. Lancer la migration"
+                            type="object"
+                            class="btn-danger"
+                            invisible="state != 'analyzed' or not confirm_migration"
+                            confirm="ATTENTION : la base et le filestore du client cible seront remplacés par cette sauvegarde. Un snapshot de sécurité sera créé avant l'opération. Continuer ?"/>
+
+                    <button name="action_finalize"
+                            string="4. Finaliser la migration"
+                            type="object"
+                            class="btn-success"
+                            invisible="state != 'validation'"
+                            confirm="La validation finale va réactiver les crons, les serveurs SMTP historiques et l'auto-restart du client. Continuer ?"/>
+
+                    <field name="state"
+                           widget="statusbar"
+                           statusbar_visible="draft,blocked,analyzed,running,validation,done,failed"/>
+
+                </header>
+
+
+                <sheet>
+
+                    <!-- ================================================= -->
+                    <!-- GUIDAGE CONTEXTUEL                                -->
+                    <!-- ================================================= -->
+
+                    <div class="alert alert-info"
+                         role="alert"
+                         invisible="state != 'draft'">
+                        <strong>Étape 1 — Préparer la migration</strong><br/>
+                        Sélectionnez un client SaaS déjà provisionné, puis lancez
+                        l'analyse de la cible. Aucune restauration n'est effectuée
+                        pendant cette étape.
+                    </div>
+
+                    <div class="alert alert-warning"
+                         role="alert"
+                         invisible="state != 'blocked'">
+                        <strong>Migration bloquée.</strong><br/>
+                        Des modules nécessaires à la sauvegarde ne sont pas disponibles
+                        dans le runtime du client cible. Consultez l'analyse ci-dessous
+                        avant de continuer.
+                    </div>
+
+                    <div class="alert alert-success"
+                         role="alert"
+                         invisible="state != 'analyzed'">
+                        <strong>La cible est prête.</strong><br/>
+                        Vérifiez les modules, synchronisez le contrat si nécessaire,
+                        puis confirmez explicitement la restauration destructive.
+                    </div>
+
+                    <div class="alert alert-info"
+                         role="alert"
+                         invisible="state != 'running'">
+                        <strong>Migration en cours.</strong><br/>
+                        La restauration de la base et du filestore est en cours.
+                        Ne redémarrez pas manuellement le client pendant cette opération.
+                    </div>
+
+                    <div class="alert alert-warning"
+                         role="alert"
+                         invisible="state != 'validation'">
+                        <strong>Validation requise.</strong><br/>
+                        La restauration est terminée. Testez maintenant le client cible
+                        avant de cliquer sur « Finaliser la migration ».
+                    </div>
+
+                    <div class="alert alert-success"
+                         role="alert"
+                         invisible="state != 'done'">
+                        <strong>Migration finalisée.</strong><br/>
+                        Le client a été restauré et remis en exploitation.
+                    </div>
+
+                    <div class="alert alert-danger"
+                         role="alert"
+                         invisible="state != 'failed'">
+                        <strong>La migration a échoué.</strong><br/>
+                        Consultez le message d'erreur et le journal technique avant
+                        toute nouvelle tentative.
+                    </div>
+
+
+                    <!-- ================================================= -->
+                    <!-- IDENTITE                                          -->
+                    <!-- ================================================= -->
+
+                    <div class="oe_title">
+                        <label for="name"/>
+                        <h1>
+                            <field name="name" readonly="1"/>
+                        </h1>
+                    </div>
+
+
+                    <group>
+
+                        <group string="Sauvegarde source">
+
+                            <field name="backup_file_id"
+                                   readonly="1"/>
+
+                            <field name="backup_module_count"
+                                   string="Modules détectés"/>
+
+                        </group>
+
+                        <group string="Client SaaS cible">
+
+                            <field name="client_id"
+                                   options="{'no_create': True}"
+                                   readonly="state in ('running','validation','done')"/>
+
+                            <field name="contract_id"
+                                   readonly="1"/>
+
+                            <field name="target_database"
+                                   readonly="1"/>
+
+                            <field name="target_url"
+                                   widget="url"
+                                   readonly="1"/>
+
+                            <field name="client_state"
+                                   readonly="1"/>
+
+                        </group>
+
+                    </group>
+
+
+                    <!-- ================================================= -->
+                    <!-- CONTROLES                                         -->
+                    <!-- ================================================= -->
+
+                    <group string="Contrôle de compatibilité">
+
+                        <group>
+
+                            <field name="runtime_available_count"
+                                   string="Modules disponibles"/>
+
+                            <field name="runtime_missing_count"
+                                   string="Modules manquants"/>
+
+                            <field name="catalog_match_count"
+                                   string="Trouvés dans le catalogue SaaS"/>
+
+                            <field name="contract_added_count"
+                                   string="Ajoutés au contrat"/>
+
+                        </group>
+
+                        <group>
+
+                            <field name="sync_contract_modules"/>
+
+                            <field name="confirm_migration"
+                                   invisible="state != 'analyzed'"/>
+
+                        </group>
+
+                    </group>
+
+
+                    <div class="alert alert-danger"
+                         role="alert"
+                         invisible="not runtime_missing_count">
+
+                        <strong>Modules runtime manquants</strong>
+
+                        <field name="runtime_missing_modules"
+                               nolabel="1"
+                               readonly="1"/>
+
+                    </div>
+
+
+                    <!-- ================================================= -->
+                    <!-- VALIDATION                                        -->
+                    <!-- ================================================= -->
+
+                    <group string="Résultat de la restauration">
+
+                        <group>
+
+                            <field name="http_status"
+                                   string="Statut HTTP"/>
+
+                        </group>
+
+                        <group>
+
+                            <field name="error_message"
+                                   invisible="not error_message"/>
+
+                        </group>
+
+                    </group>
+
+
+                    <!-- ================================================= -->
+                    <!-- DETAILS                                           -->
+                    <!-- ================================================= -->
+
+                    <notebook>
+
+                        <page string="Analyse">
+
+                            <field name="analysis_report"
+                                   nolabel="1"
+                                   readonly="1"/>
+
+                        </page>
+
+
+                        <page string="Snapshots de sécurité">
+
+                            <group>
+
+                                <field name="snapshot_db_path"
+                                       string="Snapshot base de données"/>
+
+                                <field name="snapshot_filestore_path"
+                                       string="Snapshot filestore"/>
+
+                            </group>
+
+                        </page>
+
+
+                        <page string="Journal technique">
+
+                            <field name="operation_log"
+                                   nolabel="1"
+                                   readonly="1"/>
+
+                        </page>
+
+                    </notebook>
+
+                </sheet>
+
+                <chatter/>
+
+            </form>
+
+        </field>
+    </record>
+
+
+    <!-- ========================================================= -->
+    <!-- ACTION                                                     -->
+    <!-- ========================================================= -->
+
+    <record id="saas_backup_migration_action" model="ir.actions.act_window">
+
+        <field name="name">Migrations SaaS</field>
+
+        <field name="res_model">saas.backup.migration</field>
+
+        <field name="view_mode">list,form</field>
+
+        <field name="search_view_id"
+               ref="saas_backup_migration_view_search"/>
+
+        <field name="help" type="html">
+
+            <p class="o_view_nocontent_smiling_face">
+                Démarrer une migration SaaS
+            </p>
+
+            <p>
+                Importez une sauvegarde ZIP provenant d'une ancienne instance,
+                analysez ses modules puis restaurez-la vers un client SaaS
+                déjà provisionné.
+            </p>
+
+            <p>
+                Le processus crée automatiquement un snapshot de sécurité avant
+                toute restauration destructive.
+            </p>
+
+        </field>
+
+    </record>
+
+</odoo>
