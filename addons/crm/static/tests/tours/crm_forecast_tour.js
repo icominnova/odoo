@@ -19,8 +19,10 @@ registry.category("web_tour.tours").add('crm_forecast', {
         content: 'Open Forecast menu',
         run: 'click',
     }, {
-        trigger: '.o_column_quick_create',
-        content: 'Wait page loading',
+        // The "New" button only opens the quick create once the groups are
+        // loaded, otherwise it opens the full form view.
+        trigger: ".o_forecast_kanban_view .o_kanban_group",
+        content: "Wait for the forecast view to be loaded",
     }, {
         trigger: ".o-kanban-button-new",
         content: "click create",
@@ -77,6 +79,9 @@ registry.category("web_tour.tours").add('crm_forecast', {
         trigger: "button[name=action_set_won_rainbowman]",
         content: "win the lead",
         run:"click"
+    }, {
+        trigger: ".o_form_view .ribbon:contains('Won')",
+        content: "wait for the lead to be won",
     }, {
         trigger: '.o_back_button',
         content: 'navigate back to the kanban view',

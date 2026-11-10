@@ -15,7 +15,7 @@ import { contains, onRpc } from "@web/../tests/web_test_helpers";
 import { setupEditor, testEditor } from "../_helpers/editor";
 import { cleanLinkArtifacts, unformat } from "../_helpers/format";
 import { getContent, setSelection } from "../_helpers/selection";
-import { insertText } from "../_helpers/user_actions";
+import { deleteBackward, insertText, undo } from "../_helpers/user_actions";
 
 describe("button style", () => {
     test("editable button should have cursor text", async () => {
@@ -86,6 +86,47 @@ describe("button style", () => {
         );
     });
 
+    test("Button containing a font size keeps its own font size", async () => {
+        const { el, editor } = await setupEditor(
+            unformat(`
+                <p>
+                    <span class="display-1-fs"><a href="#" class="btn btn-primary"><span style="font-size: 12px;">b</span></a></span>
+                    <span class="display-1-fs"><a href="#" class="btn btn-primary"><span class="h6-fs foo">c</span></a></span>
+                </p>
+            `)
+        );
+        const [inlineButton, classButton] = el.querySelectorAll("a.btn");
+        const outerSpan = el.querySelector("span.display-1-fs");
+        for (const button of [inlineButton, classButton]) {
+            expect(button).toHaveClass("o_btn_with_font_size");
+            expect(getComputedStyle(button).fontSize).not.toBe(
+                getComputedStyle(outerSpan).fontSize
+            );
+        }
+        expect(editor.getContent()).not.toInclude("o_btn_with_font_size");
+    });
+
+    test("Font size mark follows the button content", async () => {
+        const { el, editor } = await setupEditor(
+            '<p><span class="display-1-fs"><a href="#" class="btn btn-primary">b</a></span></p>'
+        );
+        const button = el.querySelector("a.btn");
+        expect(button).not.toHaveClass("o_btn_with_font_size");
+
+        const innerSpan = editor.document.createElement("span");
+        innerSpan.className = "h6-fs";
+        innerSpan.append(...button.childNodes);
+        button.append(innerSpan);
+        editor.shared.history.addStep();
+        expect(button).toHaveClass("o_btn_with_font_size");
+
+        undo(editor);
+        expect(button).not.toHaveClass("o_btn_with_font_size");
+        expect(getComputedStyle(button).fontSize).toBe(
+            getComputedStyle(el.querySelector("span.display-1-fs")).fontSize
+        );
+    });
+
     test("Should be able to change button style", async () => {
         await testEditor({
             contentBefore: unformat(`
@@ -111,6 +152,22 @@ describe("button style", () => {
                 </div>
             `),
         });
+    });
+
+    test("backspace on button should not remove editor", async () => {
+        const { el, editor } = await setupEditor(
+            '<p><a href="https://test.com/" class="btn btn-lg btn-primary">#</a>[]</p>'
+        );
+        expect(getContent(el)).toBe(
+            `<p>\ufeff<a href="https://test.com/" class="btn btn-lg btn-primary">\ufeff#\ufeff</a>\ufeff[]</p>`
+        );
+        deleteBackward(editor);
+        deleteBackward(editor);
+        deleteBackward(editor);
+        expect(getContent(el)).toBe(
+            `<p o-we-hint-text='Type "/" for commands' class="o-we-hint">[]<br></p>`
+        );
+        expect(editor.editable.isConnected).toBe(true);
     });
 });
 
@@ -306,17 +363,33 @@ describe("Custom button style", () => {
 
         // test fill + rounded
         await click('select[name="link_style_shape"]');
-        await select("fill rounded-circle");
+        await select("fill rounded-pill");
         await animationFrame();
         expect(cleanLinkArtifacts(getContent(el))).toBe(
-            '<p><a href="https://test.com/" class="rounded-circle btn btn-fill-custom" style="color: rgb(0, 0, 0); background-color: rgb(166, 227, 226); border-width: 1px; border-color: rgb(0, 143, 140); border-style: dashed; ">linkLabel</a></p>'
+            '<p><a href="https://test.com/" class="rounded-pill btn btn-fill-custom" style="color: rgb(0, 0, 0); background-color: rgb(166, 227, 226); border-width: 1px; border-color: rgb(0, 143, 140); border-style: dashed; ">linkLabel</a></p>'
         );
 
         await click(".o_we_apply_link");
         await animationFrame();
         expect(cleanLinkArtifacts(getContent(el))).toBe(
-            '<p><a href="https://test.com/" class="rounded-circle btn btn-fill-custom" style="color: rgb(0, 0, 0); background-color: rgb(166, 227, 226); border-width: 1px; border-color: rgb(0, 143, 140); border-style: dashed; ">link[]Label</a></p>'
+            '<p><a href="https://test.com/" class="rounded-pill btn btn-fill-custom" style="color: rgb(0, 0, 0); background-color: rgb(166, 227, 226); border-width: 1px; border-color: rgb(0, 143, 140); border-style: dashed; ">link[]Label</a></p>'
         );
+    });
+
+    test("Editor should replace rounded-circle with rounded-pill", async () => {
+        await setupEditor(
+            '<p><a href="https://test.com/" class="btn btn-fill-primary rounded-circle">link[]Label</a></p>'
+        );
+        const a = queryOne("p > a");
+        await waitFor(".o-we-linkpopover");
+        await click(".o_we_edit_link");
+        await animationFrame();
+        expect('select[name="link_style_shape"]').toHaveValue("fill rounded-pill");
+
+        await click(".o_we_apply_link");
+        await animationFrame();
+        expect(a).toHaveClass("btn btn-fill-primary rounded-pill");
+        expect(a).not.toHaveClass("rounded-circle");
     });
 });
 
@@ -423,5 +496,16 @@ test("button should never contain selection placeholder", async () => {
             '<button style="display: block" contenteditable="true"><div style="display: block" contenteditable="false">a</div></button>',
         contentBeforeEdit:
             '<button style="display: block" contenteditable="true"><div style="display: block" contenteditable="false">a</div></button>',
+    });
+});
+
+test.tags("firefox");
+describe("firefox", () => {
+    test("text should be inserted inside link after backspace", async () => {
+        const { el, editor } = await setupEditor('<p><a href="#">link</a>t[]est</p>');
+        deleteBackward(editor);
+        deleteBackward(editor);
+        await insertText(editor, "X");
+        expect(cleanLinkArtifacts(getContent(el))).toBe('<p><a href="#">linX[]</a>est</p>');
     });
 });

@@ -2,15 +2,15 @@
 # This file contains the translation of the following modules:
 # * html_builder
 #
-# "Dylan Kiss (dyki)" <dyki@odoo.com>, 2025.
+# "Dylan Kiss (dyki)" <dyki@odoo.com>, 2025, 2026.
 # "Junko Augias (juau)" <juau@odoo.com>, 2025, 2026.
-# Weblate <noreply-mt-weblate@weblate.org>, 2025.
+# Weblate <noreply-mt-weblate@weblate.org>, 2025, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-01-25 18:36+0000\n"
-"PO-Revision-Date: 2026-02-04 06:28+0000\n"
+"POT-Creation-Date: 2026-10-24 17:37+0000\n"
+"PO-Revision-Date: 2026-11-06 04:33+0000\n"
 "Last-Translator: \"Junko Augias (juau)\" <juau@odoo.com>\n"
 "Language-Team: Japanese <https://translate.odoo.com/projects/odoo-19/"
 "html_builder/ja/>\n"
@@ -19,7 +19,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Generator: Weblate 5.14.3\n"
+"X-Generator: Weblate 2026.8.1\n"
 
 #. module: html_builder
 #. odoo-javascript
@@ -58,6 +58,12 @@ msgstr ""
 
 #. module: html_builder
 #. odoo-javascript
+#: code:addons/html_builder/static/src/plugins/shape/shape_selector.xml:0
+msgid "A"
+msgstr ""
+
+#. module: html_builder
+#. odoo-javascript
 #: code:addons/html_builder/static/src/core/operation_plugin.js:0
 msgid ""
 "A technical issue occurred in the builder, you should save or discard your "
@@ -73,7 +79,7 @@ msgstr "追加"
 
 #. module: html_builder
 #. odoo-javascript
-#: code:addons/html_builder/static/src/plugins/add_product_option.xml:0
+#: code:addons/html_builder/static/src/plugins/add_product_option.js:0
 msgid "Add Product"
 msgstr "プロダクト追加"
 
@@ -244,12 +250,8 @@ msgstr "代替タグ"
 #. module: html_builder
 #. odoo-javascript
 #: code:addons/html_builder/static/src/core/anchor/anchor_plugin.js:0
-msgid ""
-"Anchor copied to clipboard%(br)s%(open_span)sLink: %(anchor_link)s%"
-"(close_span)s"
+msgid "Anchor copied to clipboard"
 msgstr ""
-"アンカーがクリップボードにコピーされました%(br)s%(open_span)sリンク：%"
-"(anchor_link)s%(close_span)s"
 
 #. module: html_builder
 #. odoo-javascript
@@ -1099,7 +1101,7 @@ msgstr "クリエイティブ"
 #. odoo-javascript
 #: code:addons/html_builder/static/src/plugins/image/image_tool_option.xml:0
 msgid "Crop image"
-msgstr "画像をクロップ"
+msgstr "画像を切り抜き"
 
 #. module: html_builder
 #. odoo-javascript
@@ -1164,6 +1166,12 @@ msgstr "暗くする"
 #: code:addons/html_builder/static/src/plugins/border_configurator_option.xml:0
 msgid "Dashed"
 msgstr "破線"
+
+#. module: html_builder
+#. odoo-javascript
+#: code:addons/html_builder/static/src/plugins/date_time_field_option.xml:0
+msgid "Date"
+msgstr ""
 
 #. module: html_builder
 #. odoo-javascript
@@ -1679,6 +1687,14 @@ msgstr "非表示要素"
 
 #. module: html_builder
 #. odoo-javascript
+#: code:addons/html_builder/static/src/core/version_error_plugin.js:0
+msgid ""
+"It might have caused problem during the editing. Please drag the new version "
+"from the snippet panel to update it."
+msgstr ""
+
+#. module: html_builder
+#. odoo-javascript
 #: code:addons/html_builder/static/src/core/building_blocks/builder_list.js:0
 msgid "Item"
 msgstr "項目"
@@ -1698,6 +1714,7 @@ msgstr "ラビリンス"
 #. module: html_builder
 #. odoo-javascript
 #: code:addons/html_builder/static/src/plugins/rating_option.xml:0
+#: code:addons/html_builder/static/src/plugins/size_option.xml:0
 msgid "Large"
 msgstr "大"
 
@@ -1800,6 +1817,7 @@ msgstr "メディア"
 #. module: html_builder
 #. odoo-javascript
 #: code:addons/html_builder/static/src/plugins/rating_option.xml:0
+#: code:addons/html_builder/static/src/plugins/size_option.xml:0
 msgid "Medium"
 msgstr "中"
 
@@ -2122,7 +2140,7 @@ msgstr "新しいタブでこのURLをプレビュー"
 #: code:addons/html_builder/static/src/plugins/alert_option.xml:0
 #: code:addons/html_builder/static/src/plugins/badge_option.xml:0
 msgid "Primary"
-msgstr "プライマリ"
+msgstr "メイン"
 
 #. module: html_builder
 #. odoo-javascript
@@ -2249,7 +2267,7 @@ msgstr "パータンを繰り返す"
 #: code:addons/html_builder/static/src/plugins/background_option/background_image.xml:0
 #: code:addons/html_builder/static/src/plugins/image/replace_media_option.xml:0
 msgid "Replace"
-msgstr "置き換える"
+msgstr "置き換え"
 
 #. module: html_builder
 #. odoo-javascript
@@ -2262,7 +2280,7 @@ msgstr "アイコンを置き換え"
 #. odoo-javascript
 #: code:addons/html_builder/static/src/plugins/image/replace_media_option.js:0
 msgid "Replace Image"
-msgstr "画像を差替"
+msgstr "画像を差し換え"
 
 #. module: html_builder
 #. odoo-javascript
@@ -2288,6 +2306,12 @@ msgstr "リセット"
 #: code:addons/html_builder/static/src/plugins/image/image_tool_option.xml:0
 msgid "Reset crop"
 msgstr "切り抜きをリセット"
+
+#. module: html_builder
+#. odoo-javascript
+#: code:addons/html_builder/static/src/plugins/image/image_shape_option.xml:0
+msgid "Reset shape transformation"
+msgstr ""
 
 #. module: html_builder
 #. odoo-javascript
@@ -2405,7 +2429,7 @@ msgstr "レコードを検索..."
 #. odoo-javascript
 #: code:addons/html_builder/static/src/core/building_blocks/select_many2x.xml:0
 msgid "Search more..."
-msgstr "もっと検索..."
+msgstr "さらに検索..."
 
 #. module: html_builder
 #. odoo-javascript
@@ -2418,7 +2442,7 @@ msgstr "検索してさらにレコードを表示"
 #: code:addons/html_builder/static/src/plugins/alert_option.xml:0
 #: code:addons/html_builder/static/src/plugins/badge_option.xml:0
 msgid "Secondary"
-msgstr "セカンダリ"
+msgstr "サブ"
 
 #. module: html_builder
 #. odoo-javascript
@@ -2494,6 +2518,7 @@ msgstr "手裏剣  (R)"
 #: code:addons/html_builder/static/src/plugins/image/image_size.xml:0
 #: code:addons/html_builder/static/src/plugins/image/image_tool_option.xml:0
 #: code:addons/html_builder/static/src/plugins/rating_option.xml:0
+#: code:addons/html_builder/static/src/plugins/size_option.xml:0
 msgid "Size"
 msgstr "サイズ"
 
@@ -2507,6 +2532,7 @@ msgstr "傾斜"
 #. odoo-javascript
 #: code:addons/html_builder/static/src/plugins/font/font_plugin.js:0
 #: code:addons/html_builder/static/src/plugins/rating_option.xml:0
+#: code:addons/html_builder/static/src/plugins/size_option.xml:0
 msgid "Small"
 msgstr "小"
 
@@ -2798,6 +2824,12 @@ msgstr "このブロックはこのページのどこにもドロップできま
 #: code:addons/html_builder/static/src/core/building_blocks/builder_fontfamilypicker.xml:0
 msgid "This font is hosted and served to your visitors by Google servers"
 msgstr "Googleサーバーがこのフォントをホストして提供します"
+
+#. module: html_builder
+#. odoo-javascript
+#: code:addons/html_builder/static/src/core/version_error_plugin.js:0
+msgid "This snippet is outdated"
+msgstr ""
 
 #. module: html_builder
 #. odoo-javascript
@@ -3241,6 +3273,13 @@ msgstr "⌙ 有効"
 #: code:addons/html_builder/static/src/plugins/rating_option.xml:0
 msgid "⌙ Inactive"
 msgstr "⌙ 無効"
+
+#~ msgid ""
+#~ "Anchor copied to clipboard%(br)s%(open_span)sLink: %(anchor_link)s%"
+#~ "(close_span)s"
+#~ msgstr ""
+#~ "アンカーがクリップボードにコピーされました%(br)s%(open_span)sリンク：%"
+#~ "(anchor_link)s%(close_span)s"
 
 #~ msgid "Anchor copied to clipboard%(br)sLink: %(anchorLink)s"
 #~ msgstr ""

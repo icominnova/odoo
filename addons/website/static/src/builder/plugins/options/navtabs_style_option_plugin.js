@@ -45,6 +45,10 @@ class NavTabsStyleOptionPlugin extends Plugin {
         }),
         is_unremovable_selector: ".nav-item",
         unsplittable_node_predicates: this.isUnsplittable,
+        dropzone_selector: {
+            selector: ".s_tabs, .s_tabs_images",
+            excludeAncestor: ".s_table_of_content, .s_tabs, .s_tabs_images",
+        },
     };
 
     setup() {
@@ -128,6 +132,14 @@ class NavTabsStyleOptionPlugin extends Plugin {
             node.closest("li")?.classList.contains("nav-item")
         );
     }
+}
+
+export class NavTabsTranslationPlugin extends Plugin {
+    static id = "navTabsTranslation";
+    /** @type {import("plugins").WebsiteResources} */
+    resources = {
+        force_background_translation_state_selectors: [".s_tabs_nav a", ".o_nav_tabs_description"],
+    };
 }
 
 const getTabsEl = (editingElement) => editingElement.querySelector(".s_tabs_nav");

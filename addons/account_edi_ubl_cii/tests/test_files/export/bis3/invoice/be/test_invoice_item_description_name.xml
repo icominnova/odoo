@@ -19,7 +19,7 @@
 		<cac:Party>
 			<cbc:EndpointID schemeID="0208">0202239951</cbc:EndpointID>
 			<cac:PartyIdentification>
-				<cbc:ID>0202239951</cbc:ID>
+				<cbc:ID schemeID="0208">0202239951</cbc:ID>
 			</cac:PartyIdentification>
 			<cac:PartyName>
 				<cbc:Name>company_1_data</cbc:Name>
@@ -40,7 +40,7 @@
 			</cac:PartyTaxScheme>
 			<cac:PartyLegalEntity>
 				<cbc:RegistrationName>company_1_data</cbc:RegistrationName>
-				<cbc:CompanyID>0202239951</cbc:CompanyID>
+				<cbc:CompanyID schemeID="0208">0202239951</cbc:CompanyID>
 			</cac:PartyLegalEntity>
 			<cac:Contact>
 				<cbc:Name>company_1_data</cbc:Name>
@@ -51,7 +51,7 @@
 		<cac:Party>
 			<cbc:EndpointID schemeID="0208">0477472701</cbc:EndpointID>
 			<cac:PartyIdentification>
-				<cbc:ID>0477472701</cbc:ID>
+				<cbc:ID schemeID="0208">0477472701</cbc:ID>
 			</cac:PartyIdentification>
 			<cac:PartyName>
 				<cbc:Name>partner_be</cbc:Name>
@@ -72,7 +72,7 @@
 			</cac:PartyTaxScheme>
 			<cac:PartyLegalEntity>
 				<cbc:RegistrationName>partner_be</cbc:RegistrationName>
-				<cbc:CompanyID>0477472701</cbc:CompanyID>
+				<cbc:CompanyID schemeID="0208">0477472701</cbc:CompanyID>
 			</cac:PartyLegalEntity>
 			<cac:Contact>
 				<cbc:Name>partner_be</cbc:Name>
@@ -129,8 +129,8 @@
 		<cbc:InvoicedQuantity unitCode="C62">1.0</cbc:InvoicedQuantity>
 		<cbc:LineExtensionAmount currencyID="EUR">100.00</cbc:LineExtensionAmount>
 		<cac:Item>
-			<cbc:Description>[P123] Test Product</cbc:Description>
-			<cbc:Name>Test Product</cbc:Name>
+			<cbc:Description>Description of the product</cbc:Description>
+			<cbc:Name>[P123] Test Product</cbc:Name>
 			<cac:SellersItemIdentification>
 				<cbc:ID>P123</cbc:ID>
 			</cac:SellersItemIdentification>

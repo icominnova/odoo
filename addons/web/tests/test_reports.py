@@ -99,9 +99,11 @@ class TestReports(odoo.tests.HttpCase):
             'key': 'base.test_report',
             'arch': '''
                 <main>
-                    <div">
+                    <div class="header">HEADER</div>
+                    <div>
                         <p>TEST</p>
                     </div>
+                    <div class="footer">FOOTER</div>
                 </main>
             '''
         })
@@ -115,7 +117,7 @@ class TestReports(odoo.tests.HttpCase):
         with (MockRequest(report.env) as mock_request,
             patch('subprocess.run') as mock_popen,
             patch.object(root.session_store, 'delete') as mock_delete,
-            patch.object(os, 'unlink') as mock_unlink):
+            patch.object(os, 'unlink', wraps=os.unlink) as mock_unlink):
 
             mock_request.session = self.authenticate(admin.login, admin.login)
 

@@ -13,16 +13,16 @@
 # Jarmo Kortetjärvi <jarmo.kortetjarvi@gmail.com>, 2022
 # Tuomo Aura <tuomo.aura@web-veistamo.fi>, 2022
 # Ossi Mantylahti <ossi.mantylahti@obs-solutions.fi>, 2023
-# "Tiffany Chang (tic)" <tic@odoo.com>, 2025.
-# Weblate <noreply-mt-weblate@weblate.org>, 2025.
+# "Tiffany Chang (tic)" <tic@odoo.com>, 2025, 2026.
+# Weblate <noreply-mt-weblate@weblate.org>, 2025, 2026.
 # Saara Hakanen <sahak@odoo.com>, 2025.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 15.5alpha1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-01-25 18:37+0000\n"
-"PO-Revision-Date: 2025-11-24 12:08+0000\n"
-"Last-Translator: Saara Hakanen <sahak@odoo.com>\n"
+"POT-Creation-Date: 2026-02-20 18:37+0000\n"
+"PO-Revision-Date: 2026-08-05 21:09+0000\n"
+"Last-Translator: \"Tiffany Chang (tic)\" <tic@odoo.com>\n"
 "Language-Team: Finnish <https://translate.odoo.com/projects/odoo-19/"
 "website_livechat/fi/>\n"
 "Language: fi\n"
@@ -30,7 +30,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Weblate 5.12.2\n"
+"X-Generator: Weblate 2026.6.1\n"
 
 #. module: website_livechat
 #: model:ir.model.fields,field_description:website_livechat.field_website_visitor__session_count
@@ -102,18 +102,6 @@ msgid "Config Settings"
 msgstr "Asetukset"
 
 #. module: website_livechat
-#. odoo-javascript
-#: code:addons/website_livechat/static/src/web/livechat_channel_info_list_patch.xml:0
-msgid "Country"
-msgstr "Maa"
-
-#. module: website_livechat
-#. odoo-javascript
-#: code:addons/website_livechat/static/src/web/livechat_channel_info_list_patch.js:0
-msgid "Country & Language"
-msgstr "Maa & Kieli"
-
-#. module: website_livechat
 #: model:ir.model,name:website_livechat.model_discuss_channel
 msgid "Discussion Channel"
 msgstr "Keskustelukanava"
@@ -155,12 +143,6 @@ msgid "In Conversation"
 msgstr "Keskustelussa"
 
 #. module: website_livechat
-#. odoo-javascript
-#: code:addons/website_livechat/static/src/web/livechat_channel_info_list_patch.xml:0
-msgid "Language"
-msgstr "Kieli"
-
-#. module: website_livechat
 #: model:ir.model,name:website_livechat.model_im_livechat_channel
 msgid "Livechat Channel"
 msgstr "Livechat-kanava"
@@ -174,8 +156,7 @@ msgstr "Uusi kanava"
 #. odoo-python
 #: code:addons/website_livechat/models/website_visitor.py:0
 msgid "No Livechat Channel allows you to send a chat request for website %s."
-msgstr ""
-"Et voi lähettää livechat-kanavilla keskustelupyyntöjä verkkosivulle %s."
+msgstr "Et voi lähettää livechat-kanavilla keskustelupyyntöjä verkkosivulle %s."
 
 #. module: website_livechat
 #: model_terms:ir.ui.view,arch_db:website_livechat.website_visitor_view_kanban
@@ -322,6 +303,15 @@ msgstr ""
 #: code:addons/website_livechat/models/discuss_channel.py:0
 msgid "an operator"
 msgstr "operaattori"
+
+#~ msgid "Country"
+#~ msgstr "Maa"
+
+#~ msgid "Country & Language"
+#~ msgstr "Maa & Kieli"
+
+#~ msgid "Language"
+#~ msgstr "Kieli"
 
 #~ msgid "<small>%</small>"
 #~ msgstr "<small>#</small>"

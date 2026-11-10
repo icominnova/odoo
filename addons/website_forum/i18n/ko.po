@@ -6,16 +6,16 @@
 # JH CHOI <hwangtog@gmail.com>, 2022
 # Martin Trigaux, 2022
 # Sarah Park, 2023
-# "Dylan Kiss (dyki)" <dyki@odoo.com>, 2025.
-# "Kwanghee Park (kwpa)" <kwpa@odoo.com>, 2025.
-# Weblate <noreply-mt-weblate@weblate.org>, 2025.
+# "Dylan Kiss (dyki)" <dyki@odoo.com>, 2025, 2026.
+# "Kwanghee Park (kwpa)" <kwpa@odoo.com>, 2025, 2026.
+# Weblate <noreply-mt-weblate@weblate.org>, 2025, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-01-25 18:37+0000\n"
-"PO-Revision-Date: 2025-11-12 11:25+0000\n"
-"Last-Translator: \"Kwanghee Park (kwpa)\" <kwpa@odoo.com>\n"
+"POT-Creation-Date: 2026-10-30 17:40+0000\n"
+"PO-Revision-Date: 2026-08-02 14:29+0000\n"
+"Last-Translator: Weblate <noreply-mt-weblate@weblate.org>\n"
 "Language-Team: Korean <https://translate.odoo.com/projects/odoo-19/"
 "website_forum/ko/>\n"
 "Language: ko\n"
@@ -23,7 +23,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Generator: Weblate 5.12.2\n"
+"X-Generator: Weblate 2026.6.1\n"
 
 #. module: website_forum
 #. odoo-javascript
@@ -246,24 +246,6 @@ msgid ""
 msgstr ""
 "<a class=\"btn btn-primary forum_register_url o_translate_inline\" href=\"/"
 "web/login\">회원 가입</a>"
-
-#. module: website_forum
-#: model_terms:ir.ui.view,arch_db:website_forum.404
-msgid ""
-"<a class=\"btn-link o_translate_inline\" t-attf-href=\"/forum\"><i "
-"class=\"oi oi-arrow-right display-inline-block\"/> Return to questions list</"
-"a>"
-msgstr ""
-"<a class=\"btn-link o_translate_inline\" t-attf-href=\"/forum\"><i "
-"class=\"oi oi-arrow-right display-inline-block\"/>질문 목록으로 돌아가기</a>"
-
-#. module: website_forum
-#: model_terms:ir.ui.view,arch_db:website_forum.forum_all_oe_structure_forum_all_top
-msgid ""
-"<a class=\"mb-2 o_translate_inline\" t-attf-href=\"/profile/users\" data-bs-"
-"original-title=\"\" title=\"\" target=\"_blank\">Meet our community members</"
-"a>"
-msgstr ""
 
 #. module: website_forum
 #: model_terms:ir.ui.view,arch_db:website_forum.post_display
@@ -655,6 +637,13 @@ msgstr "<i class=\"fa fa-users fa-fw opacity-50\"/> 사용자"
 #: model_terms:ir.ui.view,arch_db:website_forum.user_profile_content
 msgid "<i class=\"oi oi-arrow-right d-inline-block\"/> Go to Forums"
 msgstr "<i class=\"oi oi-arrow-right d-inline-block\"/> 게시판으로 이동하기"
+
+#. module: website_forum
+#: model_terms:ir.ui.view,arch_db:website_forum.404
+msgid ""
+"<i class=\"oi oi-arrow-right display-inline-block\"/> Return to questions "
+"list"
+msgstr ""
 
 #. module: website_forum
 #: model_terms:ir.ui.view,arch_db:website_forum.post_dropdown
@@ -2442,6 +2431,11 @@ msgid "Mark as spam"
 msgstr "스팸으로 표시"
 
 #. module: website_forum
+#: model_terms:ir.ui.view,arch_db:website_forum.forum_all_oe_structure_forum_all_top
+msgid "Meet our community members"
+msgstr ""
+
+#. module: website_forum
 #: model:ir.model.fields,field_description:website_forum.field_forum_forum__message_has_error
 #: model:ir.model.fields,field_description:website_forum.field_forum_post__message_has_error
 #: model:ir.model.fields,field_description:website_forum.field_forum_tag__message_has_error
@@ -2681,6 +2675,12 @@ msgstr "모욕 게시물"
 #: model_terms:ir.ui.view,arch_db:website_forum.moderation_queue
 msgid "Offensive Posts"
 msgstr "불쾌감을 주는 게시물"
+
+#. module: website_forum
+#. odoo-javascript
+#: code:addons/website_forum/static/src/interactions/website_forum.js:0
+msgid "Oh no! Please sign in to perform this action"
+msgstr ""
 
 #. module: website_forum
 #. odoo-javascript
@@ -4285,6 +4285,15 @@ msgstr "툴팁으로 귀하의 이력을 볼 수 있습니다"
 #: model_terms:ir.ui.view,arch_db:website_forum.follow
 msgid "your email..."
 msgstr "귀하의 이메일..."
+
+#~ msgid ""
+#~ "<a class=\"btn-link o_translate_inline\" t-attf-href=\"/forum\"><i "
+#~ "class=\"oi oi-arrow-right display-inline-block\"/> Return to questions "
+#~ "list</a>"
+#~ msgstr ""
+#~ "<a class=\"btn-link o_translate_inline\" t-attf-href=\"/forum\"><i "
+#~ "class=\"oi oi-arrow-right display-inline-block\"/>질문 목록으로 돌아가기</"
+#~ "a>"
 
 #~ msgid "%d karma required to unlink a comment."
 #~ msgstr "댓글 링크를 해제하려면 %d 명성이 필요합니다."

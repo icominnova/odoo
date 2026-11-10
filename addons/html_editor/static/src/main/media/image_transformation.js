@@ -38,7 +38,7 @@ export class ImageTransformation extends Component {
         editable: { validate: (p) => p.nodeType === Node.ELEMENT_NODE },
         image: { validate: (p) => p.tagName === "IMG" },
         destroy: { type: Function },
-        onChange: { type: Function },
+        onChange: { type: Function, optional: true },
         onApply: { type: Function, optional: true },
         onComponentMounted: { type: Function, optional: true },
     };
@@ -53,17 +53,21 @@ export class ImageTransformation extends Component {
         this.transfoContainer = useRef("transfoContainer");
         this.transfoControls = useRef("transfoControls");
         this.transfoCenter = useRef("transfoCenter");
+        this.transfoDragger = null;
         this.computeImageTransformations();
         onMounted(() => {
+            this.transfoDragger = this.document.createElement("div");
+            this.transfoDragger.className = "transfo-dragger";
+            this.transfoContainer.el.prepend(this.transfoDragger);
             this.positionTransfoContainer();
             this.props.onComponentMounted();
         });
-        useExternalListener(window, "mousemove", this.mouseMove);
-        useExternalListener(window, "mouseup", this.mouseUp);
+        useExternalListener(window, "pointermove", this.pointerMove);
+        useExternalListener(window, "pointerup", this.pointerUp);
         if (this.document.defaultView.frameElement) {
             const iframeWindow = this.document.defaultView;
-            useExternalListener(iframeWindow, "mousemove", this.mouseMove);
-            useExternalListener(iframeWindow, "mouseup", this.mouseUp);
+            useExternalListener(iframeWindow, "pointermove", this.pointerMove);
+            useExternalListener(iframeWindow, "pointerup", this.pointerUp);
         }
         // When a character key is pressed and the image gets deleted,
         // close the image transform via selectionchange.
@@ -88,7 +92,7 @@ export class ImageTransformation extends Component {
         this.props.destroy();
     }
 
-    mouseMove(ev) {
+    pointerMove(ev) {
         if (!this.transfo.active) {
             return;
         }
@@ -215,19 +219,34 @@ export class ImageTransformation extends Component {
             this.image.parentElement,
             (node) => node.offsetWidth > currentPixelWidth
         );
-        const widthPercent = (currentPixelWidth / container.offsetWidth) * 100;
+        const containerStyles = window.getComputedStyle(container);
+        const widthPercent =
+            (currentPixelWidth /
+                (container.offsetWidth -
+                    parseFloat(containerStyles.paddingLeft) -
+                    parseFloat(containerStyles.paddingRight) -
+                    parseFloat(containerStyles.borderLeftWidth) -
+                    parseFloat(containerStyles.borderRightWidth))) *
+            100;
         this.image.style.width = Math.min(100, widthPercent).toFixed(2) + "%";
     }
 
-    mouseUp() {
+    pointerUp() {
+        if (!this.transfo.active) {
+            return;
+        }
         this.isCurrentlyTransforming = false;
+        // Width should be converted to percentage only
+        // when image dimension is changed. See `mouseMove`.
+        if (this.transfo.active.type.length === 2) {
+            this.convertPixelWidthToPercentage();
+        }
         this.transfo.active = null;
-        this.convertPixelWidthToPercentage();
         this.props.onApply?.();
-        this.props.onChange();
+        this.props.onChange?.();
     }
 
-    mouseDown(ev) {
+    pointerDown(ev) {
         if (this.transfo.active) {
             return;
         }
@@ -306,7 +325,22 @@ export class ImageTransformation extends Component {
         this.transfo.settings.rotationStep = 5;
     }
 
+    getScrollContainer() {
+        let el = this.props.editable;
+        const doc = el.ownerDocument;
+        while (el && el !== doc.body && el !== doc.documentElement) {
+            const style = getComputedStyle(el);
+            if (el.scrollHeight > el.clientHeight && ["auto", "scroll"].includes(style.overflowY)) {
+                return el;
+            }
+            el = el.parentElement;
+        }
+        return doc.documentElement;
+    }
+
     positionTransfoContainer() {
+        const scrollContainer = this.getScrollContainer();
+
         const settings = this.transfo.settings;
         const width = parseFloat(getComputedStyle(this.image).width);
         const height = parseFloat(getComputedStyle(this.image).height);
@@ -314,16 +348,31 @@ export class ImageTransformation extends Component {
         settings.translateyp = Math.round((settings.translatey / height) * 1000) / 10;
 
         this.setImageTransformation(this.image);
+        const container = this.transfoContainer.el;
 
-        this.transfoContainer.el.style.position = "absolute";
-        this.transfoContainer.el.style.width = width + "px";
-        this.transfoContainer.el.style.height = height + "px";
-        this.transfoContainer.el.style.top = settings.pos.top + "px";
-        this.transfoContainer.el.style.left = settings.pos.left + "px";
+        container.style.position = "absolute";
+        container.style.width = width + "px";
+        container.style.height = height + "px";
+        container.style.top = settings.pos.top + "px";
+        container.style.left = settings.pos.left + "px";
+        container.style.pointerEvents = "none";
+        this.setImageTransformation(container);
+
+        const win = this.props.editable.ownerDocument.defaultView;
+        const frameElement = win.frameElement;
+        const frameTop = frameElement ? frameElement.getBoundingClientRect().top : 0;
+        const scrollRect = scrollContainer.getBoundingClientRect();
+        const scrollAbsTop = scrollRect.top + win.pageYOffset + frameTop;
+        const rect = container.getBoundingClientRect();
+        const realTop = rect.top + win.pageYOffset + frameTop;
+
+        const clipTop = Math.max(0, scrollAbsTop - realTop);
+        const dragger = this.transfoDragger;
+        dragger.style.width = width + "px";
+        dragger.style.height = height + "px";
+        dragger.style.clipPath = clipTop > 0 ? `inset(${clipTop}px 0px 0px 0px)` : "none";
 
         const controls = this.transfoControls.el;
-
-        this.setImageTransformation(controls);
         controls.style.width = width + "px";
         controls.style.height = height + "px";
         controls.style.cursor = "move";

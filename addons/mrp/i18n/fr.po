@@ -8,16 +8,17 @@
 # Martin Trigaux, 2022
 # Cécile Collart <cco@odoo.com>, 2022
 # Jolien De Paepe, 2023
-# "Dylan Kiss (dyki)" <dyki@odoo.com>, 2025.
-# Weblate <noreply-mt-weblate@weblate.org>, 2025.
-# "Manon Rondou (ronm)" <ronm@odoo.com>, 2025.
+# "Dylan Kiss (dyki)" <dyki@odoo.com>, 2025, 2026.
+# Weblate <noreply-mt-weblate@weblate.org>, 2025, 2026.
+# "Manon Rondou (ronm)" <ronm@odoo.com>, 2025, 2026.
+# "Cécile Collart (cco)" <cco@odoo.com>, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-01-25 18:35+0000\n"
-"PO-Revision-Date: 2025-12-02 14:48+0000\n"
-"Last-Translator: \"Manon Rondou (ronm)\" <ronm@odoo.com>\n"
+"POT-Creation-Date: 2026-04-10 18:37+0000\n"
+"PO-Revision-Date: 2026-08-02 11:24+0000\n"
+"Last-Translator: \"Cécile Collart (cco)\" <cco@odoo.com>\n"
 "Language-Team: French <https://translate.odoo.com/projects/odoo-19/mrp/fr/>\n"
 "Language: fr\n"
 "MIME-Version: 1.0\n"
@@ -25,7 +26,7 @@ msgstr ""
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=3; plural=(n == 0 || n == 1) ? 0 : ((n != 0 && n % "
 "1000000 == 0) ? 1 : 2);\n"
-"X-Generator: Weblate 5.14.3\n"
+"X-Generator: Weblate 2026.6.1\n"
 
 #. module: mrp
 #: model:ir.model.fields,help:mrp.field_mrp_production__state
@@ -60,9 +61,8 @@ msgid ""
 " <br/><br/> The manufactured products will be moved towards <b>%"
 "(destination)s</b>, <br/> as specified from <b>%(operation)s</b> destination."
 msgstr ""
-" <br/><br/> Les produits fabriqués seront transportés vers <b>%"
-"(destination)s</b>, <br/> comme indiqué dans la destination de <b>%"
-"(operation)s</b>."
+" <br/><br/> Les produits fabriqués seront transportés vers <b>%(destination)"
+"s</b>, <br/> comme indiqué dans la destination de <b>%(operation)s</b>."
 
 #. module: mrp
 #: model:ir.model.fields.selection,name:mrp.selection__mrp_bom__ready_to_produce__all_available
@@ -192,7 +192,7 @@ msgstr "'Produits finis - %s' % object.name"
 #. module: mrp
 #: model:ir.actions.report,print_report_name:mrp.action_report_mrp_mo_overview
 msgid "'MO Overview - %s' % object.display_name"
-msgstr "'Aperçu de l'ordre de fabrication - %s' % object.display_name"
+msgstr "\"Aperçu de l'ordre de fabrication - %s\" % object.display_name"
 
 #. module: mrp
 #: model:ir.actions.report,print_report_name:mrp.action_report_production_order
@@ -253,55 +253,14 @@ msgstr ""
 "stock."
 
 #. module: mrp
-#: model_terms:ir.ui.view,arch_db:mrp.report_mrporder
-msgid "100"
-msgstr "100"
-
-#. module: mrp
-#: model_terms:ir.ui.view,arch_db:mrp.report_mrp_production_components
-#: model_terms:ir.ui.view,arch_db:mrp.report_mrp_workorder
-msgid "12345678901"
-msgstr "12345678901"
-
-#. module: mrp
 #: model_terms:product.template,description:mrp.product_product_computer_desk_leg_product_template
 msgid "18″ x 2½″ Square Leg"
 msgstr "18″ x 2½″ Square Leg"
 
 #. module: mrp
-#: model_terms:ir.ui.view,arch_db:mrp.report_mrporder
-msgid "2023-09-15"
-msgstr "15-09-2023"
-
-#. module: mrp
-#: model_terms:ir.ui.view,arch_db:mrp.report_mrp_production_components
-msgid "25"
-msgstr "25"
-
-#. module: mrp
-#: model_terms:ir.ui.view,arch_db:mrp.report_mrporder
-msgid "50"
-msgstr "50"
-
-#. module: mrp
-#: model_terms:ir.ui.view,arch_db:mrp.report_mrporder
-msgid "58"
-msgstr "58"
-
-#. module: mrp
-#: model_terms:ir.ui.view,arch_db:mrp.report_mrporder
-msgid "60"
-msgstr "60"
-
-#. module: mrp
 #: model_terms:ir.ui.view,arch_db:mrp.report_mrp_production_components
 msgid "8 GB RAM"
 msgstr "8 Go RAM"
-
-#. module: mrp
-#: model_terms:ir.ui.view,arch_db:mrp.report_mrporder
-msgid "987654321098"
-msgstr "987654321098"
 
 #. module: mrp
 #. odoo-javascript
@@ -420,6 +379,11 @@ msgstr "<span class=\"o_stat_text\">Aperçu des nomenclatures</span>"
 #: model_terms:ir.ui.view,arch_db:mrp.mrp_production_form_view
 msgid "<span class=\"o_stat_text\">Child MO</span>"
 msgstr "<span class=\"o_stat_text\">OF enfants</span>"
+
+#. module: mrp
+#: model_terms:ir.ui.view,arch_db:mrp.mrp_bom_form_view
+msgid "<span class=\"o_stat_text\">Copy Existing Operations</span>"
+msgstr "<span class=\"o_stat_text\">Copier les opérations existantes</span>"
 
 #. module: mrp
 #: model_terms:ir.ui.view,arch_db:mrp.mrp_workcenter_view
@@ -705,8 +669,8 @@ msgid ""
 "                                Instead, it is used to decompose a BoM into "
 "its components when:"
 msgstr ""
-"Une nomenclature du type kit n'est pas produite avec un ordre de fabrication."
-"<br/>\n"
+"Une nomenclature du type kit n'est pas produite avec un ordre de "
+"fabrication.<br/>\n"
 "Au lieu de cela, il est utilisé pour décomposer une nomenclature en ses "
 "composants lorsque :"
 
@@ -752,7 +716,7 @@ msgstr "Activités"
 #: model:ir.model.fields,field_description:mrp.field_mrp_routing_workcenter__activity_exception_decoration
 #: model:ir.model.fields,field_description:mrp.field_mrp_unbuild__activity_exception_decoration
 msgid "Activity Exception Decoration"
-msgstr "Activité exception décoration"
+msgstr "Indicateur d’exception d’activité"
 
 #. module: mrp
 #: model:ir.model.fields,field_description:mrp.field_mrp_production__activity_state
@@ -884,7 +848,7 @@ msgstr "Étiquettes du rapport de répartition"
 #. module: mrp
 #: model:ir.model.fields,field_description:mrp.field_res_config_settings__group_mrp_reception_report
 msgid "Allocation Report for Manufacturing Orders"
-msgstr "Rapport de répartition des ordres de fabrication"
+msgstr "Rapport d'allocation des ordres de fabrication"
 
 #. module: mrp
 #: model:ir.model.fields,field_description:mrp.field_mrp_production__allow_workorder_dependencies
@@ -1394,7 +1358,7 @@ msgstr "Composants de nomenclature"
 #: model_terms:ir.ui.view,arch_db:mrp.mo_overview_content
 #: model_terms:ir.ui.view,arch_db:mrp.report_mrp_bom
 msgid "BoM Cost"
-msgstr "Coût dans la nomenclature"
+msgstr "Coût de la nomenclature"
 
 #. module: mrp
 #. odoo-javascript
@@ -3394,7 +3358,7 @@ msgid ""
 "Location where you want to send the components resulting from the unbuild "
 "order."
 msgstr ""
-"Emplacement dans lequel vous souhaitez envoyer les composants résultant de "
+"Emplacement vers lequel vous souhaitez envoyer les composants issus de "
 "l'ordre de déconstruction."
 
 #. module: mrp
@@ -3691,6 +3655,7 @@ msgstr "Ordre de fabrication"
 #: model:ir.actions.act_window,name:mrp.action_mrp_production_form
 #: model:ir.actions.act_window,name:mrp.mrp_production_action
 #: model:ir.actions.act_window,name:mrp.mrp_production_action_picking_deshboard
+#: model:ir.model.fields,field_description:mrp.field_stock_picking__production_ids
 #: model:ir.ui.menu,name:mrp.menu_mrp_production_action
 #: model_terms:ir.ui.view,arch_db:mrp.mrp_production_form_view
 #: model_terms:ir.ui.view,arch_db:mrp.mrp_production_tree_view
@@ -4005,6 +3970,12 @@ msgid "No unbuild order found"
 msgstr "Aucun ordre de déconstruction trouvé"
 
 #. module: mrp
+#. odoo-python
+#: code:addons/mrp/wizard/mrp_production_serial_numbers.py:0
+msgid "No valid serial numbers provided."
+msgstr "Aucun numéro de série valide n’a été fourni."
+
+#. module: mrp
 #: model_terms:ir.actions.act_window,help:mrp.action_mrp_workorder_production
 #: model_terms:ir.actions.act_window,help:mrp.action_mrp_workorder_production_specific
 #: model_terms:ir.actions.act_window,help:mrp.action_mrp_workorder_workcenter
@@ -4055,10 +4026,10 @@ msgid ""
 "of Materials, which means that operations can still be planned on it/them. "
 "To prevent this, deletion of the work center is recommended instead."
 msgstr ""
-"Notez que le(s) poste(s) de travail archivé(s) : '%s' est/sont toujours "
-"lié(s) à des nomenclatures actives, ce qui signifie que des opérations "
-"peuvent toujours y être planifiées. Pour éviter cela, la suppression du "
-"poste de travail est recommandée."
+"Notez que le(s) poste(s) de travail archivé(s) : '%s' est/sont toujours lié"
+"(s) à des nomenclatures actives, ce qui signifie que des opérations peuvent "
+"toujours y être planifiées. Pour éviter cela, la suppression du poste de "
+"travail est recommandée."
 
 #. module: mrp
 #. odoo-python
@@ -4295,8 +4266,7 @@ msgstr "Filtres de recherche d'opérations"
 #. module: mrp
 #: model:ir.model.fields,help:mrp.field_mrp_routing_workcenter__needed_by_operation_ids
 msgid "Operations that cannot start before this operation is completed."
-msgstr ""
-"Opérations qui ne peuvent pas démarrer avant la fin de cette opération."
+msgstr "Opérations qui ne peuvent pas démarrer avant la fin de cette opération."
 
 #. module: mrp
 #: model:ir.model.fields,help:mrp.field_mrp_routing_workcenter__blocked_by_operation_ids
@@ -4513,7 +4483,7 @@ msgstr "Planifié en même temps que d'autre(s) ordre(s) de travail à %s"
 #: model:ir.ui.menu,name:mrp.mrp_planning_menu_root
 #: model_terms:ir.ui.view,arch_db:mrp.res_config_settings_view_form
 msgid "Planning"
-msgstr "Planning"
+msgstr "Planification"
 
 #. module: mrp
 #: model:product.template,name:mrp.product_product_plastic_laminate_product_template
@@ -4592,6 +4562,11 @@ msgid "Pre-Production"
 msgstr "Pré-fabrication"
 
 #. module: mrp
+#: model_terms:ir.ui.view,arch_db:mrp.view_mrp_production_serials_form
+msgid "Prepare MO"
+msgstr "Préparer l'OF"
+
+#. module: mrp
 #. odoo-javascript
 #: code:addons/mrp/static/src/components/bom_overview_control_panel/mrp_bom_overview_control_panel.xml:0
 #: code:addons/mrp/static/src/components/mo_overview/mrp_mo_overview.xml:0
@@ -4631,8 +4606,7 @@ msgstr "Défaut de processus"
 #. module: mrp
 #: model_terms:ir.ui.view,arch_db:mrp.res_config_settings_view_form
 msgid "Process manufacturing orders from the barcode application"
-msgstr ""
-"Traiter les ordres de fabrication à partir de l'application code-barres"
+msgstr "Traiter les ordres de fabrication à partir de l'application code-barres"
 
 #. module: mrp
 #: model_terms:ir.ui.view,arch_db:mrp.res_config_settings_view_form
@@ -4767,7 +4741,7 @@ msgstr "Mouvements de produit (Ligne de mouvement de stock)"
 #. module: mrp
 #: model:ir.model.fields,field_description:mrp.field_stock_move__product_qty_available
 msgid "Product On Hand Quantity"
-msgstr "Quantité de produits disponibles"
+msgstr "Quantité de produits en stock"
 
 #. module: mrp
 #: model_terms:ir.ui.view,arch_db:mrp.view_production_graph
@@ -4900,7 +4874,6 @@ msgstr "Production démarrée en retard"
 
 #. module: mrp
 #: model:ir.model.fields,field_description:mrp.field_mrp_production_group__production_ids
-#: model:ir.model.fields,field_description:mrp.field_stock_picking__production_ids
 #: model:ir.model.fields,field_description:mrp.field_stock_reference__production_ids
 msgid "Productions"
 msgstr "Productions"
@@ -5445,6 +5418,11 @@ msgid "Show Bom Tab"
 msgstr "Afficher l’onglet Nomenclature"
 
 #. module: mrp
+#: model:ir.model.fields,field_description:mrp.field_mrp_bom__show_copy_operations_button
+msgid "Show Copy Operations Button"
+msgstr "Afficher le bouton de copie des opérations"
+
+#. module: mrp
 #: model_terms:ir.ui.view,arch_db:mrp.mrp_production_form_view
 msgid "Show Details"
 msgstr "Afficher les détails"
@@ -5812,6 +5790,15 @@ msgid "Technical field to check when we can unreserve"
 msgstr "Champ technique à cocher si nous pouvons annuler la réservation"
 
 #. module: mrp
+#: model:ir.model.fields,help:mrp.field_mrp_bom__show_copy_operations_button
+msgid ""
+"Technical field used to control the visibility of the 'Copy Existing "
+"Operations' button."
+msgstr ""
+"Champ technique utilisé pour contrôler la visibilité du bouton \"Copier les "
+"opérations existantes\"."
+
+#. module: mrp
 #: model:ir.model.fields,help:mrp.field_mrp_production__is_outdated_bom
 msgid "The BoM has been updated since creation of the MO"
 msgstr ""
@@ -6017,6 +6004,12 @@ msgstr ""
 #: code:addons/mrp/report/mrp_report_bom_structure.py:0
 msgid "There is no defined calendar on workcenter %s."
 msgstr "Aucun calendrier n'est défini sur le poste de travail %s."
+
+#. module: mrp
+#. odoo-python
+#: code:addons/mrp/wizard/mrp_production_serial_numbers.py:0
+msgid "There is no serial numbers to apply."
+msgstr "Il n'y a pas de numéros de série à appliquer."
 
 #. module: mrp
 #: model_terms:ir.actions.act_window,help:mrp.action_mrp_unbuild_moves
@@ -7220,10 +7213,10 @@ msgstr ""
 "                        <b invisible=\"consumption != 'strict'\">\n"
 "                            Veuillez revoir votre consommation de composants "
 "ou demander à un responsable de valider\n"
-"                            <span invisible=\"mrp_production_count != "
-"1\">cet ordre de fabrication</span>\n"
-"                            <span invisible=\"mrp_production_count == "
-"1\">ces ordres de fabrication</span>.\n"
+"                            <span invisible=\"mrp_production_count != 1\">"
+"cet ordre de fabrication</span>\n"
+"                            <span invisible=\"mrp_production_count == 1\">"
+"ces ordres de fabrication</span>.\n"
 "                        </b>"
 
 #. module: mrp
@@ -7266,8 +7259,8 @@ msgid ""
 "Productivity Losses."
 msgstr ""
 "Vous devez définir au moins une perte de productivité non active dans la "
-"catégorie 'Performance'. Créez-en une depuis l'application Fabrication, "
-"menu : Configuration / Pertes de Productivité."
+"catégorie 'Performance'. Créez-en une depuis l'application Fabrication, menu "
+": Configuration / Pertes de Productivité."
 
 #. module: mrp
 #. odoo-python
@@ -7277,16 +7270,6 @@ msgid ""
 msgstr ""
 "Vous devez générer un ou plusieurs numéros de lot/série pour marquer "
 "certaines productions comme terminées"
-
-#. module: mrp
-#. odoo-python
-#: code:addons/mrp/models/mrp_production.py:0
-msgid ""
-"You need to supply Lot/Serial Number for products and 'consume' them: %"
-"(missing_products)s"
-msgstr ""
-"Vous devez fournir un lot/numéro de série pour les produits et les "
-"'consommer' : %(missing_products)s"
 
 #. module: mrp
 #: model:ir.actions.act_window,name:mrp.action_mrp_production_backorder
@@ -7418,6 +7401,37 @@ msgstr "durée réelle"
 #: code:addons/mrp/models/mrp_production.py:0
 msgid "split"
 msgstr "fractionner"
+
+#~ msgid "100"
+#~ msgstr "100"
+
+#~ msgid "12345678901"
+#~ msgstr "12345678901"
+
+#~ msgid "2023-09-15"
+#~ msgstr "15-09-2023"
+
+#~ msgid "25"
+#~ msgstr "25"
+
+#~ msgid "50"
+#~ msgstr "50"
+
+#~ msgid "58"
+#~ msgstr "58"
+
+#~ msgid "60"
+#~ msgstr "60"
+
+#~ msgid "987654321098"
+#~ msgstr "987654321098"
+
+#~ msgid ""
+#~ "You need to supply Lot/Serial Number for products and 'consume' them: %"
+#~ "(missing_products)s"
+#~ msgstr ""
+#~ "Vous devez fournir un lot/numéro de série pour les produits et les "
+#~ "'consommer' : %(missing_products)s"
 
 #~ msgid "# Read Work Orders"
 #~ msgstr "# Ordres de travail lus"

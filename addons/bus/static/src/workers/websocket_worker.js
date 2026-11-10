@@ -37,7 +37,16 @@ export const WORKER_STATE = Object.freeze({
     IDLE: "IDLE",
     CONNECTING: "CONNECTING",
 });
-const MAXIMUM_RECONNECT_DELAY = 60000;
+// Application-level ping/pong payload (browsers don't expose websocket ping/pong).
+const PING_PONG_MESSAGE = new Uint8Array([0x00]);
+const MAXIMUM_RECONNECT_DELAY = 120_000;
+// Don't wait to reconnect: keep-alive shouldn't be noticed, and the closing
+// handshake was aborted because the client explicitly tried to connect while
+// the socket was stuck in the closing state.
+const IMMEDIATE_RECONNECT_CLOSE_CODES = [
+    WEBSOCKET_CLOSE_CODES.KEEP_ALIVE_TIMEOUT,
+    WEBSOCKET_CLOSE_CODES.CLOSING_HANDSHAKE_ABORTED,
+];
 const UUID = Date.now().toString(36) + Math.random().toString(36).substring(2);
 const logger = new Logger("bus_websocket_worker");
 
@@ -50,8 +59,9 @@ const logger = new Logger("bus_websocket_worker");
  */
 export class WebsocketWorker {
     INITIAL_RECONNECT_DELAY = 1000;
-    RECONNECT_JITTER = 1000;
+    RECONNECT_JITTER = 30000;
     CONNECTION_CHECK_DELAY = 60_000;
+    CONNECTION_CHECK_PONG_TIMEOUT = 15_000;
 
     constructor(name) {
         this.name = name;
@@ -351,11 +361,20 @@ export class WebsocketWorker {
      */
     _onWebsocketClose({ code, reason }) {
         clearInterval(this._connectionCheckInterval);
+        clearTimeout(this._connectionCheckPongTimeout);
         this._logDebug("_onWebsocketClose", code, reason);
         this._updateState(WORKER_STATE.DISCONNECTED);
         this.lastChannelSubscription = null;
         this.firstSubscribeDeferred = new Deferred();
+        if (IMMEDIATE_RECONNECT_CLOSE_CODES.includes(code)) {
+            this.connectRetryDelay = 0;
+        }
         if (this.isReconnecting) {
+            if (code === WEBSOCKET_CLOSE_CODES.CLOSING_HANDSHAKE_ABORTED) {
+                // This close was triggered manually by `_start`, which discards
+                // the socket right after: nothing else will retry to connect.
+                this._retryConnectionWithDelay();
+            }
             // Connection was not established but the close event was
             // triggered anyway. Let the onWebsocketError method handle
             // this case.
@@ -374,17 +393,6 @@ export class WebsocketWorker {
         // WebSocket was not closed cleanly, let's try to reconnect.
         this.broadcast("BUS:RECONNECTING", { closeCode: code });
         this.isReconnecting = true;
-        if (
-            [
-                WEBSOCKET_CLOSE_CODES.KEEP_ALIVE_TIMEOUT,
-                WEBSOCKET_CLOSE_CODES.CLOSING_HANDSHAKE_ABORTED,
-            ].includes(code)
-        ) {
-            // Don't wait to reconnect: keep-alive shouldn't be noticed, and the
-            // closing handshake was aborted because the client explicitly tried
-            // to connect while the socket was stuck in the closing state.
-            this.connectRetryDelay = 0;
-        }
         if (code === WEBSOCKET_CLOSE_CODES.SESSION_EXPIRED) {
             this.isWaitingForNewUID = true;
         }
@@ -406,6 +414,11 @@ export class WebsocketWorker {
      */
     _onWebsocketMessage(messageEv) {
         this._restartConnectionCheckInterval();
+        clearTimeout(this._connectionCheckPongTimeout);
+        if (typeof messageEv.data !== "string") {
+            this._logDebug("connection_check_pong");
+            return;
+        }
         const notifications = JSON.parse(messageEv.data);
         this._logDebug("_onWebsocketMessage", notifications);
         this.lastNotificationId = notifications[notifications.length - 1].id;
@@ -450,32 +463,49 @@ export class WebsocketWorker {
     }
 
     /**
-     * Sends a custom application-level message to perform a connection check
-     * on the WebSocket.
-     *
-     * Browsers rely on the OS's TCP mechanism, which can take minutes or
-     * hours to detect a dead connection. Sending data triggers an immediate
-     * I/O operation, quickly revealing any network-level failure. This must be
-     * implemented at the application level because the browser WebSocket API
-     * does not expose the built-in ping/pong mechanism.
+     * Application-level ping/pong, as the browser does not expose the
+     * websocket one. A dead connection (e.g. after a network change) is
+     * otherwise only detected after the kernel retransmission timeout.
+     * If the server does not answer in time, reconnect.
      */
     _restartConnectionCheckInterval() {
         clearInterval(this._connectionCheckInterval);
         this._connectionCheckInterval = setInterval(() => {
             if (this._isWebsocketConnected()) {
-                this.websocket.send(new Uint8Array([0x00]));
+                this.websocket.send(PING_PONG_MESSAGE);
                 this._logDebug("connection_checked");
+                clearTimeout(this._connectionCheckPongTimeout);
+                this._connectionCheckPongTimeout = setTimeout(
+                    () => this._onConnectionCheckTimeout(),
+                    this.CONNECTION_CHECK_PONG_TIMEOUT
+                );
             }
         }, this.CONNECTION_CHECK_DELAY);
     }
 
     /**
-     * Try to reconnect to the server, an exponential back off is
-     * applied to the reconnect attempts.
+     * The server did not answer the connection check: drop the socket without
+     * waiting for its closing handshake and reconnect.
+     */
+    _onConnectionCheckTimeout() {
+        this._logDebug("connection_check_timeout");
+        this._removeWebsocketListeners();
+        this.websocket?.close();
+        this.websocket = null;
+        this._onWebsocketClose({
+            code: WEBSOCKET_CLOSE_CODES.KEEP_ALIVE_TIMEOUT,
+            reason: "CONNECTION_CHECK_TIMEOUT",
+        });
+    }
+
+    /**
+     * Try to reconnect to the server, add a random jitter to avoid thundering
+     * herd problem.
      */
     _retryConnectionWithDelay() {
+        clearTimeout(this.connectTimeout);
         this.connectRetryDelay =
-            Math.min(this.connectRetryDelay * 1.5, MAXIMUM_RECONNECT_DELAY) +
+            Math.min(this.connectRetryDelay, MAXIMUM_RECONNECT_DELAY) +
             this.RECONNECT_JITTER * Math.random();
         this._logDebug("_retryConnectionWithDelay", this.connectRetryDelay);
         this.connectTimeout = setTimeout(this._start.bind(this), this.connectRetryDelay);
@@ -549,6 +579,8 @@ export class WebsocketWorker {
     _stop() {
         this._logDebug("_stop");
         clearTimeout(this.connectTimeout);
+        clearInterval(this._connectionCheckInterval);
+        clearTimeout(this._connectionCheckPongTimeout);
         this.connectRetryDelay = this.INITIAL_RECONNECT_DELAY;
         this.isReconnecting = false;
         this.lastChannelSubscription = null;

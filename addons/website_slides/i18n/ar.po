@@ -8,16 +8,16 @@
 # Mustafa J. Kadhem <safi2266@gmail.com>, 2022
 # Martin Trigaux, 2022
 # Malaz Abuidris <msea@odoo.com>, 2022
-# "Tiffany Chang (tic)" <tic@odoo.com>, 2025.
-# "Dylan Kiss (dyki)" <dyki@odoo.com>, 2025.
-# Weblate <noreply-mt-weblate@weblate.org>, 2025.
-# "Malaz Siddig Elsayed Abuidris (msea)" <msea@odoo.com>, 2025.
+# "Tiffany Chang (tic)" <tic@odoo.com>, 2025, 2026.
+# "Dylan Kiss (dyki)" <dyki@odoo.com>, 2025, 2026.
+# Weblate <noreply-mt-weblate@weblate.org>, 2025, 2026.
+# "Malaz Siddig Elsayed Abuidris (msea)" <msea@odoo.com>, 2025, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-01-25 18:35+0000\n"
-"PO-Revision-Date: 2025-11-19 13:36+0000\n"
+"POT-Creation-Date: 2026-10-30 17:37+0000\n"
+"PO-Revision-Date: 2026-09-21 05:33+0000\n"
 "Last-Translator: \"Malaz Siddig Elsayed Abuidris (msea)\" <msea@odoo.com>\n"
 "Language-Team: Arabic <https://translate.odoo.com/projects/odoo-19/"
 "website_slides/ar/>\n"
@@ -27,7 +27,7 @@ msgstr ""
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=6; plural=n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 "
 "&& n%100<=10 ? 3 : n%100>=11 ? 4 : 5;\n"
-"X-Generator: Weblate 5.12.2\n"
+"X-Generator: Weblate 2026.8.1\n"
 
 #. module: website_slides
 #: model:ir.model.fields,field_description:website_slides.field_slide_channel__members_engaged_count
@@ -196,15 +196,6 @@ msgid ""
 msgstr ""
 "<a href=\"/contactus\" class=\"btn btn-primary rounded-circle "
 "o_translate_inline\">تواصل</a>"
-
-#. module: website_slides
-#: model_terms:ir.ui.view,arch_db:website_slides.profile_access_denied
-msgid ""
-"<a t-attf-href=\"/slides/course-#{request.params.get('channel_id')}\" "
-"class=\"o_translate_inline\">Return to the course.</a>"
-msgstr ""
-"<a t-attf-href=\"/slides/course-#{request.params.get('channel_id')}\" "
-"class=\"o_translate_inline\">العودة إلى الدورة.</a>"
 
 #. module: website_slides
 #. odoo-python
@@ -436,9 +427,9 @@ msgid ""
 "align: center;\">\n"
 "                            <a t-att-href=\"(object.website_share_url + '?"
 "fullscreen=1') if ctx.get('fullscreen') else object.website_share_url\">\n"
-"                                <img t-att-alt=\"object.name\" t-attf-"
-"src=\"{{ ctx.get('base_url') }}/web/image/slide.slide/{{ object.id }}/"
-"image_1024\" style=\"height:auto; width:150px; margin: 16px;\"/>\n"
+"                                <img t-att-alt=\"object.name\" t-att-"
+"src=\"object.get_image_1024_src()\" style=\"height:auto; width:150px; "
+"margin: 16px;\"/>\n"
 "                            </a>\n"
 "                        </div>\n"
 "                        <div style=\"padding: 16px 8px 16px 8px; text-align: "
@@ -461,41 +452,6 @@ msgid ""
 "                </div>\n"
 "            "
 msgstr ""
-"<div style=\"margin: 0px; padding: 0px;\">\n"
-"                    <p style=\"margin: 0px; padding: 0px; font-size: 13px;"
-"\">\n"
-"                        مرحباً<br/><br/>\n"
-"                         قام <t t-out=\"user.name or ''\">ميتشل آدمن</t> "
-"بمشاركة <t t-out=\"object.slide_category or ''\">مستند</t> <strong t-"
-"out=\"object.name or ''\">\"الأشجار\"</strong> معك!\n"
-"                        </p><div style=\"margin: 16px 8px 16px 8px; text-"
-"align: center;\">\n"
-"                            <a t-att-href=\"(object.website_share_url + '?"
-"fullscreen=1') if ctx.get('fullscreen') else object.website_share_url\">\n"
-"                                <img t-att-alt=\"object.name\" t-attf-"
-"src=\"{{ ctx.get('base_url') }}/web/image/slide.slide/{{ object.id }}/"
-"image_1024\" style=\"height:auto; width:150px; margin: 16px;\"/>\n"
-"                            </a>\n"
-"                        </div>\n"
-"                        <div style=\"padding: 16px 8px 16px 8px; text-align: "
-"center;\">\n"
-"                            <a t-att-href=\"(object.website_share_url + '?"
-"fullscreen=1') if ctx.get('fullscreen') else object.website_share_url\" t-"
-"attf-style=\"background-color: {{user.company_id.email_secondary_color or "
-"'#875A7B'}}; padding: 8px 16px 8px 16px; text-decoration: none; color: "
-"{{user.company_id.email_primary_color or '#FFFFFF'}}; border-radius: 5px;"
-"\">عرض مستند <strong t-out=\"object.name or ''\">\"الأشجار\"</strong></a>\n"
-"                        </div>\n"
-"                        <t t-if=\"user.signature\" data-o-mail-quote-"
-"container=\"1\">\n"
-"                            <br/>\n"
-"                            <div data-o-mail-quote=\"1\">--<br data-o-mail-"
-"quote=\"1\"/><t t-out=\"user.signature or ''\" data-o-mail-quote=\"1\">ميتشل "
-"آدمن</t></div>\n"
-"                        </t>\n"
-"                    \n"
-"                </div>\n"
-"            "
 
 #. module: website_slides
 #: model:mail.template,body_html:website_slides.slide_template_published
@@ -513,9 +469,9 @@ msgid ""
 "                            <div style=\"padding: 16px 8px 16px 8px; text-"
 "align: center;\">\n"
 "                                <a t-att-href=\"object.website_share_url\">\n"
-"                                <img t-att-alt=\"object.name\" t-attf-"
-"src=\"{{ ctx.get('base_url') }}/web/image/slide.slide/{{ object.id }}/"
-"image_1024\" style=\"height:auto; width:150px; margin: 16px;\"/>\n"
+"                                <img t-att-alt=\"object.name\" t-att-"
+"src=\"object.get_image_1024_src()\" style=\"height:auto; width:150px; "
+"margin: 16px;\"/>\n"
 "                            </a>\n"
 "                        </div>\n"
 "                        </t>\n"
@@ -540,45 +496,6 @@ msgid ""
 "                </div>\n"
 "            "
 msgstr ""
-"<div style=\"margin: 0px; padding: 0px;\">\n"
-"                    <p style=\"margin: 0px; padding: 0px; font-size: 13px;"
-"\">\n"
-"                        مرحباً<br/><br/>\n"
-"                        لقد تم إضافة محتوى جديد في دورة <strong t-"
-"out=\"object.channel_id.name or ''\">الأشجار، الخشب، والحدائق</strong> التي "
-"تتبعها:<br/><br/>\n"
-"                        </p><center><strong t-out=\"object.name or "
-"''\">الأشجار</strong></center>\n"
-"                        <t t-if=\"object.image_1024\">\n"
-"                            <div style=\"padding: 16px 8px 16px 8px; text-"
-"align: center;\">\n"
-"                                <a t-att-href=\"object.website_share_url\">\n"
-"                                <img t-att-alt=\"object.name\" t-attf-"
-"src=\"{{ ctx.get('base_url') }}/web/image/slide.slide/{{ object.id }}/"
-"image_1024\" style=\"height:auto; width:150px; margin: 16px;\"/>\n"
-"                            </a>\n"
-"                        </div>\n"
-"                        </t>\n"
-"                        <div style=\"padding: 16px 8px 16px 8px; text-align: "
-"center;\">\n"
-"                            <a t-att-href=\"object.website_share_url\" t-"
-"attf-style=\"background-color: "
-"{{object.user_id.company_id.email_secondary_color or '#875A7B'}}; padding: "
-"8px 16px 8px 16px; text-decoration: none; color: "
-"{{object.user_id.company_id.email_primary_color or '#FFFFFF'}}; border-"
-"radius: 5px;\">عرض المحتوى</a>\n"
-"                        </div>\n"
-"                        استمتع بهذا المحتوى الحصري!\n"
-"                        <t t-if=\"user.signature\" data-o-mail-quote-"
-"container=\"1\">\n"
-"                            <br/>\n"
-"                            <div data-o-mail-quote=\"1\">--<br data-o-mail-"
-"quote=\"1\"/><t t-out=\"user.signature or ''\" data-o-mail-quote=\"1\">ميتشل "
-"آدمن</t></div>\n"
-"                        </t>\n"
-"                    \n"
-"                </div>\n"
-"            "
 
 #. module: website_slides
 #: model_terms:ir.ui.view,arch_db:website_slides.user_profile_content
@@ -607,7 +524,7 @@ msgstr "<i class=\"fa fa-check me-1\"/> تم الإكمال"
 #. module: website_slides
 #: model_terms:ir.ui.view,arch_db:website_slides.course_card
 msgid "<i class=\"fa fa-check\" aria-hidden=\"true\"/> Completed"
-msgstr ""
+msgstr "<i class=\"fa fa-check\" aria-hidden=\"true\"/> مكتملة"
 
 #. module: website_slides
 #: model_terms:ir.ui.view,arch_db:website_slides.course_join
@@ -648,7 +565,7 @@ msgstr "<i class=\"fa fa-cloud-upload me-1\"/>إضافة محتوى"
 #. module: website_slides
 #: model_terms:ir.ui.view,arch_db:website_slides.slide_content_detailed
 msgid "<i class=\"fa fa-comments\"/> Comments"
-msgstr ""
+msgstr "<i class=\"fa fa-comments\"/> التعليقات"
 
 #. module: website_slides
 #: model_terms:ir.ui.view,arch_db:website_slides.slide_content_detailed
@@ -875,6 +792,8 @@ msgid ""
 "<i class=\"fa fa-tag me-2 text-muted\"/>\n"
 "          My Courses"
 msgstr ""
+"<i class=\"fa fa-tag me-2 text-muted\"/>\n"
+"          دوراتي"
 
 #. module: website_slides
 #: model_terms:ir.ui.view,arch_db:website_slides.user_profile_content
@@ -991,6 +910,8 @@ msgid ""
 "<span class=\"me-2 d-none d-md-inline\">Continue</span><i class=\"oi oi-"
 "arrow-right\" aria-hidden=\"true\"/>"
 msgstr ""
+"<span class=\"me-2 d-none d-md-inline\">متابعة</span><i class=\"oi oi-arrow-"
+"right\" aria-hidden=\"true\"/>"
 
 #. module: website_slides
 #: model_terms:ir.ui.view,arch_db:website_slides.course_slides_list
@@ -1034,6 +955,8 @@ msgid ""
 "<span class=\"position-absolute top-0 badge bg-secondary mt-2 ms-2\">New "
 "Content</span>"
 msgstr ""
+"<span class=\"position-absolute top-0 badge bg-secondary mt-2 ms-2\">محتوى "
+"جديد</span>"
 
 #. module: website_slides
 #: model_terms:ir.ui.view,arch_db:website_slides.slide_content_detailed
@@ -1260,6 +1183,8 @@ msgstr "<strong>لا يوجد حاضرون بعد!</strong>"
 #: model_terms:ir.ui.view,arch_db:website_slides.slide_social_email
 msgid "<strong>Sharing is caring!</strong> Your email(s) will arrive shortly."
 msgstr ""
+"<strong>المشاركة هي تعبير عن الاهتمام!</strong> ستصلك رسائل البريد "
+"الإلكتروني قريبًا."
 
 #. module: website_slides
 #: model:slide.slide,name:website_slides.slide_slide_demo_2_1
@@ -2895,9 +2820,11 @@ msgid "Display"
 msgstr "عرض"
 
 #. module: website_slides
+#: model:ir.model.fields,field_description:website_slides.field_base_partner_merge_automatic_wizard__display_name
 #: model:ir.model.fields,field_description:website_slides.field_gamification_challenge__display_name
 #: model:ir.model.fields,field_description:website_slides.field_gamification_karma_tracking__display_name
 #: model:ir.model.fields,field_description:website_slides.field_mail_activity__display_name
+#: model:ir.model.fields,field_description:website_slides.field_mail_message__display_name
 #: model:ir.model.fields,field_description:website_slides.field_res_config_settings__display_name
 #: model:ir.model.fields,field_description:website_slides.field_res_groups__display_name
 #: model:ir.model.fields,field_description:website_slides.field_res_partner__display_name
@@ -3619,9 +3546,11 @@ msgid "HowTo"
 msgstr "كيفية عمل"
 
 #. module: website_slides
+#: model:ir.model.fields,field_description:website_slides.field_base_partner_merge_automatic_wizard__id
 #: model:ir.model.fields,field_description:website_slides.field_gamification_challenge__id
 #: model:ir.model.fields,field_description:website_slides.field_gamification_karma_tracking__id
 #: model:ir.model.fields,field_description:website_slides.field_mail_activity__id
+#: model:ir.model.fields,field_description:website_slides.field_mail_message__id
 #: model:ir.model.fields,field_description:website_slides.field_res_config_settings__id
 #: model:ir.model.fields,field_description:website_slides.field_res_groups__id
 #: model:ir.model.fields,field_description:website_slides.field_res_partner__id
@@ -4324,6 +4253,16 @@ msgid "Menu Entry"
 msgstr "قيد القائمة"
 
 #. module: website_slides
+#: model:ir.model,name:website_slides.model_base_partner_merge_automatic_wizard
+msgid "Merge Partner Wizard"
+msgstr "معالج دمج الوكيل"
+
+#. module: website_slides
+#: model:ir.model,name:website_slides.model_mail_message
+msgid "Message"
+msgstr "الرسالة"
+
+#. module: website_slides
 #: model:ir.model.fields,field_description:website_slides.field_slide_channel__message_has_error
 #: model:ir.model.fields,field_description:website_slides.field_slide_slide__message_has_error
 msgid "Message Delivery error"
@@ -4448,7 +4387,7 @@ msgstr "جديد"
 #. odoo-javascript
 #: code:addons/website_slides/static/src/website_builder/courses_list_page_option.xml:0
 msgid "New Content Badge"
-msgstr ""
+msgstr "شارة المحتوى الجديد"
 
 #. module: website_slides
 #: model:ir.model.fields,field_description:website_slides.field_slide_channel__publish_template_id
@@ -4807,6 +4746,7 @@ msgstr "محور"
 #: code:addons/website_slides/static/src/xml/slide_course_join.xml:0
 #: code:addons/website_slides/static/src/xml/slide_quiz.xml:0
 #: model_terms:ir.ui.view,arch_db:website_slides.course_join
+#: model_terms:ir.ui.view,arch_db:website_slides.slide_social_email
 msgid "Please"
 msgstr "رجاءً"
 
@@ -4823,15 +4763,8 @@ msgstr ""
 #: code:addons/website_slides/static/src/interactions/slide_like.js:0
 msgid "Please %(a_login_open)slogin%(a_login_close)s to vote for this lesson"
 msgstr ""
-
-#. module: website_slides
-#: model_terms:ir.ui.view,arch_db:website_slides.slide_social_email
-msgid ""
-"Please <a t-attf-href=\"/odoo?redirect=#{request.httprequest.url}\" "
-"class=\"fw-bold o_translate_inline\"> login </a> to share this"
-msgstr ""
-"يُرجى <a t-attf-href=\"/odoo?redirect=#{request.httprequest.url}\" class=\"fw-"
-"bold o_translate_inline\">تسجيل الدخول</a> للمشاركة"
+"يُرجى %(a_login_open)sتسجيل الدخول%(a_login_close)s لتتمكن من التصويت على هذا "
+"الدرس"
 
 #. module: website_slides
 #. odoo-python
@@ -5252,6 +5185,11 @@ msgid "Retry"
 msgstr "إعادة المحاولة"
 
 #. module: website_slides
+#: model_terms:ir.ui.view,arch_db:website_slides.profile_access_denied
+msgid "Return to the course."
+msgstr "العودة إلى الدورة "
+
+#. module: website_slides
 #: model_terms:ir.ui.view,arch_db:website_slides.view_slide_channel_form
 msgid "Review Course"
 msgstr "مراجعة الدورة"
@@ -5368,7 +5306,7 @@ msgstr "البحث عن المحتوى"
 #. module: website_slides
 #: model_terms:ir.ui.view,arch_db:website_slides.courses_search_bar
 msgid "Search Courses"
-msgstr ""
+msgstr "البحث عن الدورات"
 
 #. module: website_slides
 #: model_terms:ir.ui.view,arch_db:website_slides.course_nav
@@ -6881,6 +6819,14 @@ msgstr ""
 
 #. module: website_slides
 #. odoo-python
+#: code:addons/website_slides/models/base_partner_merge.py:0
+msgid ""
+"You cannot merge these contacts because multiple contacts are enrolled in "
+"the same courses: %s"
+msgstr ""
+
+#. module: website_slides
+#. odoo-python
 #: code:addons/website_slides/controllers/main.py:0
 msgid "You cannot upload on this channel."
 msgstr "لا يمكنك الرفع على هذه القناة."
@@ -7011,7 +6957,7 @@ msgstr ""
 #. odoo-javascript
 #: code:addons/website_slides/static/src/js/public/components/slide_share_dialog/email_sharing_input.xml:0
 msgid "Your email(s) will arrive shortly."
-msgstr ""
+msgstr "ستصل رسائل البريد الإلكتروني الخاصة بك قريبًا."
 
 #. module: website_slides
 #. odoo-python
@@ -7244,6 +7190,7 @@ msgstr "انضمام"
 #. odoo-javascript
 #: code:addons/website_slides/static/src/js/public/components/slide_share_dialog/email_sharing_input.xml:0
 #: code:addons/website_slides/static/src/xml/slide_course_join.xml:0
+#: model_terms:ir.ui.view,arch_db:website_slides.slide_social_email
 msgid "login"
 msgstr "تسجيل الدخول"
 
@@ -7328,6 +7275,7 @@ msgstr "لطلب صلاحية الوصول"
 #. module: website_slides
 #. odoo-javascript
 #: code:addons/website_slides/static/src/js/public/components/slide_share_dialog/email_sharing_input.xml:0
+#: model_terms:ir.ui.view,arch_db:website_slides.slide_social_email
 msgid "to share this"
 msgstr "لمشاركة هذا"
 
@@ -7362,6 +7310,177 @@ msgstr "قام {{ user.name }} بمشاركة {{ object.slide_category }} معك
 #: model_terms:ir.ui.view,arch_db:website_slides.course_nav
 msgid "└<span class=\"ms-1\">Uncategorized</span>"
 msgstr "└<span class=\"ms-1\">غير مصنف</span>"
+
+#~ msgid ""
+#~ "<div style=\"margin: 0px; padding: 0px;\">\n"
+#~ "                    <p style=\"margin: 0px; padding: 0px; font-size: 13px;"
+#~ "\">\n"
+#~ "                        Hello<br/><br/>\n"
+#~ "                        <t t-out=\"user.name or ''\">Mitchell Admin</t> "
+#~ "shared the <t t-out=\"object.slide_category or ''\">document</t> <strong "
+#~ "t-out=\"object.name or ''\">Trees</strong> with you!\n"
+#~ "                        </p><div style=\"margin: 16px 8px 16px 8px; text-"
+#~ "align: center;\">\n"
+#~ "                            <a t-att-href=\"(object.website_share_url + '?"
+#~ "fullscreen=1') if ctx.get('fullscreen') else object.website_share_url\">\n"
+#~ "                                <img t-att-alt=\"object.name\" t-attf-"
+#~ "src=\"{{ ctx.get('base_url') }}/web/image/slide.slide/{{ object.id }}/"
+#~ "image_1024\" style=\"height:auto; width:150px; margin: 16px;\"/>\n"
+#~ "                            </a>\n"
+#~ "                        </div>\n"
+#~ "                        <div style=\"padding: 16px 8px 16px 8px; text-"
+#~ "align: center;\">\n"
+#~ "                            <a t-att-href=\"(object.website_share_url + '?"
+#~ "fullscreen=1') if ctx.get('fullscreen') else object.website_share_url\" t-"
+#~ "attf-style=\"background-color: {{user.company_id.email_secondary_color or "
+#~ "'#875A7B'}}; padding: 8px 16px 8px 16px; text-decoration: none; color: "
+#~ "{{user.company_id.email_primary_color or '#FFFFFF'}}; border-radius: 5px;"
+#~ "\">View <strong t-out=\"object.name or ''\">Trees</strong></a>\n"
+#~ "                        </div>\n"
+#~ "                        <t t-if=\"user.signature\" data-o-mail-quote-"
+#~ "container=\"1\">\n"
+#~ "                            <br/>\n"
+#~ "                            <div data-o-mail-quote=\"1\">--<br data-o-"
+#~ "mail-quote=\"1\"/><t t-out=\"user.signature or ''\" data-o-mail-"
+#~ "quote=\"1\">Mitchell Admin</t></div>\n"
+#~ "                        </t>\n"
+#~ "                    \n"
+#~ "                </div>\n"
+#~ "            "
+#~ msgstr ""
+#~ "<div style=\"margin: 0px; padding: 0px;\">\n"
+#~ "                    <p style=\"margin: 0px; padding: 0px; font-size: 13px;"
+#~ "\">\n"
+#~ "                        مرحباً<br/><br/>\n"
+#~ "                         قام <t t-out=\"user.name or ''\">ميتشل آدمن</t> "
+#~ "بمشاركة <t t-out=\"object.slide_category or ''\">مستند</t> <strong t-"
+#~ "out=\"object.name or ''\">\"الأشجار\"</strong> معك!\n"
+#~ "                        </p><div style=\"margin: 16px 8px 16px 8px; text-"
+#~ "align: center;\">\n"
+#~ "                            <a t-att-href=\"(object.website_share_url + '?"
+#~ "fullscreen=1') if ctx.get('fullscreen') else object.website_share_url\">\n"
+#~ "                                <img t-att-alt=\"object.name\" t-attf-"
+#~ "src=\"{{ ctx.get('base_url') }}/web/image/slide.slide/{{ object.id }}/"
+#~ "image_1024\" style=\"height:auto; width:150px; margin: 16px;\"/>\n"
+#~ "                            </a>\n"
+#~ "                        </div>\n"
+#~ "                        <div style=\"padding: 16px 8px 16px 8px; text-"
+#~ "align: center;\">\n"
+#~ "                            <a t-att-href=\"(object.website_share_url + '?"
+#~ "fullscreen=1') if ctx.get('fullscreen') else object.website_share_url\" t-"
+#~ "attf-style=\"background-color: {{user.company_id.email_secondary_color or "
+#~ "'#875A7B'}}; padding: 8px 16px 8px 16px; text-decoration: none; color: "
+#~ "{{user.company_id.email_primary_color or '#FFFFFF'}}; border-radius: 5px;"
+#~ "\">عرض مستند <strong t-out=\"object.name or ''\">\"الأشجار\"</strong></"
+#~ "a>\n"
+#~ "                        </div>\n"
+#~ "                        <t t-if=\"user.signature\" data-o-mail-quote-"
+#~ "container=\"1\">\n"
+#~ "                            <br/>\n"
+#~ "                            <div data-o-mail-quote=\"1\">--<br data-o-"
+#~ "mail-quote=\"1\"/><t t-out=\"user.signature or ''\" data-o-mail-"
+#~ "quote=\"1\">ميتشل آدمن</t></div>\n"
+#~ "                        </t>\n"
+#~ "                    \n"
+#~ "                </div>\n"
+#~ "            "
+
+#~ msgid ""
+#~ "<div style=\"margin: 0px; padding: 0px;\">\n"
+#~ "                    <p style=\"margin: 0px; padding: 0px; font-size: 13px;"
+#~ "\">\n"
+#~ "                        Hello<br/><br/>\n"
+#~ "                        There is something new in the course <strong t-"
+#~ "out=\"object.channel_id.name or ''\">Trees, Wood and Gardens</strong> you "
+#~ "are following:<br/><br/>\n"
+#~ "                        </p><center><strong t-out=\"object.name or "
+#~ "''\">Trees</strong></center>\n"
+#~ "                        <t t-if=\"object.image_1024\">\n"
+#~ "                            <div style=\"padding: 16px 8px 16px 8px; text-"
+#~ "align: center;\">\n"
+#~ "                                <a t-att-"
+#~ "href=\"object.website_share_url\">\n"
+#~ "                                <img t-att-alt=\"object.name\" t-attf-"
+#~ "src=\"{{ ctx.get('base_url') }}/web/image/slide.slide/{{ object.id }}/"
+#~ "image_1024\" style=\"height:auto; width:150px; margin: 16px;\"/>\n"
+#~ "                            </a>\n"
+#~ "                        </div>\n"
+#~ "                        </t>\n"
+#~ "                        <div style=\"padding: 16px 8px 16px 8px; text-"
+#~ "align: center;\">\n"
+#~ "                            <a t-att-href=\"object.website_share_url\" t-"
+#~ "attf-style=\"background-color: "
+#~ "{{object.user_id.company_id.email_secondary_color or '#875A7B'}}; "
+#~ "padding: 8px 16px 8px 16px; text-decoration: none; color: "
+#~ "{{object.user_id.company_id.email_primary_color or '#FFFFFF'}}; border-"
+#~ "radius: 5px;\">View content</a>\n"
+#~ "                        </div>\n"
+#~ "                        Enjoy this exclusive content!\n"
+#~ "                        <t t-if=\"user.signature\" data-o-mail-quote-"
+#~ "container=\"1\">\n"
+#~ "                            <br/>\n"
+#~ "                            <div data-o-mail-quote=\"1\">--<br data-o-"
+#~ "mail-quote=\"1\"/><t t-out=\"user.signature or ''\" data-o-mail-"
+#~ "quote=\"1\">Mitchell Admin</t></div>\n"
+#~ "                        </t>\n"
+#~ "                    \n"
+#~ "                </div>\n"
+#~ "            "
+#~ msgstr ""
+#~ "<div style=\"margin: 0px; padding: 0px;\">\n"
+#~ "                    <p style=\"margin: 0px; padding: 0px; font-size: 13px;"
+#~ "\">\n"
+#~ "                        مرحباً<br/><br/>\n"
+#~ "                        لقد تم إضافة محتوى جديد في دورة <strong t-"
+#~ "out=\"object.channel_id.name or ''\">الأشجار، الخشب، والحدائق</strong> "
+#~ "التي تتبعها:<br/><br/>\n"
+#~ "                        </p><center><strong t-out=\"object.name or "
+#~ "''\">الأشجار</strong></center>\n"
+#~ "                        <t t-if=\"object.image_1024\">\n"
+#~ "                            <div style=\"padding: 16px 8px 16px 8px; text-"
+#~ "align: center;\">\n"
+#~ "                                <a t-att-"
+#~ "href=\"object.website_share_url\">\n"
+#~ "                                <img t-att-alt=\"object.name\" t-attf-"
+#~ "src=\"{{ ctx.get('base_url') }}/web/image/slide.slide/{{ object.id }}/"
+#~ "image_1024\" style=\"height:auto; width:150px; margin: 16px;\"/>\n"
+#~ "                            </a>\n"
+#~ "                        </div>\n"
+#~ "                        </t>\n"
+#~ "                        <div style=\"padding: 16px 8px 16px 8px; text-"
+#~ "align: center;\">\n"
+#~ "                            <a t-att-href=\"object.website_share_url\" t-"
+#~ "attf-style=\"background-color: "
+#~ "{{object.user_id.company_id.email_secondary_color or '#875A7B'}}; "
+#~ "padding: 8px 16px 8px 16px; text-decoration: none; color: "
+#~ "{{object.user_id.company_id.email_primary_color or '#FFFFFF'}}; border-"
+#~ "radius: 5px;\">عرض المحتوى</a>\n"
+#~ "                        </div>\n"
+#~ "                        استمتع بهذا المحتوى الحصري!\n"
+#~ "                        <t t-if=\"user.signature\" data-o-mail-quote-"
+#~ "container=\"1\">\n"
+#~ "                            <br/>\n"
+#~ "                            <div data-o-mail-quote=\"1\">--<br data-o-"
+#~ "mail-quote=\"1\"/><t t-out=\"user.signature or ''\" data-o-mail-"
+#~ "quote=\"1\">ميتشل آدمن</t></div>\n"
+#~ "                        </t>\n"
+#~ "                    \n"
+#~ "                </div>\n"
+#~ "            "
+
+#~ msgid ""
+#~ "<a t-attf-href=\"/slides/course-#{request.params.get('channel_id')}\" "
+#~ "class=\"o_translate_inline\">Return to the course.</a>"
+#~ msgstr ""
+#~ "<a t-attf-href=\"/slides/course-#{request.params.get('channel_id')}\" "
+#~ "class=\"o_translate_inline\">العودة إلى الدورة.</a>"
+
+#~ msgid ""
+#~ "Please <a t-attf-href=\"/odoo?redirect=#{request.httprequest.url}\" "
+#~ "class=\"fw-bold o_translate_inline\"> login </a> to share this"
+#~ msgstr ""
+#~ "يُرجى <a t-attf-href=\"/odoo?redirect=#{request.httprequest.url}\" "
+#~ "class=\"fw-bold o_translate_inline\">تسجيل الدخول</a> للمشاركة"
 
 #~ msgid "<i class=\"fa fa-comments\"/> Comments ("
 #~ msgstr "<i class=\"fa fa-comments\"/> التعليقات ("
@@ -7659,9 +7778,6 @@ msgstr "└<span class=\"ms-1\">غير مصنف</span>"
 
 #~ msgid "Restrict publishing to this website."
 #~ msgstr "قصر إمكانية النشر على هذا الموقع الإلكتروني. "
-
-#~ msgid "Return to the course."
-#~ msgstr "العودة إلى الدورة "
 
 #~ msgid "Save & Publish"
 #~ msgstr "حفظ ونشر "

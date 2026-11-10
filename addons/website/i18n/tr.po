@@ -40,19 +40,20 @@
 # Martin Trigaux, 2023
 # Ertuğrul Güreş <ertugrulg@projetgrup.com>, 2023
 # Murat Durmuş <muratd@projetgrup.com>, 2023
-# "Dylan Kiss (dyki)" <dyki@odoo.com>, 2025.
-# "Tiffany Chang (tic)" <tic@odoo.com>, 2025.
-# Weblate <noreply-mt-weblate@weblate.org>, 2025.
+# "Dylan Kiss (dyki)" <dyki@odoo.com>, 2025, 2026.
+# "Tiffany Chang (tic)" <tic@odoo.com>, 2025, 2026.
+# Weblate <noreply-mt-weblate@weblate.org>, 2025, 2026.
 # DeepL <noreply-mt-deepl@weblate.org>, 2025.
-# Odoo Turkish Import <dyki+tr@odoo.com>, 2025.
-# "Malaz Siddig Elsayed Abuidris (msea)" <msea@odoo.com>, 2025.
+# Odoo Turkish Import <dyki+tr@odoo.com>, 2025, 2026.
+# "Malaz Siddig Elsayed Abuidris (msea)" <msea@odoo.com>, 2025, 2026.
+# "Deniz Guvener Unal (degu)" <degu@odoo.com>, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-02-06 18:35+0000\n"
-"PO-Revision-Date: 2025-11-28 12:50+0000\n"
-"Last-Translator: \"Malaz Siddig Elsayed Abuidris (msea)\" <msea@odoo.com>\n"
+"POT-Creation-Date: 2026-10-30 17:37+0000\n"
+"PO-Revision-Date: 2026-08-02 17:03+0000\n"
+"Last-Translator: \"Deniz Guvener Unal (degu)\" <degu@odoo.com>\n"
 "Language-Team: Turkish <https://translate.odoo.com/projects/odoo-19/website/"
 "tr/>\n"
 "Language: tr\n"
@@ -60,7 +61,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
-"X-Generator: Weblate 5.14.3\n"
+"X-Generator: Weblate 2026.6.1\n"
 
 #. module: website
 #: model_terms:ir.ui.view,arch_db:website.s_quotes_carousel_compact
@@ -293,98 +294,6 @@ msgid "$ 32M"
 msgstr "32 M$"
 
 #. module: website
-#: model_terms:ir.ui.view,arch_db:website.s_product_catalog
-msgid "$1.50"
-msgstr "$1.50"
-
-#. module: website
-#: model_terms:ir.ui.view,arch_db:website.s_pricelist_boxed
-msgid "$12.00"
-msgstr "$12.00"
-
-#. module: website
-#: model_terms:ir.ui.view,arch_db:website.s_pricelist_boxed
-msgid "$13.00"
-msgstr "$13.00"
-
-#. module: website
-#: model_terms:ir.ui.view,arch_db:website.s_pricelist_boxed
-msgid "$13.50"
-msgstr "$13.50"
-
-#. module: website
-#: model_terms:ir.ui.view,arch_db:website.s_pricelist_boxed
-msgid "$14.50"
-msgstr "$14.50"
-
-#. module: website
-#: model_terms:ir.ui.view,arch_db:website.s_pricelist_boxed
-msgid "$15.00"
-msgstr "$15.00"
-
-#. module: website
-#: model_terms:ir.ui.view,arch_db:website.s_pricelist_boxed
-msgid "$16.00"
-msgstr "$16.00"
-
-#. module: website
-#: model_terms:ir.ui.view,arch_db:website.s_product_catalog
-msgid "$25.00"
-msgstr "$25.00"
-
-#. module: website
-#: model_terms:ir.ui.view,arch_db:website.s_product_catalog
-msgid "$26.00"
-msgstr "$26.00"
-
-#. module: website
-#: model_terms:ir.ui.view,arch_db:website.s_product_catalog
-msgid "$28.00"
-msgstr "$28.00"
-
-#. module: website
-#: model_terms:ir.ui.view,arch_db:website.s_pricelist_cafe
-#: model_terms:ir.ui.view,arch_db:website.s_product_catalog
-msgid "$3.00"
-msgstr "$3.00"
-
-#. module: website
-#: model_terms:ir.ui.view,arch_db:website.s_pricelist_cafe
-msgid "$3.50"
-msgstr "$3.50"
-
-#. module: website
-#: model_terms:ir.ui.view,arch_db:website.s_pricelist_cafe
-msgid "$4.00"
-msgstr "$4.00"
-
-#. module: website
-#: model_terms:ir.ui.view,arch_db:website.s_pricelist_cafe
-msgid "$4.10"
-msgstr "$4.10"
-
-#. module: website
-#: model_terms:ir.ui.view,arch_db:website.s_pricelist_cafe
-msgid "$4.25"
-msgstr "$4.25"
-
-#. module: website
-#: model_terms:ir.ui.view,arch_db:website.s_pricelist_cafe
-msgid "$4.50"
-msgstr "$4.50"
-
-#. module: website
-#: model_terms:ir.ui.view,arch_db:website.s_product_catalog
-msgid "$5.00"
-msgstr "$5.00"
-
-#. module: website
-#. odoo-python
-#: code:addons/website/models/ir_ui_view.py:0
-msgid "%(error)s (website: %(website_id)s)"
-msgstr "%(error)s (web sitesi: %(website_id)s)"
-
-#. module: website
 #. odoo-javascript
 #: code:addons/website/static/src/client_actions/website_preview/website_builder_action.js:0
 msgid "%s is not a valid URL."
@@ -431,6 +340,12 @@ msgstr "'. ' için sonuçlar gösteriliyor"
 
 #. module: website
 #. odoo-javascript
+#: code:addons/website/static/src/snippets/s_searchbar/search_bar.js:0
+msgid "(%(count)s found)"
+msgstr ""
+
+#. module: website
+#. odoo-javascript
 #: code:addons/website/static/src/builder/plugins/form/form_option.xml:0
 msgid "+ Field"
 msgstr "+ Alan"
@@ -439,21 +354,6 @@ msgstr "+ Alan"
 #: model_terms:ir.ui.view,arch_db:website.res_config_settings_view_form
 msgid "+ New Website"
 msgstr "+ Yeni Websitesi"
-
-#. module: website
-#: model_terms:ir.ui.view,arch_db:website.template_footer_descriptive
-msgid "+1 555-555-5556"
-msgstr "+1 555-555-5556"
-
-#. module: website
-#: model_terms:ir.ui.view,arch_db:website.s_masonry_block_mosaic_template
-msgid "+12"
-msgstr "12'den fazla"
-
-#. module: website
-#: model_terms:ir.ui.view,arch_db:website.s_numbers_charts
-msgid "+25.000"
-msgstr "25.000'den fazla"
 
 #. module: website
 #: model_terms:ir.ui.view,arch_db:website.show_website_info
@@ -533,48 +433,10 @@ msgid "/contactus"
 msgstr "/bizimle iletişime geç"
 
 #. module: website
-#: model_terms:ir.ui.view,arch_db:website.s_key_images
-msgid "01"
-msgstr "01"
-
-#. module: website
-#: model_terms:ir.ui.view,arch_db:website.s_key_images
-msgid "02"
-msgstr "02"
-
-#. module: website
-#: model_terms:ir.ui.view,arch_db:website.s_key_images
-msgid "03"
-msgstr "03"
-
-#. module: website
-#: model_terms:ir.ui.view,arch_db:website.s_key_images
-msgid "04"
-msgstr "04"
-
-#. module: website
 #. odoo-javascript
 #: code:addons/website/static/src/builder/plugins/options/map_option.xml:0
 msgid "1 km"
 msgstr "1 km"
-
-#. module: website
-#. odoo-javascript
-#: code:addons/website/static/src/builder/plugins/options/media_list_item_option.xml:0
-msgid "1/2 - 1/2"
-msgstr "1/2 - 1/2"
-
-#. module: website
-#. odoo-javascript
-#: code:addons/website/static/src/builder/plugins/options/media_list_item_option.xml:0
-msgid "1/3 - 2/3"
-msgstr "1/3 - 2/3"
-
-#. module: website
-#. odoo-javascript
-#: code:addons/website/static/src/builder/plugins/options/media_list_item_option.xml:0
-msgid "1/4 - 3/4"
-msgstr "1/4 - 3/4"
 
 #. module: website
 #. odoo-javascript
@@ -611,11 +473,6 @@ msgstr "12 bin"
 #: code:addons/website/static/src/builder/plugins/options/map_option.xml:0
 msgid "15 km"
 msgstr "15 km"
-
-#. module: website
-#: model_terms:ir.ui.view,arch_db:website.s_countdown
-msgid "16"
-msgstr "16"
 
 #. module: website
 #. odoo-javascript
@@ -665,11 +522,6 @@ msgid "2000 km"
 msgstr "2000 km"
 
 #. module: website
-#: model_terms:ir.ui.view,arch_db:website.s_masonry_block_mosaic_template
-msgid "22%"
-msgstr "%22"
-
-#. module: website
 #: model_terms:ir.ui.view,arch_db:website.s_features_wave
 msgid "24/7 Customer Support"
 msgstr "7/24 Müşteri Desteği"
@@ -678,11 +530,6 @@ msgstr "7/24 Müşteri Desteği"
 #: model_terms:ir.ui.view,arch_db:website.s_key_benefits
 msgid "24/7 Support"
 msgstr "7/24 Destek"
-
-#. module: website
-#: model_terms:ir.ui.view,arch_db:website.color_combinations_debug_view
-msgid "25%"
-msgstr "%25"
 
 #. module: website
 #: model_terms:ir.ui.view,arch_db:website.template_footer_centered
@@ -701,11 +548,6 @@ msgstr "2x"
 #: model_terms:ir.ui.view,arch_db:website.s_rating
 msgid "3 out of 5 stars"
 msgstr "5 üzerinden 3 yıldız"
-
-#. module: website
-#: model_terms:ir.ui.view,arch_db:website.s_countdown
-msgid "30"
-msgstr "30"
 
 #. module: website
 #. odoo-javascript
@@ -785,17 +627,6 @@ msgid "404 Not Found"
 msgstr "404 Bulunamadı"
 
 #. module: website
-#: model_terms:ir.ui.view,arch_db:website.s_countdown
-msgid "45"
-msgstr "45"
-
-#. module: website
-#: model_terms:ir.ui.view,arch_db:website.s_numbers_framed
-#: model_terms:ir.ui.view,arch_db:website.s_numbers_showcase
-msgid "45%"
-msgstr "%45"
-
-#. module: website
 #. odoo-javascript
 #: code:addons/website/static/src/builder/plugins/font_awesome_option.xml:0
 msgid "4x"
@@ -853,11 +684,6 @@ msgstr "5x"
 
 #. module: website
 #: model_terms:ir.ui.view,arch_db:website.s_numbers_charts
-msgid "75%"
-msgstr "%75"
-
-#. module: website
-#: model_terms:ir.ui.view,arch_db:website.s_numbers_charts
 msgid ""
 "75% of clients have been using the service for over a decade consistently."
 msgstr ""
@@ -893,21 +719,6 @@ msgstr ": Yüklendikten sonra,"
 #: code:addons/website/static/src/builder/plugins/theme/theme_advanced_option.xml:0
 msgid "<Head> and <body>"
 msgstr "<Head> ve <body>"
-
-#. module: website
-#: model_terms:ir.ui.view,arch_db:website.s_bento_grid
-msgid ""
-"<a class=\"o_translate_inline btn btn-secondary\" t-att-"
-"href=\"cta_btn_href\">\n"
-"                            Shop Now\n"
-"                        </a>\n"
-"                        <br/>"
-msgstr ""
-"<a class=\"o_translate_inline btn btn-secondary\" t-att-"
-"href=\"cta_btn_href\">\n"
-"                            Şimdi Alışveriş Yapın\n"
-"                       </a>\n"
-"                        <br/>"
 
 #. module: website
 #: model_terms:ir.ui.view,arch_db:website.bs_debug_view
@@ -1074,85 +885,6 @@ msgid ""
 msgstr ""
 "<a href=\"/contactus\" class=\"btn btn-primary o_translate_inline\">Bize "
 "ulaşın</a>"
-
-#. module: website
-#: model_terms:ir.ui.view,arch_db:website.s_split_intro
-msgid ""
-"<a t-att-href=\"cta_btn_href\" class=\"btn btn-lg btn-primary "
-"o_translate_inline\">Discover more</a>"
-msgstr ""
-"<a t-att-href=\"cta_btn_href\" class=\"btn btn-lg btn-primary "
-"o_translate_inline\">Daha fazlasını keşfedin</a>"
-
-#. module: website
-#: model_terms:ir.ui.view,arch_db:website.s_framed_intro
-msgid ""
-"<a t-att-href=\"cta_btn_href\" class=\"btn btn-lg btn-primary "
-"o_translate_inline\">Discover</a>"
-msgstr ""
-"<a t-att-href=\"cta_btn_href\" class=\"btn btn-lg btn-primary "
-"o_translate_inline\">Keşfedin</a>"
-
-#. module: website
-#: model_terms:ir.ui.view,arch_db:website.s_intro_pill
-msgid ""
-"<a t-att-href=\"cta_btn_href\" class=\"btn btn-lg btn-primary "
-"o_translate_inline\">Get Started</a>"
-msgstr ""
-"<a t-att-href=\"cta_btn_href\" class=\"btn btn-lg btn-primary "
-"o_translate_inline\">Başlayın</a>"
-
-#. module: website
-#: model_terms:ir.ui.view,arch_db:website.s_banner
-msgid ""
-"<a t-att-href=\"cta_btn_href\" class=\"btn btn-lg btn-primary "
-"o_translate_inline\">Start Now <span class=\"fa fa-angle-right ms-2\"/></a>"
-msgstr ""
-"<a t-att-href=\"cta_btn_href\" class=\"btn btn-lg btn-primary "
-"o_translate_inline\">Şimdi Başlayın <span class=\"fa fa-angle-right ms-2\"/"
-"></a>"
-
-#. module: website
-#: model_terms:ir.ui.view,arch_db:website.s_adventure
-msgid ""
-"<a t-att-href=\"cta_btn_href\" class=\"btn btn-lg btn-primary "
-"o_translate_inline\">Start Now</a>"
-msgstr ""
-"<a t-att-href=\"cta_btn_href\" class=\"btn btn-lg btn-primary "
-"o_translate_inline\">Şimdi Başlayın</a>"
-
-#. module: website
-#: model_terms:ir.ui.view,arch_db:website.s_image_hexagonal
-msgid ""
-"<a t-att-href=\"cta_btn_href\" class=\"btn btn-primary btn-lg "
-"o_translate_inline\">Contact Us</a>"
-msgstr ""
-"<a t-att-href=\"cta_btn_href\" class=\"btn btn-primary btn-lg "
-"o_translate_inline\">Bize Ulaşın</a>"
-
-#. module: website
-#: model_terms:ir.ui.view,arch_db:website.s_closer_look
-msgid ""
-"<a t-att-href=\"cta_btn_href\" class=\"btn btn-primary mb-2 "
-"o_translate_inline\">Start Now</a>\n"
-"                <a t-att-href=\"cta_btn_href\" class=\"btn btn-outline-"
-"primary mb-2 o_translate_inline\"><t t-out=\"cta_btn_text\">Contact us</t></"
-"a>"
-msgstr ""
-"<a t-att-href=\"cta_btn_href\" class=\"btn btn-primary mb-2 "
-"o_translate_inline\">Şimdi Başlayın</a>\n"
-"                <a t-att-href=\"cta_btn_href\" class=\"btn btn-outline-"
-"primary mb-2 o_translate_inline\"><t t-out=\"cta_btn_text\"> Bize Ulaşın</"
-"t></a>"
-
-#. module: website
-#: model_terms:ir.ui.view,arch_db:website.s_banner_connected
-msgid ""
-"<a t-att-href=\"cta_btn_href\" class=\"o_translate_inline btn btn-lg btn-"
-"secondary\">Discover</a>"
-msgstr ""
-"<a t-att-href=\"cta_btn_href\" class=\"o_translate_inline btn btn-lg btn-"
-"secondary\">Keşfedin</a>"
 
 #. module: website
 #. odoo-javascript
@@ -3065,13 +2797,19 @@ msgstr "<u>Salı</u><br/>08.00-18.00"
 
 #. module: website
 #: model_terms:ir.ui.view,arch_db:website.s_opening_hours
-msgid "<u>Wednesday</u><br/>8.00am-12.00am"
-msgstr "<u>Çarşamba</u><br/>08.00-12.00"
+msgid "<u>Wednesday</u><br/>8.00am-12.00pm"
+msgstr ""
 
 #. module: website
 #: model_terms:ir.ui.view,arch_db:website.s_opening_hours
 msgid "<u>info@yourcompany.example.com</u>"
 msgstr "<u>info@yourcompany.example.com</u>"
+
+#. module: website
+#. odoo-javascript
+#: code:addons/website/static/src/components/website_loader/website_loader.xml:0
+msgid "A"
+msgstr ""
 
 #. module: website
 #: model_terms:ir.ui.view,arch_db:website.res_config_settings_view_form
@@ -3268,6 +3006,12 @@ msgid "A new visit is considered if last connection was more than 8 hours ago."
 msgstr "Son bağlantı 8 saatten fazla ise yeni bir ziyaret kabul edilir."
 
 #. module: website
+#. odoo-python
+#: code:addons/website/models/website_controller_page.py:0
+msgid "A page must be set to display a concrete model."
+msgstr ""
+
+#. module: website
 #: model_terms:ir.ui.view,arch_db:website.bs_debug_view
 msgid "A second item"
 msgstr "İkinci bir öğe"
@@ -3409,8 +3153,8 @@ msgstr "Akordeon Görseli"
 
 #. module: website
 #: model_terms:ir.ui.view,arch_db:website.res_config_settings_view_form
-msgid "Accounts are usable across all your multiple websites"
-msgstr "Hesaplar birden fazla web sitenizin tümünde kullanılabilir"
+msgid "Accounts created on this website are usable across all other websites"
+msgstr ""
 
 #. module: website
 #: model_terms:ir.ui.view,arch_db:website.new_page_template_landing_2_s_three_columns
@@ -3681,6 +3425,12 @@ msgstr "Bundan sonra yeni bir alan ekle"
 #: code:addons/website/static/src/builder/plugins/form/form_option_plugin.js:0
 msgid "Add a new field at the end"
 msgstr "Sonunda yeni bir alan ekleyin"
+
+#. module: website
+#. odoo-javascript
+#: code:addons/website/static/src/builder/plugins/options/media_list_item_option.xml:0
+msgid "Add an image"
+msgstr ""
 
 #. module: website
 #: model_terms:ir.ui.view,arch_db:website.res_config_settings_view_form
@@ -4440,6 +4190,12 @@ msgstr "Web Sitesinde Mevcut"
 
 #. module: website
 #. odoo-javascript
+#: code:addons/website/static/src/components/website_loader/website_loader.xml:0
+msgid "B"
+msgstr ""
+
+#. module: website
+#. odoo-javascript
 #: code:addons/website/static/src/builder/plugins/options/google_maps_option/google_maps_api_key_dialog.xml:0
 msgid "BSgzTvR5L1GB9jriT451iTN4huVPxHmltG6T6eo"
 msgstr "BSgzTvR5L1GB9jriT451iTN4huVPxHmltG6T6eo"
@@ -4961,6 +4717,13 @@ msgstr ""
 msgid "By default, the domains of the following services are already blocked:"
 msgstr ""
 "Varsayılan olarak aşağıdaki servislerin alan adları zaten engellenmiştir:"
+
+#. module: website
+#. odoo-javascript
+#: code:addons/website/static/src/components/dialog/seo.xml:0
+#: code:addons/website/static/src/components/website_loader/website_loader.xml:0
+msgid "C"
+msgstr ""
 
 #. module: website
 #: model:ir.model.fields,field_description:website.field_res_config_settings__cdn_url
@@ -5973,6 +5736,7 @@ msgstr "İletişim Bilgisi"
 #: model_terms:ir.ui.view,arch_db:website.s_contact_info
 #: model_terms:ir.ui.view,arch_db:website.s_cta_box
 #: model_terms:ir.ui.view,arch_db:website.s_floating_blocks
+#: model_terms:ir.ui.view,arch_db:website.s_image_hexagonal
 #: model_terms:ir.ui.view,arch_db:website.s_text_block_h2_contact
 #: model_terms:ir.ui.view,arch_db:website.s_website_form_info
 #: model_terms:ir.ui.view,arch_db:website.template_footer_mega_cards
@@ -5990,6 +5754,7 @@ msgstr "Kontak Ziyaretçi"
 #: model_terms:ir.ui.view,arch_db:website.contactus
 #: model_terms:ir.ui.view,arch_db:website.footer_custom
 #: model_terms:ir.ui.view,arch_db:website.s_call_to_action
+#: model_terms:ir.ui.view,arch_db:website.s_closer_look
 #: model_terms:ir.ui.view,arch_db:website.s_cover
 #: model_terms:ir.ui.view,arch_db:website.s_cta_card
 #: model_terms:ir.ui.view,arch_db:website.s_cta_mockups
@@ -6542,6 +6307,13 @@ msgstr "Gösteriyi Özelleştir"
 #. module: website
 #. odoo-javascript
 #: code:addons/website/static/src/builder/plugins/options/countdown_option.xml:0
+#: code:addons/website/static/src/components/dialog/seo.xml:0
+msgid "D"
+msgstr ""
+
+#. module: website
+#. odoo-javascript
+#: code:addons/website/static/src/builder/plugins/options/countdown_option.xml:0
 msgid "D - H - M"
 msgstr "D - H - M"
 
@@ -7027,7 +6799,9 @@ msgid "Discord Account"
 msgstr "Discord Hesabı"
 
 #. module: website
+#: model_terms:ir.ui.view,arch_db:website.s_banner_connected
 #: model_terms:ir.ui.view,arch_db:website.s_card
+#: model_terms:ir.ui.view,arch_db:website.s_framed_intro
 #: model_terms:ir.ui.view,arch_db:website.s_quadrant
 #: model_terms:ir.ui.view,arch_db:website.s_striped_top
 msgid "Discover"
@@ -7050,6 +6824,7 @@ msgstr "Tüm özellikleri keşfedin"
 
 #. module: website
 #: model_terms:ir.ui.view,arch_db:website.s_cover
+#: model_terms:ir.ui.view,arch_db:website.s_split_intro
 msgid "Discover more"
 msgstr "Daha fazlasını keşfet"
 
@@ -7434,6 +7209,12 @@ msgstr "Seçtiğiniz biriyle değiştirmek için bir simgeyi çift tıklayın."
 #: code:addons/website/static/src/builder/plugins/options/chart_option.xml:0
 msgid "Doughnut"
 msgstr "Tatlı çörek"
+
+#. module: website
+#. odoo-javascript
+#: code:addons/website/static/src/builder/plugins/options/popup_option_plugin.js:0
+msgid "Drag blocks here"
+msgstr ""
 
 #. module: website
 #. odoo-javascript
@@ -8312,6 +8093,12 @@ msgid "External ID"
 msgstr "Harici Kimlik"
 
 #. module: website
+#. odoo-python
+#: code:addons/website/models/ir_ui_view.py:0
+msgid "External ID can not be loaded: %(error)s (website: %(website_id)s)"
+msgstr ""
+
+#. module: website
 #. odoo-javascript
 #: code:addons/website/static/src/builder/plugins/options/popup_option.xml:0
 msgid "Extra Large"
@@ -9095,6 +8882,11 @@ msgid "Get Delivered"
 msgstr "Teslim Alın"
 
 #. module: website
+#: model_terms:ir.ui.view,arch_db:website.s_intro_pill
+msgid "Get Started"
+msgstr ""
+
+#. module: website
 #: model_terms:ir.ui.view,arch_db:website.template_footer_descriptive
 #: model_terms:ir.ui.view,arch_db:website.template_footer_links
 #: model_terms:ir.ui.view,arch_db:website.template_footer_mega
@@ -9267,6 +9059,7 @@ msgstr "Google Analytics Anahtar"
 #. module: website
 #. odoo-javascript
 #: code:addons/website/static/src/builder/plugins/theme/theme_advanced_option.xml:0
+#: model_terms:ir.ui.view,arch_db:website.snippets
 msgid "Google Map"
 msgstr "Google Harita"
 
@@ -9274,6 +9067,15 @@ msgstr "Google Harita"
 #: model:ir.model.fields,field_description:website.field_website__google_maps_api_key
 msgid "Google Maps API Key"
 msgstr "Google Haritalar API Keyi"
+
+#. module: website
+#. odoo-javascript
+#: code:addons/website/static/src/builder/plugins/options/google_maps_option/google_maps_service.js:0
+#: code:addons/website/static/src/core/website_map_service.js:0
+msgid ""
+"Google Maps configuration has changed. Please reload the page for changes to "
+"take effect."
+msgstr ""
 
 #. module: website
 #. odoo-javascript
@@ -10098,6 +9900,7 @@ msgstr "Hizmetlerinizi veya ürününüzün temel özelliklerini görselleştiri
 #. odoo-javascript
 #: code:addons/website/static/src/builder/plugins/layout_option/add_element_option.xml:0
 #: code:addons/website/static/src/builder/plugins/options/cover_properties_option.xml:0
+#: code:addons/website/static/src/builder/plugins/options/media_list_item_option.xml:0
 #: code:addons/website/static/src/builder/plugins/options/navbar_logo_option.xml:0
 #: code:addons/website/static/src/builder/plugins/options/searchbar_option_plugin.js:0
 #: code:addons/website/static/src/builder/plugins/theme/theme_tab.xml:0
@@ -11222,7 +11025,6 @@ msgstr "Dizüstü"
 #: code:addons/website/static/src/builder/plugins/options/countdown_option.xml:0
 #: code:addons/website/static/src/builder/plugins/options/popup_option.xml:0
 #: code:addons/website/static/src/builder/plugins/options/scroll_button_option.xml:0
-#: code:addons/website/static/src/builder/plugins/size_option.xml:0
 #: code:addons/website/static/src/builder/plugins/theme/theme_button_option.xml:0
 #: code:addons/website/static/src/builder/plugins/theme/theme_tab.xml:0
 #: model_terms:ir.ui.view,arch_db:website.bs_debug_view
@@ -11691,6 +11493,7 @@ msgstr "Yükleniyor"
 
 #. module: website
 #. odoo-javascript
+#: code:addons/website/static/src/builder/builder_urlpicker.js:0
 #: code:addons/website/static/src/components/dialog/add_page_dialog.js:0
 #: code:addons/website/static/src/js/editor/html_editor.js:0
 #: code:addons/website/static/src/xml/website.background.video.xml:0
@@ -11944,7 +11747,6 @@ msgstr "Başlangıç, ana yemek ve tatlılardan oluşan Akdeniz büfesi"
 #: code:addons/website/static/src/builder/plugins/options/popup_option.xml:0
 #: code:addons/website/static/src/builder/plugins/options/scroll_button_option.xml:0
 #: code:addons/website/static/src/builder/plugins/options/social_media_option.xml:0
-#: code:addons/website/static/src/builder/plugins/size_option.xml:0
 msgid "Medium"
 msgstr "Aracı:"
 
@@ -14022,8 +13824,8 @@ msgstr "Yer tutucu"
 #. module: website
 #. odoo-javascript
 #: code:addons/website/static/src/builder/plugins/options/google_maps_option/google_maps_api_key_dialog.xml:0
-msgid "Places API"
-msgstr "Yerler API'si"
+msgid "Places API (NEW)"
+msgstr ""
 
 #. module: website
 #. odoo-javascript
@@ -14192,6 +13994,12 @@ msgstr "Bunun önizlemesi"
 
 #. module: website
 #. odoo-javascript
+#: code:addons/website/static/src/builder/builder_urlpicker.xml:0
+msgid "Preview this URL in a new tab"
+msgstr "Bu URL’yi yeni sekmede önizleyin"
+
+#. module: website
+#. odoo-javascript
 #: code:addons/website/static/src/builder/plugins/options/image_gallery_option.xml:0
 #: code:addons/website/static/src/snippets/s_dynamic_snippet_carousel/000.xml:0
 #: code:addons/website/static/src/snippets/s_image_gallery/001.xml:0
@@ -14242,6 +14050,7 @@ msgstr "Fiyatlandırma Planları"
 #. module: website
 #. odoo-javascript
 #: code:addons/website/static/src/builder/plugins/options/header/header_font_option.xml:0
+#: code:addons/website/static/src/builder/plugins/theme/theme_colors_option.xml:0
 msgid "Primary"
 msgstr "Birincil"
 
@@ -15442,6 +15251,7 @@ msgstr "İkinci varsayılan radyo"
 #. module: website
 #. odoo-javascript
 #: code:addons/website/static/src/builder/plugins/options/header/header_font_option.xml:0
+#: code:addons/website/static/src/builder/plugins/theme/theme_colors_option.xml:0
 msgid "Secondary"
 msgstr "İkincil"
 
@@ -15795,6 +15605,11 @@ msgid "Shop Desks"
 msgstr "Masaları satın alın"
 
 #. module: website
+#: model_terms:ir.ui.view,arch_db:website.s_bento_grid
+msgid "Shop Now"
+msgstr ""
+
+#. module: website
 #: model_terms:ir.ui.view,arch_db:website.s_floating_blocks
 msgid "Shop Sofas"
 msgstr "Kanepeleri satın alın"
@@ -15996,7 +15811,6 @@ msgstr "Site"
 #: code:addons/website/static/src/builder/plugins/options/mega_menu_option.xml:0
 #: code:addons/website/static/src/builder/plugins/options/popup_option.xml:0
 #: code:addons/website/static/src/builder/plugins/options/social_media_option.xml:0
-#: code:addons/website/static/src/builder/plugins/size_option.xml:0
 msgid "Size"
 msgstr "Boyut"
 
@@ -16129,7 +15943,6 @@ msgstr "Yavaşlama"
 #: code:addons/website/static/src/builder/plugins/options/popup_option.xml:0
 #: code:addons/website/static/src/builder/plugins/options/scroll_button_option.xml:0
 #: code:addons/website/static/src/builder/plugins/options/social_media_option.xml:0
-#: code:addons/website/static/src/builder/plugins/size_option.xml:0
 #: code:addons/website/static/src/builder/plugins/theme/theme_button_option.xml:0
 #: code:addons/website/static/src/builder/plugins/theme/theme_tab.xml:0
 #: model_terms:ir.ui.view,arch_db:website.bs_debug_view
@@ -16348,10 +16161,17 @@ msgid "Start After"
 msgstr "Sonra Başlat"
 
 #. module: website
+#: model_terms:ir.ui.view,arch_db:website.s_adventure
+#: model_terms:ir.ui.view,arch_db:website.s_closer_look
 #: model_terms:ir.ui.view,arch_db:website.s_comparisons
 #: model_terms:ir.ui.view,arch_db:website.s_comparisons_horizontal
 msgid "Start Now"
 msgstr "Şimdi Başla"
+
+#. module: website
+#: model_terms:ir.ui.view,arch_db:website.s_banner
+msgid "Start Now <span class=\"fa fa-angle-right ms-2\"/>"
+msgstr ""
 
 #. module: website
 #: model_terms:ir.ui.view,arch_db:website.s_card_offset
@@ -16582,6 +16402,12 @@ msgid "Switch Theme"
 msgstr "Anahtarı Teması"
 
 #. module: website
+#. odoo-javascript
+#: code:addons/website/static/src/components/dialog/seo.xml:0
+msgid "T"
+msgstr ""
+
+#. module: website
 #: model_terms:ir.ui.view,arch_db:website.s_mega_menu_menus_logos
 msgid "T-shirts"
 msgstr "Tişörtler"
@@ -16750,9 +16576,23 @@ msgid "Template ID: %s"
 msgstr "Tema ID:%s"
 
 #. module: website
+#. odoo-python
+#: code:addons/website/models/ir_ui_view.py:0
+msgid ""
+"Template does not exist or has been deleted: %(error)s (website: %"
+"(website_id)s)"
+msgstr ""
+
+#. module: website
 #: model_terms:ir.ui.view,arch_db:website.qweb_500
 msgid "Template fallback"
 msgstr "Şablon Adı"
+
+#. module: website
+#. odoo-python
+#: code:addons/website/models/ir_ui_view.py:0
+msgid "Template not found: '%(error)s' (website: %(website_id)s)"
+msgstr ""
 
 #. module: website
 #: model_terms:ir.ui.view,arch_db:website.template_footer_mega
@@ -16972,12 +16812,6 @@ msgstr "Aşağıdaki alan adı geçerli değil:"
 #: code:addons/website/static/src/xml/website_form.xml:0
 msgid "The form has been sent successfully."
 msgstr "Form başarılı şekilde gönderildi."
-
-#. module: website
-#. odoo-python
-#: code:addons/website/controllers/form.py:0
-msgid "The form's specified model does not exist"
-msgstr "Formun belirtilen modeli mevcut değil"
 
 #. module: website
 #: model:ir.model.fields,help:website.field_ir_actions_server__website_url
@@ -17345,6 +17179,13 @@ msgid ""
 msgstr ""
 "Bu yazı tipi zaten mevcut, yalnızca sunucu sürümünü değiştirmek için yerel "
 "bir yazı tipi olarak ekleyebilirsiniz."
+
+#. module: website
+#. odoo-python
+#: code:addons/website/controllers/form.py:0
+msgid ""
+"This form cannot be submitted. Please contact the website administrator."
+msgstr ""
 
 #. module: website
 #: model_terms:ir.ui.view,arch_db:website.bs_debug_view
@@ -17893,14 +17734,14 @@ msgstr "Metindeki başlığı çevirin. Menü otomatik olarak oluşturulur."
 #. module: website
 #. odoo-javascript
 #: code:addons/website/static/src/builder/plugins/translation_tab/translate_webpage_option.xml:0
-msgid "Translate the whole content with AI"
-msgstr "Tüm içeriği yapay zeka ile çevirin"
+msgid "Translate to"
+msgstr "Şuna çevir"
 
 #. module: website
 #. odoo-javascript
 #: code:addons/website/static/src/builder/plugins/translation_tab/translate_webpage_option.xml:0
-msgid "Translate to"
-msgstr "Şuna çevir"
+msgid "Translate your content (yellow part) with AI"
+msgstr ""
 
 #. module: website
 #. odoo-javascript
@@ -18447,7 +18288,6 @@ msgstr "Dikey Özellikler"
 #. odoo-javascript
 #: code:addons/website/static/src/builder/plugins/options/background_option.xml:0
 #: code:addons/website/static/src/builder/plugins/options/background_video_option.xml:0
-#: model_terms:ir.ui.view,arch_db:website.s_video
 #: model_terms:ir.ui.view,arch_db:website.snippets
 msgid "Video"
 msgstr "Video"
@@ -19630,9 +19470,33 @@ msgid "Write your text"
 msgstr "Metninizi yazın"
 
 #. module: website
+#. odoo-javascript
+#: code:addons/website/static/src/builder/plugins/options/social_media_option_plugin.js:0
+#: code:addons/website/static/src/builder/plugins/theme/theme_button_option.xml:0
+#: code:addons/website/static/src/builder/plugins/theme/theme_tab.xml:0
+#: model_terms:ir.ui.view,arch_db:website.footer_custom
+#: model_terms:ir.ui.view,arch_db:website.header_social_links
+#: model_terms:ir.ui.view,arch_db:website.s_mega_menu_odoo_menu
+#: model_terms:ir.ui.view,arch_db:website.s_references_social
+#: model_terms:ir.ui.view,arch_db:website.s_share
+#: model_terms:ir.ui.view,arch_db:website.s_social_media
+#: model_terms:ir.ui.view,arch_db:website.template_footer_centered
+#: model_terms:ir.ui.view,arch_db:website.template_footer_headline
+#: model_terms:ir.ui.view,arch_db:website.template_footer_links
+msgid "X"
+msgstr ""
+
+#. module: website
 #: model:ir.model.fields,field_description:website.field_website__social_twitter
 msgid "X Account"
 msgstr "X Hesabı"
+
+#. module: website
+#. odoo-javascript
+#: code:addons/website/static/src/builder/plugins/theme/theme_button_option.xml:0
+#: code:addons/website/static/src/builder/plugins/theme/theme_tab.xml:0
+msgid "Y"
+msgstr ""
 
 #. module: website
 #. odoo-javascript
@@ -19695,18 +19559,6 @@ msgstr ""
 "türlü soru veya sorununuza yardımcı olmaya hazırdır."
 
 #. module: website
-#. odoo-javascript
-#: code:addons/website/static/src/builder/plugins/form/form_option_plugin.js:0
-msgid "You can't duplicate the submit button of the form."
-msgstr "Formun gönder düğmesini çoğaltamazsınız."
-
-#. module: website
-#. odoo-javascript
-#: code:addons/website/static/src/builder/plugins/form/form_option_plugin.js:0
-msgid "You can't remove the submit button of the form"
-msgstr "Formun gönder düğmesini kaldıramazsınız"
-
-#. module: website
 #. odoo-python
 #: code:addons/website/models/website.py:0
 msgid ""
@@ -19730,6 +19582,12 @@ msgstr ""
 #: code:addons/website/static/src/builder/plugins/form/form_option_plugin.js:0
 msgid "You cannot duplicate this field."
 msgstr "Bu alanı kopyalayamazsınız."
+
+#. module: website
+#. odoo-javascript
+#: code:addons/website/static/src/builder/plugins/options/card_image_option_plugin.js:0
+msgid "You cannot duplicate this image."
+msgstr ""
 
 #. module: website
 #. odoo-javascript
@@ -21393,6 +21251,209 @@ msgstr "✽  Pizzalar"
 msgid "✽  What We Offer"
 msgstr "✽  Sunduklarımız"
 
+#~ msgid "%(error)s (website: %(website_id)s)"
+#~ msgstr "%(error)s (web sitesi: %(website_id)s)"
+
+#~ msgid "Places API"
+#~ msgstr "Yerler API'si"
+
+#~ msgid "The form's specified model does not exist"
+#~ msgstr "Formun belirtilen modeli mevcut değil"
+
+#~ msgid "Accounts are usable across all your multiple websites"
+#~ msgstr "Hesaplar birden fazla web sitenizin tümünde kullanılabilir"
+
+#~ msgid "Translate the whole content with AI"
+#~ msgstr "Tüm içeriği yapay zeka ile çevirin"
+
+#~ msgid "<u>Wednesday</u><br/>8.00am-12.00am"
+#~ msgstr "<u>Çarşamba</u><br/>08.00-12.00"
+
+#~ msgid "$1.50"
+#~ msgstr "$1.50"
+
+#~ msgid "$12.00"
+#~ msgstr "$12.00"
+
+#~ msgid "$13.00"
+#~ msgstr "$13.00"
+
+#~ msgid "$13.50"
+#~ msgstr "$13.50"
+
+#~ msgid "$14.50"
+#~ msgstr "$14.50"
+
+#~ msgid "$15.00"
+#~ msgstr "$15.00"
+
+#~ msgid "$16.00"
+#~ msgstr "$16.00"
+
+#~ msgid "$25.00"
+#~ msgstr "$25.00"
+
+#~ msgid "$26.00"
+#~ msgstr "$26.00"
+
+#~ msgid "$28.00"
+#~ msgstr "$28.00"
+
+#~ msgid "$3.00"
+#~ msgstr "$3.00"
+
+#~ msgid "$3.50"
+#~ msgstr "$3.50"
+
+#~ msgid "$4.00"
+#~ msgstr "$4.00"
+
+#~ msgid "$4.10"
+#~ msgstr "$4.10"
+
+#~ msgid "$4.25"
+#~ msgstr "$4.25"
+
+#~ msgid "$4.50"
+#~ msgstr "$4.50"
+
+#~ msgid "$5.00"
+#~ msgstr "$5.00"
+
+#~ msgid "+1 555-555-5556"
+#~ msgstr "+1 555-555-5556"
+
+#~ msgid "+12"
+#~ msgstr "12'den fazla"
+
+#~ msgid "+25.000"
+#~ msgstr "25.000'den fazla"
+
+#~ msgid "01"
+#~ msgstr "01"
+
+#~ msgid "02"
+#~ msgstr "02"
+
+#~ msgid "03"
+#~ msgstr "03"
+
+#~ msgid "04"
+#~ msgstr "04"
+
+#~ msgid "1/2 - 1/2"
+#~ msgstr "1/2 - 1/2"
+
+#~ msgid "1/3 - 2/3"
+#~ msgstr "1/3 - 2/3"
+
+#~ msgid "1/4 - 3/4"
+#~ msgstr "1/4 - 3/4"
+
+#~ msgid "16"
+#~ msgstr "16"
+
+#~ msgid "22%"
+#~ msgstr "%22"
+
+#~ msgid "25%"
+#~ msgstr "%25"
+
+#~ msgid "30"
+#~ msgstr "30"
+
+#~ msgid "45"
+#~ msgstr "45"
+
+#~ msgid "45%"
+#~ msgstr "%45"
+
+#~ msgid "75%"
+#~ msgstr "%75"
+
+#~ msgid ""
+#~ "<a class=\"o_translate_inline btn btn-secondary\" t-att-"
+#~ "href=\"cta_btn_href\">\n"
+#~ "                            Shop Now\n"
+#~ "                        </a>\n"
+#~ "                        <br/>"
+#~ msgstr ""
+#~ "<a class=\"o_translate_inline btn btn-secondary\" t-att-"
+#~ "href=\"cta_btn_href\">\n"
+#~ "                            Şimdi Alışveriş Yapın\n"
+#~ "                       </a>\n"
+#~ "                        <br/>"
+
+#~ msgid ""
+#~ "<a t-att-href=\"cta_btn_href\" class=\"btn btn-lg btn-primary "
+#~ "o_translate_inline\">Discover more</a>"
+#~ msgstr ""
+#~ "<a t-att-href=\"cta_btn_href\" class=\"btn btn-lg btn-primary "
+#~ "o_translate_inline\">Daha fazlasını keşfedin</a>"
+
+#~ msgid ""
+#~ "<a t-att-href=\"cta_btn_href\" class=\"btn btn-lg btn-primary "
+#~ "o_translate_inline\">Discover</a>"
+#~ msgstr ""
+#~ "<a t-att-href=\"cta_btn_href\" class=\"btn btn-lg btn-primary "
+#~ "o_translate_inline\">Keşfedin</a>"
+
+#~ msgid ""
+#~ "<a t-att-href=\"cta_btn_href\" class=\"btn btn-lg btn-primary "
+#~ "o_translate_inline\">Get Started</a>"
+#~ msgstr ""
+#~ "<a t-att-href=\"cta_btn_href\" class=\"btn btn-lg btn-primary "
+#~ "o_translate_inline\">Başlayın</a>"
+
+#~ msgid ""
+#~ "<a t-att-href=\"cta_btn_href\" class=\"btn btn-lg btn-primary "
+#~ "o_translate_inline\">Start Now <span class=\"fa fa-angle-right ms-2\"/></"
+#~ "a>"
+#~ msgstr ""
+#~ "<a t-att-href=\"cta_btn_href\" class=\"btn btn-lg btn-primary "
+#~ "o_translate_inline\">Şimdi Başlayın <span class=\"fa fa-angle-right "
+#~ "ms-2\"/></a>"
+
+#~ msgid ""
+#~ "<a t-att-href=\"cta_btn_href\" class=\"btn btn-lg btn-primary "
+#~ "o_translate_inline\">Start Now</a>"
+#~ msgstr ""
+#~ "<a t-att-href=\"cta_btn_href\" class=\"btn btn-lg btn-primary "
+#~ "o_translate_inline\">Şimdi Başlayın</a>"
+
+#~ msgid ""
+#~ "<a t-att-href=\"cta_btn_href\" class=\"btn btn-primary btn-lg "
+#~ "o_translate_inline\">Contact Us</a>"
+#~ msgstr ""
+#~ "<a t-att-href=\"cta_btn_href\" class=\"btn btn-primary btn-lg "
+#~ "o_translate_inline\">Bize Ulaşın</a>"
+
+#~ msgid ""
+#~ "<a t-att-href=\"cta_btn_href\" class=\"btn btn-primary mb-2 "
+#~ "o_translate_inline\">Start Now</a>\n"
+#~ "                <a t-att-href=\"cta_btn_href\" class=\"btn btn-outline-"
+#~ "primary mb-2 o_translate_inline\"><t t-out=\"cta_btn_text\">Contact us</"
+#~ "t></a>"
+#~ msgstr ""
+#~ "<a t-att-href=\"cta_btn_href\" class=\"btn btn-primary mb-2 "
+#~ "o_translate_inline\">Şimdi Başlayın</a>\n"
+#~ "                <a t-att-href=\"cta_btn_href\" class=\"btn btn-outline-"
+#~ "primary mb-2 o_translate_inline\"><t t-out=\"cta_btn_text\"> Bize Ulaşın</"
+#~ "t></a>"
+
+#~ msgid ""
+#~ "<a t-att-href=\"cta_btn_href\" class=\"o_translate_inline btn btn-lg btn-"
+#~ "secondary\">Discover</a>"
+#~ msgstr ""
+#~ "<a t-att-href=\"cta_btn_href\" class=\"o_translate_inline btn btn-lg btn-"
+#~ "secondary\">Keşfedin</a>"
+
+#~ msgid "You can't duplicate the submit button of the form."
+#~ msgstr "Formun gönder düğmesini çoğaltamazsınız."
+
+#~ msgid "You can't remove the submit button of the form"
+#~ msgstr "Formun gönder düğmesini kaldıramazsınız"
+
 #~ msgid "%s List"
 #~ msgstr "%s Listesi"
 
@@ -22491,9 +22552,6 @@ msgstr "✽  Sunduklarımız"
 #~ msgstr ""
 #~ "Lütfen formu doğru şekilde doldurun. Çok fazla dosya yüklediniz. (Azami "
 #~ "%s dosya)"
-
-#~ msgid "Preview this URL in a new tab"
-#~ msgstr "Bu URL’yi yeni sekmede önizleyin"
 
 #~ msgid "Privacy"
 #~ msgstr "Özel"

@@ -37,6 +37,7 @@ class SaleOrder(models.Model):
     _description = "Sales Order"
     _order = 'date_order desc, id desc'
     _check_company_auto = True
+    _mail_post_access = "read"
 
     _date_order_conditional_required = models.Constraint(
         "CHECK((state = 'sale' AND date_order IS NOT NULL) OR state != 'sale')",
@@ -72,6 +73,7 @@ class SaleOrder(models.Model):
         string="Status",
         readonly=True, copy=False, index=True,
         tracking=3,
+        group_expand=True,
         default='draft')
     locked = fields.Boolean(
         help="Locked orders cannot be modified.",
@@ -133,7 +135,7 @@ class SaleOrder(models.Model):
 
     validity_date = fields.Date(
         string="Expiration",
-        help="Validity of the order, after that you will not able to sign & pay the quotation.",
+        help="Validity of the quotation. After this date, you will no longer be able to sign and pay it.",
         compute='_compute_validity_date',
         store=True, readonly=False, copy=False, precompute=True)
     journal_id = fields.Many2one(
@@ -550,6 +552,7 @@ class SaleOrder(models.Model):
                     quantity=1.0,
                     currency_id=currency,
                     sign=1,
+                    special_mode='total_excluded',
                     special_type='early_payment',
                     tax_ids=line.tax_ids.flatten_taxes_hierarchy().filtered(lambda tax: tax.amount_type != 'fixed'),
                 ))
@@ -559,6 +562,7 @@ class SaleOrder(models.Model):
                     quantity=1.0,
                     currency_id=currency,
                     sign=1,
+                    special_mode='total_excluded',
                     special_type='early_payment',
                 ))
         return epd_lines
@@ -570,7 +574,7 @@ class SaleOrder(models.Model):
         # existing invoices. This is necessary since such a refund is not
         # directly linked to the SO.
         for order in self:
-            invoices = order.order_line.invoice_lines.move_id.filtered(lambda r: r.move_type in ('out_invoice', 'out_refund'))
+            invoices = order.order_line.invoice_lines.move_id.filtered(lambda r: r.move_type in ('out_invoice', 'out_refund', 'out_receipt'))
             order.invoice_ids = invoices
             order.invoice_count = len(invoices)
 
@@ -590,7 +594,7 @@ class SaleOrder(models.Model):
                 # A solution is using the 'not any' operators with inverted search first
                 # ("orders with invoiced lines").
                 falsy_domain = [('order_line', 'not any', [
-                    ('invoice_lines.move_id.move_type', 'in', ('out_invoice', 'out_refund'))
+                    ('invoice_lines.move_id.move_type', 'in', ('out_invoice', 'out_refund', 'out_receipt'))
                 ])]
                 if len(value) == 1:
                     return falsy_domain
@@ -602,13 +606,13 @@ class SaleOrder(models.Model):
                     JOIN account_move_line aml ON aml.id = soli_rel.invoice_line_id
                     JOIN account_move am ON am.id = aml.move_id
                 WHERE
-                    am.move_type in ('out_invoice', 'out_refund') AND
+                    am.move_type in ('out_invoice', 'out_refund', 'out_receipt') AND
                     am.id = ANY(%s)
             """, (list(value),))
             so_ids = self.env.cr.fetchone()[0] or []
             return [('id', 'in', so_ids)] + falsy_domain
         return [('order_line.invoice_lines', 'any', [
-            ('move_id.move_type', 'in', ('out_invoice', 'out_refund')),
+            ('move_id.move_type', 'in', ('out_invoice', 'out_refund', 'out_receipt')),
             ('move_id', operator, value),
         ])]
 
@@ -675,11 +679,16 @@ class SaleOrder(models.Model):
             )
 
     def _compute_amount_undiscounted(self):
+        AccountTax = self.env['account.tax']
         for order in self:
-            total = 0.0
+            subtotal = 0
             for line in order.order_line:
-                total += (line.price_subtotal * 100)/(100-line.discount) if line.discount != 100 else (line.price_unit * line.product_uom_qty)
-            order.amount_undiscounted = total
+                base_line = line._prepare_base_line_for_taxes_computation(discount=0)
+                # Exclude global discounts and down payments
+                if not base_line.get('special_type'):
+                    AccountTax._add_tax_details_in_base_line(base_line, order.company_id)
+                    subtotal += base_line['tax_details']['raw_total_excluded_currency']
+            order.amount_undiscounted = subtotal
 
     @api.depends('client_order_ref', 'origin', 'partner_id')
     def _compute_duplicated_order_ids(self):
@@ -701,6 +710,8 @@ class SaleOrder(models.Model):
 
         self.env['sale.order'].flush_model(['company_id', 'partner_id', 'client_order_ref', 'origin', 'state'])
 
+        accessible_orders = self.env['sale.order']._search([])
+
         result = self.env.execute_query(SQL("""
             SELECT
                 sale_order.id AS order_id,
@@ -715,10 +726,12 @@ class SaleOrder(models.Model):
                     sale_order.origin = duplicate_order.name
                     OR sale_order.client_order_ref = duplicate_order.client_order_ref
                 )
+                AND duplicate_order.id IN %(accessible_orders)s
              WHERE sale_order.id IN %(orders)s
              GROUP BY sale_order.id
             """,
             orders=tuple(orders.ids),
+            accessible_orders=accessible_orders.subselect(),
         ))
         return {
             order_id: set(duplicate_ids)
@@ -777,7 +790,7 @@ class SaleOrder(models.Model):
     @api.depends('company_id', 'partner_id', 'amount_total')
     def _compute_partner_credit_warning(self):
         for order in self:
-            order.with_company(order.company_id)
+            order = order.with_company(order.company_id)
             order.partner_credit_warning = ''
             show_warning = order.state in ('draft', 'sent') and \
                            order.company_id.account_use_credit_limit
@@ -804,6 +817,7 @@ class SaleOrder(models.Model):
             )
 
     @api.depends('state')
+    @api.depends_context('lang')
     def _compute_type_name(self):
         for record in self:
             if record.state in ('draft', 'sent', 'cancel'):
@@ -926,10 +940,11 @@ class SaleOrder(models.Model):
 
     @api.onchange('order_line')
     def _onchange_order_line(self):
+        linked_lines_by_line = self.order_line._get_linked_lines_by_line()
         for index, line in enumerate(self.order_line):
             if line.display_type == 'line_subsection' and not line.parent_id:
                 line.display_type = 'line_section'
-            combo_item_lines = line._get_linked_lines().filtered('combo_item_id')
+            combo_item_lines = linked_lines_by_line[line].filtered('combo_item_id')
             if line.product_template_id.type != 'combo':
                 if combo_item_lines:
                     # Delete any linked combo item lines if the line's product is no longer a combo
@@ -1778,6 +1793,11 @@ class SaleOrder(models.Model):
             return self.env.ref('sale.mt_order_sent')
         return super()._track_subtype(init_values)
 
+    def _get_model_description(self, model_name):
+        if not self:
+            return super()._get_model_description(model_name)
+        return self.type_name
+
     # PAYMENT #
 
     def _force_lines_to_invoice_policy_order(self):
@@ -2127,7 +2147,7 @@ class SaleOrder(models.Model):
             downpayment_wizard = order.env['sale.advance.payment.inv'].create({
                 'sale_order_ids': order,
                 'advance_payment_method': 'fixed',
-                'fixed_amount': order.amount_paid,
+                'fixed_amount': self.env.context.get('downpayment_fixed_amount', order.amount_paid),
             })
             generated_invoices |= downpayment_wizard._create_invoices(order)
 

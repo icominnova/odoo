@@ -165,7 +165,8 @@ class ProductProduct(models.Model):
         domain_quant = [('product_id', 'in', self.ids)] + domain_quant_loc
         dates_in_the_past = False
         # only to_date as to_date will correspond to qty_available
-        to_date = fields.Datetime.to_datetime(to_date)
+        to_date = self.env.company._to_datetime_upper_bound(to_date)
+
         if to_date and to_date < fields.Datetime.now():
             dates_in_the_past = True
 
@@ -183,8 +184,12 @@ class ProductProduct(models.Model):
             owners = self.env.context['owners']
             if owners:
                 domain_quant += [('owner_id', 'in', self.env.context['owners'])]
+                domain_move_in += [('move_line_ids.owner_id', 'in', owners)]
+                domain_move_out += [('move_line_ids.owner_id', 'in', owners)]
             else:
                 domain_quant += [('owner_id', '=', False)]
+                domain_move_in += [('move_line_ids.owner_id', '=', False)]
+                domain_move_out += [('move_line_ids.owner_id', '=', False)]
         if package_id is not None:
             domain_quant += [('package_id', '=', package_id)]
         if dates_in_the_past:
@@ -207,7 +212,7 @@ class ProductProduct(models.Model):
         quants_res = {product.id: (quantity, reserved_quantity) for product, quantity, reserved_quantity in Quant._read_group(domain_quant, ['product_id'], ['quantity:sum', 'reserved_quantity:sum'])}
         expired_unreserved_quants_res = {}
         if self.env.context.get('with_expiration'):
-            max_date = self.env.context['to_date'] if self.env.context.get('to_date') else self.env.context['with_expiration']
+            max_date = self.env.context['to_date'] if self.env.context.get('to_date') and self.env.context.get('fresh_qty_forecast') else self.env.context['with_expiration']
             domain_quant += [('removal_date', '<=', max_date)]
             expired_unreserved_quants_res = {product.id: quantity - reserved_quantity for product, quantity, reserved_quantity in Quant._read_group(domain_quant, ['product_id'], ['quantity:sum', 'reserved_quantity:sum'])}
         moves_in_res_past = defaultdict(float)
@@ -265,14 +270,16 @@ class ProductProduct(models.Model):
         """
         if self.env.context.get('skip_qty_available_update', False):
             return
+        warehouse = None
         for product in self:
             if (
                 product.type == "consu" and product.is_storable and float_compare(product.qty_available,
                      0.0, precision_rounding=product.uom_id.rounding) >= 0
             ):
-                warehouse = self.env['stock.warehouse'].search(
-                    [('company_id', '=', self.env.company.id)], limit=1
-                )
+                if warehouse is None:
+                    warehouse = self.env['stock.warehouse'].search(
+                        [('company_id', '=', self.env.company.id)], limit=1
+                    )
                 self.env['stock.quant'].with_context(inventory_mode=True, from_inverse_qty=True).create({
                     'product_id': product.id,
                     'location_id': warehouse.lot_stock_id.id,
@@ -340,13 +347,15 @@ class ProductProduct(models.Model):
         def _search_ids(model, values):
             ids = set()
             domains = []
+            Model = self.env[model]
+            rec_names = Model._rec_names_search or [Model._rec_name]
             for item in values:
                 if isinstance(item, int):
                     ids.add(item)
                 else:
-                    domains.append(Domain(self.env[model]._rec_name, 'ilike', item))
+                    domains.append(Domain.OR(Domain(name, 'ilike', item) for name in rec_names))
             if domains:
-                ids |= set(self.env[model].search(Domain.OR(domains)).ids)
+                ids |= set(Model.search(Domain.OR(domains)).ids)
             return ids
 
         # We may receive a location or warehouse from the context, either by explicit
@@ -394,26 +403,38 @@ class ProductProduct(models.Model):
             dest_loc_domain = Domain('location_dest_id', 'in', locations.ids)
             dest_loc_domain_out = Domain('location_dest_id', 'not in', locations.ids)
         elif locations:
-            alias = locations._table + '_inner'
-            paths_query = Query(locations.env, alias, SQL.identifier(locations._table))
-            paths_query.add_where(SQL(
-                """EXISTS (
-                    SELECT 1
-                      FROM stock_location parent
-                     WHERE parent.id IN %s
-                       AND %s LIKE parent.parent_path || '%%'
-                )""",
-                tuple(locations.ids),
-                SQL.identifier(alias, 'parent_path'),
-            ))
-            loc_domain = Domain('location_id', 'in', paths_query)
+            descendants_query = Query(
+                locations.env,
+                'descendants',
+                SQL(
+                    """
+                    (
+                        WITH RECURSIVE descendants AS (
+                            SELECT id
+                            FROM stock_location
+                            WHERE id IN %s
+
+                            UNION
+
+                            SELECT sl.id
+                            FROM stock_location sl
+                            JOIN descendants d
+                                ON sl.location_id = d.id
+                        )
+                        SELECT id FROM descendants
+                    )
+                    """,
+                    tuple(locations.ids),
+                ),
+            )
+            loc_domain = Domain('location_id', 'in', descendants_query)
             # The condition should be split for done and not-done moves as the final_dest_id only make sense
             # for the part of the move chain that is not done yet.
-            dest_loc_domain_done = Domain('location_dest_id', 'in', paths_query)
+            dest_loc_domain_done = Domain('location_dest_id', 'in', descendants_query)
             dest_loc_domain_in_progress = Domain([
                 '|',
-                    '&', ('location_final_id', '!=', False), ('location_final_id', 'in', paths_query),
-                    '&', ('location_final_id', '=', False), ('location_dest_id', 'in', paths_query),
+                    '&', ('location_final_id', '!=', False), ('location_final_id', 'in', descendants_query),
+                    '&', ('location_final_id', '=', False), ('location_dest_id', 'in', descendants_query),
             ])
             dest_loc_domain = Domain([
                 '|',
@@ -425,6 +446,12 @@ class ProductProduct(models.Model):
                     '&', ('state', '=', 'done'), ~dest_loc_domain_done,
                     '&', ('state', '!=', 'done'), ~dest_loc_domain_in_progress,
             ])
+            if self.env.context.get('skip_in_progress'):
+                return (
+                    loc_domain,
+                    dest_loc_domain_done & ~loc_domain,
+                    loc_domain & ~dest_loc_domain_done
+                )
 
         # returns: (domain_quant_loc, domain_move_in_loc, domain_move_out_loc)
         return (
@@ -459,6 +486,12 @@ class ProductProduct(models.Model):
         return self._search_product_quantity(operator, value, 'outgoing_qty')
 
     def _search_free_qty(self, operator, value):
+        if not ({'from_date', 'to_date'} & set(self.env.context.keys())):
+            product_ids = self._search_field_by_quants(
+                operator, value, self.env.context.get('lot_id'), self.env.context.get('owner_id'),
+                self.env.context.get('package_id'), field="free_qty"
+            )
+            return [('id', 'in', product_ids)]
         return self._search_product_quantity(operator, value, 'free_qty')
 
     def _search_product_quantity(self, operator, value, field):
@@ -468,6 +501,9 @@ class ProductProduct(models.Model):
         return [('id', 'in', ids)]
 
     def _search_qty_available_new(self, operator, value, lot_id=False, owner_id=False, package_id=False):
+        return self._search_field_by_quants(operator, value, lot_id, owner_id, package_id)
+
+    def _search_field_by_quants(self, operator, value, lot_id=False, owner_id=False, package_id=False, field="qty_available"):
         ''' Optimized method which doesn't search on stock.moves, only on stock.quants. '''
         op = PY_OPERATORS.get(operator)
         if not op:
@@ -485,17 +521,18 @@ class ProductProduct(models.Model):
             domain_quant.append(('owner_id', '=', owner_id))
         if package_id:
             domain_quant.append(('package_id', '=', package_id))
-        quants_groupby = self.env['stock.quant']._read_group(domain_quant, ['product_id'], ['quantity:sum'])
+        quants_groupby = self.env['stock.quant']._read_group(domain_quant, ['product_id'], ['quantity:sum', 'reserved_quantity:sum'])
 
         # check if we need include zero values in result
         include_zero = op(0.0, value)
 
         processed_product_ids = set()
-        for product, quantity_sum in quants_groupby:
+        for product, quantity_sum, reserved_sum in quants_groupby:
             product_id = product.id
+            field_sum = quantity_sum - reserved_sum if field == "free_qty" else quantity_sum
             if include_zero:
                 processed_product_ids.add(product_id)
-            if op(quantity_sum, value):
+            if op(field_sum, value):
                 product_ids.add(product_id)
 
         if include_zero:
@@ -598,7 +635,7 @@ class ProductProduct(models.Model):
         domain = [
             '|',
                 ('product_id', '=', self.id),
-                ('category_id', '=', self.product_tmpl_id.categ_id.id),
+                ('category_id', 'parent_of', self.product_tmpl_id.categ_id.id),
         ]
         return self.env['product.template']._get_action_view_related_putaway_rules(domain)
 
@@ -639,7 +676,7 @@ class ProductProduct(models.Model):
         )
 
         # If user have rights to write on quant, we define the view as editable.
-        if self.env.user.has_group('stock.group_stock_manager'):
+        if self.env.user.has_group('stock.group_stock_user'):
             self = self.with_context(inventory_mode=True)
             # Set default location id if multilocations is inactive
             if not self.env.user.has_group('stock.group_stock_multi_locations'):
@@ -883,7 +920,7 @@ class ProductTemplate(models.Model):
                 if template.serial_prefix_format in sequences_by_prefix:
                     template.lot_sequence_id = sequences_by_prefix[template.serial_prefix_format]
                 else:
-                    new_sequence = self.env['ir.sequence'].create({
+                    new_sequence = self.env['ir.sequence'].sudo().create({
                         'name': f'{template.name} Serial Sequence',
                         'code': 'stock.lot.serial',
                         'prefix': template.serial_prefix_format,
@@ -911,7 +948,7 @@ class ProductTemplate(models.Model):
     def _compute_show_qty_status_button(self):
         for template in self:
             template.show_on_hand_qty_status_button = template.is_storable
-            template.show_forecasted_qty_status_button = template.is_storable
+            template.show_forecasted_qty_status_button = template.is_storable and template.product_variant_id
 
     @api.depends('is_storable')
     def _compute_has_available_route_ids(self):
@@ -1105,13 +1142,59 @@ class ProductTemplate(models.Model):
                     raise UserError(_("This product's company cannot be changed as long as there are quantities of it belonging to another company."))
 
         clean_inventory = False
+        templates_to_reset = self.env['product.template']
         if 'is_storable' in vals and any(vals['is_storable'] != prod_tmpl.is_storable and not prod_tmpl.is_storable for prod_tmpl in self):
             clean_inventory = True
+            if vals['is_storable']:
+                templates_to_reset = self.filtered(lambda tmpl: not tmpl.is_storable)
 
         res = super().write(vals)
         if clean_inventory:
             self.env['stock.quant'].sudo()._clean_reservations()
+            templates_to_reset._reset_inventory()
         return res
+
+    def _reset_inventory(self):
+        """
+        This methods create quants to match the move history of products that become storable
+        and make inventory adjustments to resets their inventory quantities.
+
+        These adjustments are necessary to ensure the integrity of the product valuation.
+        """
+        move_line_domain = Domain([
+            ('product_id', 'in', self.product_variant_ids.ids),
+            ('state', '=', 'done'),
+            '|',
+                ('location_usage', 'in', ('internal', 'transit')),
+                ('location_dest_usage', 'in', ('internal', 'transit')),
+        ])
+        move_lines_to_match = self.env['stock.move.line'].search_fetch(domain=move_line_domain, field_names=('product_id', 'location_id', 'quantity_product_uom'))
+        inventory_ledger = defaultdict(float)
+        for move_line in move_lines_to_match:
+            if move_line.location_usage in ('internal', 'transit'):
+                inventory_ledger[move_line.product_id, move_line.location_id] -= move_line.quantity_product_uom
+            if move_line.location_dest_usage in ('internal', 'transit'):
+                inventory_ledger[move_line.product_id, move_line.location_dest_id] += move_line.quantity_product_uom
+        # Unticking "Track Inventory" keeps the existing quants, so on a
+        # storable -> not storable -> storable toggle only counter balance the
+        # moves that aren't already reflected on hand.
+        on_hand = self.env['stock.quant']._read_group(
+            [('product_id', 'in', self.product_variant_ids.ids),
+             ('location_id.usage', 'in', ('internal', 'transit'))],
+            ['product_id', 'location_id'], ['quantity:sum'],
+        )
+        for product, location, quantity in on_hand:
+            if (product, location) in inventory_ledger:
+                inventory_ledger[product, location] -= quantity
+        quants_to_reset = self.env['stock.quant'].create([
+            {
+                'product_id': product.id,
+                'location_id': location.id,
+                'quantity': quantity,
+                'inventory_quantity': 0.0,
+            } for (product, location), quantity in inventory_ledger.items() if not product.uom_id.is_zero(quantity)
+        ])
+        quants_to_reset._apply_inventory()
 
     def copy(self, default=None):
         new_products = super().copy(default=default)
@@ -1152,7 +1235,7 @@ class ProductTemplate(models.Model):
         domain = [
             '|',
                 ('product_id.product_tmpl_id', '=', self.id),
-                ('category_id', '=', self.categ_id.id),
+                ('category_id', 'parent_of', self.categ_id.id),
         ]
         return self._get_action_view_related_putaway_rules(domain)
 

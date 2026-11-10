@@ -1,9 +1,16 @@
-import { beforeEach, describe, expect, test } from "@odoo/hoot";
-import { manuallyDispatchProgrammaticEvent, microTick, press } from "@odoo/hoot-dom";
-import { animationFrame, tick } from "@odoo/hoot-mock";
-import { patchWithCleanup } from "@web/../tests/web_test_helpers";
-import { browser } from "@web/core/browser/browser";
-import { setupEditor, testEditor } from "../_helpers/editor";
+import {
+    animationFrame,
+    beforeEach,
+    describe,
+    expect,
+    manuallyDispatchProgrammaticEvent,
+    microTick,
+    mockUserAgent,
+    press,
+    test,
+    tick,
+} from "@odoo/hoot";
+import { base64Img, setupEditor, testEditor } from "../_helpers/editor";
 import { unformat } from "../_helpers/format";
 import { getContent, setSelection } from "../_helpers/selection";
 import { deleteBackward, insertText, tripleClick, undo } from "../_helpers/user_actions";
@@ -72,6 +79,14 @@ describe("Selection collapsed", () => {
             });
         });
 
+        test("should correctly place cursor when backspacing inside a <t> tag", async () => {
+            await testEditor({
+                contentBefore: "<p><t>ab[]c</t></p>",
+                stepFunction: deleteBackward,
+                contentAfter: "<p><t>a[]c</t></p>",
+            });
+        });
+
         test("should delete the last character in a paragraph (1)", async () => {
             await testEditor({
                 contentBefore: "<p>abc[]</p>",
@@ -134,7 +149,7 @@ describe("Selection collapsed", () => {
                     '<p data-selection-placeholder=""><br></p>' +
                     '<div><p>uv</p><br><span class="style" data-oe-zws-empty-inline="">[]\u200B</span></div>' +
                     '<p data-selection-placeholder=""><br></p>',
-                contentAfter: '<div><p>uv</p><br><span class="style">[]\u200B</span></div>',
+                contentAfter: '<div><p>uv</p><br><span class="style" data-oe-zws-empty-inline="">[]\u200B</span></div>',
             });
         });
 
@@ -224,7 +239,7 @@ describe("Selection collapsed", () => {
                 },
                 contentAfterEdit:
                     '<p>ab<span class="style" data-oe-zws-empty-inline="">[]\u200B</span>ef</p>',
-                contentAfter: '<p>ab<span class="style">[]\u200B</span>ef</p>',
+                contentAfter: '<p>ab<span class="style" data-oe-zws-empty-inline="">[]\u200B</span>ef</p>',
             });
         });
 
@@ -414,21 +429,30 @@ describe("Selection collapsed", () => {
 
         test("should unwrap a block next to an inline unbreakable element", async () => {
             await testEditor({
-                contentBefore: `<div><p>abc</p><div class="o_image"></div><p>[]def</p></div>`,
+                contentBefore: `<div><p>abc</p><span class="oe_unbreakable"></span><p>[]def</p></div>`,
                 stepFunction: async (editor) => {
                     deleteBackward(editor);
                 },
-                contentAfter: `<div><p>abc</p><div class="o_image"></div>[]def</div>`,
+                // After the deleteBackward, the automatic normalization of
+                // setSelection puts the cursor at the deepest position, that is
+                // in the span, rather than after it. While it might look a bit
+                // weird in this case, it makes more sense if one imagine that
+                // it is a style tag like bold or italic.
+                contentAfter: `<div><p>abc</p><span class="oe_unbreakable">[]</span>def</div>`,
             });
         });
 
         test("should remove an inline unbreakable contenteditable='false' sibling element", async () => {
             await testEditor({
-                contentBefore: `<div><p>abc</p><div class="o_image"></div>[]def</div>`,
+                contentBefore: `<div><p>abc</p><span class="oe_unbreakable" contenteditable="false">d</span>[]efg</div>`,
+                contentBeforeEdit:
+                    '<p data-selection-placeholder=""><br></p>' +
+                    `<div><p>abc</p><span class="oe_unbreakable" contenteditable="false">d</span>[]efg</div>` +
+                    '<p data-selection-placeholder=""><br></p>',
                 stepFunction: async (editor) => {
                     deleteBackward(editor);
                 },
-                contentAfter: `<div><p>abc</p>[]def</div>`,
+                contentAfter: `<div><p>abc</p>[]efg</div>`,
             });
         });
 
@@ -502,16 +526,16 @@ describe("Selection collapsed", () => {
 
         test("should merge paragraph with previous one containing a media element", async () => {
             await testEditor({
-                contentBefore: `<p>abc</p><p style="margin-bottom: 0px;"><o-image class="o_image" contenteditable="false"></o-image></p><p>[]def</p>`,
+                contentBefore: `<p>abc</p><p style="margin-bottom: 0px;"><span class="o_file_box" contenteditable="false"><a href="#" title="document" data-mimetype="application/pdf"></a></span></p><p>[]def</p>`,
                 stepFunction: deleteBackward,
-                contentAfterEdit: `<p>abc</p><p style="margin-bottom: 0px;"><o-image class="o_image" contenteditable="false"></o-image>[]def</p>`,
-                contentAfter: `<p>abc</p><p style="margin-bottom: 0px;"><o-image class="o_image"></o-image>[]def</p>`,
+                contentAfterEdit: `<p>abc</p><p style="margin-bottom: 0px;">\ufeff<span class="o_file_box" contenteditable="false"><a href="#" title="document" data-mimetype="application/pdf"></a></span>\ufeff[]def</p>`,
+                contentAfter: `<p>abc</p><p style="margin-bottom: 0px;"><span class="o_file_box"><a href="#" title="document" data-mimetype="application/pdf"></a></span>[]def</p>`,
             });
         });
 
         test("should remove a media element inside a p", async () => {
             await testEditor({
-                contentBefore: `<p>abc</p><p style="margin-bottom: 0px;"><o-image class="o_image" contenteditable="false"></o-image>[]def</p>`,
+                contentBefore: `<p>abc</p><p style="margin-bottom: 0px;"><span class="fa fa-icon" contenteditable="false"></span>[]def</p>`,
                 stepFunction: deleteBackward,
                 contentAfter: `<p>abc</p><p style="margin-bottom: 0px;">[]def</p>`,
             });
@@ -519,7 +543,7 @@ describe("Selection collapsed", () => {
 
         test("should remove a link to uploaded document", async () => {
             await testEditor({
-                contentBefore: `<p>abc<a href="#" title="document" data-mimetype="application/pdf" class="o_image" contenteditable="false"></a>[]</p>`,
+                contentBefore: `<p>abc<span class="o_file_box" contenteditable="false"><a href="#" title="document" data-mimetype="application/pdf"></a></span>[]</p>`,
                 stepFunction: deleteBackward,
                 contentAfter: `<p>abc[]</p>`,
             });
@@ -527,7 +551,7 @@ describe("Selection collapsed", () => {
 
         test("should remove a link to uploaded document at the beginning of the editable", async () => {
             await testEditor({
-                contentBefore: `<p><a href="#" title="document" data-mimetype="application/pdf" class="o_image" contenteditable="false"></a>[]</p>`,
+                contentBefore: `<p><span class="o_file_box" contenteditable="false"><a href="#" title="document" data-mimetype="application/pdf"></a></span>[]</p>`,
                 stepFunction: deleteBackward,
                 contentAfter: `<p>[]<br></p>`,
             });
@@ -580,6 +604,14 @@ describe("Selection collapsed", () => {
                 stepFunction: deleteBackward,
                 contentAfterEdit: `<p><strong>abc</strong></p><p><strong data-oe-zws-empty-inline="">\u200B</strong><br></p><p o-we-hint-text='Type "/" for commands' class="o-we-hint"><strong data-oe-zws-empty-inline="">\u200B[]</strong><br></p>`,
                 contentAfter: `<p><strong>abc</strong></p><p><br></p><p>[]<br></p>`,
+            });
+        });
+
+        test("should not teleport cursor after image", async () => {
+            await testEditor({
+                contentBefore: `<div>a[]<img style="display: block" src="${base64Img}">b</div>`,
+                stepFunction: deleteBackward,
+                contentAfter: `<div>[]<img style="display: block" src="${base64Img}">b</div>`,
             });
         });
     });
@@ -1697,7 +1729,7 @@ describe("Selection not collapsed", () => {
                 '<p data-selection-placeholder=""><br></p>' +
                 '<div><p>ab <span class="style" data-oe-zws-empty-inline="">[]\u200B</span> d</p></div>' +
                 '<p data-selection-placeholder=""><br></p>',
-            contentAfter: '<div><p>ab <span class="style">[]\u200B</span> d</p></div>',
+            contentAfter: '<div><p>ab <span class="style" data-oe-zws-empty-inline="">[]\u200B</span> d</p></div>',
         });
     });
 
@@ -1757,6 +1789,17 @@ describe("Selection not collapsed", () => {
                 '<div><p>ab <span class="style">x[]</span> f</p></div>' +
                 '<p data-selection-placeholder=""><br></p>',
             contentAfter: '<div><p>ab <span class="style">x[]</span> f</p></div>',
+        });
+    });
+
+    test("should convert space to nbsp", async () => {
+        await testEditor({
+            contentBefore: "<div>a<span> [b]</span></div>",
+            stepFunction: async (editor) => {
+                deleteBackward(editor);
+                await insertText(editor, "x");
+            },
+            contentAfter: "<div>a<span>&nbsp;x[]</span></div>",
         });
     });
 
@@ -2087,7 +2130,7 @@ describe("Selection not collapsed", () => {
             stepFunction: deleteBackward,
             contentAfter: unformat(
                 `<table><tbody>
-                    <tr><td>[]ef</td><td>gh</td></tr>
+                    <tr><td>ef[]</td><td>gh</td></tr>
                 </tbody></table>`
             ),
         });
@@ -2104,7 +2147,7 @@ describe("Selection not collapsed", () => {
             stepFunction: deleteBackward,
             contentAfter: unformat(
                 `<table><tbody>
-                    <tr><td>[]cd</td></tr>
+                    <tr><td>cd[]</td></tr>
                     <tr><td>gh</td></tr>
                 </tbody></table>`
             ),
@@ -2258,7 +2301,7 @@ describe("Selection not collapsed", () => {
         await testEditor({
             contentBefore: '<p>ab<b class="oe_unremovable">[cd]</b>ef</p>',
             stepFunction: deleteBackward,
-            contentAfter: '<p>ab<b class="oe_unremovable">[]\u200B</b>ef</p>',
+            contentAfter: '<p>ab<b class="oe_unremovable" data-oe-zws-empty-inline="">[]\u200B</b>ef</p>',
         });
     });
 
@@ -2277,6 +2320,14 @@ describe("Selection not collapsed", () => {
             stepFunction: deleteBackward,
             contentAfter: `<div><br></div><div>[]<br></div>`,
             config: { baseContainers: ["DIV"] },
+        });
+    });
+
+    test("should not remove blockquote when it contains content on Backspace", async () => {
+        await testEditor({
+            contentBefore: `<blockquote><img>[]</blockquote>`,
+            stepFunction: deleteBackward,
+            contentAfter: `<blockquote>[]<br></blockquote>`,
         });
     });
 
@@ -2325,7 +2376,7 @@ describe("Selection not collapsed", () => {
         await testEditor({
             contentBefore: '<p>a<span class="style-class">[bcde]</span>f</p>',
             stepFunction: deleteBackward,
-            contentAfter: '<p>a<span class="style-class">[]\u200B</span>f</p>',
+            contentAfter: '<p>a<span class="style-class" data-oe-zws-empty-inline="">[]\u200B</span>f</p>',
         });
     });
 
@@ -2476,12 +2527,7 @@ describe("Selection not collapsed", () => {
     });
 
     describe("Android Chrome", () => {
-        beforeEach(() => {
-            patchWithCleanup(browser.navigator, {
-                userAgent:
-                    "Mozilla/5.0 (Linux; Android 10; Pixel 3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/133.0.0.0 Mobile Safari/537.36",
-            });
-        });
+        beforeEach(() => mockUserAgent("android"));
 
         // This simulates the sequence of events that happens in Android Chrome
         // when pressing backspace. Some random stuff might happen, and
@@ -2547,5 +2593,213 @@ describe("Selection not collapsed", () => {
             await tick(); // Wait for the selection change to be handled
             expect(getContent(el)).toBe("<p>wonderful []</p>");
         });
+
+        test.tags("mobile");
+        test("should not break Gboard correction", async () => {
+            const dispatch = (type, eventInit) =>
+                manuallyDispatchProgrammaticEvent(editor.editable, type, eventInit);
+            const { editor, el } = await setupEditor("<p>Gxf[]</p>");
+            // Roughly as observed on Android Chrome with Gboard:
+            // - selection change
+            // - keydown event
+            // - input deleteContentBackward
+            // - keydown event
+            // - input insertText
+            const selection = editor.document.getSelection();
+            await dispatch("keydown", { key: "Unidentified" });
+            for (let i = 0; i < 2; i++) {
+                selection.modify("extend", "backward", "character");
+            }
+            await backspaceAndroid(editor);
+            await dispatch("keydown", { key: "Unidentified" });
+            await insertText(editor, "if ");
+            await tick(); // Wait for the selection change to be handled
+            expect(getContent(el)).toBe("<p>Gif []</p>");
+        });
+
+        // This simulates the sequence of events that happens when pressing
+        // the Backspace key on the Microsoft Swiftkey keyboard on Android.
+        // The change of selection that Swiftkey is doing can be mocked
+        // differently for each case if needed.
+        const swiftkeyBackspace = async (
+            editor,
+            { mockSelectionChange } = {
+                mockSelectionChange: (selection) =>
+                    selection.modify("extend", "backward", "character"),
+            }
+        ) => {
+            const dispatch = (type, eventInit) =>
+                manuallyDispatchProgrammaticEvent(editor.editable, type, eventInit);
+            await dispatch("keydown", { key: "Unidentified" });
+            const selection = editor.document.getSelection();
+            if (selection.isCollapsed) {
+                mockSelectionChange(selection);
+            }
+            await dispatch("beforeinput", {
+                inputType: "deleteContentBackward",
+            });
+            // Swiftkey deletes the content even if the beforeinput is default prevented.
+            selection.getRangeAt(0).deleteContents();
+            await dispatch("input", { inputType: "deleteContentBackward" });
+            await dispatch("keyup", { key: "Unidentified" });
+            await animationFrame();
+        };
+
+        test.tags("mobile");
+        test("should handle tables correctly on backspace with Unidentified key", async () => {
+            const { editor, el } = await setupEditor(
+                unformat(`
+                    <table>
+                        <tbody>
+                            <tr><td><br></td><td>[]<br></td><td><br></td></tr>
+                            <tr><td>a</td><td>b</td><td>c</td></tr>
+                        </tbody>
+                    </table>
+                `)
+            );
+            expect(getContent(el)).toBe(
+                unformat(`
+                    <p data-selection-placeholder=""><br></p>
+                    <table>
+                        <tbody>
+                            <tr><td><br></td><td>[]<br></td><td><br></td></tr>
+                            <tr><td>a</td><td>b</td><td>c</td></tr>
+                        </tbody>
+                    </table>
+                    <p data-selection-placeholder=""><br></p>
+                `)
+            );
+            await swiftkeyBackspace(editor);
+            expect(getContent(el)).toBe(
+                unformat(`
+                    <p data-selection-placeholder=""><br></p>
+                    <table>
+                        <tbody>
+                            <tr><td><br></td><td>[]<br></td><td><br></td></tr>
+                            <tr><td>a</td><td>b</td><td>c</td></tr>
+                        </tbody>
+                    </table>
+                    <p data-selection-placeholder=""><br></p>
+                `)
+            );
+            await tick(); // Wait for the release of the Android Chrome selection change hack, see "onAndroidChromeSelectionChange".
+            const tds = [...editor.editable.querySelectorAll("td")];
+            setSelection({
+                anchorNode: tds[4],
+                anchorOffset: 0,
+                focusNode: tds[5],
+                focusOffset: 1,
+            });
+            await tick(); // Wait for the selectionchange event.
+            expect(getContent(el)).toBe(
+                unformat(`
+                    <p data-selection-placeholder=""><br></p>
+                    <table class="o_selected_table">
+                        <tbody>
+                            <tr><td><br></td><td><br></td><td><br></td></tr>
+                            <tr><td>a</td><td class="o_selected_td">[b</td><td class="o_selected_td">c]</td></tr>
+                        </tbody>
+                    </table>
+                    <p data-selection-placeholder=""><br></p>
+                `)
+            );
+            await swiftkeyBackspace(editor);
+            expect(getContent(el)).toBe(
+                unformat(`
+                    <p data-selection-placeholder=""><br></p>
+                    <table>
+                        <tbody>
+                            <tr><td><br></td><td><br></td><td><br></td></tr>
+                            <tr><td>a</td><td><p o-we-hint-text='Type "/" for commands' class="o-we-hint">[]<br></p></td><td><p><br></p></td></tr>
+                            </tbody>
+                        </table>
+                    <p data-selection-placeholder=""><br></p>
+                `)
+            );
+        });
+
+        test.tags("mobile");
+        test("should handle lists correctly on backspace with Unidentified key", async () => {
+            const { editor, el } = await setupEditor(
+                `<ul><li>abc</li><li>[def]</li><li>ghi</li></ul>`
+            );
+            await swiftkeyBackspace(editor);
+            expect(getContent(el)).toBe(
+                `<ul><li>abc</li><li o-we-hint-text="List" class="o-we-hint">[]<br></li><li>ghi</li></ul>`
+            );
+            await swiftkeyBackspace(editor);
+            expect(getContent(el)).toBe(
+                `<ul><li>abc</li><li class="oe-nested o-we-hint" o-we-hint-text="List">[]<br></li><li>ghi</li></ul>`
+            );
+            await swiftkeyBackspace(editor);
+            expect(getContent(el)).toBe(
+                `<ul><li>abc</li></ul><p o-we-hint-text='Type "/" for commands' class="o-we-hint">[]<br></p><ul><li>ghi</li></ul>`
+            );
+        });
+
+        test.tags("mobile");
+        test("should remove separator on backspace with Unidentified key", async () => {
+            const { editor, el } = await setupEditor(`<p>abc</p><hr><p>[]<br></p>`);
+            expect(getContent(el)).toBe(
+                `<p>abc</p><hr contenteditable="false"><p o-we-hint-text='Type "/" for commands' class="o-we-hint">[]<br></p>`
+            );
+            await swiftkeyBackspace(editor);
+            expect(getContent(el)).toBe(
+                `<p>abc</p><p o-we-hint-text='Type "/" for commands' class="o-we-hint">[]<br></p>`
+            );
+        });
+
+        test.tags("mobile");
+        test("should remove separator after banner on backspace with Unidentified key", async () => {
+            const { editor, el } = await setupEditor(
+                unformat(`
+                    <p>abc</p>
+                    <div class="o_editor_banner user-select-none o-contenteditable-false lh-1 d-flex align-items-center alert alert-info pb-0 pt-3" data-oe-role="status" contenteditable="false" role="status">
+                        <i class="o_editor_banner_icon mb-3 fst-normal" data-oe-aria-label="Banner Info" aria-label="Banner Info">💡</i>
+                        <div class="o_editor_banner_content o-contenteditable-true w-100 px-3" contenteditable="true">
+                            <p><br></p>
+                        </div>
+                    </div>
+                    <hr>
+                    <p>[]<br></p>
+                `)
+            );
+            await swiftkeyBackspace(editor, {
+                mockSelectionChange: (selection) => {
+                    // Swiftkey moves the selection inside of the banner because
+                    // the hr element is not editable and neither is the banner.
+                    const p = editor.editable.querySelector(".o_editor_banner_content p");
+                    selection.setPosition(p, 0);
+                },
+            });
+            expect(getContent(el)).toBe(
+                unformat(`
+                    <p>abc</p>
+                    <div class="o_editor_banner user-select-none o-contenteditable-false lh-1 d-flex align-items-center alert alert-info pb-0 pt-3" data-oe-role="status" contenteditable="false" role="status">
+                        <i class="o_editor_banner_icon mb-3 fst-normal" data-oe-aria-label="Banner Info" aria-label="Banner Info">💡</i>
+                        <div class="o_editor_banner_content o-contenteditable-true w-100 px-3" contenteditable="true">
+                            <p><br></p>
+                        </div>
+                    </div>
+                    <p o-we-hint-text='Type "/" for commands' class="o-we-hint">[]<br></p>
+                `)
+            );
+        });
+    });
+});
+
+test("should remove character before unremovable", async () => {
+    await testEditor({
+        contentBefore: `<p>a<span class="oe_unremovable">[]x</span>b</p>`,
+        stepFunction: deleteBackward,
+        contentAfter: `<p><span class="oe_unremovable">[]x</span>b</p>`,
+    });
+});
+
+test("should remove character before unremovable (2)", async () => {
+    await testEditor({
+        contentBefore: `<p>aa<span class="oe_unremovable">[]x</span>b</p>`,
+        stepFunction: deleteBackward,
+        contentAfter: `<p>a[]<span class="oe_unremovable">x</span>b</p>`,
     });
 });

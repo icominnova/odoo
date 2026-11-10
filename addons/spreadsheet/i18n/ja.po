@@ -2,15 +2,16 @@
 # This file contains the translation of the following modules:
 # * spreadsheet
 #
-# "Dylan Kiss (dyki)" <dyki@odoo.com>, 2025.
+# "Dylan Kiss (dyki)" <dyki@odoo.com>, 2025, 2026.
 # "Junko Augias (juau)" <juau@odoo.com>, 2025, 2026.
-# Weblate <noreply-mt-weblate@weblate.org>, 2025.
+# Weblate <noreply-mt-weblate@weblate.org>, 2025, 2026.
+# Ryoko Tsuda <ryoko@quartile.co>, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 18.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-02-06 18:36+0000\n"
-"PO-Revision-Date: 2026-02-11 17:42+0000\n"
+"POT-Creation-Date: 2026-10-24 17:38+0000\n"
+"PO-Revision-Date: 2026-09-01 06:32+0000\n"
 "Last-Translator: \"Junko Augias (juau)\" <juau@odoo.com>\n"
 "Language-Team: Japanese <https://translate.odoo.com/projects/odoo-19/"
 "spreadsheet/ja/>\n"
@@ -19,7 +20,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Generator: Weblate 5.14.3\n"
+"X-Generator: Weblate 2026.8.1\n"
 
 #. module: spreadsheet
 #. odoo-javascript
@@ -257,6 +258,12 @@ msgstr "%s 一致、全シート内で"
 
 #. module: spreadsheet
 #. odoo-javascript
+#: code:addons/spreadsheet/static/src/o_spreadsheet/o_spreadsheet.js:0
+msgid "'${str}'"
+msgstr ""
+
+#. module: spreadsheet
+#. odoo-javascript
 #: code:addons/spreadsheet/static/src/o_spreadsheet/o_spreadsheet.xml:0
 msgid "(Blanks)"
 msgstr "(空欄)"
@@ -277,7 +284,7 @@ msgstr "(次へ)"
 #. odoo-javascript
 #: code:addons/spreadsheet/static/src/o_spreadsheet/o_spreadsheet.js:0
 msgid "(previous)"
-msgstr "(前へ)"
+msgstr "(前期)"
 
 #. module: spreadsheet
 #. odoo-javascript
@@ -348,6 +355,12 @@ msgstr "2行"
 #: code:addons/spreadsheet/static/src/o_spreadsheet/o_spreadsheet.js:0
 msgid "=PIVOT(${"
 msgstr "=PIVOT(${"
+
+#. module: spreadsheet
+#. odoo-javascript
+#: code:addons/spreadsheet/static/src/o_spreadsheet/o_spreadsheet.xml:0
+msgid "A"
+msgstr ""
 
 #. module: spreadsheet
 #. odoo-javascript
@@ -517,6 +530,12 @@ msgstr "休日とみなす日付を含む範囲または配列定数。"
 #. module: spreadsheet
 #. odoo-javascript
 #: code:addons/spreadsheet/static/src/o_spreadsheet/o_spreadsheet.js:0
+msgid "A reference to a cell."
+msgstr ""
+
+#. module: spreadsheet
+#. odoo-javascript
+#: code:addons/spreadsheet/static/src/o_spreadsheet/o_spreadsheet.js:0
 msgid "A segment of a string."
 msgstr "文字列のセグメント。"
 
@@ -604,6 +623,12 @@ msgstr "絶対値"
 #: code:addons/spreadsheet/static/src/o_spreadsheet/o_spreadsheet.js:0
 msgid "Absolute value of a number."
 msgstr "数字の絶対値"
+
+#. module: spreadsheet
+#. odoo-javascript
+#: code:addons/spreadsheet/static/src/actions/spreadsheet_download_action.js:0
+msgid "Access Error"
+msgstr ""
 
 #. module: spreadsheet
 #. odoo-javascript
@@ -1096,27 +1121,6 @@ msgstr "画像転送中に予期せぬエラーが発生しました"
 #. module: spreadsheet
 #. odoo-javascript
 #: code:addons/spreadsheet/static/src/o_spreadsheet/o_spreadsheet.js:0
-msgid ""
-"An unexpected error occurred while pasting content.\n"
-"          Additional information can be found in the browser console."
-msgstr ""
-"コンテンツを貼り付ける際に予期しないエラーが発生しました\n"
-"          追加情報は、ブラウザのコンソールでご確認いただけます。"
-
-#. module: spreadsheet
-#. odoo-javascript
-#: code:addons/spreadsheet/static/src/o_spreadsheet/o_spreadsheet.js:0
-msgid ""
-"An unexpected error occurred while pasting content.\n"
-"          This is probably due to a spreadsheet version mismatch."
-msgstr ""
-"コンテンツを貼付ける際に予期しないエラーが発生しました。\n"
-"          スプレッドシートのバージョンが一致していないことが原因である可能性"
-"が高いです。"
-
-#. module: spreadsheet
-#. odoo-javascript
-#: code:addons/spreadsheet/static/src/o_spreadsheet/o_spreadsheet.js:0
 msgid "An unexpected error occurred. Submit a support ticket at odoo.com/help."
 msgstr ""
 "予期せぬエラーが発生しました。odoo.com/helpでサポートチケットを提出して下さ"
@@ -1325,8 +1329,8 @@ msgstr "考慮するデータセットを含む配列または範囲。"
 #. module: spreadsheet
 #. odoo-javascript
 #: code:addons/spreadsheet/static/src/o_spreadsheet/o_spreadsheet.js:0
-msgid "Array result was not expanded because it would overwrite data in %s."
-msgstr "%sのデータを上書きしてしまうため、配列の結果は展開されませんでした。"
+msgid "Array result was not expanded because it would overwrite data."
+msgstr ""
 
 #. module: spreadsheet
 #. odoo-javascript
@@ -1808,6 +1812,13 @@ msgstr "リンクされたシートが隠されているためリンクを開け
 #. module: spreadsheet
 #. odoo-javascript
 #: code:addons/spreadsheet/static/src/o_spreadsheet/o_spreadsheet.js:0
+msgid ""
+"Cannot perform this action on merged cells. Unmerge the cells and try again."
+msgstr ""
+
+#. module: spreadsheet
+#. odoo-javascript
+#: code:addons/spreadsheet/static/src/o_spreadsheet/o_spreadsheet.js:0
 msgid "Cannot remove duplicates for an unknown reason"
 msgstr "原因不明で重複を削除できません。"
 
@@ -1998,6 +2009,14 @@ msgstr "チャートタイプ"
 #: code:addons/spreadsheet/static/src/o_spreadsheet/o_spreadsheet.js:0
 msgid "Checkbox"
 msgstr "チェックボックス"
+
+#. module: spreadsheet
+#. odoo-javascript
+#: code:addons/spreadsheet/static/src/o_spreadsheet/o_spreadsheet.js:0
+msgid ""
+"Checks whether there is a reference to a cell that contains a formula, and "
+"returns TRUE or FALSE."
+msgstr ""
 
 #. module: spreadsheet
 #. odoo-javascript
@@ -4169,24 +4188,6 @@ msgstr "関数 [[FUNCTION_NAME]] の結果が見つかりませんでした。"
 #. odoo-javascript
 #: code:addons/spreadsheet/static/src/o_spreadsheet/o_spreadsheet.js:0
 msgid ""
-"Function [[FUNCTION_NAME]] expects criteria_range and criterion to be in "
-"pairs."
-msgstr ""
-"関数 [[FUNCTION_NAME]] では、criteria_range と criterion はペアで指定する必要"
-"があります。"
-
-#. module: spreadsheet
-#. odoo-javascript
-#: code:addons/spreadsheet/static/src/o_spreadsheet/o_spreadsheet.js:0
-msgid ""
-"Function [[FUNCTION_NAME]] expects criteria_range to have the same dimension"
-msgstr ""
-"関数 [[FUNCTION_NAME]] では、criteria_range の次元が同一である必要があります"
-
-#. module: spreadsheet
-#. odoo-javascript
-#: code:addons/spreadsheet/static/src/o_spreadsheet/o_spreadsheet.js:0
-msgid ""
 "Function [[FUNCTION_NAME]] expects number values for %s, but got a boolean."
 msgstr ""
 "関数 [[FUNCTION_NAME]] は %s に数値を必要としますが、ブール値が渡されました。"
@@ -4614,7 +4615,7 @@ msgstr "時間"
 #. odoo-javascript
 #: code:addons/spreadsheet/static/src/o_spreadsheet/o_spreadsheet.js:0
 msgid "Hour component of a specific time."
-msgstr "特定の時間のHour要素。"
+msgstr "指定した時刻の時(hour)部分。"
 
 #. module: spreadsheet
 #. odoo-javascript
@@ -4795,12 +4796,8 @@ msgstr "[[FUNCTION_NAME]]の検証で '%s' が見つかりません( '%s' 内)�
 #: code:addons/spreadsheet/static/src/o_spreadsheet/o_spreadsheet.js:0
 msgid ""
 "In [[FUNCTION_NAME]], the number of columns of the first matrix (%s) must be "
-"equal to the \n"
-"          number of rows of the second matrix (%s)."
+"equal to the           number of rows of the second matrix (%s)."
 msgstr ""
-"[[FUNCTION_NAME]]内で the number of columns of the first matrix初めのマトリク"
-"ス (%s)の行数は \n"
-"          2つ目のマトリクス (%s)の列数と同等である必要があります。"
 
 #. module: spreadsheet
 #. odoo-javascript
@@ -5353,7 +5350,7 @@ msgstr "直近７日"
 #. odoo-javascript
 #: code:addons/spreadsheet/static/src/global_filters/helpers.js:0
 msgid "Last 90 Days"
-msgstr "過去90日"
+msgstr "直近90日"
 
 #. module: spreadsheet
 #. odoo-javascript
@@ -5519,7 +5516,7 @@ msgstr "さらに読み込む..."
 #. odoo-javascript
 #: code:addons/spreadsheet/static/src/o_spreadsheet/o_spreadsheet.xml:0
 msgid "Locale"
-msgstr "ローカル"
+msgstr "ロケール"
 
 #. module: spreadsheet
 #. odoo-javascript
@@ -5700,7 +5697,7 @@ msgstr "5月"
 #. odoo-javascript
 #: code:addons/spreadsheet/static/src/o_spreadsheet/o_spreadsheet.js:0
 msgid "Measure"
-msgstr "測定対象"
+msgstr "集計項目"
 
 #. module: spreadsheet
 #. odoo-javascript
@@ -5766,7 +5763,8 @@ msgstr ""
 msgid ""
 "Merged cells found in the spill zone. Please unmerge cells before using "
 "array formulas."
-msgstr "スピル領域に結合されたセルが見つかりました。配列数式を使用する前に、セルの結"
+msgstr ""
+"スピル領域に結合されたセルが見つかりました。配列数式を使用する前に、セルの結"
 "合を解除してください。"
 
 #. module: spreadsheet
@@ -5872,7 +5870,7 @@ msgstr "分"
 #. odoo-javascript
 #: code:addons/spreadsheet/static/src/o_spreadsheet/o_spreadsheet.js:0
 msgid "Minute component of a specific time."
-msgstr "特定の時刻の分(分成分)。"
+msgstr "指定した時刻の分(minute)部分。"
 
 #. module: spreadsheet
 #. odoo-javascript
@@ -6064,7 +6062,7 @@ msgstr "非定期のキャッシュフローに基づく正味現在価値。"
 #. odoo-javascript
 #: code:addons/spreadsheet/static/src/o_spreadsheet/o_spreadsheet.js:0
 msgid "Net working days between two dates (specifying weekends)."
-msgstr "2 つの日付の間の正味稼働日数(週末を指定)。"
+msgstr "2つの日付の間の正味の営業日数(週末を指定)。"
 
 #. module: spreadsheet
 #. odoo-javascript
@@ -6083,6 +6081,12 @@ msgstr "新規ピボット"
 #: code:addons/spreadsheet/static/src/o_spreadsheet/o_spreadsheet.js:0
 msgid "Next coupon date after the settlement date."
 msgstr "決済日後の次回クーポン日"
+
+#. module: spreadsheet
+#. odoo-javascript
+#: code:addons/spreadsheet/static/src/hooks.js:0
+msgid "No"
+msgstr ""
 
 #. module: spreadsheet
 #. odoo-javascript
@@ -6354,6 +6358,12 @@ msgstr "OFFSETは範囲外へ値を求めます。"
 
 #. module: spreadsheet
 #. odoo-javascript
+#: code:addons/spreadsheet/static/src/helpers/geo_json_service.js:0
+msgid "Oceania"
+msgstr ""
+
+#. module: spreadsheet
+#. odoo-javascript
 #: code:addons/spreadsheet/static/src/o_spreadsheet/o_spreadsheet.js:0
 msgid "October"
 msgstr "10月"
@@ -6363,6 +6373,24 @@ msgstr "10月"
 #: code:addons/spreadsheet/static/src/chart/plugins/odoo_chart_core_plugin.js:0
 msgid "Odoo Bar Chart"
 msgstr "Odooバーグラフ"
+
+#. module: spreadsheet
+#. odoo-javascript
+#: code:addons/spreadsheet/static/src/chart/plugins/odoo_chart_core_plugin.js:0
+msgid "Odoo Combo Chart"
+msgstr ""
+
+#. module: spreadsheet
+#. odoo-javascript
+#: code:addons/spreadsheet/static/src/chart/plugins/odoo_chart_core_plugin.js:0
+msgid "Odoo Funnel Chart"
+msgstr ""
+
+#. module: spreadsheet
+#. odoo-javascript
+#: code:addons/spreadsheet/static/src/chart/plugins/odoo_chart_core_plugin.js:0
+msgid "Odoo Geo Chart"
+msgstr ""
 
 #. module: spreadsheet
 #. odoo-javascript
@@ -6379,14 +6407,44 @@ msgstr "Odoo円グラフ"
 #. module: spreadsheet
 #. odoo-javascript
 #: code:addons/spreadsheet/static/src/chart/plugins/odoo_chart_core_plugin.js:0
+msgid "Odoo Pyramid Chart"
+msgstr ""
+
+#. module: spreadsheet
+#. odoo-javascript
+#: code:addons/spreadsheet/static/src/chart/plugins/odoo_chart_core_plugin.js:0
 msgid "Odoo Radar Chart"
 msgstr "Odooラダーグラフ"
+
+#. module: spreadsheet
+#. odoo-javascript
+#: code:addons/spreadsheet/static/src/chart/plugins/odoo_chart_core_plugin.js:0
+msgid "Odoo Scatter Chart"
+msgstr ""
 
 #. module: spreadsheet
 #. odoo-javascript
 #: code:addons/spreadsheet/static/src/hooks.js:0
 msgid "Odoo Spreadsheet"
 msgstr "Odooスプレッドシート"
+
+#. module: spreadsheet
+#. odoo-javascript
+#: code:addons/spreadsheet/static/src/chart/plugins/odoo_chart_core_plugin.js:0
+msgid "Odoo Sunburst Chart"
+msgstr ""
+
+#. module: spreadsheet
+#. odoo-javascript
+#: code:addons/spreadsheet/static/src/chart/plugins/odoo_chart_core_plugin.js:0
+msgid "Odoo Treemap Chart"
+msgstr ""
+
+#. module: spreadsheet
+#. odoo-javascript
+#: code:addons/spreadsheet/static/src/chart/plugins/odoo_chart_core_plugin.js:0
+msgid "Odoo Waterfall Chart"
+msgstr ""
 
 #. module: spreadsheet
 #. odoo-javascript
@@ -6589,13 +6647,13 @@ msgstr "ピボット #%(formulaId)s"
 #. odoo-javascript
 #: code:addons/spreadsheet/static/src/index.js:0
 msgid "Pivot #%(pivot_id)s"
-msgstr "ピボット数%(pivot_id)s"
+msgstr "ピボット #%(pivot_id)s"
 
 #. module: spreadsheet
 #. odoo-javascript
 #: code:addons/spreadsheet/static/src/o_spreadsheet/o_spreadsheet.js:0
 msgid "Pivot #%s"
-msgstr "ピボット数%s"
+msgstr "ピボット #%s"
 
 #. module: spreadsheet
 #. odoo-javascript
@@ -7050,7 +7108,7 @@ msgstr "範囲を並べ替え"
 #. odoo-javascript
 #: code:addons/spreadsheet/static/src/o_spreadsheet/o_spreadsheet.xml:0
 msgid "Replace"
-msgstr "置き換える"
+msgstr "置換"
 
 #. module: spreadsheet
 #. odoo-javascript
@@ -7131,6 +7189,12 @@ msgstr "出現回数が 1 回のみの項目を返す"
 #: code:addons/spreadsheet/static/src/pivot/pivot_functions.js:0
 msgid "Return the current value of a spreadsheet filter."
 msgstr "スプレッドシートフィルタの現在の値を返します。"
+
+#. module: spreadsheet
+#. odoo-javascript
+#: code:addons/spreadsheet/static/src/pivot/pivot_functions.js:0
+msgid "Return the label of the current value of a spreadsheet filter."
+msgstr ""
 
 #. module: spreadsheet
 #. odoo-javascript
@@ -7603,7 +7667,7 @@ msgstr "セミコロン"
 #. odoo-javascript
 #: code:addons/spreadsheet/static/src/o_spreadsheet/o_spreadsheet.xml:0
 msgid "Separator"
-msgstr "セパレータ"
+msgstr "区切り文字"
 
 #. module: spreadsheet
 #. odoo-javascript
@@ -8849,7 +8913,7 @@ msgid ""
 "resizing your browser window or adjusting frozen rows and columns."
 msgstr ""
 "現在のウィンドウが小さすぎて、シートが正しく表示されません。ブラウザのウィン"
-"ドウサイズを変更するか、固定された行とカラムを調整して下さい。"
+"ドウサイズを変更するか、固定された行と列を調整して下さい。"
 
 #. module: spreadsheet
 #. odoo-javascript
@@ -11114,7 +11178,7 @@ msgstr "参照元文字列。"
 msgid ""
 "The start date of the period from which to calculate the number of net "
 "working days."
-msgstr "正味労働日数を計算する期間の開始日"
+msgstr "正味の営業日数の計算対象となる期間の開始日。"
 
 #. module: spreadsheet
 #. odoo-javascript
@@ -12155,10 +12219,9 @@ msgstr "この操作は、複数選択を許可されていません。"
 #. odoo-javascript
 #: code:addons/spreadsheet/static/src/o_spreadsheet/o_spreadsheet.js:0
 msgid ""
-"This operation is not possible due to a merge. Please remove the merges "
-"first than try again."
+"This operation would cause tables to overlap. Move or remove the conflicting "
+"table and try again."
 msgstr ""
-"マージのためこの操作ができません。マージを削除してから再試行して下さい。"
 
 #. module: spreadsheet
 #. odoo-javascript
@@ -12577,7 +12640,7 @@ msgstr "無題スプレッドシート"
 #. odoo-javascript
 #: code:addons/spreadsheet/static/src/o_spreadsheet/o_spreadsheet.js:0
 msgid "Up to current column"
-msgstr "現在のカラムまで"
+msgstr "現在の列まで"
 
 #. module: spreadsheet
 #. odoo-javascript
@@ -13066,13 +13129,9 @@ msgstr "区切り文字に含まれる各文字の周囲で文字列を分割す
 #: code:addons/spreadsheet/static/src/o_spreadsheet/o_spreadsheet.js:0
 msgid ""
 "Whether or not to remove empty text messages from the split results. The "
-"default behavior is to treat \n"
-"        consecutive delimiters as one (if TRUE). If FALSE, empty cells "
-"values are added between consecutive delimiters."
+"default behavior is to treat         consecutive delimiters as one (if "
+"TRUE). If FALSE, empty cells values are added between consecutive delimiters."
 msgstr ""
-"分割結果から空の文字列メッセージを削除するかどうか。デフォルトでは \n"
-"       連続する区切り文字を1つにします (TRUEの場合)。FALSE の場合、連続する区"
-"切り文字の間に空のセルの値が追加されます。"
 
 #. module: spreadsheet
 #. odoo-javascript
@@ -13204,7 +13263,7 @@ msgstr "世界"
 #. odoo-javascript
 #: code:addons/spreadsheet/static/src/o_spreadsheet/o_spreadsheet.js:0
 msgid "Wrap"
-msgstr "ラップ"
+msgstr "折り返し"
 
 #. module: spreadsheet
 #. odoo-javascript
@@ -13295,6 +13354,12 @@ msgstr "年"
 
 #. module: spreadsheet
 #. odoo-javascript
+#: code:addons/spreadsheet/static/src/hooks.js:0
+msgid "Yes"
+msgstr ""
+
+#. module: spreadsheet
+#. odoo-javascript
 #: code:addons/spreadsheet/static/src/global_filters/helpers.js:0
 msgid "Yesterday"
 msgstr "昨日"
@@ -13310,6 +13375,21 @@ msgstr "既存のフィルタ内でセルを結合することはできません
 #: code:addons/spreadsheet/static/src/o_spreadsheet/o_spreadsheet.js:0
 msgid "You cannot create overlapping tables."
 msgstr "重複するテーブルは作成できません。"
+
+#. module: spreadsheet
+#. odoo-javascript
+#: code:addons/spreadsheet/static/src/o_spreadsheet/o_spreadsheet.js:0
+msgid ""
+"You copied content from a different version of the application. Only text "
+"and image content will be pasted."
+msgstr ""
+
+#. module: spreadsheet
+#. odoo-javascript
+#: code:addons/spreadsheet/static/src/actions/spreadsheet_download_action.js:0
+msgid ""
+"You don't have the rights to export data. Please contact an Administrator."
+msgstr ""
 
 #. module: spreadsheet
 #. odoo-javascript
@@ -13547,7 +13627,7 @@ msgstr "以下ではない："
 #. odoo-javascript
 #: code:addons/spreadsheet/static/src/o_spreadsheet/o_spreadsheet.js:0
 msgid "number of columns"
-msgstr "カラム数"
+msgstr "列数"
 
 #. module: spreadsheet
 #. odoo-javascript
@@ -13695,6 +13775,12 @@ msgstr "明日"
 
 #. module: spreadsheet
 #. odoo-javascript
+#: code:addons/spreadsheet/static/src/public_readonly_app/public_readonly.xml:0
+msgid "x"
+msgstr ""
+
+#. module: spreadsheet
+#. odoo-javascript
 #: code:addons/spreadsheet/static/src/o_spreadsheet/o_spreadsheet.js:0
 msgid "yesterday"
 msgstr "昨日"
@@ -13704,6 +13790,60 @@ msgstr "昨日"
 #: code:addons/spreadsheet/static/src/o_spreadsheet/o_spreadsheet.js:0
 msgid "zero"
 msgstr "ゼロ"
+
+#~ msgid ""
+#~ "This operation is not possible due to a merge. Please remove the merges "
+#~ "first than try again."
+#~ msgstr ""
+#~ "マージのためこの操作ができません。マージを削除してから再試行して下さい。"
+
+#~ msgid ""
+#~ "An unexpected error occurred while pasting content.\n"
+#~ "          Additional information can be found in the browser console."
+#~ msgstr ""
+#~ "コンテンツを貼り付ける際に予期しないエラーが発生しました\n"
+#~ "          追加情報は、ブラウザのコンソールでご確認いただけます。"
+
+#~ msgid ""
+#~ "An unexpected error occurred while pasting content.\n"
+#~ "          This is probably due to a spreadsheet version mismatch."
+#~ msgstr ""
+#~ "コンテンツを貼付ける際に予期しないエラーが発生しました。\n"
+#~ "          スプレッドシートのバージョンが一致していないことが原因である可能"
+#~ "性が高いです。"
+
+#~ msgid ""
+#~ "Function [[FUNCTION_NAME]] expects criteria_range and criterion to be in "
+#~ "pairs."
+#~ msgstr ""
+#~ "関数 [[FUNCTION_NAME]] では、criteria_range と criterion はペアで指定する"
+#~ "必要があります。"
+
+#~ msgid ""
+#~ "Function [[FUNCTION_NAME]] expects criteria_range to have the same "
+#~ "dimension"
+#~ msgstr ""
+#~ "関数 [[FUNCTION_NAME]] では、criteria_range の次元が同一である必要がありま"
+#~ "す"
+
+#~ msgid ""
+#~ "In [[FUNCTION_NAME]], the number of columns of the first matrix (%s) must "
+#~ "be equal to the \n"
+#~ "          number of rows of the second matrix (%s)."
+#~ msgstr ""
+#~ "[[FUNCTION_NAME]]内で the number of columns of the first matrix初めのマト"
+#~ "リクス (%s)の行数は \n"
+#~ "          2つ目のマトリクス (%s)の列数と同等である必要があります。"
+
+#~ msgid ""
+#~ "Whether or not to remove empty text messages from the split results. The "
+#~ "default behavior is to treat \n"
+#~ "        consecutive delimiters as one (if TRUE). If FALSE, empty cells "
+#~ "values are added between consecutive delimiters."
+#~ msgstr ""
+#~ "分割結果から空の文字列メッセージを削除するかどうか。デフォルトでは \n"
+#~ "       連続する区切り文字を1つにします (TRUEの場合)。FALSE の場合、連続す"
+#~ "る区切り文字の間に空のセルの値が追加されます。"
 
 #~ msgid ""
 #~ "Function [[FUNCTION_NAME]] expects number values for %s, but got a %s."

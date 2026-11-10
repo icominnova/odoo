@@ -1,5 +1,5 @@
 import { withSequence } from "@html_editor/utils/resource";
-import { describe, expect, test } from "@odoo/hoot";
+import { describe, expect, freezeTime, mockUserAgent, test } from "@odoo/hoot";
 import {
     click,
     delay,
@@ -12,9 +12,11 @@ import {
     press,
     queryAll,
     queryAllTexts,
+    queryFirst,
     queryOne,
     waitFor,
     waitForNone,
+    waitUntil,
 } from "@odoo/hoot-dom";
 import { advanceTime, animationFrame, tick } from "@odoo/hoot-mock";
 import {
@@ -48,7 +50,7 @@ import { insertText } from "./_helpers/user_actions";
 import { expandToolbar } from "./_helpers/toolbar";
 import { nodeSize } from "@html_editor/utils/position";
 import { expectElementCount } from "./_helpers/ui_expectations";
-import { ToolbarPlugin } from "@html_editor/main/toolbar/toolbar_plugin";
+import { DELAY_TOOLBAR_OPEN, ToolbarPlugin } from "@html_editor/main/toolbar/toolbar_plugin";
 import { ImageCrop } from "@html_editor/main/media/image_crop";
 import { Editor } from "@html_editor/editor";
 
@@ -210,7 +212,7 @@ test("toolbar buttons react to selection change", async () => {
     expect(getContent(el)).toBe("<p><strong>[test]</strong> some text</p>");
     expect(".btn[name='bold']").toHaveClass("active");
     expect(".btn[name='remove_format']").not.toHaveAttribute("disabled");
-    expect(".btn[name='remove_format']").toHaveAttribute("title", "Remove Format");
+    expect(".btn[name='remove_format']").toHaveAttribute("title", "Remove Format (Ctrl + Space)");
 
     // set selection where text is not bold
     setContent(el, "<p><strong>test</strong> some [text]</p>");
@@ -485,6 +487,72 @@ test("toolbar works: change font size correctly when closest block element has a
     expect(inputEl).toHaveValue(h1Size);
 });
 
+test("toolbar font size selector reflects heading size after remove format", async () => {
+    const { el } = await setupEditor(`<h2 class="display-3-fs">[heading 2]</h2>`);
+    await expandToolbar();
+    const style = getHtmlStyle(document);
+    const getFontSizeFromVar = (cssVar) => {
+        const strValue = getCSSVariableValue(cssVar, style);
+        const remValue = parseFloat(strValue);
+        const pxValue = convertNumericToUnit(remValue, "rem", "px", style);
+        return Math.round(pxValue);
+    };
+    await waitFor(".o-we-toolbar");
+    const iframeEl = queryOne(".o-we-toolbar [name='font_size_selector'] iframe");
+    const inputEl = await waitUntil(() => {
+        const input = iframeEl.contentWindow.document?.querySelector("input[name='font-size-input']");
+        return input?.value && input;
+    });
+    expect(inputEl).toHaveValue(getFontSizeFromVar("display-3-font-size").toString());
+
+    await click(".btn[name='remove_format']");
+    await animationFrame();
+
+    expect(getContent(el)).toBe(`<h2>[heading 2]</h2>`);
+    expect(inputEl).toHaveValue(getFontSizeFromVar("h2-font-size").toString());
+});
+
+test("toolbar font size selector reflects default size with o_default_font_size class", async () => {
+    await setupEditor(
+        '<p class="display-3-fs">abc <span class="o_default_font_size">[def]</span> ghi</p>'
+    );
+    await expandToolbar();
+    const style = getHtmlStyle(document);
+    const getFontSizeFromVar = (cssVar) => {
+        const strValue = getCSSVariableValue(cssVar, style);
+        const remValue = parseFloat(strValue);
+        const pxValue = convertNumericToUnit(remValue, "rem", "px", style);
+        return Math.round(pxValue);
+    };
+    await waitFor(".o-we-toolbar");
+    const iframeEl = queryOne(".o-we-toolbar [name='font_size_selector'] iframe");
+    const inputEl = await waitUntil(() => {
+        const input = iframeEl.contentWindow.document?.querySelector("input[name='font-size-input']");
+        return input?.value && input;
+    });
+    expect(inputEl).toHaveValue(getFontSizeFromVar("font-size-base").toString());
+});
+
+test("toolbar works: apply custom font size on a selection inside block default class", async () => {
+    const { el } = await setupEditor(
+        '<h2 class="display-3-fs">abc <span class="h2">d[e]f</span> ghi</h2>'
+    );
+    await expandToolbar();
+    await contains(".o-we-toolbar [name='font_size_selector'].dropdown-toggle").click();
+    const style = getHtmlStyle(document);
+    const getFontSizeFromVar = (cssVar) => {
+        const strValue = getCSSVariableValue(cssVar, style);
+        const remValue = parseFloat(strValue);
+        const pxValue = convertNumericToUnit(remValue, "rem", "px", style);
+        return Math.round(pxValue);
+    };
+    const h1Size = getFontSizeFromVar("h1-font-size").toString();
+    await contains(`.o_font_size_selector_menu .dropdown-item:contains('${h1Size}')`).click();
+    expect(getContent(el)).toBe(
+        '<h2 class="display-3-fs">abc <span class="h2">d<span class="h1-fs">[e]</span>f</span> ghi</h2>'
+    );
+});
+
 test("toolbar works: show the correct text alignment", async () => {
     const { el } = await setupEditor("<p>[test</p><p><br>]</p>");
     await expandToolbar();
@@ -564,7 +632,7 @@ test("should not create empty extra nodes while changing format of link", async 
     await waitFor(".o_font_size_selector_menu .dropdown-item:contains('80')");
     await contains(".o_font_size_selector_menu .dropdown-item:contains('80')").click();
     expect(getContent(el)).toBe(
-        `<p><span class="display-1-fs">\ufeff<a href="http://test.com" class="o_link_in_selection">\ufeff[test.com]\ufeff</a>\ufeff</span></p>`
+        `<p>[\ufeff<a href="http://test.com" class="display-1-fs">\ufefftest.com\ufeff</a>\ufeff]</p>`
     );
 });
 
@@ -582,7 +650,7 @@ test("should not create empty extra nodes while changing format of link on mobil
     await waitFor(".o_font_size_selector_menu .dropdown-item:contains('80')");
     await contains(".o_font_size_selector_menu .dropdown-item:contains('80')").click();
     expect(getContent(el)).toBe(
-        `<p><span class="display-1-fs">\ufeff<a href="http://test.com" class="o_link_in_selection">\ufeff[test.com]\ufeff</a>\ufeff</span></p>`
+        `<p>[\ufeff<a href="http://test.com" class="display-1-fs">\ufefftest.com\ufeff</a>\ufeff]</p>`
     );
 });
 
@@ -634,7 +702,7 @@ test("toolbar works: displays correct font size on input", async () => {
     await press("8");
     expect(inputEl).toHaveValue("8");
     await advanceTime(200);
-    expect(".o_font_size_selector_menu").toHaveCount(1);
+    expectElementCount(".o_font_size_selector_menu", 1);
     expect(getContent(el)).toBe(`<p><span style="font-size: 8px;">[test]</span></p>`);
     await expectElementCount(".o-we-toolbar", 1);
 });
@@ -785,6 +853,52 @@ test("toolbar open on single selected cell in table", async () => {
     await expectElementCount(".o-we-toolbar", 1);
 });
 
+test("toolbar opens when selecting table header cells", async () => {
+    await setupEditor(`
+        <table class="table table-bordered o_table">
+            <tbody>
+                <tr>
+                    <th class="o_table_header">[Header 1</th>
+                    <th class="o_table_header">Header 2]</th>
+                </tr>
+                <tr>
+                    <td>Cell 1</td>
+                    <td>Cell 2</td>
+                </tr>
+            </tbody>
+        </table>
+    `);
+    await expectElementCount(".o-we-toolbar", 1);
+});
+
+test.tags("desktop");
+test("Position toolbar correctly on table selection", async () => {
+    const contentBefore = unformat(`
+        <p>abcd</p>
+        <p>abcd</p>
+        <table class="table table-bordered o_table">
+            <tbody>
+                <tr>
+                    <td><p><br></p></td>
+                    <td><p>[<br></p></td>
+                </tr>
+                <tr>
+                    <td><p><br></p></td>
+                    <td><p>]<br></p></td>
+                </tr>
+            </tbody>
+        </table>
+    `);
+
+    await setupEditor(contentBefore);
+    await waitFor(".o-we-toolbar");
+    const firstTd = queryFirst("td.o_selected_td");
+    const toolbarOverlay = queryOne(".o-we-toolbar").parentElement;
+    const toolbarRect = toolbarOverlay.getBoundingClientRect();
+    const cellRect = firstTd.getBoundingClientRect();
+    expect([toolbarRect.left, toolbarRect.bottom]).toMatch([cellRect.left, cellRect.top]);
+});
+
 test("should select table single cell when entire content is selected via mouse movement", async () => {
     const content = unformat(`
         <table class="table table-bordered o_table" style="width: 250px;">
@@ -847,6 +961,84 @@ test("should select table single cell when entire content is selected via mouse 
     });
     manuallyDispatchProgrammaticEvent(lastP, "mouseup", {
         detail: 1,
+        clientX: rect.right + 5,
+        clientY: rect.top,
+    });
+
+    await animationFrame();
+    await tick();
+
+    expect(firstTd).toHaveClass("o_selected_td");
+    await expectElementCount(".o-we-toolbar", 1);
+});
+
+test("should select table single formatted cell when entire content is selected via mouse movement", async () => {
+    const content = unformat(`
+        <table class="table table-bordered o_table" style="width: 250px;">
+            <tbody>
+                <tr>
+                    <td style="width: 200px;">
+                        <p><strong>abcdefghijklmno</strong></p>
+                        <p>
+                            <font style="color: red;">
+                                abcdefghijklmnopqrs
+                            </font>
+                        </p>
+                        <p><em>abcdefg</em></p>
+                    </td>
+                    <td style="width: 50px;"><p><br></p></td>
+                </tr>
+                <tr>
+                    <td><p><br></p></td>
+                    <td><p><br></p></td>
+                </tr>
+            </tbody>
+        </table>
+    `);
+
+    const { el } = await setupEditor(content);
+
+    const firstTd = el.querySelector("td");
+    const firstP = firstTd.firstElementChild;
+    const lastP = firstTd.lastElementChild;
+
+    const firstTextNode = firstP.querySelector("strong").firstChild;
+    const lastTextNode = lastP.querySelector("em").firstChild;
+
+    // Simulate mousedown at the top of the first paragraph.
+    const rectStart = firstP.getBoundingClientRect();
+    manuallyDispatchProgrammaticEvent(firstP, "mousedown", {
+        clientX: rectStart.left,
+        clientY: rectStart.top,
+    });
+
+    // Select from start of first formatted node to end of last formatted node.
+    setSelection({
+        anchorNode: firstTextNode,
+        anchorOffset: 0,
+        focusNode: lastTextNode,
+        focusOffset: nodeSize(lastTextNode),
+    });
+
+    await animationFrame();
+
+    // Simulate mouse movement until end of selection.
+    const range = document.createRange();
+    range.setStart(lastTextNode, 0);
+    range.setEnd(lastTextNode, nodeSize(lastTextNode));
+    const rect = range.getBoundingClientRect();
+
+    manuallyDispatchProgrammaticEvent(lastP, "mousemove", {
+        clientX: rect.right,
+        clientY: rect.top,
+    });
+
+    manuallyDispatchProgrammaticEvent(lastP, "mousemove", {
+        clientX: rect.right + 5,
+        clientY: rect.top,
+    });
+
+    manuallyDispatchProgrammaticEvent(lastP, "mouseup", {
         clientX: rect.right + 5,
         clientY: rect.top,
     });
@@ -1075,6 +1267,7 @@ test("toolbar correctly show namespace button group and stop showing when namesp
 });
 
 test("toolbar does not evaluate isActive when namespace does not match", async () => {
+    const { promise: isActivePromise, resolve: resolveIsActive } = Promise.withResolvers();
     class TestPlugin extends Plugin {
         static id = "TestPlugin";
         resources = {
@@ -1087,7 +1280,10 @@ test("toolbar does not evaluate isActive when namespace does not match", async (
                     commandId: "test_cmd",
                     description: "Test Button",
                     icon: "fa-square",
-                    isActive: () => expect.step("image format evaluated"),
+                    isActive: () => {
+                        expect.step("image format evaluated");
+                        resolveIsActive();
+                    },
                 },
             ],
         };
@@ -1106,7 +1302,7 @@ test("toolbar does not evaluate isActive when namespace does not match", async (
     await waitFor(".o-we-toolbar");
     expect.verifySteps([]);
     await click("img");
-    await animationFrame();
+    await isActivePromise;
     expect.verifySteps(["image format evaluated"]);
 });
 
@@ -1561,6 +1757,18 @@ test("toolbar should close when clicked outside the iframe", async () => {
     await expectElementCount(".o-we-toolbar", 0);
 });
 
+test.tags("desktop", "iframe");
+test("toolbar should close when clicked outside the iframe (even if selection got in the toolbar)", async () => {
+    await setupEditor("<p>[a]</p>", { props: { iframe: true } });
+    await expectElementCount(".o-we-toolbar", 1);
+    const sepEl = queryFirst(".o-we-toolbar .o-we-toolbar-vertical-separator");
+    setSelection({ anchorNode: sepEl, anchorOffset: 0 });
+    await expectElementCount(".o-we-toolbar", 1);
+    // click outside the iframe
+    await click(".o-main-components-container");
+    await expectElementCount(".o-we-toolbar", 0);
+});
+
 describe.tags("desktop");
 describe("toolbar open and close on user interaction", () => {
     describe("mouse", () => {
@@ -1602,6 +1810,37 @@ describe("toolbar open and close on user interaction", () => {
 
             await pointerUp(el.ownerDocument);
             await expectElementCount(".o-we-toolbar", 1);
+        });
+
+        test("deferred toolbar update after destroy does not crash", async () => {
+            const { el, editor, plugins } = await setupEditor("<p>[test]</p>", {
+                props: { iframe: true },
+            });
+            await waitFor(".o-we-toolbar");
+            const toolbarPlugin = plugins.get("toolbar");
+            const iframeDoc = el.ownerDocument;
+
+            // Capture the selection data while the editor is still alive: this is
+            // what a pending (debounced) toolbar update carries with it.
+            const selectionData = editor.shared.selection.getSelectionData();
+
+            // Tear down the editor the way its view does: `willBeRemoved` keeps
+            // the editable's contenteditable attribute (so the update still passes
+            // its editability checks)...
+            editor.destroy(true);
+            expect(toolbarPlugin.isDestroyed).toBe(true);
+            // ...then the iframe is removed from the DOM, nulling out defaultView.
+            iframeDoc.defaultView.frameElement.remove();
+            expect(iframeDoc.defaultView).toBe(null);
+
+            // Simulate the surviving deferred update. Without the `isDestroyed`
+            // guard in `_updateToolbar`, this crashes in `getFilteredTargetedNodes`
+            // with: TypeError: Cannot read properties of null (reading
+            // 'getComputedStyle').
+            toolbarPlugin.updateToolbar(selectionData);
+            await advanceTime(DELAY_TOOLBAR_OPEN);
+
+            expect(toolbarPlugin.getIsToolbarOpen()).toBe(false);
         });
 
         test("toolbar should close on mousedown", async () => {
@@ -1648,7 +1887,8 @@ describe("toolbar open and close on user interaction", () => {
             await simulateDoubleClickSelect(p);
             expect(getContent(el)).toBe("<p>[test]</p>");
             // toolbar open after double click is debounced
-            await advanceTime(500);
+            await advanceTime(DELAY_TOOLBAR_OPEN);
+            await animationFrame();
             await expectElementCount(".o-we-toolbar", 1);
         });
 
@@ -1659,27 +1899,53 @@ describe("toolbar open and close on user interaction", () => {
             await simulateTripleClickSelect(p);
             expect(getContent(el)).toBe("<p>[test text]</p>");
             // toolbar open after triple click is debounced
-            await advanceTime(500);
+            await advanceTime(DELAY_TOOLBAR_OPEN);
             await expectElementCount(".o-we-toolbar", 1);
         });
 
         test("toolbar should not open between double and triple click", async () => {
-            const { el } = await setupEditor("<p>test text</p>");
+            // Track toolbar updates to assert debouncing behavior.
+            patchWithCleanup(ToolbarPlugin.prototype, {
+                triggerDebouncedUpdateToolbar(...args) {
+                    expect.step("triggerDebouncedUpdateToolbar");
+                    return super.triggerDebouncedUpdateToolbar(...args);
+                },
+                _updateToolbar(...args) {
+                    expect.step("updateToolbar");
+                    return super._updateToolbar(...args);
+                },
+            });
+            const { el } = await setupEditor("<p>test text[]</p>");
             const p = el.firstElementChild;
 
-            // Double click
+            // setupEditor with a selection marker triggers an initial updateToolbar
+            // via selectionchange_handlers. Clear these setup steps before the test.
+            // Since _updateToolbar is called asynchronously by the debounce(..., 0)
+            // wrapper, wait for it to complete.
+            await tick();
+            expect.verifySteps(["updateToolbar"]);
+
+            // Double click: first click is synchronous, second schedules debounced update
             await firstClick(p);
+            // Freeze time so the clock only moves with advanceTime, not with real time.
+            // Done after the first click, which waits for its update on the real clock.
+            freezeTime();
             await secondClick(p);
             expect(getContent(el)).toBe("<p>[test] text</p>");
-            await advanceTime(100);
-            // Toolbar is not open yet, waiting for a possible third click
-            await expectElementCount(".o-we-toolbar", 0);
+            expect.verifySteps(["updateToolbar", "triggerDebouncedUpdateToolbar"]);
 
-            // Third click
+            // Debounced update is not executed yet
+            await advanceTime(100);
+            expect.verifySteps([]);
+
+            // Third click: cancels scheduled update and schedules a new one
             await thirdClick(p);
             expect(getContent(el)).toBe("<p>[test text]</p>");
-            await advanceTime(500);
-            await expectElementCount(".o-we-toolbar", 1);
+            expect.verifySteps(["triggerDebouncedUpdateToolbar"]);
+
+            // Scheduled update is executed after the full debounce delay
+            await advanceTime(DELAY_TOOLBAR_OPEN);
+            expect.verifySteps(["updateToolbar"]);
         });
 
         test("toolbar should not open after triple click while mouse is down", async () => {
@@ -1692,14 +1958,14 @@ describe("toolbar open and close on user interaction", () => {
             setSelection({ anchorNode: p, anchorOffset: 0, focusOffset: 1 });
             await tick(); // selectionChange
             expect(getContent(el)).toBe("<p>[test text]</p>");
-            await advanceTime(500);
+            await advanceTime(DELAY_TOOLBAR_OPEN);
             // Toolbar is not open yet, waiting for mouseup
             await expectElementCount(".o-we-toolbar", 0);
 
             // Mouse up
             manuallyDispatchProgrammaticEvent(p, "mouseup", { detail: 3 });
             manuallyDispatchProgrammaticEvent(p, "click", { detail: 3 });
-            await advanceTime(500);
+            await advanceTime(DELAY_TOOLBAR_OPEN);
             await expectElementCount(".o-we-toolbar", 1);
         });
 
@@ -1739,7 +2005,7 @@ describe("toolbar open and close on user interaction", () => {
 
             await keyUp(["Shift", "ArrowRight"]);
 
-            await advanceTime(500); // Toolbar open on keyup is debounced
+            await advanceTime(DELAY_TOOLBAR_OPEN); // Toolbar open on keyup is debounced
             await expectElementCount(".o-we-toolbar", 1);
         });
 
@@ -1757,7 +2023,7 @@ describe("toolbar open and close on user interaction", () => {
             // Toolbar should open after keyup
             await keyUp(["Shift", "ArrowRight"]);
 
-            await advanceTime(500); // toolbar open on keyup is debounced
+            await advanceTime(DELAY_TOOLBAR_OPEN); // toolbar open on keyup is debounced
             await expectElementCount(".o-we-toolbar", 1);
         });
 
@@ -1794,7 +2060,7 @@ describe("toolbar open and close on user interaction", () => {
             await tick(); // selectionChange
             await keyUp(["Shift", "ArrowRight"]);
             await advanceTime(100);
-            await expectElementCount(".o-we-toolbar", 0);
+            expect(".o-we-toolbar").toHaveCount(0);
 
             // Keystroke # 2
             await keyDown(["Shift", "ArrowRight"]);
@@ -1802,9 +2068,33 @@ describe("toolbar open and close on user interaction", () => {
             await tick(); // selectionChange
             await keyUp(["Shift", "ArrowRight"]);
             await advanceTime(100);
-            await expectElementCount(".o-we-toolbar", 0);
+            expect(".o-we-toolbar").toHaveCount(0);
 
             // Toolbar opens some time after the last keyup
+            await advanceTime(DELAY_TOOLBAR_OPEN);
+            await expectElementCount(".o-we-toolbar", 1);
+        });
+
+        test("toolbar should open on Cmd+Shift+Arrow on macOS", async () => {
+            mockUserAgent("mac");
+            const { el } = await setupEditor("<p>[]test</p>");
+            await expectElementCount(".o-we-toolbar", 0);
+
+            // Simulate Cmd+Shift+ArrowRight: keydown fires but keyup is suppressed by macOS
+            await keyDown(["Meta", "Shift", "ArrowRight"]);
+            setContent(el, "<p>[test]</p>");
+            await tick(); // selectionChange
+
+            await animationFrame();
+            // Toolbar should still be closed
+            await expectElementCount(".o-we-toolbar", 0);
+
+            // keyup is NOT fired (macOS suppresses it when Cmd is held)
+            // selectionchange fires and acts as the fallback trigger
+            manuallyDispatchProgrammaticEvent(document, "selectionchange");
+            await tick();
+
+            // wait for the debounced toolbar update
             await advanceTime(500);
             await expectElementCount(".o-we-toolbar", 1);
         });
@@ -2010,4 +2300,28 @@ test("toolbar should not be displayed when only invisible nodes are selected", a
     await expectElementCount(".o-we-toolbar", 1);
     setContent(el, `<div><p>abc</p><h1 class="d-none">[I'm not displayed]</h1></div>`);
     await expectElementCount(".o-we-toolbar", 0);
+});
+
+test("should highlight text color button on color picker opened", async () => {
+    await setupEditor(`<div><p>[abc]</p></div>`);
+    await waitFor(".o-we-toolbar");
+    await expandToolbar();
+    expect(".o-select-color-foreground").not.toHaveClass("active");
+    await click(".o-select-color-foreground");
+    await waitFor(".o_font_color_selector");
+    expect(".o-select-color-foreground").toHaveClass("active");
+});
+
+test("formats should be enabled when inline code selected", async () => {
+    await setupEditor(`<div class="o-paragraph">[ab<code class="o_inline_code">code</code>]</div>`);
+    await expectElementCount(".o-we-toolbar", 1);
+    await click(`[name="bold"]`);
+    await waitFor(`[name="bold"].active`);
+
+    expect("strong").toHaveCount(1);
+
+    await click(`[name="bold"].active`);
+    await waitFor(`[name="bold"]:not(.active)`);
+
+    expect("strong").toHaveCount(0);
 });

@@ -73,7 +73,11 @@ class PosPayment(models.Model):
         result = self.env['account.move']
         change_payment = self.filtered(lambda p: p.is_change and p.payment_method_id.type == 'cash')
         payment_to_change = self.filtered(lambda p: not p.is_change and p.payment_method_id.type == 'cash')[:1]
-        for payment in self - change_payment:
+        payments = self
+        if change_payment and payment_to_change:
+            payments = self - change_payment
+
+        for payment in payments:
             order = payment.pos_order_id
             payment_method = payment.payment_method_id
             if payment_method.type == 'pay_later' or float_is_zero(payment.amount, precision_rounding=order.currency_id.rounding):
@@ -131,14 +135,11 @@ class PosPayment(models.Model):
         """
 
         result = self.env['account.move.line']
-        for payment in self:
-            if not payment.account_move_id:
-                continue
+        for move, payments in self.filtered('account_move_id').grouped('account_move_id').items():
+            currency = payments[0].currency_id
+            is_positive_amount = currency.compare_amounts(sum(payments.mapped('amount')), 0) > 0
 
-            currency = payment.currency_id
-            is_positive_amount = currency.compare_amounts(payment.amount, 0) > 0
-
-            for line in payment.account_move_id.line_ids:
+            for line in move.line_ids:
                 if currency.compare_amounts(line.balance, 0) == 0 or line.account_id != receivable_account or line.reconciled:
                     continue
 

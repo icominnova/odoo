@@ -40,7 +40,7 @@ class ResCompany(models.Model):
     def iap_enrich_auto(self):
         """ Enrich company. This method should be called by automatic processes
         and a protection is added to avoid doing enrich in a loop. """
-        if self.env.user._is_system() and self.env.registry.ready:
+        if self.env.user._is_system() and self.env.registry.ready and not self.env.context.get('install_demo'):
             for company in self.filtered(lambda company: not company.iap_enrich_auto_done):
                 company._enrich()
             self.iap_enrich_auto_done = True
@@ -63,8 +63,8 @@ class ResCompany(models.Model):
         company_data = {field: value for field, value in company_data.items()
                         if field in self.partner_id._fields and value and (field == 'image_1920' or not self.partner_id[field])}
 
-        # for company: from state_id / country_id display_name like to IDs
-        company_data.update(self._enrich_extract_m2o_id(company_data, ['state_id', 'country_id']))
+        # for company: from state_id / country_id / industry_id display_name like to IDs
+        company_data.update(self._enrich_extract_m2o_id(company_data, ['state_id', 'country_id', 'industry_id']))
 
         self.partner_id.write(company_data)
         return True

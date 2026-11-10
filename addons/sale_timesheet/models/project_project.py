@@ -120,24 +120,10 @@ class ProjectProject(models.Model):
             elif not project.timesheet_product_id:
                 project.timesheet_product_id = default_product
 
-    @api.depends('pricing_type', 'allow_timesheets', 'allow_billable', 'sale_line_employee_ids', 'sale_line_employee_ids.employee_id')
     def _compute_warning_employee_rate(self):
-        projects = self.filtered(lambda p: p.allow_billable and p.allow_timesheets and p.pricing_type == 'employee_rate')
-        employees = self.env['account.analytic.line']._read_group(
-            [('task_id', 'in', projects.task_ids.ids), ('employee_id', '!=', False)],
-            ['project_id'],
-            ['employee_id:array_agg'],
-        )
-        dict_project_employee = {project.id: employee_ids for project, employee_ids in employees}
-        for project in projects:
-            project.warning_employee_rate = any(
-                x not in project.sale_line_employee_ids.employee_id.ids
-                for x in dict_project_employee.get(project.id, ())
-            )
+        self.warning_employee_rate = False
 
-        (self - projects).warning_employee_rate = False
-
-    @api.depends('sale_line_employee_ids.sale_line_id', 'sale_line_id')
+    @api.depends('sale_line_id')
     def _compute_partner_id(self):
         billable_projects = self.filtered('allow_billable')
         for project in billable_projects:
@@ -189,13 +175,27 @@ class ProjectProject(models.Model):
         return res
 
     def _update_timesheets_sale_line_id(self):
-        for project in self.filtered(lambda p: p.allow_billable and p.allow_timesheets):
-            timesheet_ids = project.mapped('timesheet_ids').filtered(lambda t: not t.is_so_line_edited and t._is_updatable_timesheet())
-            if not timesheet_ids:
+        projects = self.filtered(lambda p: p.allow_billable and p.allow_timesheets)
+        if not projects:
+            return
+        timesheets_per_project = self.env['account.analytic.line']._read_group(
+            [
+                ('project_id', 'in', projects.ids),
+                '|', ('task_id', '=', False), ('task_id.sale_line_id', '!=', False),
+                ('is_so_line_edited', '=', False),
+            ],
+            ['project_id'],
+            ['id:recordset'],
+        )
+        for project, timesheets in timesheets_per_project:
+            timesheets_per_employee = timesheets.filtered(lambda t: t._is_updatable_timesheet()).grouped('employee_id')
+            if not timesheets_per_employee:
                 continue
-            for employee_id in project.sale_line_employee_ids.filtered(lambda l: l.project_id == project).employee_id:
-                sale_line_id = project.sale_line_employee_ids.filtered(lambda l: l.project_id == project and l.employee_id == employee_id).sale_line_id
-                timesheet_ids.filtered(lambda t: t.employee_id == employee_id).sudo().so_line = sale_line_id
+            for mapping in project.sale_line_employee_ids:
+                timesheets_to_update = timesheets_per_employee.get(
+                    mapping.employee_id, self.env['account.analytic.line']
+                ).filtered(lambda t: t.so_line != mapping.sale_line_id)
+                timesheets_to_update.sudo().so_line = mapping.sale_line_id
 
     def action_view_timesheet(self):
         self.ensure_one()
@@ -530,3 +530,14 @@ class ProjectProject(models.Model):
             *super()._get_template_default_context_whitelist(),
             "allow_timesheets",
         ]
+
+    def _get_processed_analytic_account_vals(self, vals_list):
+        analytic_accounts_vals = super()._get_processed_analytic_account_vals(vals_list)
+        for vals in analytic_accounts_vals:
+            if (
+                (partner_id := self.env['res.partner'].browse(vals.get('partner_id')))
+                and partner_id.company_id
+                and vals.get('company_id') != partner_id.company_id.id
+            ):
+                vals['company_id'] = partner_id.company_id.id
+        return analytic_accounts_vals

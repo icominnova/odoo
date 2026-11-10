@@ -102,16 +102,16 @@ describe("Selection collapsed", () => {
         });
         test("should split block without afecting the uploaded document link", async () => {
             await testEditor({
-                contentBefore: `<p>abc<a href="#" title="document" data-mimetype="application/pdf" class="o_image"></a>[]def</p>`,
+                contentBefore: `<p>abc<span class="o_file_box"><a href="#" title="document" data-mimetype="application/pdf"></a></span>[]def</p>`,
                 stepFunction: splitBlock,
-                contentAfter: `<p>abc<a href="#" title="document" data-mimetype="application/pdf" class="o_image"></a></p><p>[]def</p>`,
+                contentAfter: `<p>abc<span class="o_file_box"><a href="#" title="document" data-mimetype="application/pdf"></a></span></p><p>[]def</p>`,
             });
         });
         test("should split block without afecting the uploaded document link (2)", async () => {
             await testEditor({
-                contentBefore: `<p>abc<a href="#" title="document" data-mimetype="application/pdf" class="o_image"></a>[]</p>`,
+                contentBefore: `<p>abc<span class="o_file_box"><a href="#" title="document" data-mimetype="application/pdf"></a></span>[]</p>`,
                 stepFunction: splitBlock,
-                contentAfter: `<p>abc<a href="#" title="document" data-mimetype="application/pdf" class="o_image"></a></p><p>[]<br></p>`,
+                contentAfter: `<p>abc<span class="o_file_box"><a href="#" title="document" data-mimetype="application/pdf"></a></span></p><p>[]<br></p>`,
             });
         });
         test("should not split block with conditional template", async () => {
@@ -603,14 +603,21 @@ describe("Selection collapsed", () => {
                     contentAfter: '<p>ab</p><p><a href="http://test.test/">[]cd</a></p>',
                 });
             });
-            test("should insert a paragraph break in the middle of an anchor", async () => {
+            test("should insert a paragraph break in the middle of an inline node", async () => {
+                await testEditor({
+                    contentBefore: "<p><strong>a[]b</strong></p>",
+                    stepFunction: splitBlockA,
+                    contentAfterEdit: "<p><strong>a</strong></p><p><strong>[]b</strong></p>",
+                    contentAfter: "<p><strong>a</strong></p><p><strong>[]b</strong></p>",
+                });
+            });
+            test("should insert a <br> in the middle of an unsplittable anchor", async () => {
                 await testEditor({
                     contentBefore: '<p><a href="http://test.test/">a[]b</a></p>',
                     stepFunction: splitBlockA,
                     contentAfterEdit:
-                        '<p>\ufeff<a href="http://test.test/">\ufeffa\ufeff</a>\ufeff</p><p>\ufeff<a href="http://test.test/" class="o_link_in_selection">\ufeff[]b\ufeff</a>\ufeff</p>',
-                    contentAfter:
-                        '<p><a href="http://test.test/">a</a></p><p><a href="http://test.test/">[]b</a></p>',
+                        '<p>\ufeff<a href="http://test.test/" class="o_link_in_selection">\ufeffa<br>[]b\ufeff</a>\ufeff</p>',
+                    contentAfter: '<p><a href="http://test.test/">a<br>[]b</a></p>',
                 });
             });
             test("should insert a paragraph break outside the ending edge of an anchor (1)", async () => {
@@ -639,7 +646,7 @@ describe("Selection collapsed", () => {
                         '<p><span class="a">ab</span></p><p><span class="b">[]cd</span></p>',
                     stepFunction: splitBlock,
                     contentAfter:
-                        '<p><span class="a">ab</span></p><p><span class="b">\u200b</span><br></p><p><span class="b">[]cd</span></p>',
+                        '<p><span class="a">ab</span></p><p><span class="b" data-oe-zws-empty-inline="">\u200b</span><br></p><p><span class="b">[]cd</span></p>',
                 });
             });
 
@@ -677,7 +684,7 @@ describe("Selection collapsed", () => {
                     stepFunction: splitBlock,
                     contentAfterEdit:
                         '<h1><font style="color: red;" data-oe-zws-empty-inline="">\u200b</font></h1>' +
-                        `<p o-we-hint-text='Type "/" for commands' class="o-we-hint"><font style="color: red;" data-oe-zws-empty-inline="">[]\u200b</font></p>`,
+                        `<p o-we-hint-text='Type "/" for commands' class="o-we-hint">[]<br></p>`,
                     contentAfter: "<h1><br></h1><p>[]<br></p>",
                 });
             });

@@ -8,6 +8,7 @@ from collections import defaultdict
 from odoo import api, fields, models, _, Command, tools, SUPERUSER_ID
 from odoo.http import request
 from odoo.exceptions import AccessError, ValidationError, UserError
+from odoo.fields import Domain
 from odoo.tools import SQL, convert
 from odoo.service.common import exp_version
 from odoo.addons.point_of_sale.models.pos_printer import format_epson_certified_domain
@@ -26,7 +27,7 @@ class PosConfig(models.Model):
         return self.env['stock.warehouse'].search(self.env['stock.warehouse']._check_company_domain(self.env.company), limit=1).id
 
     def _default_picking_type_id(self):
-        return self.env['stock.warehouse'].with_context(active_test=False).search(self.env['stock.warehouse']._check_company_domain(self.env.company), limit=1).pos_type_id.id
+        return self.env['stock.warehouse'].search(self.env['stock.warehouse']._check_company_domain(self.env.company), limit=1).pos_type_id.id
 
     def _default_sale_journal(self):
         journal = self.env['account.journal']._ensure_company_account_journal()
@@ -177,7 +178,7 @@ class PosConfig(models.Model):
     has_active_session = fields.Boolean(compute='_compute_current_session')
     manual_discount = fields.Boolean(string="Line Discounts", default=True)
     ship_later = fields.Boolean(string="Ship Later")
-    warehouse_id = fields.Many2one('stock.warehouse', default=_default_warehouse_id, ondelete='restrict')
+    warehouse_id = fields.Many2one('stock.warehouse', compute='_compute_warehouse_id', store=True, readonly=False, precompute=True, ondelete='restrict')
     route_id = fields.Many2one('stock.route', string="Spefic route for products delivered later.")
     picking_policy = fields.Selection([
         ('direct', 'As soon as possible'),
@@ -242,6 +243,11 @@ class PosConfig(models.Model):
                 'records': records
             })
 
+    def _get_paid_orders_config_domain(self):
+        """Domain on pos.order matching configs whose paid orders are visible from this config."""
+        self.ensure_one()
+        return Domain('config_id', 'in', (self | self.trusted_config_ids).ids)
+
     def read_config_open_orders(self, domain, record_ids=[]):
         delete_record_ids = {}
         dynamic_records = {}
@@ -254,7 +260,7 @@ class PosConfig(models.Model):
             delete_record_ids[model] = browsed.filtered(lambda r: not r.exists()).ids
             # Cancelled orders must be forced deleted from the user interface.
             if model == "pos.order":
-                delete_record_ids[model] += browsed.filtered(lambda r: r.state == "cancel").ids
+                delete_record_ids[model] += browsed.exists().filtered(lambda r: r.state == "cancel").ids
 
         pos_order_data = dynamic_records.get('pos.order') or self.env['pos.order']
         data = pos_order_data.read_pos_data([], self)
@@ -285,10 +291,10 @@ class PosConfig(models.Model):
 
         record = read_records[0]
         record['_server_version'] = exp_version()
-        record['_base_url'] = self.get_base_url()
+        record['_base_url'] = config.get_base_url()
         record['_data_server_date'] = self.env.context.get('pos_last_server_date') or self.env.cr.now()
-        record['_has_cash_move_perm'] = self.env.user.has_group('account.group_account_invoice')
-        record['_has_cash_delete_perm'] = self.env.user.has_group('account.group_account_basic')
+        record['_has_cash_move_perm'] = self.env.user._has_cash_move_permission()
+        record['_has_cash_delete_perm'] = self.env.user._has_cash_delete_permission()
         record['_pos_special_products_ids'] = self.env['pos.config']._get_special_products().ids
 
         # Add custom fields for 'formula' taxes.
@@ -309,6 +315,14 @@ class PosConfig(models.Model):
             config.fast_payment_method_ids = config.fast_payment_method_ids.filtered(lambda pm: pm.id in config.payment_method_ids.ids)
             if not config.fast_payment_method_ids:
                 config.use_fast_payment = False
+
+    @api.depends('picking_type_id')
+    def _compute_warehouse_id(self):
+        for config in self:
+            if config.picking_type_id.warehouse_id:
+                config.warehouse_id = config.picking_type_id.warehouse_id
+            else:
+                config.warehouse_id = config._default_warehouse_id()
 
     @api.depends('payment_method_ids')
     def _compute_cash_control(self):
@@ -398,7 +412,7 @@ class PosConfig(models.Model):
             statistics['orders']['paid'] = {
                 'amount': total_paid,
                 'count': paid_order_count,
-                'display': f"{currency.format(total_paid)} ({paid_order_count} {'order' if paid_order_count == 1 else 'orders'})"
+                'display': f"{currency.format(total_paid)} ({paid_order_count} {self.env._('order') if paid_order_count == 1 else self.env._('orders')})"
             }
 
         if draft_orders:
@@ -407,7 +421,7 @@ class PosConfig(models.Model):
             statistics['orders']['draft'] = {
                 'amount': total_draft,
                 'count': count_draft,
-                'display': f"{currency.format(total_draft)} ({count_draft} {'order' if count_draft == 1 else 'orders'})"
+                'display': f"{currency.format(total_draft)} ({count_draft} {self.env._('order') if count_draft == 1 else self.env._('orders')})"
             }
 
         return statistics
@@ -555,8 +569,8 @@ class PosConfig(models.Model):
 
         pos_configs = super().create(vals_list)
         pos_configs._create_sequences()
-        pos_configs.sudo()._check_modules_to_install()
-        pos_configs.sudo()._check_groups_implied()
+        pos_configs._check_modules_to_install()
+        pos_configs._check_groups_implied()
         pos_configs._update_preparation_printers_menuitem_visibility()
         # If you plan to add something after this, use a new environment. The one above is no longer valid after the modules install.
         return pos_configs
@@ -616,7 +630,8 @@ class PosConfig(models.Model):
             prepa_printers_menuitem.active = self.sudo().env['pos.config'].search_count([('is_order_printer', '=', True)], limit=1) > 0
 
     @api.depends('use_pricelist', 'pricelist_id', 'available_pricelist_ids', 'payment_method_ids', 'limit_categories',
-        'iface_available_categ_ids', 'module_pos_hr', 'module_pos_discount', 'iface_tipproduct', 'default_preset_id', 'module_pos_appointment')
+        'iface_available_categ_ids', 'module_pos_hr', 'module_pos_discount', 'iface_tipproduct', 'default_preset_id', 'module_pos_appointment',
+        'cash_rounding', 'rounding_method', 'only_round_cash_method')
     def _compute_local_data_integrity(self):
         self.last_data_change = self.env.cr.now()
 
@@ -637,6 +652,9 @@ class PosConfig(models.Model):
                 if key in vals.keys():
                     if bypass_payment_method_ids_forbidden_change and key == 'payment_method_ids':
                         continue
+                    # Allow activating a pos config even if it has an open session, but don't allow deactivating it.
+                    if key == 'active' and vals['active']:
+                        continue
                     field_name = self._fields[key].get_description(self.env)["string"]
                     forbidden_fields.append(field_name)
 
@@ -652,9 +670,9 @@ class PosConfig(models.Model):
             if config.use_presets and config.default_preset_id and config.default_preset_id.id not in config.available_preset_ids.ids:
                 config.available_preset_ids |= config.default_preset_id
 
-        self.sudo()._set_fiscal_position()
-        self.sudo()._check_modules_to_install()
-        self.sudo()._check_groups_implied()
+        self._set_fiscal_position()
+        self._check_modules_to_install()
+        self._check_groups_implied()
         if 'is_order_printer' in vals:
             self._update_preparation_printers_menuitem_visibility()
         return result
@@ -721,13 +739,19 @@ class PosConfig(models.Model):
         sequences_to_delete.unlink()
         return res
 
+    def _check_pos_manager_access(self):
+        if not (self.env.is_admin() or self.env.user.has_group('point_of_sale.group_pos_manager')):
+            raise AccessError(_("Only Point of Sale managers can modify a Point of Sale configuration."))
+
     # TODO-JCB: Maybe we can move this logic in `_reset_default_on_vals`
     def _set_fiscal_position(self):
         for config in self:
             if config.tax_regime_selection and config.default_fiscal_position_id and (config.default_fiscal_position_id.id not in config.fiscal_position_ids.ids):
-                config.fiscal_position_ids = [(4, config.default_fiscal_position_id.id)]
+                self._check_pos_manager_access()
+                config.sudo().fiscal_position_ids = [(4, config.default_fiscal_position_id.id)]
             elif not config.tax_regime_selection and config.fiscal_position_ids.ids:
-                config.fiscal_position_ids = [(5, 0, 0)]
+                self._check_pos_manager_access()
+                config.sudo().fiscal_position_ids = [(5, 0, 0)]
 
     def _check_modules_to_install(self):
         # determine modules to install
@@ -742,6 +766,7 @@ class PosConfig(models.Model):
             modules = self.env['ir.module.module'].sudo().search([('name', 'in', expected)])
             modules = modules.filtered(lambda module: module.state not in STATES)
             if modules:
+                self._check_pos_manager_access()
                 modules.button_immediate_install()
                 # just in case we want to do something if we install a module. (like a refresh ...)
                 return True
@@ -754,7 +779,11 @@ class PosConfig(models.Model):
                 if field.type in ('boolean', 'selection') and hasattr(field, 'implied_group'):
                     field_group_xmlids = getattr(field, 'group', 'base.group_user').split(',')
                     field_groups = self.env['res.groups'].concat(*(self.env.ref(it) for it in field_group_xmlids))
-                    field_groups.write({'implied_ids': [(4, self.env.ref(field.implied_group).id)]})
+                    implied_group = self.env.ref(field.implied_group)
+                    field_groups = field_groups.filtered(lambda group: implied_group not in group.implied_ids)
+                    if field_groups:
+                        self._check_pos_manager_access()
+                        field_groups.sudo().write({'implied_ids': [(4, implied_group.id)]})
 
 
     def execute(self):
@@ -896,6 +925,19 @@ class PosConfig(models.Model):
         except (TypeError, ValueError, OverflowError):
             return DEFAULT_LIMIT_LOAD_PRODUCT
 
+    def get_product_loading_info(self):
+        """Return total product.template count matching the PoS domain and the configured loading limit.
+
+        Used by the frontend to warn the user before triggering a full sync when the product
+        count exceeds the configured limit or crosses the dangerous threshold (20 000+).
+        """
+        self.ensure_one()
+        ProductTemplate = self.env['product.template']
+        domain = ProductTemplate._load_pos_data_domain({}, self)
+        total_count = ProductTemplate.search_count(domain)
+        limit = self.get_limited_product_count()
+        return {'total_count': total_count, 'limit': limit}
+
     def _get_limited_partner_count(self):
         config_param = self.env['ir.config_parameter'].sudo().get_param('point_of_sale.limited_customer_count', DEFAULT_LIMIT_LOAD_PARTNER)
         try:
@@ -1025,9 +1067,12 @@ class PosConfig(models.Model):
             bank_journal = self.env['account.journal'].search([('type', '=', 'bank'), ('company_id', 'in', self.env.company.parent_ids.ids)], limit=1)
             if not bank_journal:
                 raise UserError(_('Ensure that there is an existing bank journal. Check if chart of accounts is installed in your company.'))
+            chart_template = self.with_context(allowed_company_ids=self.env.company.root_id.ids).env['account.chart.template']
+            outstanding_account = chart_template.ref('account_journal_payment_debit_account_id', raise_if_not_found=False) or self.env.company.transfer_account_id
             bank_pm = self.env['pos.payment.method'].create({
                 'name': _('Card'),
                 'journal_id': bank_journal.id,
+                'outstanding_account_id': outstanding_account.id if outstanding_account else False,
                 'company_id': self.env.company.id,
                 'sequence': 1,
             })

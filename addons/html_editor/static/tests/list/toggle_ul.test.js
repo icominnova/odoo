@@ -24,6 +24,30 @@ describe("Range collapsed", () => {
             });
         });
 
+        test("should preserve color and background color when creating a list", async () => {
+            await testEditor({
+                contentBefore: `<p><font style="color: red; background-color: red;">[a]</font></p>`,
+                stepFunction: toggleUnorderedList,
+                contentAfter: `<ul><li style="color: red;"><font style="background-color: red;">[a]</font></li></ul>`,
+            });
+        });
+
+        test("should preserve color creating a list (1)", async () => {
+            await testEditor({
+                contentBefore: `<p><font class="text-o-color-1">[a]</font></p>`,
+                stepFunction: toggleUnorderedList,
+                contentAfter: `<ul><li><font class="text-o-color-1">[a]</font></li></ul>`,
+            });
+        });
+
+        test("should preserve color creating a list (2)", async () => {
+            await testEditor({
+                contentBefore: `<p><font style="color: red;">[a]</font></p>`,
+                stepFunction: toggleUnorderedList,
+                contentAfter: `<ul><li style="color: red;">[a]</li></ul>`,
+            });
+        });
+
         test("should turn a paragraph into a list", async () => {
             await testEditor({
                 contentBefore: "<p>ab[]cd</p>",
@@ -48,6 +72,22 @@ describe("Range collapsed", () => {
             });
         });
 
+        test("should turn a ordered list without marker into an unordered list", async () => {
+            await testEditor({
+                contentBefore: '<ol><li class="oe-nested">ab[]cd</li></ol>',
+                stepFunction: toggleUnorderedList,
+                contentAfter: "<ul><li>ab[]cd</li></ul>",
+            });
+        });
+
+        test("should turn a checklist without marker into a unordered list", async () => {
+            await testEditor({
+                contentBefore: '<ul class="o_checklist"><li class="oe-nested">ab[]cd</li></ul>',
+                stepFunction: toggleUnorderedList,
+                contentAfter: "<ul><li>ab[]cd</li></ul>",
+            });
+        });
+
         test("should turn a heading into a list", async () => {
             await testEditor({
                 contentBefore: "<h1>ab[]cd</h1>",
@@ -61,6 +101,14 @@ describe("Range collapsed", () => {
                 contentBefore: "[<h1>abcd</h1>]",
                 stepFunction: toggleUnorderedList,
                 contentAfter: "<ul><li>[<h1>abcd</h1>]</li></ul>",
+            });
+        });
+
+        test("should create a list inside a blockquote", async () => {
+            await testEditor({
+                contentBefore: "<blockquote>ab[]cd</blockquote>",
+                stepFunction: toggleUnorderedList,
+                contentAfter: "<blockquote><ul><li>ab[]cd</li></ul></blockquote>",
             });
         });
 

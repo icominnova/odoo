@@ -13,16 +13,16 @@
 # Niyas Raphy, 2022
 # Martin Trigaux, 2023
 # Malaz Abuidris <msea@odoo.com>, 2023
-# "Tiffany Chang (tic)" <tic@odoo.com>, 2025.
-# "Dylan Kiss (dyki)" <dyki@odoo.com>, 2025.
-# Weblate <noreply-mt-weblate@weblate.org>, 2025.
+# "Tiffany Chang (tic)" <tic@odoo.com>, 2025, 2026.
+# "Dylan Kiss (dyki)" <dyki@odoo.com>, 2025, 2026.
+# Weblate <noreply-mt-weblate@weblate.org>, 2025, 2026.
 # "Malaz Siddig Elsayed Abuidris (msea)" <msea@odoo.com>, 2025, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-02-06 18:35+0000\n"
-"PO-Revision-Date: 2026-01-06 10:38+0000\n"
+"POT-Creation-Date: 2026-10-30 17:37+0000\n"
+"PO-Revision-Date: 2026-09-09 05:11+0000\n"
 "Last-Translator: \"Malaz Siddig Elsayed Abuidris (msea)\" <msea@odoo.com>\n"
 "Language-Team: Arabic <https://translate.odoo.com/projects/odoo-19/website/"
 "ar/>\n"
@@ -32,7 +32,7 @@ msgstr ""
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=6; plural=n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 "
 "&& n%100<=10 ? 3 : n%100>=11 ? 4 : 5;\n"
-"X-Generator: Weblate 5.14.3\n"
+"X-Generator: Weblate 2026.8.1\n"
 
 #. module: website
 #: model_terms:ir.ui.view,arch_db:website.s_quotes_carousel_compact
@@ -259,98 +259,6 @@ msgid "$ 32M"
 msgstr "$ 32M"
 
 #. module: website
-#: model_terms:ir.ui.view,arch_db:website.s_product_catalog
-msgid "$1.50"
-msgstr "$1.50"
-
-#. module: website
-#: model_terms:ir.ui.view,arch_db:website.s_pricelist_boxed
-msgid "$12.00"
-msgstr "$12.00"
-
-#. module: website
-#: model_terms:ir.ui.view,arch_db:website.s_pricelist_boxed
-msgid "$13.00"
-msgstr "$13.00"
-
-#. module: website
-#: model_terms:ir.ui.view,arch_db:website.s_pricelist_boxed
-msgid "$13.50"
-msgstr "$13.50"
-
-#. module: website
-#: model_terms:ir.ui.view,arch_db:website.s_pricelist_boxed
-msgid "$14.50"
-msgstr "$14.50"
-
-#. module: website
-#: model_terms:ir.ui.view,arch_db:website.s_pricelist_boxed
-msgid "$15.00"
-msgstr "$15.00"
-
-#. module: website
-#: model_terms:ir.ui.view,arch_db:website.s_pricelist_boxed
-msgid "$16.00"
-msgstr "$16.00"
-
-#. module: website
-#: model_terms:ir.ui.view,arch_db:website.s_product_catalog
-msgid "$25.00"
-msgstr "$25.00"
-
-#. module: website
-#: model_terms:ir.ui.view,arch_db:website.s_product_catalog
-msgid "$26.00"
-msgstr "$26.00"
-
-#. module: website
-#: model_terms:ir.ui.view,arch_db:website.s_product_catalog
-msgid "$28.00"
-msgstr "$28.00"
-
-#. module: website
-#: model_terms:ir.ui.view,arch_db:website.s_pricelist_cafe
-#: model_terms:ir.ui.view,arch_db:website.s_product_catalog
-msgid "$3.00"
-msgstr "$3.00"
-
-#. module: website
-#: model_terms:ir.ui.view,arch_db:website.s_pricelist_cafe
-msgid "$3.50"
-msgstr "$3.50"
-
-#. module: website
-#: model_terms:ir.ui.view,arch_db:website.s_pricelist_cafe
-msgid "$4.00"
-msgstr "$4.00"
-
-#. module: website
-#: model_terms:ir.ui.view,arch_db:website.s_pricelist_cafe
-msgid "$4.10"
-msgstr "$4.10"
-
-#. module: website
-#: model_terms:ir.ui.view,arch_db:website.s_pricelist_cafe
-msgid "$4.25"
-msgstr "$4.25"
-
-#. module: website
-#: model_terms:ir.ui.view,arch_db:website.s_pricelist_cafe
-msgid "$4.50"
-msgstr "$4.50"
-
-#. module: website
-#: model_terms:ir.ui.view,arch_db:website.s_product_catalog
-msgid "$5.00"
-msgstr "$5.00"
-
-#. module: website
-#. odoo-python
-#: code:addons/website/models/ir_ui_view.py:0
-msgid "%(error)s (website: %(website_id)s)"
-msgstr "%(error)s (الموقع الإلكتروني: %(website_id)s)"
-
-#. module: website
 #. odoo-javascript
 #: code:addons/website/static/src/client_actions/website_preview/website_builder_action.js:0
 msgid "%s is not a valid URL."
@@ -396,6 +304,12 @@ msgstr "'. يتم عرض النتائج لـ '"
 
 #. module: website
 #. odoo-javascript
+#: code:addons/website/static/src/snippets/s_searchbar/search_bar.js:0
+msgid "(%(count)s found)"
+msgstr ""
+
+#. module: website
+#. odoo-javascript
 #: code:addons/website/static/src/builder/plugins/form/form_option.xml:0
 msgid "+ Field"
 msgstr "+ حقل"
@@ -404,21 +318,6 @@ msgstr "+ حقل"
 #: model_terms:ir.ui.view,arch_db:website.res_config_settings_view_form
 msgid "+ New Website"
 msgstr "+ موقع إلكتروني جديد"
-
-#. module: website
-#: model_terms:ir.ui.view,arch_db:website.template_footer_descriptive
-msgid "+1 555-555-5556"
-msgstr "+1 555-555-5556"
-
-#. module: website
-#: model_terms:ir.ui.view,arch_db:website.s_masonry_block_mosaic_template
-msgid "+12"
-msgstr "+12"
-
-#. module: website
-#: model_terms:ir.ui.view,arch_db:website.s_numbers_charts
-msgid "+25.000"
-msgstr "+25.000"
 
 #. module: website
 #: model_terms:ir.ui.view,arch_db:website.show_website_info
@@ -497,48 +396,10 @@ msgid "/contactus"
 msgstr "/contactus"
 
 #. module: website
-#: model_terms:ir.ui.view,arch_db:website.s_key_images
-msgid "01"
-msgstr "01"
-
-#. module: website
-#: model_terms:ir.ui.view,arch_db:website.s_key_images
-msgid "02"
-msgstr "02"
-
-#. module: website
-#: model_terms:ir.ui.view,arch_db:website.s_key_images
-msgid "03"
-msgstr "03"
-
-#. module: website
-#: model_terms:ir.ui.view,arch_db:website.s_key_images
-msgid "04"
-msgstr "04"
-
-#. module: website
 #. odoo-javascript
 #: code:addons/website/static/src/builder/plugins/options/map_option.xml:0
 msgid "1 km"
 msgstr "1 كم"
-
-#. module: website
-#. odoo-javascript
-#: code:addons/website/static/src/builder/plugins/options/media_list_item_option.xml:0
-msgid "1/2 - 1/2"
-msgstr "1/2 - 1/2"
-
-#. module: website
-#. odoo-javascript
-#: code:addons/website/static/src/builder/plugins/options/media_list_item_option.xml:0
-msgid "1/3 - 2/3"
-msgstr "1/3 - 2/3"
-
-#. module: website
-#. odoo-javascript
-#: code:addons/website/static/src/builder/plugins/options/media_list_item_option.xml:0
-msgid "1/4 - 3/4"
-msgstr "1/4 - 3/4"
 
 #. module: website
 #. odoo-javascript
@@ -575,11 +436,6 @@ msgstr "12k"
 #: code:addons/website/static/src/builder/plugins/options/map_option.xml:0
 msgid "15 km"
 msgstr "15 كم"
-
-#. module: website
-#: model_terms:ir.ui.view,arch_db:website.s_countdown
-msgid "16"
-msgstr "16"
 
 #. module: website
 #. odoo-javascript
@@ -629,11 +485,6 @@ msgid "2000 km"
 msgstr "2000 كم"
 
 #. module: website
-#: model_terms:ir.ui.view,arch_db:website.s_masonry_block_mosaic_template
-msgid "22%"
-msgstr "22%"
-
-#. module: website
 #: model_terms:ir.ui.view,arch_db:website.s_features_wave
 msgid "24/7 Customer Support"
 msgstr "خدمة عملاء على مدار الساعة"
@@ -642,11 +493,6 @@ msgstr "خدمة عملاء على مدار الساعة"
 #: model_terms:ir.ui.view,arch_db:website.s_key_benefits
 msgid "24/7 Support"
 msgstr "دعم على مدار الساعة"
-
-#. module: website
-#: model_terms:ir.ui.view,arch_db:website.color_combinations_debug_view
-msgid "25%"
-msgstr "25%"
 
 #. module: website
 #: model_terms:ir.ui.view,arch_db:website.template_footer_centered
@@ -665,11 +511,6 @@ msgstr "2x"
 #: model_terms:ir.ui.view,arch_db:website.s_rating
 msgid "3 out of 5 stars"
 msgstr "3 نجوم من أصل 5"
-
-#. module: website
-#: model_terms:ir.ui.view,arch_db:website.s_countdown
-msgid "30"
-msgstr "30"
 
 #. module: website
 #. odoo-javascript
@@ -749,17 +590,6 @@ msgid "404 Not Found"
 msgstr "404 لم يتم العثور عليه"
 
 #. module: website
-#: model_terms:ir.ui.view,arch_db:website.s_countdown
-msgid "45"
-msgstr "45"
-
-#. module: website
-#: model_terms:ir.ui.view,arch_db:website.s_numbers_framed
-#: model_terms:ir.ui.view,arch_db:website.s_numbers_showcase
-msgid "45%"
-msgstr "45%"
-
-#. module: website
 #. odoo-javascript
 #: code:addons/website/static/src/builder/plugins/font_awesome_option.xml:0
 msgid "4x"
@@ -817,11 +647,6 @@ msgstr "5x"
 
 #. module: website
 #: model_terms:ir.ui.view,arch_db:website.s_numbers_charts
-msgid "75%"
-msgstr "75%"
-
-#. module: website
-#: model_terms:ir.ui.view,arch_db:website.s_numbers_charts
 msgid ""
 "75% of clients have been using the service for over a decade consistently."
 msgstr "75% من العملاء يستخدمون الخدمة منذ أكثر من عقد من الزمان باستمرار."
@@ -853,21 +678,6 @@ msgstr "بمجرد التحميل، اتبع"
 #: code:addons/website/static/src/builder/plugins/theme/theme_advanced_option.xml:0
 msgid "<Head> and <body>"
 msgstr "<Head> و <body>"
-
-#. module: website
-#: model_terms:ir.ui.view,arch_db:website.s_bento_grid
-msgid ""
-"<a class=\"o_translate_inline btn btn-secondary\" t-att-"
-"href=\"cta_btn_href\">\n"
-"                            Shop Now\n"
-"                        </a>\n"
-"                        <br/>"
-msgstr ""
-"<a class=\"o_translate_inline btn btn-secondary\" t-att-"
-"href=\"cta_btn_href\">\n"
-"                            تسوق الآن\n"
-"                        </a>\n"
-"                        <br/>"
 
 #. module: website
 #: model_terms:ir.ui.view,arch_db:website.bs_debug_view
@@ -1029,84 +839,6 @@ msgid ""
 msgstr ""
 "<a href=\"/contactus\" class=\"btn btn-primary o_translate_inline\">تواصل "
 "معنا</a>"
-
-#. module: website
-#: model_terms:ir.ui.view,arch_db:website.s_split_intro
-msgid ""
-"<a t-att-href=\"cta_btn_href\" class=\"btn btn-lg btn-primary "
-"o_translate_inline\">Discover more</a>"
-msgstr ""
-"<a t-att-href=\"cta_btn_href\" class=\"btn btn-lg btn-primary "
-"o_translate_inline\">اكتشف المزيد</a>"
-
-#. module: website
-#: model_terms:ir.ui.view,arch_db:website.s_framed_intro
-msgid ""
-"<a t-att-href=\"cta_btn_href\" class=\"btn btn-lg btn-primary "
-"o_translate_inline\">Discover</a>"
-msgstr ""
-"<a t-att-href=\"cta_btn_href\" class=\"btn btn-lg btn-primary "
-"o_translate_inline\">استكشف</a>"
-
-#. module: website
-#: model_terms:ir.ui.view,arch_db:website.s_intro_pill
-msgid ""
-"<a t-att-href=\"cta_btn_href\" class=\"btn btn-lg btn-primary "
-"o_translate_inline\">Get Started</a>"
-msgstr ""
-"<a t-att-href=\"cta_btn_href\" class=\"btn btn-lg btn-primary "
-"o_translate_inline\">ابدأ الآن</a>"
-
-#. module: website
-#: model_terms:ir.ui.view,arch_db:website.s_banner
-msgid ""
-"<a t-att-href=\"cta_btn_href\" class=\"btn btn-lg btn-primary "
-"o_translate_inline\">Start Now <span class=\"fa fa-angle-right ms-2\"/></a>"
-msgstr ""
-"<a t-att-href=\"cta_btn_href\" class=\"btn btn-lg btn-primary "
-"o_translate_inline\">ابدأ الآن <span class=\"fa fa-angle-right ms-2\"/></a>"
-
-#. module: website
-#: model_terms:ir.ui.view,arch_db:website.s_adventure
-msgid ""
-"<a t-att-href=\"cta_btn_href\" class=\"btn btn-lg btn-primary "
-"o_translate_inline\">Start Now</a>"
-msgstr ""
-"<a t-att-href=\"cta_btn_href\" class=\"btn btn-lg btn-primary "
-"o_translate_inline\">ابدأ الآن</a>"
-
-#. module: website
-#: model_terms:ir.ui.view,arch_db:website.s_image_hexagonal
-msgid ""
-"<a t-att-href=\"cta_btn_href\" class=\"btn btn-primary btn-lg "
-"o_translate_inline\">Contact Us</a>"
-msgstr ""
-"<a t-att-href=\"cta_btn_href\" class=\"btn btn-primary btn-lg "
-"o_translate_inline\">تواصل معنا</a>"
-
-#. module: website
-#: model_terms:ir.ui.view,arch_db:website.s_closer_look
-msgid ""
-"<a t-att-href=\"cta_btn_href\" class=\"btn btn-primary mb-2 "
-"o_translate_inline\">Start Now</a>\n"
-"                <a t-att-href=\"cta_btn_href\" class=\"btn btn-outline-"
-"primary mb-2 o_translate_inline\"><t t-out=\"cta_btn_text\">Contact us</t></"
-"a>"
-msgstr ""
-"<a t-att-href=\"cta_btn_href\" class=\"btn btn-primary mb-2 "
-"o_translate_inline\">ابدأ الآن</a>\n"
-"                <a t-att-href=\"cta_btn_href\" class=\"btn btn-outline-"
-"primary mb-2 o_translate_inline\"><t t-out=\"cta_btn_text\">تواصل معنا</t></"
-"a>"
-
-#. module: website
-#: model_terms:ir.ui.view,arch_db:website.s_banner_connected
-msgid ""
-"<a t-att-href=\"cta_btn_href\" class=\"o_translate_inline btn btn-lg btn-"
-"secondary\">Discover</a>"
-msgstr ""
-"<a t-att-href=\"cta_btn_href\" class=\"o_translate_inline btn btn-lg btn-"
-"secondary\">استكشف</a>"
 
 #. module: website
 #. odoo-javascript
@@ -1876,6 +1608,11 @@ msgid ""
 "                            or easy exchanges and no stress.\n"
 "                        </small>"
 msgstr ""
+"<small class=\"text-muted\" style=\"text-align: center;\">\n"
+"                            إرجاع مجاني لمدة 30 يوم مع الاسترداد السريع "
+"للأموال<br/>\n"
+"                            أو استبدال سهل وبدون ضغوط.\n"
+"                       </small>"
 
 #. module: website
 #: model_terms:ir.ui.view,arch_db:website.s_attributes_vertical
@@ -1886,6 +1623,10 @@ msgid ""
 "                            checkout and trusted payment methods.\n"
 "                        </small>"
 msgstr ""
+"<small class=\"text-muted\" style=\"text-align: center;\">\n"
+"                            معلوماتك محمية بواسطة<br/>\n"
+"                            طرق دفع مشفرة وموثوقة.\n"
+"                        </small>"
 
 #. module: website
 #: model_terms:ir.ui.view,arch_db:website.res_config_settings_view_form
@@ -2332,6 +2073,10 @@ msgid ""
 "                        <strong>Improved Security Protocols Implemented</"
 "strong>"
 msgstr ""
+"<span class=\"o_dot o_not_editable position-absolute translate-middle-x "
+"rounded-circle pe-none\" contenteditable=\"false\"/>\n"
+"                        <small class=\"text-muted\">27 أغسطس 2024</small>\n"
+"                        <strong>تم تنفيذ بروتوكولات الأمان المُحَسَّنة</strong>"
 
 #. module: website
 #: model_terms:ir.ui.view,arch_db:website.s_timeline_list
@@ -2341,6 +2086,10 @@ msgid ""
 "                        <small class=\"text-muted\">Dec 22, 2024</small>\n"
 "                        <strong>Advanced Analytics Tools Introduced</strong>"
 msgstr ""
+"<span class=\"o_dot o_not_editable position-absolute translate-middle-x "
+"rounded-circle pe-none\" contenteditable=\"false\"/>\n"
+"                        <small class=\"text-muted\">22 ديسمبر 2024</small>\n"
+"                        <strong>تم طرح أدوات تحليل متقدمة</strong>"
 
 #. module: website
 #: model_terms:ir.ui.view,arch_db:website.s_timeline_list
@@ -2365,6 +2114,11 @@ msgid ""
 "                        <strong>Integrated Multi-Language Support Added</"
 "strong>"
 msgstr ""
+"<span class=\"o_dot o_not_editable position-absolute translate-middle-x "
+"rounded-circle pe-none\" contenteditable=\"false\"/>\n"
+"                        <small class=\"text-muted\">15 يونيو 2024</small>\n"
+"                        <strong>تمت إضافة دعم متعدد اللغات مدمج في النظام</"
+"strong>"
 
 #. module: website
 #: model_terms:ir.ui.view,arch_db:website.s_timeline_list
@@ -2374,6 +2128,11 @@ msgid ""
 "                        <small class=\"text-muted\">Oct 09, 2024</small>\n"
 "                        <strong>Mobile App Compatibility Expanded</strong>"
 msgstr ""
+"<span class=\"o_dot o_not_editable position-absolute translate-middle-x "
+"rounded-circle pe-none\" contenteditable=\"false\"/>\n"
+"                        <small class=\"text-muted\">9 أكتوبر 2024</small>\n"
+"                        <strong>تم توسيع نطاق توافق التطبيقات المحمولة</"
+"strong>"
 
 #. module: website
 #: model_terms:ir.ui.view,arch_db:website.footer_copyright_company_name
@@ -2381,11 +2140,13 @@ msgid ""
 "<span class=\"o_footer_copyright_name me-2 small\">Copyright &amp;copy; "
 "Company name</span>"
 msgstr ""
+"<span class=\"o_footer_copyright_name me-2 small\">حقوق النشر &amp;copy; اسم "
+"الشركة</span>"
 
 #. module: website
 #: model_terms:ir.ui.view,arch_db:website.template_footer_links
 msgid "<span class=\"o_force_ltr\">+1 555-555-5556\"</span>"
-msgstr ""
+msgstr "<span class=\"o_force_ltr\">+1 555-555-5556\"</span>"
 
 #. module: website
 #: model_terms:ir.ui.view,arch_db:website.footer_custom
@@ -2809,7 +2570,7 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:website.s_rating
 #: model_terms:ir.ui.view,arch_db:website.s_reviews_wall
 msgid "<strong class=\"s_rating_title\">Rating</strong>"
-msgstr ""
+msgstr "<strong class=\"s_rating_title\">التقييم</strong>"
 
 #. module: website
 #: model_terms:ir.ui.view,arch_db:website.s_numbers_boxed
@@ -2980,13 +2741,19 @@ msgstr "<u>الثلاثاء</u><br/>8.00 صباحاً - 6.00 مساءً"
 
 #. module: website
 #: model_terms:ir.ui.view,arch_db:website.s_opening_hours
-msgid "<u>Wednesday</u><br/>8.00am-12.00am"
-msgstr "<u>الأربعاء</u><br/>8.00 صباحاً - 6.00 مساءً"
+msgid "<u>Wednesday</u><br/>8.00am-12.00pm"
+msgstr "<u>الأربعاء</u><br/>من الساعة 8:00 صباحًا حتى 12:00 ظهرًا"
 
 #. module: website
 #: model_terms:ir.ui.view,arch_db:website.s_opening_hours
 msgid "<u>info@yourcompany.example.com</u>"
 msgstr "<u>info@yourcompany.example.com</u>"
+
+#. module: website
+#. odoo-javascript
+#: code:addons/website/static/src/components/website_loader/website_loader.xml:0
+msgid "A"
+msgstr "A"
 
 #. module: website
 #: model_terms:ir.ui.view,arch_db:website.res_config_settings_view_form
@@ -3160,7 +2927,7 @@ msgstr "خريطة وقائمة ببيانات محلاتك"
 #. odoo-python
 #: code:addons/website/models/website_menu.py:0
 msgid "A mega menu cannot have a parent or child menu."
-msgstr ""
+msgstr "لا يمكن أن يكون للقائمة الضخمة قائمة رئيسية أو قائمة فرعية."
 
 #. module: website
 #: model_terms:ir.ui.view,arch_db:website.s_product_catalog
@@ -3175,6 +2942,12 @@ msgstr ""
 msgid "A new visit is considered if last connection was more than 8 hours ago."
 msgstr ""
 "يتم اعتبار الزيارة الجديدة إذا كان آخر اتصال بالإنترنت قبل أكثر من 8 ساعات."
+
+#. module: website
+#. odoo-python
+#: code:addons/website/models/website_controller_page.py:0
+msgid "A page must be set to display a concrete model."
+msgstr "يجب أن يتم إعداد صفحة ليتم فيها عرض نموذج ملموس."
 
 #. module: website
 #: model_terms:ir.ui.view,arch_db:website.bs_debug_view
@@ -3272,7 +3045,7 @@ msgstr "من نحن"
 #. odoo-javascript
 #: code:addons/website/static/src/builder/plugins/options/header/header_font_option.xml:0
 msgid "Accent Color"
-msgstr ""
+msgstr "اللون المميز "
 
 #. module: website
 #. odoo-python
@@ -3313,8 +3086,10 @@ msgstr "صورة الأكورديون"
 
 #. module: website
 #: model_terms:ir.ui.view,arch_db:website.res_config_settings_view_form
-msgid "Accounts are usable across all your multiple websites"
-msgstr "يمكن استخدام الحسابات عبر كافة مواقعك الإلكترونية المتعددة"
+msgid "Accounts created on this website are usable across all other websites"
+msgstr ""
+"الحسابات التي يتم إنشاؤها على هذا الموقع الإلكتروني قابلة للاستخدام عبر جميع "
+"المواقع الإلكترونية الأخرى"
 
 #. module: website
 #: model_terms:ir.ui.view,arch_db:website.new_page_template_landing_2_s_three_columns
@@ -3368,7 +3143,7 @@ msgstr "نشط"
 #. odoo-javascript
 #: code:addons/website/static/src/builder/plugins/options/navtabs_images_style_option.xml:0
 msgid "Active only"
-msgstr ""
+msgstr "العناصر النشطة فقط"
 
 #. module: website
 #: model_terms:ir.ui.view,arch_db:website.s_three_columns
@@ -3414,7 +3189,7 @@ msgstr ""
 #. odoo-javascript
 #: code:addons/website/static/src/builder/plugins/floating_blocks/floating_blocks_option.xml:0
 msgid "Add Card"
-msgstr ""
+msgstr "إضافة بطاقة"
 
 #. module: website
 #. odoo-javascript
@@ -3493,7 +3268,7 @@ msgstr "إضافة جديد"
 #. odoo-javascript
 #: code:addons/website/static/src/builder/plugins/form/form_option_plugin.js:0
 msgid "Add New Option"
-msgstr ""
+msgstr "إضافة خيار جديد"
 
 #. module: website
 #. odoo-javascript
@@ -3548,7 +3323,7 @@ msgstr "إضافة لغة"
 #. odoo-javascript
 #: code:addons/website/static/src/builder/plugins/options/header/header_icon_background_option.xml:0
 msgid "Add a background around navigation icons"
-msgstr ""
+msgstr "إضافة خلفية حول أيقونات التنقل"
 
 #. module: website
 #. odoo-javascript
@@ -3560,13 +3335,13 @@ msgstr "قم بإضافة وصف هنا"
 #. odoo-javascript
 #: code:addons/website/static/src/client_actions/website_preview/website_switcher_systray_item.js:0
 msgid "Add a domain to your website."
-msgstr ""
+msgstr "أضف نطاقًا إلى موقعك الإلكتروني."
 
 #. module: website
 #. odoo-javascript
 #: code:addons/website/static/src/client_actions/website_preview/new_content_systray_item.js:0
 msgid "Add a livechat widget"
-msgstr ""
+msgstr "إضافة أداة دردشة مباشرة"
 
 #. module: website
 #. odoo-javascript
@@ -3585,6 +3360,12 @@ msgstr "إضافة حقل جديد بعد هذا الحقل"
 #: code:addons/website/static/src/builder/plugins/form/form_option_plugin.js:0
 msgid "Add a new field at the end"
 msgstr "إضافة حقل جديد في النهاية"
+
+#. module: website
+#. odoo-javascript
+#: code:addons/website/static/src/builder/plugins/options/media_list_item_option.xml:0
+msgid "Add an image"
+msgstr "إضافة صورة"
 
 #. module: website
 #: model_terms:ir.ui.view,arch_db:website.res_config_settings_view_form
@@ -3629,7 +3410,7 @@ msgstr "إضافة قالب صفحة"
 #. odoo-javascript
 #: code:addons/website/static/src/builder/plugins/form/form_option.xml:0
 msgid "Add predefined error message"
-msgstr ""
+msgstr "إضافة رسالة خطأ محددة مسبقًا"
 
 #. module: website
 #: model:ir.model.fields,help:website.field_website_page__is_new_page_template
@@ -3662,7 +3443,7 @@ msgstr "إضافة إلى القائمة"
 #. odoo-javascript
 #: code:addons/website/static/src/components/dialog/seo.xml:0
 msgid "Add your keyword"
-msgstr ""
+msgstr "أضف كلمتك الرئيسية"
 
 #. module: website
 #. odoo-javascript
@@ -3788,7 +3569,7 @@ msgstr "يقود ألكساندر حملاتنا التسويقية وحضور �
 #. odoo-javascript
 #: code:addons/website/static/src/builder/plugins/options/ecomm_categories_showcase_option.xml:0
 msgid "Align Between"
-msgstr ""
+msgstr "محاذاة بين"
 
 #. module: website
 #. odoo-javascript
@@ -3906,7 +3687,7 @@ msgstr "كافة المعلومات التي تحتاج إليها"
 #. odoo-javascript
 #: code:addons/website/static/src/builder/plugins/options/navtabs_images_style_option.xml:0
 msgid "All items"
-msgstr ""
+msgstr "جميع العناصر"
 
 #. module: website
 #. odoo-javascript
@@ -4022,7 +3803,7 @@ msgstr "لقد حدث خطأ، لم يتم إرسال الاستمارة."
 #. odoo-javascript
 #: code:addons/website/static/src/builder/plugins/form/form_option_plugin.js:0
 msgid "An error has occurred, the form has not been sent."
-msgstr ""
+msgstr "حدث خطأ، لم يتم إرسال الاستمارة."
 
 #. module: website
 #: model_terms:ir.ui.view,arch_db:website.qweb_500
@@ -4089,7 +3870,7 @@ msgstr "التحريك"
 #. module: website
 #: model_terms:ir.ui.view,arch_db:website.snippets
 msgid "Announcement Scroll"
-msgstr ""
+msgstr "التمرير لقراءة الإعلان"
 
 #. module: website
 #: model_terms:ir.ui.view,arch_db:website.s_color_blocks_2
@@ -4127,19 +3908,19 @@ msgstr "تطبيق"
 #. odoo-javascript
 #: code:addons/website/static/src/builder/plugins/options/scroll_button_option.xml:0
 msgid "Apply a background color"
-msgstr ""
+msgstr "تطبيق لون على الخلفية"
 
 #. module: website
 #. odoo-javascript
 #: code:addons/website/static/src/builder/plugins/options/header/header_font_option.xml:0
 msgid "Apply a light contrast on dropdown buttons"
-msgstr ""
+msgstr "تطبيق تباين خفيف على أزرار القائمة المنسدلة"
 
 #. module: website
 #. odoo-javascript
 #: code:addons/website/static/src/builder/plugins/options/scroll_button_option.xml:0
 msgid "Apply an icon color"
-msgstr ""
+msgstr "تطبيق لون للأيقونة"
 
 #. module: website
 #. odoo-javascript
@@ -4152,7 +3933,7 @@ msgstr "تطبيق التظليل"
 #: code:addons/website/static/src/builder/plugins/options/announcement_scroll_option.xml:0
 msgid ""
 "Apply the font-family of your paragraph or headings from your Theme settings"
-msgstr ""
+msgstr "قم بتطبيق مجموعة الخطوط الخاصة بالفقرة أو العناوين من إعدادات السمة"
 
 #. module: website
 #. odoo-javascript
@@ -4212,6 +3993,8 @@ msgid ""
 "Are you sure you want to discard all your changes? Once you do, they're gone "
 "for good."
 msgstr ""
+"هل أنت واثق من أنك ترغب في إهمال كافة التغييرات؟ بمجرد القيام بذلك، ستفقدها "
+"إلى الأبد."
 
 #. module: website
 #. odoo-javascript
@@ -4335,6 +4118,12 @@ msgstr "متوفر في الموقع الإلكتروني"
 
 #. module: website
 #. odoo-javascript
+#: code:addons/website/static/src/components/website_loader/website_loader.xml:0
+msgid "B"
+msgstr "B"
+
+#. module: website
+#. odoo-javascript
 #: code:addons/website/static/src/builder/plugins/options/google_maps_option/google_maps_api_key_dialog.xml:0
 msgid "BSgzTvR5L1GB9jriT451iTN4huVPxHmltG6T6eo"
 msgstr "BSgzTvR5L1GB9jriT451iTN4huVPxHmltG6T6eo"
@@ -4415,7 +4204,7 @@ msgstr "العارضة"
 #. module: website
 #: model_terms:ir.ui.view,arch_db:website.snippets
 msgid "Banner Categories"
-msgstr ""
+msgstr "فئات العارضة "
 
 #. module: website
 #: model_terms:ir.ui.view,arch_db:website.snippets
@@ -4496,12 +4285,12 @@ msgstr ""
 #. module: website
 #: model_terms:ir.ui.view,arch_db:website.snippets
 msgid "Bento Banner"
-msgstr ""
+msgstr "Bento Banner"
 
 #. module: website
 #: model_terms:ir.ui.view,arch_db:website.snippets
 msgid "Bento Block"
-msgstr ""
+msgstr "Bento Block"
 
 #. module: website
 #: model_terms:ir.ui.view,arch_db:website.snippets
@@ -4588,7 +4377,7 @@ msgstr "Blockquote"
 #. odoo-javascript
 #: code:addons/website/static/src/builder/plugins/options/ecomm_categories_showcase_option.xml:0
 msgid "Blocks Design"
-msgstr ""
+msgstr "تصميم الكتل الإنشائية "
 
 #. module: website
 #: model_terms:ir.ui.view,arch_db:website.s_mega_menu_big_icons_subtitles
@@ -4747,7 +4536,7 @@ msgstr "تعقب التصفح"
 #. odoo-javascript
 #: code:addons/website/static/src/components/dialog/seo.xml:0
 msgid "Broken Links"
-msgstr ""
+msgstr "الروابط المعطلة"
 
 #. module: website
 #. odoo-javascript
@@ -4853,6 +4642,13 @@ msgstr "عن طريق صنع هويات فريدة وجذابة للعلامة �
 #: model_terms:ir.ui.view,arch_db:website.view_edit_third_party_domains
 msgid "By default, the domains of the following services are already blocked:"
 msgstr "تكون نطاقات الخدمات التالية محظورة بشكل افتراضي:"
+
+#. module: website
+#. odoo-javascript
+#: code:addons/website/static/src/components/dialog/seo.xml:0
+#: code:addons/website/static/src/components/website_loader/website_loader.xml:0
+msgid "C"
+msgstr "C"
 
 #. module: website
 #: model:ir.model.fields,field_description:website.field_res_config_settings__cdn_url
@@ -5142,7 +4938,7 @@ msgstr "الفئات"
 #. module: website
 #: model_terms:ir.ui.view,arch_db:website.snippets
 msgid "Categories Showcase"
-msgstr ""
+msgstr "عرض الفئات "
 
 #. module: website
 #: model_terms:ir.ui.view,arch_db:website.theme_view_search
@@ -5187,7 +4983,7 @@ msgstr "تغيير الأيقونات"
 #. odoo-javascript
 #: code:addons/website/static/src/builder/plugins/dynamic_svg_option.js:0
 msgid "Change accent color"
-msgstr ""
+msgstr "تغيير اللون المميز"
 
 #. module: website
 #. odoo-javascript
@@ -5199,25 +4995,25 @@ msgstr "تغيير اللون"
 #. odoo-javascript
 #: code:addons/website/static/src/builder/plugins/dynamic_svg_option.js:0
 msgid "Change primary color"
-msgstr ""
+msgstr "تغيير اللون الأساسي"
 
 #. module: website
 #. odoo-javascript
 #: code:addons/website/static/src/builder/plugins/dynamic_svg_option.js:0
 msgid "Change secondary color"
-msgstr ""
+msgstr "تغيير اللون الثانوي"
 
 #. module: website
 #. odoo-javascript
 #: code:addons/website/static/src/builder/plugins/options/website_page_config_option.xml:0
 msgid "Change the Header Position on this page"
-msgstr ""
+msgstr "تغيير موضع الترويسة في هذه الصفحة"
 
 #. module: website
 #. odoo-javascript
 #: code:addons/website/static/src/builder/plugins/options/header/header_navigation_option.xml:0
 msgid "Change the burger button position/menu items alignment"
-msgstr ""
+msgstr "تغيير موضع زر القائمة/محاذاة عناصر القائمة"
 
 #. module: website
 #. odoo-javascript
@@ -5302,7 +5098,7 @@ msgstr "صندوق الاختيار"
 #. odoo-javascript
 #: code:addons/website/static/src/builder/plugins/form/form_option_plugin.js:0
 msgid "Checkbox List"
-msgstr ""
+msgstr "قائمة صناديق الاختيار "
 
 #. module: website
 #. odoo-javascript
@@ -5499,6 +5295,8 @@ msgstr "اضغط على"
 #: code:addons/website/static/src/client_actions/website_preview/edit_website_systray_item.js:0
 msgid "Click on \"Edit/Translate\" to apply changes made on default language."
 msgstr ""
+"انقر على \"تحرير/ترجمة\" لتطبيق التغييرات التي تم إجراؤها على اللغة "
+"الافتراضية."
 
 #. module: website
 #: model_terms:ir.ui.view,arch_db:website.s_embed_code
@@ -5608,7 +5406,7 @@ msgstr "أنواع القهوة"
 #. module: website
 #: model_terms:ir.ui.view,arch_db:website.snippets
 msgid "Collection Banner"
-msgstr ""
+msgstr "شعار المجموعة"
 
 #. module: website
 #. odoo-javascript
@@ -5855,6 +5653,7 @@ msgstr "معلومات التواصل"
 #: model_terms:ir.ui.view,arch_db:website.s_contact_info
 #: model_terms:ir.ui.view,arch_db:website.s_cta_box
 #: model_terms:ir.ui.view,arch_db:website.s_floating_blocks
+#: model_terms:ir.ui.view,arch_db:website.s_image_hexagonal
 #: model_terms:ir.ui.view,arch_db:website.s_text_block_h2_contact
 #: model_terms:ir.ui.view,arch_db:website.s_website_form_info
 #: model_terms:ir.ui.view,arch_db:website.template_footer_mega_cards
@@ -5872,6 +5671,7 @@ msgstr "تواصل مع الزائر"
 #: model_terms:ir.ui.view,arch_db:website.contactus
 #: model_terms:ir.ui.view,arch_db:website.footer_custom
 #: model_terms:ir.ui.view,arch_db:website.s_call_to_action
+#: model_terms:ir.ui.view,arch_db:website.s_closer_look
 #: model_terms:ir.ui.view,arch_db:website.s_cover
 #: model_terms:ir.ui.view,arch_db:website.s_cta_card
 #: model_terms:ir.ui.view,arch_db:website.s_cta_mockups
@@ -6073,7 +5873,7 @@ msgstr "الخصائص الأساسية"
 #. odoo-javascript
 #: code:addons/website/static/src/builder/website_builder.js:0
 msgid "Corrupted content"
-msgstr ""
+msgstr "المحتوى التالف"
 
 #. module: website
 #. odoo-javascript
@@ -6213,7 +6013,7 @@ msgstr "قم بإنشاء مشروع Google واحصل على مفتاح"
 #. odoo-javascript
 #: code:addons/website/static/src/client_actions/website_preview/new_content_systray_item.xml:0
 msgid "Create a new page"
-msgstr ""
+msgstr "إنشاء صفحة جديدة"
 
 #. module: website
 #: model_terms:ir.ui.view,arch_db:website.s_table_of_content
@@ -6420,6 +6220,13 @@ msgstr "تخصيص العرض"
 #. module: website
 #. odoo-javascript
 #: code:addons/website/static/src/builder/plugins/options/countdown_option.xml:0
+#: code:addons/website/static/src/components/dialog/seo.xml:0
+msgid "D"
+msgstr "D"
+
+#. module: website
+#. odoo-javascript
+#: code:addons/website/static/src/builder/plugins/options/countdown_option.xml:0
 msgid "D - H - M"
 msgstr "D - H - M"
 
@@ -6568,7 +6375,7 @@ msgstr "الصورة الافتراضية للمشاركة على مواقع ا�
 #. odoo-javascript
 #: code:addons/website/static/src/builder/plugins/options/header/header_font_option.xml:0
 msgid "Default Text Size and Color"
-msgstr ""
+msgstr "حجم النص الافتراضي ولونه"
 
 #. module: website
 #. odoo-javascript
@@ -6756,12 +6563,12 @@ msgstr ""
 #. module: website
 #: model_terms:ir.ui.view,arch_db:website.template_footer_headline
 msgid "Designed <br/>for Companies"
-msgstr ""
+msgstr "مصمم<br/> لخدمة الشركات"
 
 #. module: website
 #: model_terms:ir.ui.view,arch_db:website.template_footer_descriptive
 msgid "Designed for companies"
-msgstr ""
+msgstr "مصمم لخدمة الشركات"
 
 #. module: website
 #: model:website.configurator.feature,description:website.feature_page_pricing
@@ -6789,7 +6596,7 @@ msgstr "سطح المكتب"
 #. odoo-javascript
 #: code:addons/website/static/src/builder/plugins/options/header/header_navigation_option.xml:0
 msgid "Desktop Menu"
-msgstr ""
+msgstr "قائمة سطح المكتب"
 
 #. module: website
 #: model_terms:ir.ui.view,arch_db:website.s_mega_menu_odoo_menu
@@ -6840,7 +6647,7 @@ msgstr "التوجيه"
 #. odoo-javascript
 #: code:addons/website/static/src/builder/plugins/options/website_page_config_option.xml:0
 msgid "Disable to hide the footer on this page"
-msgstr ""
+msgstr "قم بتعطيله لإخفاء التذييل في هذه الصفحة"
 
 #. module: website
 #: model:ir.actions.server,name:website.website_disable_unused_snippets_assets_ir_actions_server
@@ -6878,7 +6685,7 @@ msgstr "إهمال"
 #. odoo-javascript
 #: code:addons/website/static/src/builder/website_builder.js:0
 msgid "Discard all changes?"
-msgstr ""
+msgstr "إهمال كافة التغييرات؟ "
 
 #. module: website
 #. odoo-javascript
@@ -6900,7 +6707,9 @@ msgid "Discord Account"
 msgstr "حساب Discord"
 
 #. module: website
+#: model_terms:ir.ui.view,arch_db:website.s_banner_connected
 #: model_terms:ir.ui.view,arch_db:website.s_card
+#: model_terms:ir.ui.view,arch_db:website.s_framed_intro
 #: model_terms:ir.ui.view,arch_db:website.s_quadrant
 #: model_terms:ir.ui.view,arch_db:website.s_striped_top
 msgid "Discover"
@@ -6923,6 +6732,7 @@ msgstr "اكتشف كافة الخصائص"
 
 #. module: website
 #: model_terms:ir.ui.view,arch_db:website.s_cover
+#: model_terms:ir.ui.view,arch_db:website.s_split_intro
 msgid "Discover more"
 msgstr "اكتشف المزيد"
 
@@ -6959,7 +6769,7 @@ msgstr "تعرّف على فريقنا التنفيذي"
 #. module: website
 #: model_terms:ir.ui.view,arch_db:website.s_bento_banner
 msgid "Discover our latest collection"
-msgstr ""
+msgstr "اكتشف أحدث مجموعتنا"
 
 #. module: website
 #: model_terms:ir.ui.view,arch_db:website.s_images_mosaic
@@ -6995,7 +6805,7 @@ msgstr "اكتشف المزايا الثلاث الرئيسية <br/>التي ن
 #. module: website
 #: model_terms:ir.ui.view,arch_db:website.s_intro_pill
 msgid "Discover our<br/>services"
-msgstr ""
+msgstr "اكتشف <br/>خدماتنا"
 
 #. module: website
 #: model_terms:ir.ui.view,arch_db:website.s_numbers_showcase
@@ -7187,7 +6997,7 @@ msgstr "عرض هذا الشعار على الموقع الإلكتروني."
 #. module: website
 #: model_terms:ir.ui.view,arch_db:website.res_config_settings_view_form
 msgid "Display this website for this web address"
-msgstr ""
+msgstr "عرض هذا الموقع الإلكتروني لهذا العنوان"
 
 #. module: website
 #: model_terms:ir.ui.view,arch_db:website.res_config_settings_view_form
@@ -7302,6 +7112,12 @@ msgstr "انقر مرتين على أيقونة لاستبدالها بأخرى 
 #: code:addons/website/static/src/builder/plugins/options/chart_option.xml:0
 msgid "Doughnut"
 msgstr "دونات"
+
+#. module: website
+#. odoo-javascript
+#: code:addons/website/static/src/builder/plugins/options/popup_option_plugin.js:0
+msgid "Drag blocks here"
+msgstr ""
 
 #. module: website
 #. odoo-javascript
@@ -7458,6 +7274,8 @@ msgid ""
 "Easy returns with quick<br/>\n"
 "                            and simple process"
 msgstr ""
+"تمكن من إرجاع المنتجات بسهولة<br/>\n"
+"                            مع عمليات في غاية البساطة"
 
 #. module: website
 #: model_terms:ir.ui.view,arch_db:website.new_page_template_landing_s_text_cover
@@ -7737,13 +7555,13 @@ msgstr ""
 #. odoo-javascript
 #: code:addons/website/static/src/builder/plugins/options/carousel_slides_option.xml:0
 msgid "Enable this to open the link in a new browser tab"
-msgstr ""
+msgstr "قم بتمكينه لفتح الرابط في علامة تبويب جديدة بالمتصفح"
 
 #. module: website
 #. odoo-javascript
 #: code:addons/website/static/src/builder/plugins/options/carousel_slides_option.xml:0
 msgid "Enable to make the slide clickable"
-msgstr ""
+msgstr "تمكين إمكانية النقر على الشريحة"
 
 #. module: website
 #. odoo-javascript
@@ -7774,7 +7592,7 @@ msgstr ""
 #. odoo-javascript
 #: code:addons/website/static/src/xml/html_editor.xml:0
 msgid "Enter URL, /page, or #anchor"
-msgstr ""
+msgstr "أدخل عنوان URL أو /page أو #anchor"
 
 #. module: website
 #. odoo-javascript
@@ -7814,13 +7632,15 @@ msgstr "أدخل البريد الإلكتروني"
 #. odoo-javascript
 #: code:addons/website/static/src/builder/plugins/form/form_option.xml:0
 msgid "Enter requirement conditions"
-msgstr ""
+msgstr "أدخل شروط المتطلبات"
 
 #. module: website
 #. odoo-javascript
 #: code:addons/website/static/src/builder/plugins/form/form_option_plugin.js:0
 msgid "Entered date or time is not correct! It must be %(start)s (%(format)s)."
 msgstr ""
+"التاريخ أو الوقت الذان قمت بإدخالهما غير صحيحان! يجب أن يكونا %(start)s (%"
+"(format)s)."
 
 #. module: website
 #. odoo-javascript
@@ -7828,6 +7648,8 @@ msgstr ""
 msgid ""
 "Entered date or time is not correct! It must be after %(start)s (%(format)s)."
 msgstr ""
+"التاريخ أو الوقت الذان قمت بإدخالهما غير صحيحان! يجب أن يكون الوقت أو "
+"التاريخ بعد %(start)s (%(format)s)."
 
 #. module: website
 #. odoo-javascript
@@ -7836,6 +7658,8 @@ msgid ""
 "Entered date or time is not correct! It must be after or equal to %(start)s "
 "(%(format)s)."
 msgstr ""
+"التاريخ أو الوقت الذان قمت بإدخالهما غير صحيحان! يجب أن يكون الوقت أو "
+"التاريخ بعد أو مساوياً لـ %(start)s (%(format)s)."
 
 #. module: website
 #. odoo-javascript
@@ -7844,6 +7668,8 @@ msgid ""
 "Entered date or time is not correct! It must be before %(start)s (%"
 "(format)s)."
 msgstr ""
+"التاريخ أو الوقت الذان قمت بإدخالهما غير صحيحان! يجب أن يكون الوقت أو "
+"التاريخ قبل %(start)s (%(format)s)."
 
 #. module: website
 #. odoo-javascript
@@ -7852,6 +7678,8 @@ msgid ""
 "Entered date or time is not correct! It must be before or equal to %(start)s "
 "(%(format)s)."
 msgstr ""
+"التاريخ أو الوقت الذان قمت بإدخالهما غير صحيحان! يجب أن يكون الوقت أو "
+"التاريخ قبل أو مساوياً لـ %(start)s (%(format)s)."
 
 #. module: website
 #. odoo-javascript
@@ -7860,6 +7688,8 @@ msgid ""
 "Entered date or time is not correct! It must be within %(start)s and %(end)s "
 "(%(format)s)."
 msgstr ""
+"التاريخ أو الوقت الذان قمت بإدخالهما غير صحيحان! يجب أن يكون الوقت أو "
+"التاريخ بين %(start)s و%(end)s (%(format)s)."
 
 #. module: website
 #. odoo-javascript
@@ -7867,6 +7697,8 @@ msgstr ""
 msgid ""
 "Entered date or time is not correct! It must not be %(start)s (%(format)s)."
 msgstr ""
+"التاريخ أو الوقت الذان قمت بإدخالهما غير صحيحان! يجب ألّا يكونا %(start)s (%"
+"(format)s)."
 
 #. module: website
 #. odoo-javascript
@@ -7875,6 +7707,8 @@ msgid ""
 "Entered date or time is not correct! It must not be within %(start)s and %"
 "(end)s (%(format)s)."
 msgstr ""
+"التاريخ أو الوقت الذان قمت بإدخالهما غير صحيحان! يجب ألّا يكون الوقت أو "
+"التاريخ بين %(start)s و%(end)s (%(format)s)."
 
 #. module: website
 #. odoo-javascript
@@ -7886,7 +7720,7 @@ msgstr "عرض متساوٍ"
 #. odoo-javascript
 #: code:addons/website/static/src/builder/plugins/options/ecomm_categories_showcase_option.xml:0
 msgid "Equal size"
-msgstr ""
+msgstr "حجم متساوي "
 
 #. module: website
 #. odoo-javascript
@@ -8091,7 +7925,7 @@ msgstr "استكشف"
 #. module: website
 #: model_terms:ir.ui.view,arch_db:website.s_banner_categories
 msgid "Explore Our New Collection"
-msgstr ""
+msgstr "استكشف مجموعتنا الجديدة"
 
 #. module: website
 #: model_terms:ir.ui.view,arch_db:website.s_numbers_showcase
@@ -8138,7 +7972,7 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:website.s_banner_product
 #: model_terms:ir.ui.view,arch_db:website.s_bento_block
 msgid "Explore our new collection"
-msgstr ""
+msgstr "استكشف مجموعتنا الجديدة"
 
 #. module: website
 #: model_terms:ir.ui.view,arch_db:website.s_numbers_showcase
@@ -8157,6 +7991,12 @@ msgstr "معاينة الامتداد"
 #: model:ir.model.fields,field_description:website.field_website_page__xml_id
 msgid "External ID"
 msgstr "معرف خارجي"
+
+#. module: website
+#. odoo-python
+#: code:addons/website/models/ir_ui_view.py:0
+msgid "External ID can not be loaded: %(error)s (website: %(website_id)s)"
+msgstr ""
 
 #. module: website
 #. odoo-javascript
@@ -8329,7 +8169,7 @@ msgstr "العناصر التي تم إحضارها"
 #. odoo-javascript
 #: code:addons/website/static/src/builder/plugins/form/utils.js:0
 msgid "Field"
-msgstr ""
+msgstr "حقل"
 
 #. module: website
 #: model:ir.model.fields,field_description:website.field_website_snippet_filter__field_names
@@ -8411,7 +8251,7 @@ msgstr "الملء والضبط"
 #. odoo-javascript
 #: code:addons/website/static/src/components/dialog/seo.xml:0
 msgid "Fill with AI"
-msgstr ""
+msgstr "ملء باستخدام الذكاء الاصطناعي"
 
 #. module: website
 #. odoo-javascript
@@ -8508,7 +8348,7 @@ msgstr "المرة الأولى فقط"
 #. odoo-javascript
 #: code:addons/website/static/src/builder/plugins/options/ecomm_categories_showcase_option.xml:0
 msgid "First block larger"
-msgstr ""
+msgstr "الكتلة الأولى أكبر"
 
 #. module: website
 #: model:ir.model.fields,help:website.field_ir_ui_view__first_page_id
@@ -8793,7 +8633,7 @@ msgstr "شحن مجاني"
 #. module: website
 #: model_terms:ir.ui.view,arch_db:website.template_footer_mega_columns
 msgid "Free shipping over $50"
-msgstr ""
+msgstr "شحن مجاني للطلبات التي تبلغ قيمتها أكثر من $50"
 
 #. module: website
 #: model:ir.model.fields.selection,name:website.selection__website__auth_signup_uninvited__b2c
@@ -8938,6 +8778,11 @@ msgid "Get Delivered"
 msgstr "التوصيل"
 
 #. module: website
+#: model_terms:ir.ui.view,arch_db:website.s_intro_pill
+msgid "Get Started"
+msgstr "ابدأ الآن "
+
+#. module: website
 #: model_terms:ir.ui.view,arch_db:website.template_footer_descriptive
 #: model_terms:ir.ui.view,arch_db:website.template_footer_links
 #: model_terms:ir.ui.view,arch_db:website.template_footer_mega
@@ -9015,7 +8860,7 @@ msgstr "نظارات"
 #. odoo-javascript
 #: code:addons/website/static/src/builder/plugins/options/ecomm_categories_showcase_option.xml:0
 msgid "Global options for all inner blocks."
-msgstr ""
+msgstr "الخيارات العامة لجميع الكتل الداخلية."
 
 #. module: website
 #. odoo-javascript
@@ -9109,6 +8954,7 @@ msgstr "مفتاح تحليلات Google"
 #. module: website
 #. odoo-javascript
 #: code:addons/website/static/src/builder/plugins/theme/theme_advanced_option.xml:0
+#: model_terms:ir.ui.view,arch_db:website.snippets
 msgid "Google Map"
 msgstr "خريطة Google"
 
@@ -9116,6 +8962,15 @@ msgstr "خريطة Google"
 #: model:ir.model.fields,field_description:website.field_website__google_maps_api_key
 msgid "Google Maps API Key"
 msgstr "مفتاح الواجهة البرمجية للتطبيق لخرائط Google"
+
+#. module: website
+#. odoo-javascript
+#: code:addons/website/static/src/builder/plugins/options/google_maps_option/google_maps_service.js:0
+#: code:addons/website/static/src/core/website_map_service.js:0
+msgid ""
+"Google Maps configuration has changed. Please reload the page for changes to "
+"take effect."
+msgstr ""
 
 #. module: website
 #. odoo-javascript
@@ -9133,7 +8988,7 @@ msgstr "أداة بحث Google"
 #. module: website
 #: model:ir.model.fields,field_description:website.field_res_config_settings__google_search_console
 msgid "Google Search Console Key"
-msgstr ""
+msgstr "مفتاح Google Search Console"
 
 #. module: website
 #: model:ir.model.fields,help:website.field_res_config_settings__google_search_console
@@ -9257,7 +9112,7 @@ msgstr "محرر HTML / CSS"
 #. module: website
 #: model:ir.model,name:website.model_website_html_text_processor
 msgid "HTML Text Processor Abstract Model"
-msgstr ""
+msgstr "نموذج معالج نص HTML المجرد"
 
 #. module: website
 #: model:ir.model,name:website.model_ir_http
@@ -9280,7 +9135,7 @@ msgstr "نصف الشاشة"
 #. odoo-javascript
 #: code:addons/website/static/src/builder/plugins/options/header/header_template_option.xml:0
 msgid "Hamburger Menu"
-msgstr ""
+msgstr "القائمة"
 
 #. module: website
 #: model_terms:ir.ui.view,arch_db:website.s_product_catalog
@@ -9312,7 +9167,7 @@ msgstr "الترويسة"
 #. odoo-javascript
 #: code:addons/website/static/src/builder/plugins/options/header/header_elements_option.xml:0
 msgid "Header Button"
-msgstr ""
+msgstr "زر الترويسة "
 
 #. module: website
 #: model:ir.model.fields,field_description:website.field_theme_website_page__header_color
@@ -9665,7 +9520,7 @@ msgstr "كيف تولد الأفكار إلى الحياة"
 #. odoo-javascript
 #: code:addons/website/static/src/client_actions/website_dashboard/website_dashboard.xml:0
 msgid "How to connect Plausible ?"
-msgstr ""
+msgstr "كيفية أقوم بتوصيل Plausible؟"
 
 #. module: website
 #: model_terms:ir.ui.view,arch_db:website.res_config_settings_view_form
@@ -9913,7 +9768,7 @@ msgstr ""
 #. odoo-javascript
 #: code:addons/website/static/src/builder/website_builder.js:0
 msgid "If you proceed, your changes will be lost"
-msgstr ""
+msgstr "إذا تابعت، فستفقد التغييرات التي أجريتها"
 
 #. module: website
 #. odoo-javascript
@@ -9934,6 +9789,7 @@ msgstr "قم بتوضيح خدماتك أو الميزات الرئيسية لم
 #. odoo-javascript
 #: code:addons/website/static/src/builder/plugins/layout_option/add_element_option.xml:0
 #: code:addons/website/static/src/builder/plugins/options/cover_properties_option.xml:0
+#: code:addons/website/static/src/builder/plugins/options/media_list_item_option.xml:0
 #: code:addons/website/static/src/builder/plugins/options/navbar_logo_option.xml:0
 #: code:addons/website/static/src/builder/plugins/options/searchbar_option_plugin.js:0
 #: code:addons/website/static/src/builder/plugins/theme/theme_tab.xml:0
@@ -10078,7 +9934,7 @@ msgstr "فسيفساء الصور"
 #. odoo-javascript
 #: code:addons/website/static/src/components/dialog/seo.xml:0
 msgid "Images Optimization"
-msgstr ""
+msgstr "تحسين الصور"
 
 #. module: website
 #. odoo-javascript
@@ -10101,7 +9957,7 @@ msgstr "حائط الصور"
 #. odoo-python
 #: code:addons/website/models/website_rewrite.py:0
 msgid "Import Template for Redirects"
-msgstr ""
+msgstr "استيراد قالب لإعادة التوجيه"
 
 #. module: website
 #. odoo-javascript
@@ -10403,7 +10259,7 @@ msgstr "تثبيت"
 #. odoo-javascript
 #: code:addons/website/static/src/client_actions/website_preview/new_content_systray_item.js:0
 msgid "Install \"%s\""
-msgstr ""
+msgstr "قم بتثبيت \"%s\""
 
 #. module: website
 #: model:ir.model,name:website.model_base_language_install
@@ -10515,25 +10371,25 @@ msgstr "رابط URL غير صحيح"
 #. odoo-javascript
 #: code:addons/website/static/src/builder/plugins/form/form_option_plugin.js:0
 msgid "Invalid: field is not greater than %s."
-msgstr ""
+msgstr "غير صالح: قيمة الحقل لا تزيد عن %s."
 
 #. module: website
 #. odoo-javascript
 #: code:addons/website/static/src/builder/plugins/form/form_option_plugin.js:0
 msgid "Invalid: field is not greater than or equal to %s."
-msgstr ""
+msgstr "غير صالح: قيمة الحقل ليست أكبر من أو تساوي %s."
 
 #. module: website
 #. odoo-javascript
 #: code:addons/website/static/src/builder/plugins/form/form_option_plugin.js:0
 msgid "Invalid: field is not less than %s."
-msgstr ""
+msgstr "غير صالح: قيمة الحقل ليست أقل عن %s."
 
 #. module: website
 #. odoo-javascript
 #: code:addons/website/static/src/builder/plugins/form/form_option_plugin.js:0
 msgid "Invalid: field is not less than or equal to %s."
-msgstr ""
+msgstr "غير صالح: قيمة الحقل ليست أقل من أو مساوية لـ %s."
 
 #. module: website
 #: model_terms:ir.ui.view,arch_db:website.s_numbers_grid
@@ -10672,37 +10528,37 @@ msgstr "متصل؟"
 #. odoo-javascript
 #: code:addons/website/static/src/builder/plugins/form/form_option.xml:0
 msgid "Is date after"
-msgstr ""
+msgstr "التاريخ بعد "
 
 #. module: website
 #. odoo-javascript
 #: code:addons/website/static/src/builder/plugins/form/form_option.xml:0
 msgid "Is date after or equal to"
-msgstr ""
+msgstr "التاريخ بعد أو يساوي"
 
 #. module: website
 #. odoo-javascript
 #: code:addons/website/static/src/builder/plugins/form/form_option.xml:0
 msgid "Is date before"
-msgstr ""
+msgstr "التاريخ قبل"
 
 #. module: website
 #. odoo-javascript
 #: code:addons/website/static/src/builder/plugins/form/form_option.xml:0
 msgid "Is date before or equal to"
-msgstr ""
+msgstr "التاريخ قبل أو يساوي"
 
 #. module: website
 #. odoo-javascript
 #: code:addons/website/static/src/builder/plugins/form/form_option.xml:0
 msgid "Is date between (included)"
-msgstr ""
+msgstr "التاريخ بين (شاملاً اليوم)"
 
 #. module: website
 #. odoo-javascript
 #: code:addons/website/static/src/builder/plugins/form/form_option.xml:0
 msgid "Is date not between (excluded)"
-msgstr ""
+msgstr "التاريخ ليس بين (مستبعد) "
 
 #. module: website
 #. odoo-javascript
@@ -10756,25 +10612,25 @@ msgstr "لم يتم تعيينه"
 #. odoo-javascript
 #: code:addons/website/static/src/builder/plugins/form/form_option.xml:0
 msgid "Is number greater than"
-msgstr ""
+msgstr "الرقم أكبر من"
 
 #. module: website
 #. odoo-javascript
 #: code:addons/website/static/src/builder/plugins/form/form_option.xml:0
 msgid "Is number greater than or equal to"
-msgstr ""
+msgstr "الرقم أكبر من أو يساوي"
 
 #. module: website
 #. odoo-javascript
 #: code:addons/website/static/src/builder/plugins/form/form_option.xml:0
 msgid "Is number less than"
-msgstr ""
+msgstr "الرقم أقل من"
 
 #. module: website
 #. odoo-javascript
 #: code:addons/website/static/src/builder/plugins/form/form_option.xml:0
 msgid "Is number less than or equal to"
-msgstr ""
+msgstr "الرقم أقل من أو يساوي"
 
 #. module: website
 #. odoo-javascript
@@ -10786,7 +10642,7 @@ msgstr "تم تعيينه"
 #. odoo-javascript
 #: code:addons/website/static/src/builder/plugins/form/form_option.xml:0
 msgid "Is within the last X years"
-msgstr ""
+msgstr "خلال السنوات (X) الماضية "
 
 #. module: website
 #: model_terms:ir.ui.view,arch_db:website.s_showcase
@@ -10799,7 +10655,7 @@ msgstr "إنه يجذب انتباه زائريك ويساعدهم على فهم
 #. odoo-javascript
 #: code:addons/website/static/src/components/dialog/page_properties.xml:0
 msgid "It will be gone forever!"
-msgstr ""
+msgstr "سوف تختفي إلى الأبد!"
 
 #. module: website
 #: model_terms:ir.ui.view,arch_db:website.new_page_template_services_s_text_block_2nd
@@ -10896,7 +10752,7 @@ msgstr ""
 #. odoo-javascript
 #: code:addons/website/static/src/builder/website_builder.js:0
 msgid "Keep editing"
-msgstr ""
+msgstr "استمر في التحرير"
 
 #. module: website
 #: model:ir.model.fields,field_description:website.field_ir_asset__key
@@ -11052,7 +10908,6 @@ msgstr "الحواسيب المحمولة"
 #: code:addons/website/static/src/builder/plugins/options/countdown_option.xml:0
 #: code:addons/website/static/src/builder/plugins/options/popup_option.xml:0
 #: code:addons/website/static/src/builder/plugins/options/scroll_button_option.xml:0
-#: code:addons/website/static/src/builder/plugins/size_option.xml:0
 #: code:addons/website/static/src/builder/plugins/theme/theme_button_option.xml:0
 #: code:addons/website/static/src/builder/plugins/theme/theme_tab.xml:0
 #: model_terms:ir.ui.view,arch_db:website.bs_debug_view
@@ -11186,7 +11041,7 @@ msgstr "آخر الأخبار ودراسات الحالات"
 #. odoo-javascript
 #: code:addons/website/static/src/client_actions/website_preview/new_content_systray_item.js:0
 msgid "Launch an event, start registrations"
-msgstr ""
+msgstr "نظّم فعالية وأتح المجال للتسجيل"
 
 #. module: website
 #: model_terms:ir.ui.view,arch_db:website.s_pricelist_boxed
@@ -11521,6 +11376,7 @@ msgstr "تحميل"
 
 #. module: website
 #. odoo-javascript
+#: code:addons/website/static/src/builder/builder_urlpicker.js:0
 #: code:addons/website/static/src/components/dialog/add_page_dialog.js:0
 #: code:addons/website/static/src/js/editor/html_editor.js:0
 #: code:addons/website/static/src/xml/website.background.video.xml:0
@@ -11586,7 +11442,7 @@ msgstr "القائمة الرئيسية"
 #. odoo-javascript
 #: code:addons/website/static/src/builder/plugins/options/carousel_slides_option.xml:0
 msgid "Make it clickable"
-msgstr ""
+msgstr "اجعله قابلاً للنقر"
 
 #. module: website
 #. odoo-javascript
@@ -11772,7 +11628,6 @@ msgstr "بوفيه شرقي من المقبلات والأطباق الرئيس�
 #: code:addons/website/static/src/builder/plugins/options/popup_option.xml:0
 #: code:addons/website/static/src/builder/plugins/options/scroll_button_option.xml:0
 #: code:addons/website/static/src/builder/plugins/options/social_media_option.xml:0
-#: code:addons/website/static/src/builder/plugins/size_option.xml:0
 msgid "Medium"
 msgstr "متوسط"
 
@@ -11791,25 +11646,25 @@ msgstr "تعرف على فريقنا"
 #. odoo-javascript
 #: code:addons/website/static/src/builder/plugins/options/footer_option_plugin.js:0
 msgid "Mega"
-msgstr ""
+msgstr "ضخمة "
 
 #. module: website
 #. odoo-javascript
 #: code:addons/website/static/src/builder/plugins/options/footer_option_plugin.js:0
 msgid "Mega Cards"
-msgstr ""
+msgstr "البطاقات الكبيرة"
 
 #. module: website
 #. odoo-javascript
 #: code:addons/website/static/src/builder/plugins/options/footer_option_plugin.js:0
 msgid "Mega Columns"
-msgstr ""
+msgstr "الأعمدة الكبيرة"
 
 #. module: website
 #. odoo-javascript
 #: code:addons/website/static/src/builder/plugins/options/footer_option_plugin.js:0
 msgid "Mega Links"
-msgstr ""
+msgstr "الروابط الكبيرة"
 
 #. module: website
 #. odoo-javascript
@@ -11838,7 +11693,7 @@ msgstr "الصورة الافتراضية للقائمة الكبيرة"
 #. odoo-javascript
 #: code:addons/website/static/src/components/dialog/edit_menu.js:0
 msgid "Mega menu item"
-msgstr ""
+msgstr "عنصر القائمة الكبيرة "
 
 #. module: website
 #: model_terms:ir.ui.view,arch_db:website.s_mega_menu_menus_logos
@@ -11912,7 +11767,7 @@ msgstr "القائمة رقم اثنان"
 #. odoo-javascript
 #: code:addons/website/static/src/components/dialog/edit_menu.js:0
 msgid "Menu item"
-msgstr ""
+msgstr "عنصر القائمة"
 
 #. module: website
 #: model:ir.model.fields,field_description:website.field_theme_website_menu__copy_ids
@@ -11923,7 +11778,7 @@ msgstr "قائمة تستخدم نسخة مني"
 #. odoo-javascript
 #: code:addons/website/static/src/builder/plugins/options/header/header_template_option.xml:0
 msgid "Menu with Search Bar"
-msgstr ""
+msgstr "قائمة مع شريط بحث "
 
 #. module: website
 #: model:ir.ui.menu,name:website.menu_website_menu_list
@@ -11935,13 +11790,13 @@ msgstr "القوائم"
 #. odoo-python
 #: code:addons/website/models/website_menu.py:0
 msgid "Menus cannot have more than two levels of hierarchy."
-msgstr ""
+msgstr "لا يمكن أن تحتوي القوائم على أكثر من مستويين من التسلسل الهرمي."
 
 #. module: website
 #. odoo-python
 #: code:addons/website/models/website_menu.py:0
 msgid "Menus with child menus cannot be added as a submenu."
-msgstr ""
+msgstr "لا يمكن إضافة القوائم التي تحتوي على قوائم فرعية كقائمة فرعية."
 
 #. module: website
 #: model:ir.model,name:website.model_base_partner_merge_automatic_wizard
@@ -12030,7 +11885,7 @@ msgstr "الارتفاع الأدنى"
 #. odoo-javascript
 #: code:addons/website/static/src/builder/plugins/options/ecomm_categories_showcase_option.xml:0
 msgid "Min. Height"
-msgstr ""
+msgstr "الحد الأدنى للارتفاع"
 
 #. module: website
 #. odoo-javascript
@@ -12382,7 +12237,7 @@ msgstr "التنقل"
 #. odoo-javascript
 #: code:addons/website/static/src/components/dialog/seo.xml:0
 msgid "Need help to optimize?"
-msgstr ""
+msgstr "هل تحتاج إلى مساعدة في التحسين؟"
 
 #. module: website
 #: model_terms:ir.ui.view,arch_db:website.s_faq_list
@@ -12463,7 +12318,7 @@ msgstr "النشرة الأخبارية"
 #. module: website
 #: model_terms:ir.ui.view,arch_db:website.external_snippets
 msgid "Newsletter Benefits"
-msgstr ""
+msgstr "مزايا النشرة الإخبارية"
 
 #. module: website
 #: model_terms:ir.ui.view,arch_db:website.external_snippets
@@ -12584,7 +12439,7 @@ msgstr "لا تتوفر معاينة للكتلة %s لأنه قد تم تكوي
 #. odoo-javascript
 #: code:addons/website/static/src/components/dialog/seo.xml:0
 msgid "No related keywords found. Try a broader term."
-msgstr ""
+msgstr "لم يتم العثور على كلمات رئيسية ذات صلة. جرب مصطلحًا أوسع."
 
 #. module: website
 #. odoo-javascript
@@ -12609,7 +12464,7 @@ msgstr "بلا عوان"
 #. odoo-javascript
 #: code:addons/website/static/src/builder/plugins/translation_tab/customize_translation_tab_plugin.js:0
 msgid "No translatable content found in the current webpage."
-msgstr ""
+msgstr "لم يتم العثور على محتوى قابل للترجمة في صفحة الويب الحالية."
 
 #. module: website
 #. odoo-javascript
@@ -13007,7 +12862,7 @@ msgstr "فتح في علامة تبويب جديدة"
 #. odoo-javascript
 #: code:addons/website/static/src/builder/plugins/options/header/header_top_option.xml:0
 msgid "Open menu editor"
-msgstr ""
+msgstr "فتح محرر القائمة"
 
 #. module: website
 #: model_terms:ir.ui.view,arch_db:website.snippets
@@ -13018,7 +12873,7 @@ msgstr "ساعات العمل"
 #. odoo-javascript
 #: code:addons/website/static/src/builder/plugins/options/header/header_navigation_option.xml:0
 msgid "Opening behavior of dropdown menus"
-msgstr ""
+msgstr "طريقة فتح القوائم المنسدلة"
 
 #. module: website
 #: model_terms:ir.ui.view,arch_db:website.s_company_team_detail
@@ -13054,7 +12909,7 @@ msgstr "الخيار 3"
 #. odoo-javascript
 #: code:addons/website/static/src/builder/plugins/form/form_option_plugin.js:0
 msgid "Option List"
-msgstr ""
+msgstr "قائمة الخيارات "
 
 #. module: website
 #. odoo-javascript
@@ -13566,7 +13421,7 @@ msgstr "قابلية ظهور الصفحة"
 #. odoo-javascript
 #: code:addons/website/static/src/components/dialog/add_page_dialog.xml:0
 msgid "Page categories"
-msgstr ""
+msgstr "فئات الصفحات"
 
 #. module: website
 #: model:ir.model.fields,help:website.field_website_configurator_feature__iap_page_code
@@ -13587,7 +13442,7 @@ msgstr "لم يتم إعداد وصف الصفحة."
 #. odoo-javascript
 #: code:addons/website/static/src/components/dialog/edit_menu.xml:0
 msgid "Page not found"
-msgstr ""
+msgstr "لم يتم العثور على الصفحة"
 
 #. module: website
 #. odoo-javascript
@@ -13834,8 +13689,8 @@ msgstr "العنصر النائب"
 #. module: website
 #. odoo-javascript
 #: code:addons/website/static/src/builder/plugins/options/google_maps_option/google_maps_api_key_dialog.xml:0
-msgid "Places API"
-msgstr "الواجهة البرمجية للأماكن"
+msgid "Places API (NEW)"
+msgstr ""
 
 #. module: website
 #. odoo-javascript
@@ -13881,6 +13736,8 @@ msgid ""
 "Please fill in the form correctly. The file “%(fileName)s” is too large. "
 "(Maximum %(max)s MB)"
 msgstr ""
+"يرجى تعبئة الاستمارة بشكل صحيح. حجم الملف \"%(fileName)s\" كبير جدًا. (الحد "
+"الأقصى المسموح به هو %(max)s ميغابايت)"
 
 #. module: website
 #. odoo-javascript
@@ -13898,7 +13755,7 @@ msgstr "نقاط البيع"
 #. odoo-javascript
 #: code:addons/website/static/src/builder/plugins/options/popup_option.xml:0
 msgid "Pop-up appears when a user is about to leave the website."
-msgstr ""
+msgstr "تظهر نافذة منبثقة عندما يكون المستخدم على وشك مغادرة الموقع."
 
 #. module: website
 #. odoo-javascript
@@ -13928,13 +13785,13 @@ msgstr "محفظة"
 #: code:addons/website/static/src/builder/plugins/options/popup_option.xml:0
 #: code:addons/website/static/src/builder/plugins/options/table_of_content_option.xml:0
 msgid "Position"
-msgstr "المنصب الوظيفي"
+msgstr "الموضع"
 
 #. module: website
 #. odoo-javascript
 #: code:addons/website/static/src/client_actions/website_preview/new_content_systray_item.js:0
 msgid "Post a new job offer"
-msgstr ""
+msgstr "نشر عرض عمل جديد"
 
 #. module: website
 #: model_terms:ir.ui.view,arch_db:website.s_media_list
@@ -14001,6 +13858,12 @@ msgstr "معاينة لـ"
 
 #. module: website
 #. odoo-javascript
+#: code:addons/website/static/src/builder/builder_urlpicker.xml:0
+msgid "Preview this URL in a new tab"
+msgstr "معاينة رابط URL هذا في علامة تبويب جديدة"
+
+#. module: website
+#. odoo-javascript
 #: code:addons/website/static/src/builder/plugins/options/image_gallery_option.xml:0
 #: code:addons/website/static/src/snippets/s_dynamic_snippet_carousel/000.xml:0
 #: code:addons/website/static/src/snippets/s_image_gallery/001.xml:0
@@ -14051,6 +13914,7 @@ msgstr "خطط التسعير"
 #. module: website
 #. odoo-javascript
 #: code:addons/website/static/src/builder/plugins/options/header/header_font_option.xml:0
+#: code:addons/website/static/src/builder/plugins/theme/theme_colors_option.xml:0
 msgid "Primary"
 msgstr "الرئيسي"
 
@@ -14304,6 +14168,8 @@ msgid ""
 "Quality assured<br/>\n"
 "                            with every purchase"
 msgstr ""
+"جودة مضمونة<br/>\n"
+"                            مع كل عملية شراء"
 
 #. module: website
 #: model_terms:ir.ui.view,arch_db:website.s_pricelist_boxed
@@ -14362,7 +14228,7 @@ msgstr "راديو"
 #. odoo-javascript
 #: code:addons/website/static/src/builder/plugins/form/form_option_plugin.js:0
 msgid "Radio Button List"
-msgstr ""
+msgstr "قائمة أزرار الاختيار "
 
 #. module: website
 #. odoo-javascript
@@ -14441,13 +14307,13 @@ msgstr ""
 #. odoo-javascript
 #: code:addons/website/static/src/components/dialog/page_properties.xml:0
 msgid "Ready to make these web pages disappear into thin air? Are you sure?"
-msgstr ""
+msgstr "هل أنت مستعد لجعل صفحات الويب هذه تختفي تماماً؟ هل أنت متأكد؟"
 
 #. module: website
 #. odoo-javascript
 #: code:addons/website/static/src/components/dialog/page_properties.xml:0
 msgid "Ready to make this web page disappear into thin air? Are you sure?"
-msgstr ""
+msgstr "هل أنت مستعد لجعل صفحة الويب هذه تختفي تماماً؟ هل أنت متأكد؟"
 
 #. module: website
 #: model_terms:ir.ui.view,arch_db:website.new_page_template_landing_s_features
@@ -14627,7 +14493,7 @@ msgstr "إزالة علامة التبويب"
 #. odoo-javascript
 #: code:addons/website/static/src/components/dialog/seo.xml:0
 msgid "Remove a keyword first"
-msgstr ""
+msgstr "إزالة كلمة مفتاحية أولاً"
 
 #. module: website
 #. odoo-javascript
@@ -14656,7 +14522,7 @@ msgstr "إزالة السمة"
 #. odoo-javascript
 #: code:addons/website/static/src/builder/plugins/options/background_video_option.xml:0
 msgid "Remove video"
-msgstr ""
+msgstr "إزالة الفيديو"
 
 #. module: website
 #. odoo-python
@@ -14699,7 +14565,7 @@ msgstr "مطلوب"
 #. odoo-javascript
 #: code:addons/website/static/src/builder/plugins/form/form_option.xml:0
 msgid "Requirement"
-msgstr ""
+msgstr "متطلب "
 
 #. module: website
 #. odoo-javascript
@@ -14719,7 +14585,7 @@ msgstr "إعادة تعيين القوالب"
 #: code:addons/website/static/src/builder/plugins/theme/theme_button_option.xml:0
 #: code:addons/website/static/src/builder/plugins/theme/theme_headings_option.xml:0
 msgid "Reset to Default Font Family"
-msgstr ""
+msgstr "إعادة التعيين إلى عائلة الخطوط الافتراضية"
 
 #. module: website
 #. odoo-javascript
@@ -14760,7 +14626,7 @@ msgstr "المصادر"
 #. odoo-javascript
 #: code:addons/website/static/src/client_actions/configurator/configurator.xml:0
 msgid "Restaurant, Hair Salon, Clothing Store,..."
-msgstr ""
+msgstr "مطعم، صالون حلاقة، متجر ملابس،..."
 
 #. module: website
 #: model_terms:ir.ui.view,arch_db:website.qweb_500
@@ -14796,7 +14662,7 @@ msgstr "البضاعة المرجعة"
 #. module: website
 #: model_terms:ir.ui.view,arch_db:website.template_footer_mega_cards
 msgid "Returns &amp; Exchanges"
-msgstr ""
+msgstr "الإرجاع والاستبدال"
 
 #. module: website
 #: model_terms:ir.ui.view,arch_db:website.s_numbers_grid
@@ -14921,7 +14787,7 @@ msgstr "مستدير"
 #. odoo-javascript
 #: code:addons/website/static/src/builder/plugins/options/header/header_template_option.xml:0
 msgid "Rounded Box Menu"
-msgstr ""
+msgstr "قائمة ذات شكل مربع مستدير"
 
 #. module: website
 #. odoo-javascript
@@ -14981,7 +14847,7 @@ msgstr "عينة أيقونات"
 #. module: website
 #: model_terms:ir.ui.view,arch_db:website.template_footer_mega_cards
 msgid "San Francisco CA 94134"
-msgstr ""
+msgstr "سان فرانسيسكو، كاليفورنيا 94134"
 
 #. module: website
 #. odoo-javascript
@@ -14993,7 +14859,7 @@ msgstr "قمر صناعي"
 #. module: website
 #: model_terms:ir.ui.view,arch_db:website.template_footer_mega_columns
 msgid "Satisfied or refunded"
-msgstr ""
+msgstr "إما أن تكون راضياً أو تسترد أموالك"
 
 #. module: website
 #. odoo-javascript
@@ -15032,7 +14898,7 @@ msgstr "حفظ وإعادة تحميل"
 #. odoo-javascript
 #: code:addons/website/static/src/builder/website_builder.js:0
 msgid "Save anyway"
-msgstr ""
+msgstr "حفظ على أي حال"
 
 #. module: website
 #: model_terms:ir.ui.view,arch_db:website.bs_debug_view
@@ -15092,7 +14958,7 @@ msgstr "تأثير التمرير"
 #. odoo-javascript
 #: code:addons/website/static/src/builder/plugins/options/announcement_scroll_option.xml:0
 msgid "Scroll Speed"
-msgstr ""
+msgstr "سرعة التمرير"
 
 #. module: website
 #: model_terms:ir.ui.view,arch_db:website.option_footer_scrolltop
@@ -15143,7 +15009,7 @@ msgstr "شريط البحث"
 #. odoo-javascript
 #: code:addons/website/static/src/components/dialog/seo.js:0
 msgid "Search Engine Optimization"
-msgstr ""
+msgstr "تحسين محركات البحث"
 
 #. module: website
 #: model_terms:ir.ui.view,arch_db:website.new_page_template_landing_2_s_text_block_h2
@@ -15247,6 +15113,7 @@ msgstr "الراديو الافتراضي الثاني"
 #. module: website
 #. odoo-javascript
 #: code:addons/website/static/src/builder/plugins/options/header/header_font_option.xml:0
+#: code:addons/website/static/src/builder/plugins/theme/theme_colors_option.xml:0
 msgid "Secondary"
 msgstr "الثانوي"
 
@@ -15292,6 +15159,8 @@ msgid ""
 "Secure payment<br/>\n"
 "                            with trusted methods"
 msgstr ""
+"الدفع الآمن<br/>\n"
+"                            باستخدام طرق دفع موثوقة"
 
 #. module: website
 #: model_terms:ir.ui.view,arch_db:website.template_footer_mega_cards
@@ -15313,7 +15182,7 @@ msgstr "ألقِ نظرة على تقرير التحاليل"
 #. odoo-javascript
 #: code:addons/website/static/src/components/dialog/seo.js:0
 msgid "See Google Trends about '%(keyword)s'"
-msgstr ""
+msgstr "ألقِ نظرة على بيانات Google Trends حول \"%(keyword)s\""
 
 #. module: website
 #: model_terms:ir.ui.view,arch_db:website.s_dynamic_snippet_template
@@ -15348,7 +15217,7 @@ msgstr "قم بتحديد خط Google..."
 #. odoo-javascript
 #: code:addons/website/static/src/builder/plugins/highlight/highlight_configurator.js:0
 msgid "Select a highlight"
-msgstr ""
+msgstr "تحديد تمييز"
 
 #. module: website
 #: model_terms:ir.ui.view,arch_db:website.s_features_grid
@@ -15484,7 +15353,7 @@ msgstr "الجلسة والأمان <br/> (أساسي)"
 #. odoo-javascript
 #: code:addons/website/static/src/client_actions/website_preview/new_content_systray_item.js:0
 msgid "Set up a new forum"
-msgstr ""
+msgstr "إنشاء منتدى جديد"
 
 #. module: website
 #: model_terms:ir.ui.view,arch_db:website.res_config_settings_view_form
@@ -15596,6 +15465,11 @@ msgid "Shop Desks"
 msgstr "تسوق لشراء المكاتب"
 
 #. module: website
+#: model_terms:ir.ui.view,arch_db:website.s_bento_grid
+msgid "Shop Now"
+msgstr "تسوق الآن"
+
+#. module: website
 #: model_terms:ir.ui.view,arch_db:website.s_floating_blocks
 msgid "Shop Sofas"
 msgstr "تسوق لشراء الأرائك"
@@ -15685,13 +15559,13 @@ msgstr "إظهار شريط ملفات تعريف الارتباط"
 #. odoo-javascript
 #: code:addons/website/static/src/builder/plugins/options/header/header_elements_option.xml:0
 msgid "Show/Hide Elements"
-msgstr ""
+msgstr "إظهار/إخفاء العناصر"
 
 #. module: website
 #. odoo-javascript
 #: code:addons/website/static/src/builder/plugins/theme/theme_advanced_option.xml:0
 msgid "Show/Hide the header on all pages"
-msgstr ""
+msgstr "إظهار/إخفاء العنوان في جميع الصفحات"
 
 #. module: website
 #: model_terms:ir.ui.view,arch_db:website.snippets
@@ -15729,7 +15603,7 @@ msgstr "تسجيل الدخول"
 #. module: website
 #: model_terms:ir.ui.view,arch_db:website.template_footer_mega_columns
 msgid "Sign up to receive the best promotions, our events and personal advice."
-msgstr ""
+msgstr "اشترك لتتلقى أفضل العروض الترويجية وأخبار فعالياتنا ونصائح مخصصة لك."
 
 #. module: website
 #: model:ir.model.fields.selection,name:website.selection__ir_ui_view__visibility__connected
@@ -15744,7 +15618,7 @@ msgstr "بسيط"
 #. module: website
 #: model_terms:ir.ui.view,arch_db:website.res_config_settings_view_form
 msgid "Simple and privacy-friendly Google Analytics alternative"
-msgstr ""
+msgstr "بديل لتحليلات Google بسيط ويحمي خصوصيتك"
 
 #. module: website
 #: model_terms:ir.ui.view,arch_db:website.s_bento_block
@@ -15752,6 +15626,8 @@ msgid ""
 "Simple forms. Natural textures. Timeless design. Crafted to bring calm and "
 "clarity to your space."
 msgstr ""
+"أشكال بسيطة. مواد طبيعية. تصميم خالد. مصمم خصيصًا لإضفاء الهدوء والسكينة على "
+"مساحتك."
 
 #. module: website
 #: model_terms:ir.ui.view,arch_db:website.s_banner_product
@@ -15793,7 +15669,6 @@ msgstr "الموقع"
 #: code:addons/website/static/src/builder/plugins/options/mega_menu_option.xml:0
 #: code:addons/website/static/src/builder/plugins/options/popup_option.xml:0
 #: code:addons/website/static/src/builder/plugins/options/social_media_option.xml:0
-#: code:addons/website/static/src/builder/plugins/size_option.xml:0
 msgid "Size"
 msgstr "الحجم"
 
@@ -15865,7 +15740,7 @@ msgstr "تمرير الشريحة"
 #. odoo-javascript
 #: code:addons/website/static/src/builder/plugins/options/footer_option.xml:0
 msgid "Slide Hover + Shadow"
-msgstr ""
+msgstr "تحريك المؤشر فوق شريط التمرير + الظل"
 
 #. module: website
 #: model_terms:ir.ui.view,arch_db:website.s_carousel
@@ -15917,7 +15792,7 @@ msgstr "سرعة الدوران"
 #. odoo-javascript
 #: code:addons/website/static/src/builder/plugins/options/announcement_scroll_option.xml:0
 msgid "Slowdown"
-msgstr ""
+msgstr "تباطؤ"
 
 #. module: website
 #. odoo-javascript
@@ -15926,7 +15801,6 @@ msgstr ""
 #: code:addons/website/static/src/builder/plugins/options/popup_option.xml:0
 #: code:addons/website/static/src/builder/plugins/options/scroll_button_option.xml:0
 #: code:addons/website/static/src/builder/plugins/options/social_media_option.xml:0
-#: code:addons/website/static/src/builder/plugins/size_option.xml:0
 #: code:addons/website/static/src/builder/plugins/theme/theme_button_option.xml:0
 #: code:addons/website/static/src/builder/plugins/theme/theme_tab.xml:0
 #: model_terms:ir.ui.view,arch_db:website.bs_debug_view
@@ -15963,7 +15837,7 @@ msgstr "التواصل الاجتماعي"
 #. odoo-javascript
 #: code:addons/website/static/src/builder/plugins/options/header/header_elements_option.xml:0
 msgid "Social Links"
-msgstr ""
+msgstr "روابط التواصل الاجتماعي"
 
 #. module: website
 #: model_terms:ir.ui.view,arch_db:website.s_company_team_detail
@@ -16028,7 +15902,7 @@ msgstr "الخبز المخمر"
 #. odoo-javascript
 #: code:addons/website/static/src/builder/plugins/options/ecomm_categories_showcase_option.xml:0
 msgid "Space Out"
-msgstr ""
+msgstr "تباعد المسافات"
 
 #. module: website
 #. odoo-javascript
@@ -16140,10 +16014,17 @@ msgid "Start After"
 msgstr "البدء بعد"
 
 #. module: website
+#: model_terms:ir.ui.view,arch_db:website.s_adventure
+#: model_terms:ir.ui.view,arch_db:website.s_closer_look
 #: model_terms:ir.ui.view,arch_db:website.s_comparisons
 #: model_terms:ir.ui.view,arch_db:website.s_comparisons_horizontal
 msgid "Start Now"
 msgstr "ابدأ الآن"
+
+#. module: website
+#: model_terms:ir.ui.view,arch_db:website.s_banner
+msgid "Start Now <span class=\"fa fa-angle-right ms-2\"/>"
+msgstr "ابدأ الآن <span class=\"fa fa-angle-right ms-2\"/>"
 
 #. module: website
 #: model_terms:ir.ui.view,arch_db:website.s_card_offset
@@ -16233,7 +16114,7 @@ msgstr "تدريبات القوة:"
 #. odoo-javascript
 #: code:addons/website/static/src/builder/plugins/options/header/header_template_option.xml:0
 msgid "Stretch Menu"
-msgstr ""
+msgstr "تمديد القائمة "
 
 #. module: website
 #. odoo-javascript
@@ -16283,7 +16164,7 @@ msgstr "الشكل"
 #. odoo-javascript
 #: code:addons/website/static/src/builder/plugins/options/header/header_navigation_option.xml:0
 msgid "Style of menu items"
-msgstr ""
+msgstr "نمط عناصر القائمة"
 
 #. module: website
 #. odoo-javascript
@@ -16363,13 +16244,19 @@ msgstr "مواد مستدامة"
 #. odoo-javascript
 #: code:addons/website/static/src/builder/plugins/options/announcement_scroll_option.xml:0
 msgid "Swap Direction"
-msgstr ""
+msgstr "تبديل الاتجاه"
 
 #. module: website
 #. odoo-javascript
 #: code:addons/website/static/src/builder/plugins/theme/theme_tab.xml:0
 msgid "Switch Theme"
 msgstr "تبديل السمة"
+
+#. module: website
+#. odoo-javascript
+#: code:addons/website/static/src/components/dialog/seo.xml:0
+msgid "T"
+msgstr "T"
 
 #. module: website
 #: model_terms:ir.ui.view,arch_db:website.s_mega_menu_menus_logos
@@ -16442,7 +16329,7 @@ msgstr "ألق نظرة عن قرب"
 #. odoo-javascript
 #: code:addons/website/static/src/builder/plugins/options/ecomm_categories_showcase_option.xml:0
 msgid "Tall"
-msgstr ""
+msgstr "طويل"
 
 #. module: website
 #: model:ir.model.fields,field_description:website.field_theme_ir_asset__target
@@ -16464,7 +16351,7 @@ msgstr "معفاة من الضرائب"
 #. odoo-javascript
 #: code:addons/website/static/src/client_actions/website_preview/new_content_systray_item.js:0
 msgid "Teach with videos, slides and PDF"
-msgstr ""
+msgstr "التدريس باستخدام مقاطع الفيديو والشرائح وملفات PDF"
 
 #. module: website
 #: model_terms:ir.ui.view,arch_db:website.new_page_template_groups
@@ -16506,7 +16393,7 @@ msgstr "أنواع الشاي"
 #: model:ir.actions.act_window,name:website.action_website_technical_pages
 #: model:ir.ui.menu,name:website.menu_website_technical_pages
 msgid "Technical Pages"
-msgstr ""
+msgstr "الصفحات التقنية"
 
 #. module: website
 #: model_terms:ir.ui.view,arch_db:website.show_website_info
@@ -16540,9 +16427,23 @@ msgid "Template ID: %s"
 msgstr "معرف القالب: %s"
 
 #. module: website
+#. odoo-python
+#: code:addons/website/models/ir_ui_view.py:0
+msgid ""
+"Template does not exist or has been deleted: %(error)s (website: %"
+"(website_id)s)"
+msgstr ""
+
+#. module: website
 #: model_terms:ir.ui.view,arch_db:website.qweb_500
 msgid "Template fallback"
 msgstr "ارتداد القالب"
+
+#. module: website
+#. odoo-python
+#: code:addons/website/models/ir_ui_view.py:0
+msgid "Template not found: '%(error)s' (website: %(website_id)s)"
+msgstr ""
 
 #. module: website
 #: model_terms:ir.ui.view,arch_db:website.template_footer_mega
@@ -16615,7 +16516,7 @@ msgstr "غلاف النص"
 #. odoo-javascript
 #: code:addons/website/static/src/builder/plugins/options/header/header_elements_option.xml:0
 msgid "Text Elements (e.g. phone number)"
-msgstr ""
+msgstr "عناصر النص (مثل رقم الهاتف)"
 
 #. module: website
 #. odoo-javascript
@@ -16723,7 +16624,7 @@ msgstr ""
 #: code:addons/website/models/website.py:0
 msgid ""
 "The domain path cannot contain relative path segments like '/./' or '/../'."
-msgstr ""
+msgstr "لا يمكن أن يحتوي مسار النطاق على أجزاء مسار نسبية مثل '/./' أو '/../'."
 
 #. module: website
 #: model_terms:ir.ui.view,arch_db:website.s_striped
@@ -16760,12 +16661,6 @@ msgstr "النطاق التالي غير صالح:"
 #: code:addons/website/static/src/xml/website_form.xml:0
 msgid "The form has been sent successfully."
 msgstr "تم ارسال الاستمارة بنجاح."
-
-#. module: website
-#. odoo-python
-#: code:addons/website/controllers/form.py:0
-msgid "The form's specified model does not exist"
-msgstr "نموذج الاستمارة المحدد غير موجود"
 
 #. module: website
 #: model:ir.model.fields,help:website.field_ir_actions_server__website_url
@@ -16873,7 +16768,7 @@ msgstr "يجب أن يكون اسم الصفحة قابلاً للاستخدام
 #. odoo-python
 #: code:addons/website/models/website.py:0
 msgid "The provided website domain is not a valid URL."
-msgstr ""
+msgstr "نطاق الموقع الإلكتروني المقدم ليس عنوان URL صالح."
 
 #. module: website
 #. odoo-javascript
@@ -16991,7 +16886,7 @@ msgstr "نحن محطّ ثقة منذ أعوام طويلة"
 #. odoo-javascript
 #: code:addons/website/static/src/components/dialog/page_properties.xml:0
 msgid "They will be gone forever!"
-msgstr ""
+msgstr "ستختفي إلى الأبد!"
 
 #. module: website
 #. odoo-javascript
@@ -17080,13 +16975,13 @@ msgstr "يستخدم هذا الحقل لضبط مناطق البيانات لل
 #. odoo-javascript
 #: code:addons/website/static/src/builder/plugins/form/form_option_plugin.js:0
 msgid "This field must include keyword %s."
-msgstr ""
+msgstr "يجب أن يتضمن هذا الحقل الكلمة الرئيسية %s."
 
 #. module: website
 #. odoo-javascript
 #: code:addons/website/static/src/builder/plugins/form/form_option_plugin.js:0
 msgid "This field must not include keyword %s."
-msgstr ""
+msgstr "يجب ألا يتضمن هذا الحقل الكلمة الرئيسية %s."
 
 #. module: website
 #: model:ir.model.fields,help:website.field_website_controller_page__arch
@@ -17127,6 +17022,13 @@ msgid ""
 "This font already exists, you can only add it as a local font to replace the "
 "server version."
 msgstr "هذا الخط موجود بالفعل. يمكنك فقط إضافته كخط محلي لاستبدال نسخة الخادم."
+
+#. module: website
+#. odoo-python
+#: code:addons/website/controllers/form.py:0
+msgid ""
+"This form cannot be submitted. Please contact the website administrator."
+msgstr ""
 
 #. module: website
 #: model_terms:ir.ui.view,arch_db:website.bs_debug_view
@@ -17196,7 +17098,7 @@ msgstr "هذه الصفحة"
 #. odoo-javascript
 #: code:addons/website/static/src/client_actions/website_preview/create_page_message.xml:0
 msgid "This page does not exist yet. Would you like to create it?"
-msgstr ""
+msgstr "هذه الصفحة غير موجودة بعد. هل ترغب في إنشائها؟"
 
 #. module: website
 #. odoo-javascript
@@ -17205,6 +17107,8 @@ msgid ""
 "This page may be corrupted if you save these changes. Are you sure you want "
 "to continue?"
 msgstr ""
+"قد يتلف محتوى هذه الصفحة إذا قمت بحفظ هذه التغييرات. هل أنت واثق من أنك ترغب "
+"في المتابعة؟"
 
 #. module: website
 #: model_terms:ir.ui.view,arch_db:website.s_numbers_boxed
@@ -17457,7 +17361,7 @@ msgstr ""
 #. odoo-javascript
 #: code:addons/website/static/src/client_actions/configurator/configurator.xml:0
 msgid "To what purpose?"
-msgstr ""
+msgstr "لأي غرض؟"
 
 #. module: website
 #: model_terms:ir.ui.view,arch_db:website.bs_debug_view
@@ -17491,13 +17395,13 @@ msgstr "Tony Fred، المدير التنفيذي"
 #. odoo-javascript
 #: code:addons/website/static/src/components/dialog/seo.js:0
 msgid "Too long (max 160 chars)"
-msgstr ""
+msgstr "طويل جدًا (160 حرف كحد أقصى)"
 
 #. module: website
 #. odoo-javascript
 #: code:addons/website/static/src/components/dialog/seo.js:0
 msgid "Too short (min 50 chars)"
-msgstr ""
+msgstr "قصير جدًا (50 حرف على الأقل)"
 
 #. module: website
 #. odoo-javascript
@@ -17586,7 +17490,7 @@ msgstr "متتبع"
 #. module: website
 #: model_terms:ir.ui.view,arch_db:website.res_config_settings_view_form
 msgid "Tracking & SEO"
-msgstr ""
+msgstr "التتبع وتحسين محركات البحث"
 
 #. module: website
 #: model_terms:ir.ui.view,arch_db:website.s_pricelist_boxed
@@ -17658,7 +17562,7 @@ msgstr "ترجمة الخيار"
 #. odoo-javascript
 #: code:addons/website/static/src/builder/plugins/translate_announcement_scroll_plugin.js:0
 msgid "Translate Text"
-msgstr ""
+msgstr "ترجمة النص"
 
 #. module: website
 #. odoo-javascript
@@ -17669,14 +17573,14 @@ msgstr "قم بترجمة الترويسة في النص. يتم إنشاء ال
 #. module: website
 #. odoo-javascript
 #: code:addons/website/static/src/builder/plugins/translation_tab/translate_webpage_option.xml:0
-msgid "Translate the whole content with AI"
-msgstr ""
+msgid "Translate to"
+msgstr "ترجمة إلى"
 
 #. module: website
 #. odoo-javascript
 #: code:addons/website/static/src/builder/plugins/translation_tab/translate_webpage_option.xml:0
-msgid "Translate to"
-msgstr ""
+msgid "Translate your content (yellow part) with AI"
+msgstr "ترجم محتواك (الجزء الأصفر) باستخدام الذكاء الاصطناعي"
 
 #. module: website
 #. odoo-javascript
@@ -17701,13 +17605,13 @@ msgstr "الترجمة"
 #. odoo-javascript
 #: code:addons/website/static/src/builder/plugins/translation_tab/customize_translation_tab_plugin.js:0
 msgid "Translation Error"
-msgstr ""
+msgstr "خطأ في الترجمة"
 
 #. module: website
 #. odoo-javascript
 #: code:addons/website/static/src/builder/plugins/translation_tab/customize_translation_tab_plugin.js:0
 msgid "Translation Info"
-msgstr ""
+msgstr "معلومات الترجمة"
 
 #. module: website
 #. odoo-javascript
@@ -17997,6 +17901,8 @@ msgstr "استخدام خرائط Google في موقعك (صفحة تواصل م
 #: code:addons/website/static/src/builder/plugins/font/add_font_dialog.xml:0
 msgid "Use Google’s servers for fonts. It may impact GDPR compliance"
 msgstr ""
+"الاعتماد على خوادم Google لتقديم الخطوط. يُرجى التنويه بأن هذا الإجراء قد "
+"يؤثر على مدى توافق الموقع مع أحكام لائحة حماية البيانات العامة (GDPR)"
 
 #. module: website
 #: model:ir.model.fields,field_description:website.field_theme_website_menu__use_main_menu_as_parent
@@ -18022,13 +17928,13 @@ msgstr "استخدم مجموعة لوضع الصور في قائمة لاستخ
 #. module: website
 #: model_terms:ir.ui.view,arch_db:website.view_server_action_form_website
 msgid "Use in website"
-msgstr ""
+msgstr "الاستخدام في الموقع الإلكتروني"
 
 #. module: website
 #. odoo-javascript
 #: code:addons/website/static/src/builder/plugins/options/popup_option.xml:0
 msgid "Use the generated link to open the pop-up."
-msgstr ""
+msgstr "استخدم الرابط الذي تم إنشاؤه لفتح النافذة المنبثقة."
 
 #. module: website
 #: model_terms:ir.ui.view,arch_db:website.s_media_list
@@ -18212,13 +18118,12 @@ msgstr "المحاذاة العمودية"
 #. module: website
 #: model_terms:ir.ui.view,arch_db:website.snippets
 msgid "Vertical Attributes"
-msgstr ""
+msgstr "السمات الرأسية"
 
 #. module: website
 #. odoo-javascript
 #: code:addons/website/static/src/builder/plugins/options/background_option.xml:0
 #: code:addons/website/static/src/builder/plugins/options/background_video_option.xml:0
-#: model_terms:ir.ui.view,arch_db:website.s_video
 #: model_terms:ir.ui.view,arch_db:website.snippets
 msgid "Video"
 msgstr "الفيديو"
@@ -18439,7 +18344,7 @@ msgstr "الزيارات"
 #. odoo-javascript
 #: code:addons/website/static/src/builder/plugins/options/header/header_elements_option.xml:0
 msgid "Visuals"
-msgstr ""
+msgstr "العناصر المرئية"
 
 #. module: website
 #: model_terms:ir.actions.act_window,help:website.website_visitor_view_action
@@ -18504,6 +18409,8 @@ msgid ""
 "We are a team of passionate people whose goal is to improve everyone's life "
 "through disruptive products."
 msgstr ""
+"نحن فريق من الأشخاص الشغوفين الذين يهدفون إلى تحسين حياة الجميع من خلال "
+"منتجات مبتكرة."
 
 #. module: website
 #: model_terms:ir.ui.view,arch_db:website.template_footer_mega_links
@@ -18912,7 +18819,7 @@ msgstr "تعريف الموقع الإلكتروني"
 #. odoo-python
 #: code:addons/website/controllers/main.py:0
 msgid "Website Information"
-msgstr ""
+msgstr "معلومات الموقع الإلكتروني"
 
 #. module: website
 #. odoo-javascript
@@ -18964,7 +18871,7 @@ msgstr "إعدادات صفحة الموقع الإلكتروني"
 #. module: website
 #: model:ir.model.fields,field_description:website.field_website_technical_page__website_url
 msgid "Website Page URL"
-msgstr ""
+msgstr "عنوان URL لصفحة الموقع الإلكتروني"
 
 #. module: website
 #: model:ir.actions.act_window,name:website.action_website_pages_list
@@ -19006,7 +18913,7 @@ msgstr "عامل تصفية قصاصات الموقع الإلكتروني"
 #. module: website
 #: model:ir.model,name:website.model_website_technical_page
 msgid "Website Technical Page"
-msgstr ""
+msgstr "الصفحة التقنية للموقع الإلكتروني"
 
 #. module: website
 #: model:ir.model,name:website.model_theme_website_menu
@@ -19195,7 +19102,7 @@ msgstr "آراء عملائنا."
 #. odoo-javascript
 #: code:addons/website/static/src/client_actions/configurator/configurator.xml:0
 msgid "What type of website?"
-msgstr ""
+msgstr "ما نوع الموقع الإلكتروني؟"
 
 #. module: website
 #: model_terms:ir.ui.view,arch_db:website.s_wavy_grid
@@ -19309,13 +19216,13 @@ msgstr "النساء"
 #. odoo-javascript
 #: code:addons/website/static/src/client_actions/website_preview/new_content_systray_item.js:0
 msgid "Write a new article"
-msgstr ""
+msgstr "اكتب مقالاً جديداً "
 
 #. module: website
 #. odoo-javascript
 #: code:addons/website/static/src/builder/plugins/form/form_option.xml:0
 msgid "Write custom error message"
-msgstr ""
+msgstr "اكتب رسالة خطأ مخصصة"
 
 #. module: website
 #: model_terms:ir.ui.view,arch_db:website.s_tabs
@@ -19379,12 +19286,36 @@ msgstr "اكتب شيئًا..."
 #. odoo-javascript
 #: code:addons/website/static/src/builder/plugins/options/announcement_scroll_option.xml:0
 msgid "Write your text"
-msgstr ""
+msgstr "اكتب النص الذي تريده "
+
+#. module: website
+#. odoo-javascript
+#: code:addons/website/static/src/builder/plugins/options/social_media_option_plugin.js:0
+#: code:addons/website/static/src/builder/plugins/theme/theme_button_option.xml:0
+#: code:addons/website/static/src/builder/plugins/theme/theme_tab.xml:0
+#: model_terms:ir.ui.view,arch_db:website.footer_custom
+#: model_terms:ir.ui.view,arch_db:website.header_social_links
+#: model_terms:ir.ui.view,arch_db:website.s_mega_menu_odoo_menu
+#: model_terms:ir.ui.view,arch_db:website.s_references_social
+#: model_terms:ir.ui.view,arch_db:website.s_share
+#: model_terms:ir.ui.view,arch_db:website.s_social_media
+#: model_terms:ir.ui.view,arch_db:website.template_footer_centered
+#: model_terms:ir.ui.view,arch_db:website.template_footer_headline
+#: model_terms:ir.ui.view,arch_db:website.template_footer_links
+msgid "X"
+msgstr "X"
 
 #. module: website
 #: model:ir.model.fields,field_description:website.field_website__social_twitter
 msgid "X Account"
 msgstr "حساب X"
+
+#. module: website
+#. odoo-javascript
+#: code:addons/website/static/src/builder/plugins/theme/theme_button_option.xml:0
+#: code:addons/website/static/src/builder/plugins/theme/theme_tab.xml:0
+msgid "Y"
+msgstr "Y"
 
 #. module: website
 #. odoo-javascript
@@ -19443,18 +19374,6 @@ msgstr ""
 "طوال أيام الأسبوع لمساعدتك في أي استفسارات أو مشاكل."
 
 #. module: website
-#. odoo-javascript
-#: code:addons/website/static/src/builder/plugins/form/form_option_plugin.js:0
-msgid "You can't duplicate the submit button of the form."
-msgstr "لا يمكنك صنع نسخة مطابقة لزر الإرسال الخاص بالاستمارة."
-
-#. module: website
-#. odoo-javascript
-#: code:addons/website/static/src/builder/plugins/form/form_option_plugin.js:0
-msgid "You can't remove the submit button of the form"
-msgstr "لا يمكنك إزالة زر الإرسال من الاستمارة"
-
-#. module: website
 #. odoo-python
 #: code:addons/website/models/website.py:0
 msgid ""
@@ -19480,6 +19399,12 @@ msgstr "لا يمكنك صنع نسخة مطابقة لهذا الحقل."
 
 #. module: website
 #. odoo-javascript
+#: code:addons/website/static/src/builder/plugins/options/card_image_option_plugin.js:0
+msgid "You cannot duplicate this image."
+msgstr ""
+
+#. module: website
+#. odoo-javascript
 #: code:addons/website/static/src/builder/plugins/options/facebook_option_plugin.js:0
 msgid "You didn't provide a valid Facebook link"
 msgstr "لم تقم بتقديم رابط Facebook صالح"
@@ -19488,7 +19413,7 @@ msgstr "لم تقم بتقديم رابط Facebook صالح"
 #. odoo-javascript
 #: code:addons/website/static/src/client_actions/website_preview/new_content_systray_item.xml:0
 msgid "You do not have the necessary permissions to create new content pages."
-msgstr ""
+msgstr "لا تملك الأذونات المطلوبة لإنشاء صفحات محتوى جديدة."
 
 #. module: website
 #. odoo-python
@@ -19506,7 +19431,7 @@ msgstr "لا تملك صلاحيات تحرير هذا السجل."
 #. odoo-python
 #: code:addons/website/models/website.py:0
 msgid "You don't have the necessary access rights to access this dashboard."
-msgstr ""
+msgstr "لا تملك صلاحيات الوصول المطلوبة للوصول إلى لوحة البيانات هذه."
 
 #. module: website
 #. odoo-javascript
@@ -19522,6 +19447,8 @@ msgstr ""
 #: code:addons/website/static/src/snippets/s_website_form/form.js:0
 msgid "You have uploaded too many files(Maximum %s files)."
 msgstr ""
+"لقد قمت بتحميل عدد كبير جدًا من الملفات (الحد الأقصى المسموح به هو %s ملف/"
+"ملفات)."
 
 #. module: website
 #: model_terms:ir.ui.view,arch_db:website.cookie_policy
@@ -19599,7 +19526,7 @@ msgstr ""
 #. odoo-javascript
 #: code:addons/website/static/src/builder/plugins/options/instagram_option.xml:0
 msgid "Your Instagram account"
-msgstr ""
+msgstr "حساب Instagram الخاص بك "
 
 #. module: website
 #. odoo-javascript
@@ -19607,6 +19534,7 @@ msgstr ""
 msgid ""
 "Your Instagram page must be public to be integrated into an Odoo website."
 msgstr ""
+"يجب أن تكون صفحتك على instagram عامة حتى يتم دمجها في موقع أودو الإلكتروني."
 
 #. module: website
 #: model_terms:ir.ui.view,arch_db:website.s_cards_soft
@@ -19703,7 +19631,7 @@ msgstr "بحثك '"
 #. module: website
 #: model_terms:ir.ui.view,arch_db:website.s_title
 msgid "Your section title"
-msgstr ""
+msgstr "عنوان القسم الخاص بك"
 
 #. module: website
 #: model:ir.model.fields,field_description:website.field_website__social_youtube
@@ -19775,7 +19703,7 @@ msgstr "صورة جديدة"
 #. odoo-javascript
 #: code:addons/website/static/src/client_actions/configurator/configurator.js:0
 msgid "a website"
-msgstr ""
+msgstr "موقع إلكتروني "
 
 #. module: website
 #. odoo-javascript
@@ -19807,6 +19735,8 @@ msgid ""
 "banner, announcement, scrolling text, trust indicators, info bar, site-wide "
 "banner, minimal design, trendy, bold, presentation"
 msgstr ""
+"لافتة، إعلان، نص متحرك، مؤشرات الثقة، شريط المعلومات، لافتة شاملة للموقع، "
+"تصميم بسيط، عصري، جريء، عرض تقديمي"
 
 #. module: website
 #. odoo-python
@@ -20180,7 +20110,7 @@ msgstr "مثال:  /my-awesome-page"
 #. odoo-javascript
 #: code:addons/website/static/src/builder/plugins/options/carousel_slides_option.xml:0
 msgid "e.g. /your-website-page"
-msgstr ""
+msgstr "على سبيل المثال /your-website-page"
 
 #. module: website
 #. odoo-javascript
@@ -20401,6 +20331,8 @@ msgid ""
 "hero, categories, ecommerce, shop, illustration, buy, photos, shop, product, "
 "grid, pictures"
 msgstr ""
+"العنصر البارز (البانر الرئيسي)، الفئات، التجارة الإلكترونية، المتجر، التوضيح "
+"(الرسوم التوضيحية)، الشراء، الصور، المتجر، المنتج، الشبكة (شبكة العرض)، الصور"
 
 #. module: website
 #: model_terms:ir.ui.view,arch_db:website.snippets
@@ -20963,6 +20895,9 @@ msgid ""
 "shop, cart, product, categories, ecommerce, e-commerce, cards, trendy, "
 "column, layouts, picture, photo, illustration, media, visual"
 msgstr ""
+"المتجر، سلة التسوق، المنتج، الفئات، التجارة الإلكترونية، التجارة "
+"الإلكترونية، البطاقات، العصري/الحديث، العمود، التخطيطات/القوالب، الصورة، "
+"صورة فوتوغرافية، التوضيح (الرسوم)، الوسائط، المرئيات"
 
 #. module: website
 #: model_terms:ir.ui.view,arch_db:website.snippets
@@ -21106,7 +21041,7 @@ msgstr "zip, ttf, woff, woff2, otf"
 #. module: website
 #: model_terms:ir.ui.view,arch_db:website.s_announcement_scroll
 msgid "• Free Shipping • Secure payment • Easy Return"
-msgstr ""
+msgstr "• شحن مجاني • دفع آمن • إرجاع سهل"
 
 #. module: website
 #. odoo-javascript
@@ -21128,6 +21063,206 @@ msgstr "✽  البيتزا"
 #: model_terms:ir.ui.view,arch_db:website.s_key_benefits
 msgid "✽  What We Offer"
 msgstr "✽ ما نقدمه"
+
+#~ msgid "%(error)s (website: %(website_id)s)"
+#~ msgstr "%(error)s (الموقع الإلكتروني: %(website_id)s)"
+
+#~ msgid "Places API"
+#~ msgstr "الواجهة البرمجية للأماكن"
+
+#~ msgid "The form's specified model does not exist"
+#~ msgstr "نموذج الاستمارة المحدد غير موجود"
+
+#~ msgid "Accounts are usable across all your multiple websites"
+#~ msgstr "يمكن استخدام الحسابات عبر كافة مواقعك الإلكترونية المتعددة"
+
+#~ msgid "<u>Wednesday</u><br/>8.00am-12.00am"
+#~ msgstr "<u>الأربعاء</u><br/>8.00 صباحاً - 6.00 مساءً"
+
+#~ msgid "$1.50"
+#~ msgstr "$1.50"
+
+#~ msgid "$12.00"
+#~ msgstr "$12.00"
+
+#~ msgid "$13.00"
+#~ msgstr "$13.00"
+
+#~ msgid "$13.50"
+#~ msgstr "$13.50"
+
+#~ msgid "$14.50"
+#~ msgstr "$14.50"
+
+#~ msgid "$15.00"
+#~ msgstr "$15.00"
+
+#~ msgid "$16.00"
+#~ msgstr "$16.00"
+
+#~ msgid "$25.00"
+#~ msgstr "$25.00"
+
+#~ msgid "$26.00"
+#~ msgstr "$26.00"
+
+#~ msgid "$28.00"
+#~ msgstr "$28.00"
+
+#~ msgid "$3.00"
+#~ msgstr "$3.00"
+
+#~ msgid "$3.50"
+#~ msgstr "$3.50"
+
+#~ msgid "$4.00"
+#~ msgstr "$4.00"
+
+#~ msgid "$4.10"
+#~ msgstr "$4.10"
+
+#~ msgid "$4.25"
+#~ msgstr "$4.25"
+
+#~ msgid "$4.50"
+#~ msgstr "$4.50"
+
+#~ msgid "$5.00"
+#~ msgstr "$5.00"
+
+#~ msgid "+1 555-555-5556"
+#~ msgstr "+1 555-555-5556"
+
+#~ msgid "+12"
+#~ msgstr "+12"
+
+#~ msgid "+25.000"
+#~ msgstr "+25.000"
+
+#~ msgid "01"
+#~ msgstr "01"
+
+#~ msgid "02"
+#~ msgstr "02"
+
+#~ msgid "03"
+#~ msgstr "03"
+
+#~ msgid "04"
+#~ msgstr "04"
+
+#~ msgid "1/2 - 1/2"
+#~ msgstr "1/2 - 1/2"
+
+#~ msgid "1/3 - 2/3"
+#~ msgstr "1/3 - 2/3"
+
+#~ msgid "1/4 - 3/4"
+#~ msgstr "1/4 - 3/4"
+
+#~ msgid "16"
+#~ msgstr "16"
+
+#~ msgid "22%"
+#~ msgstr "22%"
+
+#~ msgid "25%"
+#~ msgstr "25%"
+
+#~ msgid "30"
+#~ msgstr "30"
+
+#~ msgid "45"
+#~ msgstr "45"
+
+#~ msgid "45%"
+#~ msgstr "45%"
+
+#~ msgid "75%"
+#~ msgstr "75%"
+
+#~ msgid ""
+#~ "<a class=\"o_translate_inline btn btn-secondary\" t-att-"
+#~ "href=\"cta_btn_href\">\n"
+#~ "                            Shop Now\n"
+#~ "                        </a>\n"
+#~ "                        <br/>"
+#~ msgstr ""
+#~ "<a class=\"o_translate_inline btn btn-secondary\" t-att-"
+#~ "href=\"cta_btn_href\">\n"
+#~ "                            تسوق الآن\n"
+#~ "                        </a>\n"
+#~ "                        <br/>"
+
+#~ msgid ""
+#~ "<a t-att-href=\"cta_btn_href\" class=\"btn btn-lg btn-primary "
+#~ "o_translate_inline\">Discover more</a>"
+#~ msgstr ""
+#~ "<a t-att-href=\"cta_btn_href\" class=\"btn btn-lg btn-primary "
+#~ "o_translate_inline\">اكتشف المزيد</a>"
+
+#~ msgid ""
+#~ "<a t-att-href=\"cta_btn_href\" class=\"btn btn-lg btn-primary "
+#~ "o_translate_inline\">Discover</a>"
+#~ msgstr ""
+#~ "<a t-att-href=\"cta_btn_href\" class=\"btn btn-lg btn-primary "
+#~ "o_translate_inline\">استكشف</a>"
+
+#~ msgid ""
+#~ "<a t-att-href=\"cta_btn_href\" class=\"btn btn-lg btn-primary "
+#~ "o_translate_inline\">Get Started</a>"
+#~ msgstr ""
+#~ "<a t-att-href=\"cta_btn_href\" class=\"btn btn-lg btn-primary "
+#~ "o_translate_inline\">ابدأ الآن</a>"
+
+#~ msgid ""
+#~ "<a t-att-href=\"cta_btn_href\" class=\"btn btn-lg btn-primary "
+#~ "o_translate_inline\">Start Now <span class=\"fa fa-angle-right ms-2\"/></"
+#~ "a>"
+#~ msgstr ""
+#~ "<a t-att-href=\"cta_btn_href\" class=\"btn btn-lg btn-primary "
+#~ "o_translate_inline\">ابدأ الآن <span class=\"fa fa-angle-right ms-2\"/></"
+#~ "a>"
+
+#~ msgid ""
+#~ "<a t-att-href=\"cta_btn_href\" class=\"btn btn-lg btn-primary "
+#~ "o_translate_inline\">Start Now</a>"
+#~ msgstr ""
+#~ "<a t-att-href=\"cta_btn_href\" class=\"btn btn-lg btn-primary "
+#~ "o_translate_inline\">ابدأ الآن</a>"
+
+#~ msgid ""
+#~ "<a t-att-href=\"cta_btn_href\" class=\"btn btn-primary btn-lg "
+#~ "o_translate_inline\">Contact Us</a>"
+#~ msgstr ""
+#~ "<a t-att-href=\"cta_btn_href\" class=\"btn btn-primary btn-lg "
+#~ "o_translate_inline\">تواصل معنا</a>"
+
+#~ msgid ""
+#~ "<a t-att-href=\"cta_btn_href\" class=\"btn btn-primary mb-2 "
+#~ "o_translate_inline\">Start Now</a>\n"
+#~ "                <a t-att-href=\"cta_btn_href\" class=\"btn btn-outline-"
+#~ "primary mb-2 o_translate_inline\"><t t-out=\"cta_btn_text\">Contact us</"
+#~ "t></a>"
+#~ msgstr ""
+#~ "<a t-att-href=\"cta_btn_href\" class=\"btn btn-primary mb-2 "
+#~ "o_translate_inline\">ابدأ الآن</a>\n"
+#~ "                <a t-att-href=\"cta_btn_href\" class=\"btn btn-outline-"
+#~ "primary mb-2 o_translate_inline\"><t t-out=\"cta_btn_text\">تواصل معنا</"
+#~ "t></a>"
+
+#~ msgid ""
+#~ "<a t-att-href=\"cta_btn_href\" class=\"o_translate_inline btn btn-lg btn-"
+#~ "secondary\">Discover</a>"
+#~ msgstr ""
+#~ "<a t-att-href=\"cta_btn_href\" class=\"o_translate_inline btn btn-lg btn-"
+#~ "secondary\">استكشف</a>"
+
+#~ msgid "You can't duplicate the submit button of the form."
+#~ msgstr "لا يمكنك صنع نسخة مطابقة لزر الإرسال الخاص بالاستمارة."
+
+#~ msgid "You can't remove the submit button of the form"
+#~ msgstr "لا يمكنك إزالة زر الإرسال من الاستمارة"
 
 #~ msgid "%s List"
 #~ msgstr "قائمة %s"
@@ -22199,9 +22334,6 @@ msgstr "✽ ما نقدمه"
 #~ msgstr ""
 #~ "يرجى تعبئة الاستمارة بشكل صحيح. لقد قمت برفع عدد كبير من الملفات. (الحد "
 #~ "المسموح به هو %s)"
-
-#~ msgid "Preview this URL in a new tab"
-#~ msgstr "معاينة رابط URL هذا في علامة تبويب جديدة"
 
 #~ msgid "Privacy"
 #~ msgstr "الخصوصية"

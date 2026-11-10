@@ -2,16 +2,16 @@
 # This file contains the translation of the following modules:
 # * pos_self_order
 #
-# "Dylan Kiss (dyki)" <dyki@odoo.com>, 2025.
+# "Dylan Kiss (dyki)" <dyki@odoo.com>, 2025, 2026.
 # "Kwanghee Park (kwpa)" <kwpa@odoo.com>, 2025, 2026.
-# Weblate <noreply-mt-weblate@weblate.org>, 2025.
+# Weblate <noreply-mt-weblate@weblate.org>, 2025, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 18.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-02-06 18:36+0000\n"
-"PO-Revision-Date: 2026-02-12 10:54+0000\n"
-"Last-Translator: \"Kwanghee Park (kwpa)\" <kwpa@odoo.com>\n"
+"POT-Creation-Date: 2026-10-24 17:38+0000\n"
+"PO-Revision-Date: 2026-08-04 16:38+0000\n"
+"Last-Translator: Anonymous <noreply@weblate.org>\n"
 "Language-Team: Korean <https://translate.odoo.com/projects/odoo-19/"
 "pos_self_order/ko/>\n"
 "Language: ko\n"
@@ -19,7 +19,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Generator: Weblate 5.14.3\n"
+"X-Generator: Weblate 2026.6.1\n"
 
 #. module: pos_self_order
 #: model:ir.actions.report,print_report_name:pos_self_order.report_self_order_qr_codes_page
@@ -55,7 +55,8 @@ msgid ""
 "''\"/>\n"
 "                    <t t-set=\"store_name\" t-"
 "value=\"object.config_id.name\"/>\n"
-"                    <t t-set=\"tz\" t-value=\"object.env.user.tz\"/>\n"
+"                    <t t-set=\"tz\" t-"
+"value=\"object.company_id.partner_id.tz\"/>\n"
 "                    <t t-set=\"lg\" t-value=\"object.partner_id.lang or "
 "user.lang\"/>\n"
 "                    <div>\n"
@@ -77,10 +78,6 @@ msgid ""
 "                    <br/>\n"
 "                    <div>Thank you,</div>\n"
 "                    <br/>\n"
-"                    <div t-if=\"object.state == 'paid'\">\n"
-"                        <div>Attached, you will find your receipt</div>\n"
-"                        <br/>\n"
-"                    </div>\n"
 "                    <t t-out=\"store_name\">Store name</t>\n"
 "                </div>\n"
 "            "
@@ -89,39 +86,36 @@ msgstr ""
 "                    <t t-set=\"client\" t-value=\"object.partner_id\"/>\n"
 "                    <t t-set=\"client_name\" t-value=\"client.name\"/>\n"
 "                    <t t-set=\"street\" t-value=\"client.street or ''\"/>\n"
-"                    <t t-set=\"state\" t-value=\"client.state_id.name or ''\""
-"/>\n"
+"                    <t t-set=\"state\" t-value=\"client.state_id.name or "
+"''\"/>\n"
 "                    <t t-set=\"city\" t-value=\"client.city or ''\"/>\n"
-"                    <t t-set=\"country\" t-value="
-"\"client.country_id.name or ''\"/>\n"
-"                    <t t-set=\"store_name\" t-value=\"object.config_id.name\""
-"/>\n"
-"                    <t t-set=\"tz\" t-value=\"object.env.user.tz\"/>\n"
-"                    <t t-set=\"lg\" t-value="
-"\"object.partner_id.lang or user.lang\"/>\n"
+"                    <t t-set=\"country\" t-value=\"client.country_id.name or "
+"''\"/>\n"
+"                    <t t-set=\"store_name\" t-"
+"value=\"object.config_id.name\"/>\n"
+"                    <t t-set=\"tz\" t-"
+"value=\"object.company_id.partner_id.tz\"/>\n"
+"                    <t t-set=\"lg\" t-value=\"object.partner_id.lang or "
+"user.lang\"/>\n"
 "                    <div>\n"
-"                        <t t-if=\"client_name\">안녕하세요 <t t-out="
-"\"client_name\">Client name</t>님,</t>\n"
-"                        <t t-else=\"\">안녕하세요,</t>\n"
+"                        <t t-if=\"client_name\">안녕하세요<t t-"
+"out=\"client_name\">Client name</t>님,</t>\n"
+"                        <t t-else=\"\">Hello,</t>\n"
 "                    </div>\n"
 "                    <br/>\n"
-"                    <div>주문 번호 <t t-out=\"object.tracking_number\">...</"
-"t> 주문 금액 <t t-out="
-"\"format_amount(object.amount_total,object.currency_id)\">$xx.xx</t> 인 항목"
-"이 확인되었습니다. <span t-if=\"object.preset_time or client.street\">예상 준"
-"비 시간은</span> <span t-if=\"object.preset_time\"><t t-out=\"format_time"
-"(time=object.preset_time, tz=tz, time_format='short', lang_code=lg)\">12:00 p"
-"m</t></span>이며, <span t-if=\"client.street\">장소는 <t t-out=\"street\""
-">street</t>, <t t-out=\"state\">state</t>, <t t-out=\"client.zip or ''\""
-">zip</t>, <t t-out=\"city\">city</t>, <t t-out=\"country\">country</t></span>"
-"입니다.</div>\n"
+"                    <div>주문하신 <t t-out=\"object.tracking_number\">...</"
+"t> 항목인 금액 <t t-"
+"out=\"format_amount(object.amount_total,object.currency_id)\">$xx.xx</t> 건"
+"이 확정되었습니다. <span t-if=\"object.preset_time or client.street\">예상되"
+"는 준비 완료 시간은</span> <span t-if=\"object.preset_time\"><t t-"
+"out=\"format_time(time=object.preset_time, tz=tz, time_format='short', "
+"lang_code=lg)\">12:00 pm</t>이며 </span> <span t-if=\"client.street\"> 픽업 "
+"장소는<t t-out=\"street\">street</t>, <t t-out=\"state\">state</t>, <t t-"
+"out=\"client.zip or ''\">zip</t>, <t t-out=\"city\">city</t>, <t t-"
+"out=\"country\">country</t></span>입니다.</div>\n"
 "                    <br/>\n"
 "                    <div>감사합니다.</div>\n"
 "                    <br/>\n"
-"                    <div t-if=\"object.state == 'paid'\">\n"
-"                        <div>첨부된 영수증을 참조하세요.</div>\n"
-"                        <br/>\n"
-"                    </div>\n"
 "                    <t t-out=\"store_name\">Store name</t>\n"
 "                </div>\n"
 "            "
@@ -132,7 +126,8 @@ msgid ""
 "<div style=\"margin: 0; padding: 0; font-size: 14px;\">\n"
 "                    <t t-set=\"store_name\" t-"
 "value=\"object.config_id.name\"/>\n"
-"                    <t t-set=\"tz\" t-value=\"object.env.user.tz\"/>\n"
+"                    <t t-set=\"tz\" t-"
+"value=\"object.company_id.partner_id.tz\"/>\n"
 "                    <t t-set=\"lg\" t-value=\"object.partner_id.lang or "
 "user.lang\"/>\n"
 "                    <div>\n"
@@ -150,41 +145,10 @@ msgid ""
 "                    <br/>\n"
 "                    <div>Thank you,</div>\n"
 "                    <br/>\n"
-"                    <div t-if=\"object.state == 'paid'\">\n"
-"                        <div>Attached, you will find your receipt</div>\n"
-"                        <br/>\n"
-"                    </div>\n"
 "                    <t t-out=\"store_name\">Store name</t>\n"
 "                </div>\n"
 "            "
 msgstr ""
-"<div style=\"margin: 0; padding: 0; font-size: 14px;\">\n"
-"                    <t t-set=\"store_name\" t-value=\"object.config_id.name\""
-"/>\n"
-"                    <t t-set=\"tz\" t-value=\"object.env.user.tz\"/>\n"
-"                    <t t-set=\"lg\" t-value="
-"\"object.partner_id.lang or user.lang\"/>\n"
-"                    <div>\n"
-"                        <t t-if=\"client_name\">안녕하세요 <t t-out="
-"\"client_name\">고객명</t>님,</t>\n"
-"                        <t t-else=\"\">안녕하세요,</t>\n"
-"                    </div>\n"
-"                    <br/>\n"
-"                    <div>주문 번호 <t t-out=\"object.tracking_number\">...</"
-"t> 주문 금액 <t t-out=\"object.tracking_number\">$xx.xx</t> 에 대한 주문이 확"
-"정되었습니다. <span t-if=\"object.preset_time\">준비가 <t t-out=\"format_time"
-"(time=object.preset_time, tz=tz, time_format='short', lang_code=lg)\">12:00 "
-"pm</t>에 완료될 예정입니다.</span></div>\n"
-"                    <br/>\n"
-"                    <div>감사합니다.</div>\n"
-"                    <br/>\n"
-"                    <div t-if=\"object.state == 'paid'\">\n"
-"                        <div>첨부된 영수증을 참조하시기 바랍니다.</div>\n"
-"                        <br/>\n"
-"                    </div>\n"
-"                    <t t-out=\"store_name\">상점명</t>\n"
-"                </div>\n"
-"            "
 
 #. module: pos_self_order
 #: model:ir.model.fields,help:pos_self_order.field_pos_config__self_ordering_default_user_id
@@ -284,6 +248,7 @@ msgstr "지원되는 인터페이스 언어"
 #: code:addons/pos_self_order/static/src/app/pages/eating_location_page/eating_location_page.xml:0
 #: code:addons/pos_self_order/static/src/app/pages/order_history_page/order_history_page.xml:0
 #: code:addons/pos_self_order/static/src/app/pages/payment_page/payment_page.xml:0
+#: code:addons/pos_self_order/static/src/app/pages/product_page/product_page.xml:0
 #: code:addons/pos_self_order/static/src/app/pages/stand_number_page/stand_number_page.xml:0
 msgid "Back"
 msgstr "뒤로"
@@ -348,12 +313,6 @@ msgstr "셀프 주문 모드 선택"
 #: model:ir.model.fields,help:pos_self_order.field_res_config_settings__pos_self_ordering_pay_after
 msgid "Choose when the customer will pay"
 msgstr "고객이 결제할 시기를 선택하세요"
-
-#. module: pos_self_order
-#. odoo-javascript
-#: code:addons/pos_self_order/static/src/app/pages/combo_page/combo_page.xml:0
-msgid "Choose your"
-msgstr "선택하세요:"
 
 #. module: pos_self_order
 #. odoo-javascript
@@ -635,6 +594,12 @@ msgid "Enter your tracker number"
 msgstr "조회 번호 입력"
 
 #. module: pos_self_order
+#. odoo-javascript
+#: code:addons/pos_self_order/static/src/app/pages/combo_page/combo_page.xml:0
+msgid "Extra:"
+msgstr ""
+
+#. module: pos_self_order
 #: model_terms:ir.ui.view,arch_db:pos_self_order.qr_codes_page
 msgid ""
 "Feel free to use and print this QR code as many times as needed according to "
@@ -791,6 +756,37 @@ msgstr "정보"
 #: code:addons/pos_self_order/static/src/app/components/network_connectionLost_popup/network_connectionLost_popup.xml:0
 msgid "Internet Connection Lost"
 msgstr "인터넷 연결이 해제되었습니다"
+
+#. module: pos_self_order
+#. odoo-python
+#: code:addons/pos_self_order/models/pos_order.py:0
+msgid "Invalid combo line"
+msgstr ""
+
+#. module: pos_self_order
+#. odoo-python
+#: code:addons/pos_self_order/models/pos_order.py:0
+msgid "Invalid preset"
+msgstr ""
+
+#. module: pos_self_order
+#. odoo-python
+#: code:addons/pos_self_order/models/pos_order.py:0
+msgid "Invalid product attribute"
+msgstr ""
+
+#. module: pos_self_order
+#. odoo-python
+#: code:addons/pos_self_order/controllers/orders.py:0
+#: code:addons/pos_self_order/models/pos_order.py:0
+msgid "Invalid product configuration"
+msgstr ""
+
+#. module: pos_self_order
+#. odoo-python
+#: code:addons/pos_self_order/models/pos_order.py:0
+msgid "Invalid quantity"
+msgstr ""
 
 #. module: pos_self_order
 #. odoo-javascript
@@ -1160,6 +1156,18 @@ msgid "Points of Sale"
 msgstr "점포판매시스템"
 
 #. module: pos_self_order
+#. odoo-python
+#: code:addons/pos_self_order/models/pos_order.py:0
+msgid "Preset is not available in self-ordering"
+msgstr ""
+
+#. module: pos_self_order
+#. odoo-python
+#: code:addons/pos_self_order/models/pos_order.py:0
+msgid "Preset is not available in this configuration"
+msgstr ""
+
+#. module: pos_self_order
 #: model:ir.model.fields,field_description:pos_self_order.field_pos_self_order_custom_link__link_html
 msgid "Preview"
 msgstr "미리보기"
@@ -1319,12 +1327,6 @@ msgstr "국가 선택"
 
 #. module: pos_self_order
 #. odoo-javascript
-#: code:addons/pos_self_order/static/src/app/components/slots_popup/slots_popup.xml:0
-msgid "Select a hour"
-msgstr "시간 선택"
-
-#. module: pos_self_order
-#. odoo-javascript
 #: code:addons/pos_self_order/static/src/app/components/preset_info_popup/preset_info_popup.xml:0
 msgid "Select a state"
 msgstr "시/도 선택"
@@ -1336,6 +1338,12 @@ msgid "Select a table"
 msgstr "테이블 선택"
 
 #. module: pos_self_order
+#. odoo-javascript
+#: code:addons/pos_self_order/static/src/app/components/slots_popup/slots_popup.xml:0
+msgid "Select an hour"
+msgstr ""
+
+#. module: pos_self_order
 #: model:ir.model.fields,help:pos_self_order.field_pos_self_order_custom_link__pos_config_ids
 msgid ""
 "Select for which points of sale you want to display this link. Leave empty "
@@ -1344,12 +1352,6 @@ msgid ""
 msgstr ""
 "이 링크를 표시할 POS를 선택하세요. 전체 POS에서 표시되게 하려면 비워 둡니다. "
 "'QR 코드 메뉴' 기능이 활성화되어 있는 POS 중에서 선택해야 합니다."
-
-#. module: pos_self_order
-#. odoo-javascript
-#: code:addons/pos_self_order/static/src/app/components/preset_info_popup/preset_info_popup.xml:0
-msgid "Select your address"
-msgstr "주소 선택"
 
 #. module: pos_self_order
 #. odoo-javascript
@@ -1440,8 +1442,8 @@ msgstr "셀프 주문:"
 #. module: pos_self_order
 #: model:mail.template,description:pos_self_order.delivery_email_template
 #: model:mail.template,description:pos_self_order.takeout_email_template
-msgid "Sent to customers with the receipt in attachment"
-msgstr "영수증을 첨부하여 고객에게 전송합니다."
+msgid "Sent to customers"
+msgstr ""
 
 #. module: pos_self_order
 #: model:ir.model.fields,field_description:pos_self_order.field_pos_self_order_custom_link__sequence
@@ -1574,6 +1576,14 @@ msgstr "%s xmlid가 포함된 메일 템플릿이 삭제되었습니다."
 
 #. module: pos_self_order
 #. odoo-python
+#: code:addons/pos_self_order/models/pos_order.py:0
+msgid ""
+"The order ID isn't linked to the order UUID. This is a sign of a tampered "
+"payload."
+msgstr ""
+
+#. module: pos_self_order
+#. odoo-python
 #: code:addons/pos_self_order/models/res_config_settings.py:0
 msgid "The user must be a POS user"
 msgstr "사용자는 POS 사용자여야 합니다."
@@ -1637,7 +1647,7 @@ msgstr "주의"
 msgid ""
 "We invite you to get the receipt at the counter. Please remember your order "
 "number:"
-msgstr ""
+msgstr "카운터에서 영수증을 수령하세요. 주문 번호를 기억하시기 바랍니다:"
 
 #. module: pos_self_order
 #. odoo-javascript
@@ -1754,6 +1764,11 @@ msgid "Zip"
 msgstr "우편번호"
 
 #. module: pos_self_order
+#: model_terms:ir.ui.view,arch_db:pos_self_order.res_config_settings_view_form_menu
+msgid "a"
+msgstr ""
+
+#. module: pos_self_order
 #. odoo-javascript
 #: code:addons/pos_self_order/static/src/app/components/unavailable_product_dialog/unavailable_product_dialog.xml:0
 msgid "are"
@@ -1790,8 +1805,8 @@ msgstr "https://odoo.com"
 #. module: pos_self_order
 #. odoo-javascript
 #: code:addons/pos_self_order/static/src/app/pages/combo_page/combo_page.xml:0
-msgid "included"
-msgstr "포함 사항"
+msgid "included &"
+msgstr ""
 
 #. module: pos_self_order
 #. odoo-javascript
@@ -1809,6 +1824,183 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:pos_self_order.custom_link_tree
 msgid "odoo"
 msgstr "odoo"
+
+#. module: pos_self_order
+#. odoo-javascript
+#: code:addons/pos_self_order/static/src/app/pages/combo_page/combo_page.xml:0
+msgid "per extra unit"
+msgstr ""
+
+#. module: pos_self_order
+#. odoo-javascript
+#: code:addons/pos_self_order/static/src/app/pages/cart_page/cart_page.xml:0
+#: code:addons/pos_self_order/static/src/app/pages/combo_page/combo_page.xml:0
+msgid "x"
+msgstr ""
+
+#~ msgid "Select a hour"
+#~ msgstr "시간 선택"
+
+#~ msgid ""
+#~ "<div style=\"margin: 0; padding: 0; font-size: 14px;\">\n"
+#~ "                    <t t-set=\"client\" t-value=\"object.partner_id\"/>\n"
+#~ "                    <t t-set=\"client_name\" t-value=\"client.name\"/>\n"
+#~ "                    <t t-set=\"street\" t-value=\"client.street or ''\"/"
+#~ ">\n"
+#~ "                    <t t-set=\"state\" t-value=\"client.state_id.name or "
+#~ "''\"/>\n"
+#~ "                    <t t-set=\"city\" t-value=\"client.city or ''\"/>\n"
+#~ "                    <t t-set=\"country\" t-value=\"client.country_id.name "
+#~ "or ''\"/>\n"
+#~ "                    <t t-set=\"store_name\" t-"
+#~ "value=\"object.config_id.name\"/>\n"
+#~ "                    <t t-set=\"tz\" t-"
+#~ "value=\"object.company_id.partner_id.tz\"/>\n"
+#~ "                    <t t-set=\"lg\" t-value=\"object.partner_id.lang or "
+#~ "user.lang\"/>\n"
+#~ "                    <div>\n"
+#~ "                        <t t-if=\"client_name\">Hello <t t-"
+#~ "out=\"client_name\">Client name</t>,</t>\n"
+#~ "                        <t t-else=\"\">Hello,</t>\n"
+#~ "                    </div>\n"
+#~ "                    <br/>\n"
+#~ "                    <div>Your order <t t-"
+#~ "out=\"object.tracking_number\">...</t> amounting in <t t-"
+#~ "out=\"format_amount(object.amount_total,object.currency_id)\">$xx.xx</t> "
+#~ "has been confirmed. <span t-if=\"object.preset_time or client.street\">It "
+#~ "will be ready</span> <span t-if=\"object.preset_time\">at <t t-"
+#~ "out=\"format_time(time=object.preset_time, tz=tz, time_format='short', "
+#~ "lang_code=lg)\">12:00 pm</t></span> <span t-if=\"client.street\">at <t t-"
+#~ "out=\"street\">street</t>, <t t-out=\"state\">state</t>, <t t-"
+#~ "out=\"client.zip or ''\">zip</t>, <t t-out=\"city\">city</t>, <t t-"
+#~ "out=\"country\">country</t></span></div>\n"
+#~ "                    <br/>\n"
+#~ "                    <div>Thank you,</div>\n"
+#~ "                    <br/>\n"
+#~ "                    <div t-if=\"object.state == 'paid'\">\n"
+#~ "                        <div>Attached, you will find your receipt</div>\n"
+#~ "                        <br/>\n"
+#~ "                    </div>\n"
+#~ "                    <t t-out=\"store_name\">Store name</t>\n"
+#~ "                </div>\n"
+#~ "            "
+#~ msgstr ""
+#~ "<div style=\"margin: 0; padding: 0; font-size: 14px;\">\n"
+#~ "                    <t t-set=\"client\" t-value=\"object.partner_id\"/>\n"
+#~ "                    <t t-set=\"client_name\" t-value=\"client.name\"/>\n"
+#~ "                    <t t-set=\"street\" t-value=\"client.street or ''\"/"
+#~ ">\n"
+#~ "                    <t t-set=\"state\" t-value=\"client.state_id.name or "
+#~ "''\"/>\n"
+#~ "                    <t t-set=\"city\" t-value=\"client.city or ''\"/>\n"
+#~ "                    <t t-set=\"country\" t-value=\"client.country_id.name "
+#~ "or ''\"/>\n"
+#~ "                    <t t-set=\"store_name\" t-"
+#~ "value=\"object.config_id.name\"/>\n"
+#~ "                    <t t-set=\"tz\" t-"
+#~ "value=\"object.company_id.partner_id.tz\"/>\n"
+#~ "                    <t t-set=\"lg\" t-value=\"object.partner_id.lang or "
+#~ "user.lang\"/>\n"
+#~ "                    <div>\n"
+#~ "                        <t t-if=\"client_name\">안녕하세요 <t t-"
+#~ "out=\"client_name\">Client name</t>님,</t>\n"
+#~ "                        <t t-else=\"\">안녕하세요,</t>\n"
+#~ "                    </div>\n"
+#~ "                    <br/>\n"
+#~ "                    <div>고객님의 주문서 <t t-"
+#~ "out=\"object.tracking_number\">...</t>, 금액 <t t-"
+#~ "out=\"format_amount(object.amount_total,object.currency_id)\">$xx.xx</t> "
+#~ "항목이 확정되었음을 알려드립니다. <span t-if=\"object.preset_time or "
+#~ "client.street\">준비 예정 시간 및 장소는 다음과 같습니다:</span> <span t-"
+#~ "if=\"object.preset_time\">at <t t-"
+#~ "out=\"format_time(time=object.preset_time, tz=tz, time_format='short', "
+#~ "lang_code=lg)\">12:00 pm</t></span> <span t-if=\"client.street\">- <t t-"
+#~ "out=\"street\">street</t>, <t t-out=\"state\">state</t>, <t t-"
+#~ "out=\"client.zip or ''\">zip</t>, <t t-out=\"city\">city</t>, <t t-"
+#~ "out=\"country\">country</t></span></div>\n"
+#~ "                    <br/>\n"
+#~ "                    <div>감사합니다.</div>\n"
+#~ "                    <br/>\n"
+#~ "                    <div t-if=\"object.state == 'paid'\">\n"
+#~ "                        <div>첨부의 영수증을 확인하세요.</div>\n"
+#~ "                        <br/>\n"
+#~ "                    </div>\n"
+#~ "                    <t t-out=\"store_name\">Store name</t>\n"
+#~ "                </div>\n"
+#~ "            "
+
+#~ msgid ""
+#~ "<div style=\"margin: 0; padding: 0; font-size: 14px;\">\n"
+#~ "                    <t t-set=\"store_name\" t-"
+#~ "value=\"object.config_id.name\"/>\n"
+#~ "                    <t t-set=\"tz\" t-"
+#~ "value=\"object.company_id.partner_id.tz\"/>\n"
+#~ "                    <t t-set=\"lg\" t-value=\"object.partner_id.lang or "
+#~ "user.lang\"/>\n"
+#~ "                    <div>\n"
+#~ "                        <t t-if=\"client_name\">Hello <t t-"
+#~ "out=\"client_name\">Client name</t>,</t>\n"
+#~ "                        <t t-else=\"\">Hello,</t>\n"
+#~ "                    </div>\n"
+#~ "                    <br/>\n"
+#~ "                    <div>Your order <t t-"
+#~ "out=\"object.tracking_number\">...</t> amounting in <t t-"
+#~ "out=\"format_amount(object.amount_total,object.currency_id)\">$xx.xx</t> "
+#~ "has been confirmed. <span t-if=\"object.preset_time\">It will be ready at "
+#~ "<t t-out=\"format_time(time=object.preset_time, tz=tz, "
+#~ "time_format='short', lang_code=lg)\">12:00 pm</t></span></div>\n"
+#~ "                    <br/>\n"
+#~ "                    <div>Thank you,</div>\n"
+#~ "                    <br/>\n"
+#~ "                    <div t-if=\"object.state == 'paid'\">\n"
+#~ "                        <div>Attached, you will find your receipt</div>\n"
+#~ "                        <br/>\n"
+#~ "                    </div>\n"
+#~ "                    <t t-out=\"store_name\">Store name</t>\n"
+#~ "                </div>\n"
+#~ "            "
+#~ msgstr ""
+#~ "<div style=\"margin: 0; padding: 0; font-size: 14px;\">\n"
+#~ "                    <t t-set=\"store_name\" t-"
+#~ "value=\"object.config_id.name\"/>\n"
+#~ "                    <t t-set=\"tz\" t-"
+#~ "value=\"object.company_id.partner_id.tz\"/>\n"
+#~ "                    <t t-set=\"lg\" t-value=\"object.partner_id.lang or "
+#~ "user.lang\"/>\n"
+#~ "                    <div>\n"
+#~ "                        <t t-if=\"client_name\">안녕하세요 <t t-"
+#~ "out=\"client_name\">Client name</t>님,</t>\n"
+#~ "                        <t t-else=\"\">안녕하세요,</t>\n"
+#~ "                    </div>\n"
+#~ "                    <br/>\n"
+#~ "                    <div>고객님의 주문서 <t t-"
+#~ "out=\"object.tracking_number\">...</t>, 금액 <t t-"
+#~ "out=\"format_amount(object.amount_total,object.currency_id)\">$xx.xx</t> "
+#~ "항목이 확정되었음을 알려드립니다. <span t-if=\"object.preset_time\">준비 "
+#~ "예정 시간은 <t t-out=\"format_time(time=object.preset_time, tz=tz, "
+#~ "time_format='short', lang_code=lg)\">12:00 pm</t>입니다.</span></div>\n"
+#~ "                    <br/>\n"
+#~ "                    <div>감사합니다.</div>\n"
+#~ "                    <br/>\n"
+#~ "                    <div t-if=\"object.state == 'paid'\">\n"
+#~ "                        <div>첨부의 영수증을 확인하세요.</div>\n"
+#~ "                        <br/>\n"
+#~ "                    </div>\n"
+#~ "                    <t t-out=\"store_name\">Store name</t>\n"
+#~ "                </div>\n"
+#~ "            "
+
+#~ msgid "Sent to customers with the receipt in attachment"
+#~ msgstr "영수증을 첨부하여 고객에게 전송합니다."
+
+#~ msgid "Choose your"
+#~ msgstr "선택하세요:"
+
+#~ msgid "included"
+#~ msgstr "포함 사항"
+
+#~ msgid "Select your address"
+#~ msgstr "주소 선택"
 
 #~ msgid ""
 #~ "<div style=\"margin: 0; padding: 0; font-size: 14px;\">\n"

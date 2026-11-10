@@ -24,7 +24,7 @@ registry.category("web_tour.tours").add("mail/static/tests/tours/mail_composer_t
         {
             content: "Write something in composer",
             trigger: ".o-mail-Composer-input",
-            run: "edit blahblah @Not && click body",
+            run: "edit blahblah @Not",
         },
         {
             content: "Mention a partner",
@@ -75,7 +75,7 @@ registry.category("web_tour.tours").add("mail/static/tests/tours/mail_composer_t
                 const bodyContent = document.querySelector(
                     '.o_field_html[name="body"]'
                 ).textContent;
-                if (!bodyContent.includes("blahblah @Not A Demo User")) {
+                if (!bodyContent.replace(/\uFEFF/g, "").includes("blahblah @Not A Demo User")) {
                     console.error(
                         `Full composer should contain text from small composer ("blahblah @Not A Demo User") in body input (actual: ${bodyContent})`
                     );
@@ -97,6 +97,38 @@ registry.category("web_tour.tours").add("mail/static/tests/tours/mail_composer_t
                     console.error("Full composer should contain the user's signature once.");
                 }
             },
+        },
+        {
+            content: "Trigger channel mention with #",
+            trigger: ".odoo-editor-editable",
+            run() {
+                this.anchor.dispatchEvent(
+                    new InputEvent("beforeinput", {
+                        inputType: "insertText",
+                        data: "#",
+                        bubbles: true,
+                    })
+                );
+            },
+        },
+        {
+            content: "Search for general channel",
+            trigger: ".o-mail-MentionList input",
+            run: "edit gen",
+        },
+        {
+            content: "Select channel from suggestion",
+            trigger: ".o-mail-Composer-suggestion:contains(general)",
+            run: "click",
+        },
+        {
+            content: "Check channel mention is present in body",
+            trigger: '.o_field_html[name="body"] .o_channel_redirect:contains(general)',
+        },
+        {
+            // Wait for the mention popover to close, as the composer shows no
+            // dropzone while the popover owns the UI active element.
+            trigger: "body:not(:has(.o-mail-MentionList))",
         },
         {
             content: "Drop a file on the full composer",
@@ -125,10 +157,13 @@ registry.category("web_tour.tours").add("mail/static/tests/tours/mail_composer_t
             content: "Verify admin template is NOT listed",
             trigger: ".mail-composer-template-dropdown.popover",
             run() {
-                const hasAdminTemplate = [...document.querySelectorAll('.o-dropdown-item')]
-                    .some(item => item.textContent.includes("Test template for admin"));
+                const hasAdminTemplate = [...document.querySelectorAll(".o-dropdown-item")].some(
+                    (item) => item.textContent.includes("Test template for admin")
+                );
                 if (hasAdminTemplate) {
-                    console.error("Template assigned to the admin is visible to a non-assigned user! This should not happen.");
+                    console.error(
+                        "Template assigned to the admin is visible to a non-assigned user! This should not happen."
+                    );
                 }
             },
         },
@@ -204,9 +239,9 @@ registry.category("web_tour.tours").add("mail/static/tests/tours/mail_composer_t
         },
         {
             content: "Check full composer text is kept",
-            trigger: ".o-mail-Composer-input",
-            run() {
-                if (this.anchor.value !== "keep the content") {
+            trigger: ".o-mail-Composer button[title='Open Full Composer'].active",
+            run({ queryFirst }) {
+                if (queryFirst(".o-mail-Composer-input").value !== "keep the content") {
                     console.error(
                         "Composer in chatter should contain full composer text after discarding."
                     );
@@ -242,6 +277,12 @@ registry.category("web_tour.tours").add("mail/static/tests/tours/mail_composer_t
         {
             content: "Click on Send Message",
             trigger: "button:contains(Send message)",
+            run: "click",
+        },
+        {
+            content: "Continue Message Composition with Small Composer",
+            trigger:
+                ".o_popover:contains('Continue with Full Composer?') button:contains('No (Remove formatting)')",
             run: "click",
         },
         {

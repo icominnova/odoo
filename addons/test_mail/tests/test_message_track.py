@@ -5,6 +5,7 @@ from unittest.mock import patch
 
 from odoo import fields
 from odoo.addons.mail.tests.common import MailCommon
+from odoo.exceptions import AccessError
 from odoo.addons.mail.tools.discuss import Store
 from odoo.addons.test_mail.data.test_mail_data import MAIL_TEMPLATE
 from odoo.tests import Form, tagged, users
@@ -444,7 +445,7 @@ class TestTrackingInternals(MailCommon):
         })
 
         cls.properties_linked_records = cls.env['mail.test.ticket'].create([{'name': f'Record {i}'} for i in range(3)])
-        cls.properties_parent_1, cls.properties_parent_2 = cls.env['mail.test.track.all.properties.parent'].create([{
+        cls.properties_parent_1, cls.properties_parent_2, cls.properties_parent_monetary = cls.env['mail.test.track.all.properties.parent'].create([{
             'definition_properties': [
                 {'name': 'property_char', 'string': 'Property Char', 'type': 'char', 'default': 'char value'},
                 {'name': 'separator', 'type': 'separator'},
@@ -462,13 +463,21 @@ class TestTrackingInternals(MailCommon):
                 {'name': 'property_datetime', 'string': 'Property Datetime', 'type': 'datetime', 'default': '2024-01-02 12:59:01'},
                 {'name': 'property_date', 'string': 'Property Date', 'type': 'date', 'default': '2024-01-03'},
             ],
+        }, {
+            'definition_properties': [
+                {'name': 'property_amount', 'string': 'Property Amount', 'type': 'monetary',
+                 'currency_field': 'currency_id'},
+            ],
         }])
-        cls.properties_record_1, cls.properties_record_2 = cls.env['mail.test.track.all'].create([{
+        cls.properties_record_1, cls.properties_record_2, cls.properties_record_monetary = cls.env['mail.test.track.all'].create([{
             'properties_parent_id': cls.properties_parent_1.id,
         }, {
             'properties_parent_id': cls.properties_parent_2.id,
-
+        }, {
+            'company_id': cls.env.company.id,
+            'properties_parent_id': cls.properties_parent_monetary.id,
         }])
+        cls.properties_record_monetary.properties = {'property_amount': 500.0}
 
     @users('employee')
     def test_mail_track_2many(self):
@@ -730,6 +739,23 @@ class TestTrackingInternals(MailCommon):
         self.assertEqual(record._mail_track_get_field_sequence("properties"), 100,
             "Properties field should have the same sequence as their parent")
 
+        # test monetary property tracking when parent changes
+        record = self.properties_record_monetary
+        record.message_ids.unlink()
+        record.properties_parent_id = self.properties_parent_1
+        self.flush_tracking()
+
+        formatted_values = [t._tracking_value_format()[0] for t in record.mapped("message_ids.tracking_value_ids")]
+        self.assertEqual(len(formatted_values), 2)
+        self.assertFalse(formatted_values[0]['fieldInfo']['isPropertyField'])
+        self.assertEqual(formatted_values[0]['fieldInfo']['changedField'], 'Properties Parent')
+        self.assertTrue(formatted_values[1]['fieldInfo']['isPropertyField'])
+        self.assertEqual(formatted_values[1]['fieldInfo']['changedField'], 'Properties: Property Amount')
+        self.assertEqual(formatted_values[1]['fieldInfo']['fieldType'], 'monetary')
+        self.assertEqual(formatted_values[1]['fieldInfo']['currencyId'], self.env.company.currency_id.id)
+        self.assertEqual(formatted_values[1]['oldValue'], 500.0)
+        self.assertFalse(formatted_values[1]['newValue'])
+
     @users('employee')
     def test_mail_track_selection_invalid(self):
         """ Check that initial invalid selection values are allowed when tracking """
@@ -844,6 +870,55 @@ class TestTrackingInternals(MailCommon):
                 'html_field', {'string': 'HTML', 'type': 'html'},
                 test_record,
             )
+
+    def test_tracking_value_mixed_commands(self):
+        existing_message = self.env['mail.message'].create({
+            'body': '<p>Existing tracking</p>',
+            'message_type': 'comment',
+            'tracking_value_ids': [(0, 0, {
+                'new_value_char': 'Original',
+                'old_value_char': False,
+            })],
+        })
+        existing_tracking = existing_message.tracking_value_ids
+
+        message = self.env['mail.message'].create({
+            'body': '<p>Mixed tracking commands</p>',
+            'message_type': 'comment',
+            'tracking_value_ids': [
+                (0, 0, {
+                    'new_value_char': 'Created',
+                    'old_value_char': False,
+                }),
+                (1, existing_tracking.id, {'new_value_char': 'Updated'}),
+            ],
+        })
+
+        self.assertEqual(len(message.tracking_value_ids), 1)
+        self.assertEqual(existing_tracking.new_value_char, 'Updated')
+
+    @users('employee')
+    def test_tracking_value_command_access(self):
+        message = self.env['mail.message'].create({
+            'body': '<p>New tracking</p>',
+            'message_type': 'comment',
+            'tracking_value_ids': [(0, 0, {
+                'new_value_char': 'Created',
+                'old_value_char': False,
+            })],
+        })
+        self.assertEqual(len(message.sudo().tracking_value_ids), 1)
+        existing_tracking = message.sudo().tracking_value_ids
+
+        with self.assertRaises(AccessError):
+            self.env['mail.message'].create({
+                'body': '<p>Update tracking</p>',
+                'message_type': 'comment',
+                'tracking_value_ids': [
+                    (1, existing_tracking.id, {'new_value_char': 'Updated'}),
+                ],
+            })
+        self.assertEqual(existing_tracking.new_value_char, 'Created')
 
     @users('employee')
     def test_track_multi_models(self):

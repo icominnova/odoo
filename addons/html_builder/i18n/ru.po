@@ -2,14 +2,14 @@
 # This file contains the translation of the following modules:
 # * html_builder
 #
-# Weblate <noreply-mt-weblate@weblate.org>, 2025.
+# Weblate <noreply-mt-weblate@weblate.org>, 2025, 2026.
 # "Anastasiia Koroleva (koan)" <koan@odoo.com>, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 17.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-01-25 18:36+0000\n"
-"PO-Revision-Date: 2026-02-11 16:32+0000\n"
+"POT-Creation-Date: 2026-10-24 17:37+0000\n"
+"PO-Revision-Date: 2026-08-10 11:12+0000\n"
 "Last-Translator: \"Anastasiia Koroleva (koan)\" <koan@odoo.com>\n"
 "Language-Team: Russian <https://translate.odoo.com/projects/odoo-19/"
 "html_builder/ru/>\n"
@@ -17,10 +17,10 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
-"Plural-Forms: nplurals=4; plural="
-"(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<12 || n%100>14) ? 1 "
-": n%10==0 || (n%10>=5 && n%10<=9) || (n%100>=11 && n%100<=14)? 2 : 3);\n"
-"X-Generator: Weblate 5.14.3\n"
+"Plural-Forms: nplurals=4; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
+"n%10<=4 && (n%100<12 || n%100>14) ? 1 : n%10==0 || (n%10>=5 && n%10<=9) || "
+"(n%100>=11 && n%100<=14)? 2 : 3);\n"
+"X-Generator: Weblate 2026.6.1\n"
 
 #. module: html_builder
 #. odoo-javascript
@@ -61,6 +61,12 @@ msgstr ""
 
 #. module: html_builder
 #. odoo-javascript
+#: code:addons/html_builder/static/src/plugins/shape/shape_selector.xml:0
+msgid "A"
+msgstr "А"
+
+#. module: html_builder
+#. odoo-javascript
 #: code:addons/html_builder/static/src/core/operation_plugin.js:0
 msgid ""
 "A technical issue occurred in the builder, you should save or discard your "
@@ -77,7 +83,7 @@ msgstr "Добавить"
 
 #. module: html_builder
 #. odoo-javascript
-#: code:addons/html_builder/static/src/plugins/add_product_option.xml:0
+#: code:addons/html_builder/static/src/plugins/add_product_option.js:0
 msgid "Add Product"
 msgstr "Добавить продукт"
 
@@ -247,12 +253,8 @@ msgstr "Тег Alt"
 #. module: html_builder
 #. odoo-javascript
 #: code:addons/html_builder/static/src/core/anchor/anchor_plugin.js:0
-msgid ""
-"Anchor copied to clipboard%(br)s%(open_span)sLink: %(anchor_link)s%"
-"(close_span)s"
+msgid "Anchor copied to clipboard"
 msgstr ""
-"Ссылка скопирована в буфер обмена%(br)s%(open_span)sСсылка: %(anchor_link)s%"
-"(close_span)s"
 
 #. module: html_builder
 #. odoo-javascript
@@ -717,7 +719,7 @@ msgstr "Браннан"
 #. odoo-javascript
 #: code:addons/html_builder/static/src/plugins/image/image_shapes_definition.js:0
 msgid "Bread (R)"
-msgstr ""
+msgstr "Буханка (скругл.)"
 
 #. module: html_builder
 #. odoo-javascript
@@ -835,7 +837,7 @@ msgstr "Щелкните и перетащите фон, чтобы настро
 #. odoo-javascript
 #: code:addons/html_builder/static/src/plugins/image/image_shapes_definition.js:0
 msgid "Clover (R)"
-msgstr ""
+msgstr "Клевер (скругл.)"
 
 #. module: html_builder
 #. odoo-javascript
@@ -1170,6 +1172,12 @@ msgstr "Пунктирная"
 
 #. module: html_builder
 #. odoo-javascript
+#: code:addons/html_builder/static/src/plugins/date_time_field_option.xml:0
+msgid "Date"
+msgstr "Дата"
+
+#. module: html_builder
+#. odoo-javascript
 #: code:addons/html_builder/static/src/plugins/image/image_shapes_definition.js:0
 msgid "Decorative"
 msgstr "Декоративный"
@@ -1236,7 +1244,7 @@ msgstr "Diamond"
 #. odoo-javascript
 #: code:addons/html_builder/static/src/plugins/image/image_shapes_definition.js:0
 msgid "Diamond (R)"
-msgstr ""
+msgstr "Ромб (скругл.)"
 
 #. module: html_builder
 #. odoo-javascript
@@ -1268,7 +1276,7 @@ msgstr "Двери"
 #. odoo-javascript
 #: code:addons/html_builder/static/src/plugins/image/image_shapes_definition.js:0
 msgid "Door (R)"
-msgstr ""
+msgstr "Дверь (скругл.)"
 
 #. module: html_builder
 #. odoo-javascript
@@ -1286,7 +1294,7 @@ msgstr "Двойная"
 #. odoo-javascript
 #: code:addons/html_builder/static/src/plugins/image/image_shapes_definition.js:0
 msgid "Double Pill"
-msgstr ""
+msgstr "Двойная капсула"
 
 #. module: html_builder
 #. odoo-javascript
@@ -1328,19 +1336,19 @@ msgstr "Дуэт"
 #. odoo-javascript
 #: code:addons/html_builder/static/src/plugins/image/image_shapes_definition.js:0
 msgid "Duo (R)"
-msgstr ""
+msgstr "Дуэт (скругл.)"
 
 #. module: html_builder
 #. odoo-javascript
 #: code:addons/html_builder/static/src/plugins/image/image_shapes_definition.js:0
 msgid "Duo Step"
-msgstr ""
+msgstr "Двойная ступень"
 
 #. module: html_builder
 #. odoo-javascript
 #: code:addons/html_builder/static/src/plugins/image/image_shapes_definition.js:0
 msgid "Duo Step Pill"
-msgstr ""
+msgstr "Двойная ступенчатая капсула"
 
 #. module: html_builder
 #. odoo-javascript
@@ -1377,7 +1385,7 @@ msgstr "Изумруд"
 #. odoo-javascript
 #: code:addons/html_builder/static/src/plugins/image/image_shapes_definition.js:0
 msgid "Emerald (R)"
-msgstr ""
+msgstr "Изумруд (скругл.)"
 
 #. module: html_builder
 #. odoo-javascript
@@ -1462,7 +1470,7 @@ msgstr "Драгоценный камень"
 #. odoo-javascript
 #: code:addons/html_builder/static/src/plugins/image/image_shapes_definition.js:0
 msgid "Gem (R)"
-msgstr ""
+msgstr "Кристалл (скругл.)"
 
 #. module: html_builder
 #. odoo-javascript
@@ -1588,7 +1596,7 @@ msgstr "Семиугольник"
 #. odoo-javascript
 #: code:addons/html_builder/static/src/plugins/image/image_shapes_definition.js:0
 msgid "Heptagon (R)"
-msgstr ""
+msgstr "Семиугольник (скругл.)"
 
 #. module: html_builder
 #. odoo-javascript
@@ -1600,7 +1608,7 @@ msgstr "Шестиугольник"
 #. odoo-javascript
 #: code:addons/html_builder/static/src/plugins/image/image_shapes_definition.js:0
 msgid "Hexagon (R)"
-msgstr ""
+msgstr "Шестиугольник (скругл.)"
 
 #. module: html_builder
 #. odoo-javascript
@@ -1682,6 +1690,16 @@ msgstr "Невидимые элементы"
 
 #. module: html_builder
 #. odoo-javascript
+#: code:addons/html_builder/static/src/core/version_error_plugin.js:0
+msgid ""
+"It might have caused problem during the editing. Please drag the new version "
+"from the snippet panel to update it."
+msgstr ""
+"Это могло вызвать проблемы при редактировании. Пожалуйста, перетащите новую "
+"версию блока из панели блоков, чтобы обновить его."
+
+#. module: html_builder
+#. odoo-javascript
 #: code:addons/html_builder/static/src/core/building_blocks/builder_list.js:0
 msgid "Item"
 msgstr "Пункт"
@@ -1701,6 +1719,7 @@ msgstr "Лабиринт"
 #. module: html_builder
 #. odoo-javascript
 #: code:addons/html_builder/static/src/plugins/rating_option.xml:0
+#: code:addons/html_builder/static/src/plugins/size_option.xml:0
 msgid "Large"
 msgstr "Большой"
 
@@ -1724,7 +1743,7 @@ msgstr "Слева"
 #. odoo-javascript
 #: code:addons/html_builder/static/src/plugins/image/image_shapes_definition.js:0
 msgid "Lemon (R)"
-msgstr ""
+msgstr "Лимон (скругл.)"
 
 #. module: html_builder
 #. odoo-javascript
@@ -1803,6 +1822,7 @@ msgstr "Медиа"
 #. module: html_builder
 #. odoo-javascript
 #: code:addons/html_builder/static/src/plugins/rating_option.xml:0
+#: code:addons/html_builder/static/src/plugins/size_option.xml:0
 msgid "Medium"
 msgstr "Канал"
 
@@ -1979,19 +1999,19 @@ msgstr "Органические капсулы"
 #. odoo-javascript
 #: code:addons/html_builder/static/src/plugins/image/image_shapes_definition.js:0
 msgid "Organic Cross"
-msgstr ""
+msgstr "Органический крест"
 
 #. module: html_builder
 #. odoo-javascript
 #: code:addons/html_builder/static/src/plugins/image/image_shapes_definition.js:0
 msgid "Organic Dot"
-msgstr ""
+msgstr "Органическая точка"
 
 #. module: html_builder
 #. odoo-javascript
 #: code:addons/html_builder/static/src/plugins/image/image_shapes_definition.js:0
 msgid "Organic Line"
-msgstr ""
+msgstr "Органическая линия"
 
 #. module: html_builder
 #. odoo-javascript
@@ -2082,13 +2102,13 @@ msgstr "Пятиугольник"
 #. odoo-javascript
 #: code:addons/html_builder/static/src/plugins/image/image_shapes_definition.js:0
 msgid "Pentagon (R)"
-msgstr ""
+msgstr "Пятиугольник (скругл.)"
 
 #. module: html_builder
 #. odoo-javascript
 #: code:addons/html_builder/static/src/plugins/image/image_shapes_definition.js:0
 msgid "Pill (R)"
-msgstr ""
+msgstr "Капсула (скругл.)"
 
 #. module: html_builder
 #. odoo-javascript
@@ -2295,6 +2315,12 @@ msgstr "Сброс урожая"
 
 #. module: html_builder
 #. odoo-javascript
+#: code:addons/html_builder/static/src/plugins/image/image_shape_option.xml:0
+msgid "Reset shape transformation"
+msgstr "Сбросить трансформацию фигуры"
+
+#. module: html_builder
+#. odoo-javascript
 #: code:addons/html_builder/static/src/plugins/image/image_transform_option.xml:0
 msgid "Reset transformation"
 msgstr "Сброс трансформации"
@@ -2491,13 +2517,14 @@ msgstr "Шурикен"
 #. odoo-javascript
 #: code:addons/html_builder/static/src/plugins/image/image_shapes_definition.js:0
 msgid "Shuriken (R)"
-msgstr ""
+msgstr "Сюрикен (скругл.)"
 
 #. module: html_builder
 #. odoo-javascript
 #: code:addons/html_builder/static/src/plugins/image/image_size.xml:0
 #: code:addons/html_builder/static/src/plugins/image/image_tool_option.xml:0
 #: code:addons/html_builder/static/src/plugins/rating_option.xml:0
+#: code:addons/html_builder/static/src/plugins/size_option.xml:0
 msgid "Size"
 msgstr "Размер"
 
@@ -2511,6 +2538,7 @@ msgstr "Косой"
 #. odoo-javascript
 #: code:addons/html_builder/static/src/plugins/font/font_plugin.js:0
 #: code:addons/html_builder/static/src/plugins/rating_option.xml:0
+#: code:addons/html_builder/static/src/plugins/size_option.xml:0
 msgid "Small"
 msgstr "Маленький"
 
@@ -2542,7 +2570,7 @@ msgstr "Сонар"
 #. odoo-javascript
 #: code:addons/html_builder/static/src/plugins/image/image_shapes_definition.js:0
 msgid "Sonar (R)"
-msgstr ""
+msgstr "Сонар (скругл.)"
 
 #. module: html_builder
 #. odoo-javascript
@@ -2568,7 +2596,7 @@ msgstr "Протяженность"
 #. odoo-javascript
 #: code:addons/html_builder/static/src/plugins/image/image_shapes_definition.js:0
 msgid "Square (R)"
-msgstr ""
+msgstr "Квадрат (скругл.)"
 
 #. module: html_builder
 #. odoo-javascript
@@ -2580,7 +2608,7 @@ msgstr "Квадрат 1"
 #. odoo-javascript
 #: code:addons/html_builder/static/src/plugins/image/image_shapes_definition.js:0
 msgid "Square 1 (R)"
-msgstr ""
+msgstr "Квадрат 1 (скругл.)"
 
 #. module: html_builder
 #. odoo-javascript
@@ -2592,7 +2620,7 @@ msgstr "Квадрат 2"
 #. odoo-javascript
 #: code:addons/html_builder/static/src/plugins/image/image_shapes_definition.js:0
 msgid "Square 2 (R)"
-msgstr ""
+msgstr "Квадрат 2 (скругл.)"
 
 #. module: html_builder
 #. odoo-javascript
@@ -2670,7 +2698,7 @@ msgstr "Звезда 1"
 #. odoo-javascript
 #: code:addons/html_builder/static/src/plugins/image/image_shapes_definition.js:0
 msgid "Star 1 (R)"
-msgstr ""
+msgstr "Звезда 1 (скругл.)"
 
 #. module: html_builder
 #. odoo-javascript
@@ -2682,7 +2710,7 @@ msgstr "Звезда 2"
 #. odoo-javascript
 #: code:addons/html_builder/static/src/plugins/image/image_shapes_definition.js:0
 msgid "Star 2 (R)"
-msgstr ""
+msgstr "Звезда 2 (скругл.)"
 
 #. module: html_builder
 #. odoo-javascript
@@ -2694,13 +2722,13 @@ msgstr "Звезда 3"
 #. odoo-javascript
 #: code:addons/html_builder/static/src/plugins/image/image_shapes_definition.js:0
 msgid "Star 3 (R)"
-msgstr ""
+msgstr "Звезда 3 (скругл.)"
 
 #. module: html_builder
 #. odoo-javascript
 #: code:addons/html_builder/static/src/plugins/image/image_shapes_definition.js:0
 msgid "Star 4 (R)"
-msgstr ""
+msgstr "Звезда 4 (скругл.)"
 
 #. module: html_builder
 #. odoo-javascript
@@ -2763,7 +2791,7 @@ msgstr "Слеза"
 #. odoo-javascript
 #: code:addons/html_builder/static/src/plugins/image/image_shapes_definition.js:0
 msgid "Tear (R)"
-msgstr ""
+msgstr "Капля (скругл.)"
 
 #. module: html_builder
 #. odoo-javascript
@@ -2806,9 +2834,15 @@ msgstr ""
 
 #. module: html_builder
 #. odoo-javascript
+#: code:addons/html_builder/static/src/core/version_error_plugin.js:0
+msgid "This snippet is outdated"
+msgstr "Этот фрагмент устарел"
+
+#. module: html_builder
+#. odoo-javascript
 #: code:addons/html_builder/static/src/plugins/rating_option.xml:0
 msgid "Thumbs"
-msgstr ""
+msgstr "Миниатюры"
 
 #. module: html_builder
 #. odoo-javascript
@@ -2875,7 +2909,7 @@ msgstr "Треугольник"
 #. odoo-javascript
 #: code:addons/html_builder/static/src/plugins/image/image_shapes_definition.js:0
 msgid "Triangle (R)"
-msgstr ""
+msgstr "Треугольник (скругл.)"
 
 #. module: html_builder
 #. odoo-javascript
@@ -2887,19 +2921,19 @@ msgstr "Треугольная линия"
 #. odoo-javascript
 #: code:addons/html_builder/static/src/plugins/image/image_shapes_definition.js:0
 msgid "Trio In (R)"
-msgstr ""
+msgstr "Тройной внутрь (скругл.)"
 
 #. module: html_builder
 #. odoo-javascript
 #: code:addons/html_builder/static/src/plugins/image/image_shapes_definition.js:0
 msgid "Trio Out (R)"
-msgstr ""
+msgstr "Тройной наружу (скругл.)"
 
 #. module: html_builder
 #. odoo-javascript
 #: code:addons/html_builder/static/src/plugins/image/image_shapes_definition.js:0
 msgid "Triple Pill"
-msgstr ""
+msgstr "Тройная капсула"
 
 #. module: html_builder
 #. odoo-javascript
@@ -3246,6 +3280,13 @@ msgstr "⌙ Активно"
 #: code:addons/html_builder/static/src/plugins/rating_option.xml:0
 msgid "⌙ Inactive"
 msgstr "⌙ Неактивно"
+
+#~ msgid ""
+#~ "Anchor copied to clipboard%(br)s%(open_span)sLink: %(anchor_link)s%"
+#~ "(close_span)s"
+#~ msgstr ""
+#~ "Ссылка скопирована в буфер обмена%(br)s%(open_span)sСсылка: %"
+#~ "(anchor_link)s%(close_span)s"
 
 #~ msgid "ACCESS OPTIONS ANYWAY"
 #~ msgstr "ВАРИАНТЫ ДОСТУПА В ЛЮБОМ СЛУЧАЕ"

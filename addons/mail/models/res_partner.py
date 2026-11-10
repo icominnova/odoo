@@ -19,6 +19,7 @@ class ResPartner(models.Model):
     # override to add and order tracking
     name = fields.Char(tracking=1)
     email = fields.Char(tracking=1)
+    email_normalized = fields.Char(index='btree_not_null')
     phone = fields.Char(tracking=2)
     parent_id = fields.Many2one(tracking=3)
     user_id = fields.Many2one(tracking=4)
@@ -285,7 +286,8 @@ class ResPartner(models.Model):
             "avatar_128",
             "im_status",
             "is_company",
-            Store.One("main_user_id", ["share"], sudo=True),  # sudo: to access portal user of another company in chatter
+            # sudo: res.partner - to access portal user of another company in chatter
+            Store.One("main_user_id", ["partner_id", "share"], sudo=True),
             "name",
         ]
         if target.is_internal(self.env):

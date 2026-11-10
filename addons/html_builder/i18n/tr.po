@@ -2,17 +2,17 @@
 # This file contains the translation of the following modules:
 # * html_builder
 #
-# Weblate <noreply-mt-weblate@weblate.org>, 2025.
+# Weblate <noreply-mt-weblate@weblate.org>, 2025, 2026.
 # DeepL <noreply-mt-deepl@weblate.org>, 2025.
-# Odoo Turkish Import <dyki+tr@odoo.com>, 2025.
-# "Malaz Siddig Elsayed Abuidris (msea)" <msea@odoo.com>, 2025.
+# Odoo Turkish Import <dyki+tr@odoo.com>, 2025, 2026.
+# "Malaz Siddig Elsayed Abuidris (msea)" <msea@odoo.com>, 2025, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-01-25 18:36+0000\n"
-"PO-Revision-Date: 2025-11-28 12:48+0000\n"
-"Last-Translator: \"Malaz Siddig Elsayed Abuidris (msea)\" <msea@odoo.com>\n"
+"POT-Creation-Date: 2026-10-24 17:37+0000\n"
+"PO-Revision-Date: 2026-08-07 05:21+0000\n"
+"Last-Translator: Anonymous <noreply@weblate.org>\n"
 "Language-Team: Turkish <https://translate.odoo.com/projects/odoo-19/"
 "html_builder/tr/>\n"
 "Language: tr\n"
@@ -20,7 +20,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
-"X-Generator: Weblate 5.14.3\n"
+"X-Generator: Weblate 2026.6.1\n"
 
 #. module: html_builder
 #. odoo-javascript
@@ -58,6 +58,12 @@ msgstr "Resmi gezdirdiğinizde 'Başlık etiketi' araç ipucu olarak gösterilir
 
 #. module: html_builder
 #. odoo-javascript
+#: code:addons/html_builder/static/src/plugins/shape/shape_selector.xml:0
+msgid "A"
+msgstr ""
+
+#. module: html_builder
+#. odoo-javascript
 #: code:addons/html_builder/static/src/core/operation_plugin.js:0
 msgid ""
 "A technical issue occurred in the builder, you should save or discard your "
@@ -73,7 +79,7 @@ msgstr "Ekle"
 
 #. module: html_builder
 #. odoo-javascript
-#: code:addons/html_builder/static/src/plugins/add_product_option.xml:0
+#: code:addons/html_builder/static/src/plugins/add_product_option.js:0
 msgid "Add Product"
 msgstr "Ürün Ekle"
 
@@ -242,11 +248,8 @@ msgstr "Alt etiketi"
 #. module: html_builder
 #. odoo-javascript
 #: code:addons/html_builder/static/src/core/anchor/anchor_plugin.js:0
-msgid ""
-"Anchor copied to clipboard%(br)s%(open_span)sLink: %(anchor_link)s%"
-"(close_span)s"
+msgid "Anchor copied to clipboard"
 msgstr ""
-"Panoya kopyalanan çapa%(br)s%(open_span)sLink: %(anchor_link)s%(close_span)s"
 
 #. module: html_builder
 #. odoo-javascript
@@ -1164,6 +1167,12 @@ msgstr "Kesik"
 
 #. module: html_builder
 #. odoo-javascript
+#: code:addons/html_builder/static/src/plugins/date_time_field_option.xml:0
+msgid "Date"
+msgstr ""
+
+#. module: html_builder
+#. odoo-javascript
 #: code:addons/html_builder/static/src/plugins/image/image_shapes_definition.js:0
 msgid "Decorative"
 msgstr "Dekoratif"
@@ -1677,6 +1686,14 @@ msgstr "Görünmez Elemanlar"
 
 #. module: html_builder
 #. odoo-javascript
+#: code:addons/html_builder/static/src/core/version_error_plugin.js:0
+msgid ""
+"It might have caused problem during the editing. Please drag the new version "
+"from the snippet panel to update it."
+msgstr ""
+
+#. module: html_builder
+#. odoo-javascript
 #: code:addons/html_builder/static/src/core/building_blocks/builder_list.js:0
 msgid "Item"
 msgstr "Öğe"
@@ -1696,6 +1713,7 @@ msgstr "Labirent"
 #. module: html_builder
 #. odoo-javascript
 #: code:addons/html_builder/static/src/plugins/rating_option.xml:0
+#: code:addons/html_builder/static/src/plugins/size_option.xml:0
 msgid "Large"
 msgstr "Geniş"
 
@@ -1798,6 +1816,7 @@ msgstr "Medya"
 #. module: html_builder
 #. odoo-javascript
 #: code:addons/html_builder/static/src/plugins/rating_option.xml:0
+#: code:addons/html_builder/static/src/plugins/size_option.xml:0
 msgid "Medium"
 msgstr "Aracı:"
 
@@ -2289,6 +2308,12 @@ msgstr "Kırpmayı sıfırla"
 
 #. module: html_builder
 #. odoo-javascript
+#: code:addons/html_builder/static/src/plugins/image/image_shape_option.xml:0
+msgid "Reset shape transformation"
+msgstr ""
+
+#. module: html_builder
+#. odoo-javascript
 #: code:addons/html_builder/static/src/plugins/image/image_transform_option.xml:0
 msgid "Reset transformation"
 msgstr "Dönüşümü sıfırla"
@@ -2492,6 +2517,7 @@ msgstr "Şuriken (R)"
 #: code:addons/html_builder/static/src/plugins/image/image_size.xml:0
 #: code:addons/html_builder/static/src/plugins/image/image_tool_option.xml:0
 #: code:addons/html_builder/static/src/plugins/rating_option.xml:0
+#: code:addons/html_builder/static/src/plugins/size_option.xml:0
 msgid "Size"
 msgstr "Boyut"
 
@@ -2505,6 +2531,7 @@ msgstr "Eğimli"
 #. odoo-javascript
 #: code:addons/html_builder/static/src/plugins/font/font_plugin.js:0
 #: code:addons/html_builder/static/src/plugins/rating_option.xml:0
+#: code:addons/html_builder/static/src/plugins/size_option.xml:0
 msgid "Small"
 msgstr "Küçük"
 
@@ -2798,6 +2825,12 @@ msgid "This font is hosted and served to your visitors by Google servers"
 msgstr ""
 "Bu yazı tipi Google sunucuları tarafından barındırılır ve ziyaretçilerinize "
 "sunulur"
+
+#. module: html_builder
+#. odoo-javascript
+#: code:addons/html_builder/static/src/core/version_error_plugin.js:0
+msgid "This snippet is outdated"
+msgstr ""
 
 #. module: html_builder
 #. odoo-javascript
@@ -3241,3 +3274,10 @@ msgstr "⌙ Aktif"
 #: code:addons/html_builder/static/src/plugins/rating_option.xml:0
 msgid "⌙ Inactive"
 msgstr "⌙ Etkin değil"
+
+#~ msgid ""
+#~ "Anchor copied to clipboard%(br)s%(open_span)sLink: %(anchor_link)s%"
+#~ "(close_span)s"
+#~ msgstr ""
+#~ "Panoya kopyalanan çapa%(br)s%(open_span)sLink: %(anchor_link)s%"
+#~ "(close_span)s"

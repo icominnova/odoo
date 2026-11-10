@@ -90,7 +90,7 @@ class TestOrderEdiUbl(TestAccountEdiUblCii, SaleCommon):
         self.customer_company.name = "Paris Corp"
         so2 = self.env['sale.order'].with_context(default_partner_id=self.env.user.partner_id.id)._create_records_from_attachments(xml_attachment)
         self.assertEqual(so2.partner_id, self.customer_company.partner_id)
-        self.assertEqual(len(so2.activity_ids), 0)
+        self.assertEqual(len(so2.activity_ids), 1)
 
         # wrong name and wrong VAT -> new partner with the new name & new VAT, activity that a new partner was created
         self.customer_company.vat = "FR123456798"
@@ -147,6 +147,10 @@ class TestOrderEdiUbl(TestAccountEdiUblCii, SaleCommon):
         self.assertEqual(po4.activity_ids.user_id, self.env.user)
 
     def test_so_import_product_from_po(self):
+        company = self.company_data['company']
+        if "predict_bill_product" in company._fields:
+            company.predict_bill_product = True
+
         po_line_vals = [
             {
                 'product_id': self.place_prdct.id,
@@ -189,6 +193,10 @@ class TestOrderEdiUbl(TestAccountEdiUblCii, SaleCommon):
         self.assertRecordValues(so.order_line, po_line_vals)
 
     def test_po_import_product_from_so(self):
+        company = self.company_data['company']
+        if "predict_bill_product" in company._fields:
+            company.predict_bill_product = True
+
         so_line_vals = [
             {
                 'product_id': self.place_prdct.id,
@@ -225,9 +233,16 @@ class TestOrderEdiUbl(TestAccountEdiUblCii, SaleCommon):
             line['tax_ids'] = related_purchase_tax.ids
             line['price_unit'] = line_product.list_price
 
+        discounts = [line.pop('discount') for line in so_line_vals]
         self.assertRecordValues(po.order_line, so_line_vals)
+        for po_line, discount in zip(po.order_line, discounts):
+            self.assertAlmostEqual(po_line.discount, discount)
 
     def test_so_product_unit_price_with_different_uom(self):
+        company = self.company_data['company']
+        if "predict_bill_product" in company._fields:
+            company.predict_bill_product = True
+
         po_line_vals = [{
             'product_id': self.displace_prdct.id,
             'price_unit': 1100.0,
@@ -247,6 +262,10 @@ class TestOrderEdiUbl(TestAccountEdiUblCii, SaleCommon):
         self.assertRecordValues(so.order_line, po_line_vals)
 
     def test_po_product_unit_price_with_different_uom(self):
+        company = self.company_data['company']
+        if "predict_bill_product" in company._fields:
+            company.predict_bill_product = True
+
         so_line_vals = [{
             'product_id': self.displace_prdct.id,
             'price_unit': 1100.0,
@@ -307,3 +326,44 @@ class TestOrderEdiUbl(TestAccountEdiUblCii, SaleCommon):
         po = self.env['purchase.order'].with_context(default_partner_id=self.env.user.partner_id.id)._create_records_from_attachments(xml_attachment)
         # Should have same payment term as PO
         self.assertEqual(po.payment_term_id, payment_term)
+
+    def test_so_import_line_allowance_charges(self):
+        company = self.company_data['company']
+        if "predict_bill_product" in company._fields:
+            company.predict_bill_product = True
+
+        po_line_vals = [{
+            'product_id': self.place_prdct.id,
+            'price_unit': 30.0,
+            'product_uom_id': self.uom_units.id,
+            'product_qty': 10.0,
+            'tax_ids': self.purchase_tax.ids,
+            'discount': -10.0,
+        }]
+        xml_attachment = self.get_purchase_xml(po_line_vals)
+
+        so = self.env['sale.order'].with_context(default_partner_id=self.env.user.partner_id.id)._create_records_from_attachments(xml_attachment)
+        self.assertRecordValues(so.order_line, [{
+            'price_unit': 50.0,
+            'product_uom_qty': 10.0,
+            'product_uom_id': self.uom_units.id,
+            'discount': 0.0,
+        }])
+
+    def test_po_import_line_allowance_charges(self):
+        so_line_vals = [{
+            'product_id': self.place_prdct.id,
+            'product_uom_id': self.uom_units.id,
+            'product_uom_qty': 10.0,
+            'tax_ids': self.sale_tax.ids,
+            'discount': -10.0,
+        }]
+        xml_attachment = self.get_sale_xml(so_line_vals)
+
+        po = self.env['purchase.order'].with_context(default_partner_id=self.env.user.partner_id.id)._create_records_from_attachments(xml_attachment)
+        self.assertRecordValues(po.order_line, [{
+            'price_unit': 55.0,
+            'product_uom_qty': 10.0,
+            'product_uom_id': self.uom_units.id,
+            'discount': 0.0,
+        }])

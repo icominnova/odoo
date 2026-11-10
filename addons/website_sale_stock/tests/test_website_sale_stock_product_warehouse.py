@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
-from odoo.tests import tagged
+from odoo import Command
+from odoo.tests import HttpCase, tagged
 
 from odoo.addons.product.tests.test_product_attribute_value_config import (
     TestProductAttributeValueCommon,
@@ -12,7 +13,7 @@ from odoo.addons.website_sale_stock.tests.common import WebsiteSaleStockCommon
 
 @tagged('post_install', '-at_install')
 class TestWebsiteSaleStockProductWarehouse(
-    TestProductAttributeValueCommon, WebsiteSaleStockCommon
+    TestProductAttributeValueCommon, HttpCase, WebsiteSaleStockCommon
 ):
 
     @classmethod
@@ -64,6 +65,34 @@ class TestWebsiteSaleStockProductWarehouse(
             combination_info = self.product_B.with_env(test_env)._get_combination_info_variant()
         self.assertEqual(combination_info['free_qty'], 10)
 
+    def test_product_is_not_sold_out_when_at_least_one_variant_is_in_stock(self):
+        template = self._create_product(name='Protein').product_tmpl_id
+        self.env['product.template.attribute.line'].create({
+            'product_tmpl_id': template.id,
+            'attribute_id': self.size_attribute.id,
+            'value_ids': [Command.set(self.size_attribute.value_ids.ids)],
+        })
+        self.website.warehouse_id = self.warehouse_1
+        # Only the second variant is in stock.
+        self._add_product_qty_to_wh(
+            template.product_variant_ids[1].id, 10, self.warehouse_1.lot_stock_id.id
+        )
+
+        with MockRequest(self.env, website=self.website):
+            self.assertFalse(template._is_sold_out())
+
+    def test_product_is_sold_out_when_all_variants_sold_out(self):
+        template = self._create_product(name='Protein').product_tmpl_id
+        self.env['product.template.attribute.line'].create({
+            'product_tmpl_id': template.id,
+            'attribute_id': self.size_attribute.id,
+            'value_ids': [Command.set(self.size_attribute.value_ids.ids)],
+        })
+        self.website.warehouse_id = self.warehouse_1
+
+        with MockRequest(self.env, website=self.website):
+            self.assertTrue(template._is_sold_out())
+
     def test_02_update_cart_with_multi_warehouses(self):
         """ When the user updates his cart and increases a product quantity, if
         this quantity is not available in the SO's warehouse, a warning should
@@ -92,3 +121,31 @@ class TestWebsiteSaleStockProductWarehouse(
             values = so._cart_update_line_quantity(line_id=so.order_line.id, quantity=30)
             self.assertTrue(values.get('warning', False))
             self.assertEqual(values.get('quantity'), 25)
+
+    def test_open_shop_when_product_has_no_variants(self):
+        """Test opening the shop page after deleting all variants of product."""
+        product_template = self.product.product_tmpl_id
+        product_template.write({
+            'is_storable': True,
+            'allow_out_of_stock_order': False,
+        })
+
+        self.env['product.template.attribute.line'].create({
+            'product_tmpl_id': product_template.id,
+            'attribute_id': self.ssd_attribute.id,
+            'value_ids': [Command.set((self.ssd_256.id, self.ssd_512.id))],
+        })
+        product_template.product_variant_ids.unlink()
+
+        response = self.url_open('/shop')
+        self.assertEqual(response.status_code, 200)
+
+    def test_so_confirmation_keeps_manually_set_warehouse(self):
+        self.website.warehouse_id = self.warehouse_2
+        self.website.salesperson_id = self.env.user
+        so = self._create_so(
+            warehouse_id=self.warehouse_1.id,
+            order_line=[Command.create({'product_id': self.product_A.id})],
+        )
+        so.action_confirm()
+        self.assertEqual(so.warehouse_id, self.warehouse_1)

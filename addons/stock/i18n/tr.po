@@ -32,25 +32,25 @@
 # İlknur Gözütok, 2023
 # Halil, 2023
 # Tugay Hatıl <tugayh@projetgrup.com>, 2023
-# "Dylan Kiss (dyki)" <dyki@odoo.com>, 2025.
-# Weblate <noreply-mt-weblate@weblate.org>, 2025.
+# "Dylan Kiss (dyki)" <dyki@odoo.com>, 2025, 2026.
+# Weblate <noreply-mt-weblate@weblate.org>, 2025, 2026.
 # DeepL <noreply-mt-deepl@weblate.org>, 2025.
-# Odoo Turkish Import <dyki+tr@odoo.com>, 2025.
+# Odoo Turkish Import <dyki+tr@odoo.com>, 2025, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-02-06 18:35+0000\n"
-"PO-Revision-Date: 2025-11-21 14:46+0000\n"
-"Last-Translator: Odoo Turkish Import <dyki+tr@odoo.com>\n"
-"Language-Team: Turkish <https://translate.odoo.com/projects/odoo-19/stock/tr/"
-">\n"
+"POT-Creation-Date: 2026-07-24 17:38+0000\n"
+"PO-Revision-Date: 2026-08-06 03:51+0000\n"
+"Last-Translator: Weblate <noreply-mt-weblate@weblate.org>\n"
+"Language-Team: Turkish <https://translate.odoo.com/projects/odoo-19/stock/"
+"tr/>\n"
 "Language: tr\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
-"X-Generator: Weblate 5.12.2\n"
+"X-Generator: Weblate 2026.6.1\n"
 
 #. module: stock
 #. odoo-python
@@ -113,6 +113,14 @@ msgid ""
 msgstr ""
 "\n"
 "(%(serial_number)s) %(location)s konumunda var"
+
+#. module: stock
+#. odoo-python
+#: code:addons/stock/models/stock_move.py:0
+msgid ""
+"\n"
+"Package: %s"
+msgstr ""
 
 #. module: stock
 #. odoo-python
@@ -448,8 +456,8 @@ msgstr ""
 "* Müşteri: Müşterilerinize gönderilen ürünler için hedef konumu temsil eden "
 "sanal konum\n"
 "* Envanter Kaybı: Stok seviyelerini düzeltmek için yapılan envanter "
-"işlemlerinin karşılığı olarak hizmet veren sanal konum (Fiziksel "
-"envanterler)\n"
+"işlemlerinin karşılığı olarak hizmet veren sanal konum (Fiziksel envanterler)"
+"\n"
 "* Üretim: Üretim operasyonları için sanal muadil konum. Yani bu konum "
 "bileşenleri tüketir ve bitmiş ürünler üretir\n"
 "* Transit: Şirketler arası veya depolar arası operasyonlar için kullanılması "
@@ -502,52 +510,9 @@ msgid "1 Week"
 msgstr "1 Hafta"
 
 #. module: stock
-#: model_terms:ir.ui.view,arch_db:stock.report_delivery_document
-#: model_terms:ir.ui.view,arch_db:stock.stock_report_delivery_aggregated_move_lines
-msgid "1.00"
-msgstr "1.00"
-
-#. module: stock
-#: model_terms:ir.ui.view,arch_db:stock.report_package_barcode_content
-msgid "12.0"
-msgstr "12.0"
-
-#. module: stock
-#: model_terms:ir.ui.view,arch_db:stock.report_generic_barcode
-msgid "1234567890"
-msgstr "1234567890"
-
-#. module: stock
-#: model_terms:ir.ui.view,arch_db:stock.report_lot_label
-msgid "12345678901"
-msgstr "12345678901"
-
-#. module: stock
 #: model:ir.model.fields.selection,name:stock.selection__stock_picking_type__product_label_format__2x7xprice
 msgid "2 x 7 with price"
 msgstr "2x7 fiyat ile"
-
-#. module: stock
-#: model_terms:ir.ui.view,arch_db:stock.report_package_barcode
-msgid "2021-09-01"
-msgstr "01-09-2021"
-
-#. module: stock
-#: model_terms:ir.ui.view,arch_db:stock.report_package_barcode_small
-msgid "2023-01-01"
-msgstr "2023-01-01"
-
-#. module: stock
-#: model_terms:ir.ui.view,arch_db:stock.report_picking
-msgid "2023-09-24"
-msgstr "24.09.2023"
-
-#. module: stock
-#: model_terms:ir.ui.view,arch_db:stock.report_delivery_document
-#: model_terms:ir.ui.view,arch_db:stock.report_package_barcode_content
-#: model_terms:ir.ui.view,arch_db:stock.report_picking
-msgid "3.00"
-msgstr "3.00"
 
 #. module: stock
 #: model:ir.model.fields.selection,name:stock.selection__lot_label_layout__print_format__4x12
@@ -574,11 +539,6 @@ msgstr "4 x 12 fiyat ile"
 #: model:ir.model.fields.selection,name:stock.selection__stock_picking_type__product_label_format__4x7xprice
 msgid "4 x 7 with price"
 msgstr "4 x 7 fiyat ile"
-
-#. module: stock
-#: model_terms:ir.ui.view,arch_db:stock.report_package_barcode_content
-msgid "54326786758"
-msgstr "54326786758"
 
 #. module: stock
 #: model_terms:ir.ui.view,arch_db:stock.stock_warn_insufficient_qty_form_view
@@ -676,8 +636,8 @@ msgid ""
 msgstr ""
 "<div style=\"margin: 0px; padding: 0px;\">\n"
 "    <p style=\"margin: 0px; padding: 0px; font-size: 13px;\">\n"
-"        Merhaba <t t-out=\"object.partner_id.name or ''\">Brandon Freeman</"
-"t>,<br/><br/>\n"
+"        Merhaba <t t-out=\"object.partner_id.name or ''\">Brandon Freeman</t>"
+",<br/><br/>\n"
 "        Siparişinizin kargoya verildiğini bildirmekten memnuniyet duyarız.\n"
 "       <t t-if=\"hasattr(object, 'carrier_tracking_ref') and "
 "object.carrier_tracking_ref\">\n"
@@ -687,8 +647,8 @@ msgstr ""
 "               <t t-set=\"multiple_carrier_tracking\" t-"
 "value=\"object.get_multiple_carrier_tracking()\"/>\n"
 "                <t t-if=\"multiple_carrier_tracking\">\n"
-"                   <t t-foreach=\"multiple_carrier_tracking\" t-"
-"as=\"line\">\n"
+"                   <t t-foreach=\"multiple_carrier_tracking\" t-as=\"line\">"
+"\n"
 "                        <br/><a t-att-href=\"line[1]\" target=\"_blank\" t-"
 "out=\"line[0] or ''\"/>\n"
 "                    </t>\n"
@@ -710,8 +670,8 @@ msgstr ""
 "       <t t-if=\"user.signature\" data-o-mail-quote-container=\"1\">\n"
 "            <br/>\n"
 "           <div data-o-mail-quote=\"1\">--<br data-o-mail-quote=\"1\"/><t t-"
-"out=\"user.signature or ''\" data-o-mail-quote=\"1\">Mitchell Admin</t></"
-"div>\n"
+"out=\"user.signature or ''\" data-o-mail-quote=\"1\">Mitchell Admin</t></div>"
+"\n"
 "       </t>\n"
 "    </p>\n"
 "</div>\n"
@@ -887,12 +847,6 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:stock.product_view_kanban_catalog
 msgid "<span class=\"text-muted small\"> On Hand</span>"
 msgstr "<span class=\"text-muted small\"> Elde</span>"
-
-#. module: stock
-#: model_terms:ir.ui.view,arch_db:stock.product_form_view_procurement_button
-#: model_terms:ir.ui.view,arch_db:stock.product_template_form_view_procurement_button
-msgid "<span groups=\"!uom.group_uom\">On Hand</span>"
-msgstr "<span groups=\"!uom.group_uom\">Elde</span>"
 
 #. module: stock
 #: model_terms:ir.ui.view,arch_db:stock.res_config_settings_view_form
@@ -2102,8 +2056,7 @@ msgstr "Uygunluk Kontrolü"
 #: model:ir.model.fields,help:stock.field_stock_picking_type__print_label
 msgid ""
 "Check this box if you want to generate shipping label in this operation."
-msgstr ""
-"Bu işlemde kargo etiketi oluşturmak istiyorsanız bu kutuyu işaretleyin."
+msgstr "Bu işlemde kargo etiketi oluşturmak istiyorsanız bu kutuyu işaretleyin."
 
 #. module: stock
 #. odoo-python
@@ -4114,6 +4067,7 @@ msgid "Full Package Name"
 msgstr "Tam Paket Adı"
 
 #. module: stock
+#: model_terms:ir.ui.view,arch_db:stock.search_product_lot_filter
 #: model_terms:ir.ui.view,arch_db:stock.view_picking_internal_search
 msgid "Future Activities"
 msgstr "Sonraki Aktiviteler"
@@ -5356,6 +5310,7 @@ msgid "Late"
 msgstr "Geciken"
 
 #. module: stock
+#: model_terms:ir.ui.view,arch_db:stock.search_product_lot_filter
 #: model_terms:ir.ui.view,arch_db:stock.view_picking_internal_search
 msgid "Late Activities"
 msgstr "Geciken Aktiviteler"
@@ -5997,6 +5952,7 @@ msgid "Multiple destinations"
 msgstr "Çoklu varış noktaları"
 
 #. module: stock
+#: model_terms:ir.ui.view,arch_db:stock.search_product_lot_filter
 #: model_terms:ir.ui.view,arch_db:stock.view_picking_internal_search
 msgid "My Activities"
 msgstr "Aktivitelerim"
@@ -6421,7 +6377,9 @@ msgstr "Ofis sandalyesi"
 #: code:addons/stock/static/src/stock_forecasted/forecasted_header.xml:0
 #: model:ir.model.fields,field_description:stock.field_stock_quant__on_hand
 #: model:ir.model.fields,field_description:stock.field_stock_warehouse_orderpoint__qty_on_hand
+#: model_terms:ir.ui.view,arch_db:stock.product_form_view_procurement_button
 #: model_terms:ir.ui.view,arch_db:stock.product_product_stock_tree
+#: model_terms:ir.ui.view,arch_db:stock.product_template_form_view_procurement_button
 #: model_terms:ir.ui.view,arch_db:stock.search_product_lot_filter
 #: model_terms:ir.ui.view,arch_db:stock.view_stock_product_template_tree
 #: model_terms:ir.ui.view,arch_db:stock.view_stock_product_tree
@@ -6803,6 +6761,7 @@ msgstr "Paket Türü"
 #. module: stock
 #: model_terms:ir.ui.view,arch_db:stock.report_delivery_document
 #: model_terms:ir.ui.view,arch_db:stock.stock_report_delivery_aggregated_move_lines
+#: model_terms:ir.ui.view,arch_db:stock.stock_report_delivery_has_serial_move_line
 msgid "Pack of 6"
 msgstr "6'lı Paket"
 
@@ -9294,8 +9253,7 @@ msgstr "Ertelendi"
 #. module: stock
 #: model_terms:ir.ui.view,arch_db:stock.inventory_warning_set_view
 msgid "Some selected lines already have quantities set, they will be ignored."
-msgstr ""
-"Seçilen bazı satırlarda zaten miktar belirlenmiş, bunlar yok sayılacak."
+msgstr "Seçilen bazı satırlarda zaten miktar belirlenmiş, bunlar yok sayılacak."
 
 #. module: stock
 #: model:ir.model.fields,field_description:stock.field_stock_move_line__origin
@@ -9790,8 +9748,8 @@ msgid ""
 "With 'Automatic No Step Added', the location is replaced in the original "
 "move."
 msgstr ""
-"“Manuel İşlem” değeri, mevcut işlemden sonra bir stok hareketi oluşturur. "
-"“Otomatik Adım Eklenmedi” seçeneğinde, konum orijinal hareketle değiştirilir."
+"“Manuel İşlem” değeri, mevcut işlemden sonra bir stok hareketi oluşturur. “"
+"Otomatik Adım Eklenmedi” seçeneğinde, konum orijinal hareketle değiştirilir."
 
 #. module: stock
 #. odoo-python
@@ -9966,8 +9924,8 @@ msgid ""
 msgstr ""
 "İşlem türü sistemi, her stok işlemine, görünümlerini\n"
 "buna göre değiştirecek belirli bir tür atamanıza olanak tanır. \n"
-"İşlem türünde örneğin, paketlemenin varsayılan olarak gerekip "
-"gerekmediğini, \n"
+"İşlem türünde örneğin, paketlemenin varsayılan olarak gerekip gerekmediğini, "
+"\n"
 "müşteriyi göstermesi gerekip gerekmediğini belirtebilirsiniz."
 
 #. module: stock
@@ -10478,6 +10436,7 @@ msgid "Today"
 msgstr "Bugün"
 
 #. module: stock
+#: model_terms:ir.ui.view,arch_db:stock.search_product_lot_filter
 #: model_terms:ir.ui.view,arch_db:stock.view_picking_internal_search
 msgid "Today Activities"
 msgstr "Bugünkü Aktiviteler"
@@ -11356,8 +11315,7 @@ msgstr ""
 #. module: stock
 #: model_terms:ir.ui.view,arch_db:stock.view_stock_replenishment_info
 msgid "When the stock level at the forecasted date is below the minimum ("
-msgstr ""
-"Öngörülen tarihteki stok seviyesi minimum seviyenin altında olduğunda ("
+msgstr "Öngörülen tarihteki stok seviyesi minimum seviyenin altında olduğunda ("
 
 #. module: stock
 #: model:ir.model.fields,help:stock.field_stock_rule__propagate_carrier
@@ -12242,10 +12200,45 @@ msgid "units"
 msgstr "Birimler"
 
 #. module: stock
+#: model_terms:ir.ui.view,arch_db:stock.view_stock_replenishment_info
+msgid "x"
+msgstr ""
+
+#. module: stock
 #: model:mail.template,subject:stock.mail_template_data_delivery_confirmation
 msgid ""
 "{{ object.company_id.name }} Delivery Order (Ref {{ object.name or 'n/a' }})"
 msgstr "{{ object.company_id.name }} Teslimat (Ref {{ object.name or 'n/a' }})"
+
+#~ msgid "1.00"
+#~ msgstr "1.00"
+
+#~ msgid "12.0"
+#~ msgstr "12.0"
+
+#~ msgid "1234567890"
+#~ msgstr "1234567890"
+
+#~ msgid "12345678901"
+#~ msgstr "12345678901"
+
+#~ msgid "2021-09-01"
+#~ msgstr "01-09-2021"
+
+#~ msgid "2023-01-01"
+#~ msgstr "2023-01-01"
+
+#~ msgid "2023-09-24"
+#~ msgstr "24.09.2023"
+
+#~ msgid "3.00"
+#~ msgstr "3.00"
+
+#~ msgid "54326786758"
+#~ msgstr "54326786758"
+
+#~ msgid "<span groups=\"!uom.group_uom\">On Hand</span>"
+#~ msgstr "<span groups=\"!uom.group_uom\">Elde</span>"
 
 #~ msgid "<strong>Customer Address</strong>"
 #~ msgstr "<strong>Müşteri Adresi</strong>"

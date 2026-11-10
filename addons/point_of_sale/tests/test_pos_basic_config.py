@@ -9,8 +9,9 @@ from odoo.exceptions import ValidationError
 from freezegun import freeze_time
 from dateutil.relativedelta import relativedelta
 from datetime import datetime, timedelta
-from pprint import pformat
 import unittest.mock
+from odoo.http import UserError
+
 
 @odoo.tests.tagged('post_install', '-at_install')
 class TestPoSBasicConfig(TestPoSCommon):
@@ -824,16 +825,17 @@ class TestPoSBasicConfig(TestPoSCommon):
         order_data = self.create_ui_order_data([(self.product3, 1)])
         amount_paid = order_data['amount_paid']
         with (
-            self.assertLogs('odoo.addons.point_of_sale.models.pos_order', level='DEBUG') as cm,
+            self.assertLogs('odoo.addons.point_of_sale.models.pos_order') as cm,
             unittest.mock.patch('odoo.addons.point_of_sale.models.pos_order.randrange', return_value=1996)
         ):
+            self.env['ir.config_parameter'].sudo().set_param('point_of_sale.log_order_data', 'True')
             res = self.env['pos.order'].sync_from_ui([order_data])
             # Basic check for logs on order synchronization
             order_log_str = self.env['pos.order']._get_order_log_representation(order_data)
             odoo_order_id = res['pos.order'][0]['id']
             self.assertEqual(len(cm.output), 4)
             self.assertEqual(cm.output[0], f"INFO:odoo.addons.point_of_sale.models.pos_order:PoS synchronisation #1996 started for PoS orders references: [{order_log_str}]")
-            self.assertTrue(cm.output[1].startswith(f'DEBUG:odoo.addons.point_of_sale.models.pos_order:PoS synchronisation #1996 processing order {order_log_str} order full data: '))
+            self.assertTrue(cm.output[1].startswith(f'INFO:odoo.addons.point_of_sale.models.pos_order:PoS synchronisation #1996 processing order {order_log_str} order full data:'))
             self.assertEqual(cm.output[2], f'INFO:odoo.addons.point_of_sale.models.pos_order:PoS synchronisation #1996 order {order_log_str} created pos.order #{odoo_order_id}')
             self.assertEqual(cm.output[3], 'INFO:odoo.addons.point_of_sale.models.pos_order:PoS synchronisation #1996 finished')
             
@@ -927,6 +929,19 @@ class TestPoSBasicConfig(TestPoSCommon):
 
         # calling load_data should not raise an error
         self.pos_session.load_data([])
+
+    def test_load_data_picks_the_company_website_domain(self):
+        if self.env['ir.module.module']._get('website').state != 'installed':
+            self.skipTest("website module is required for this test")
+
+        company_website = self.config.company_id.website_id
+
+        if company_website:
+            company_website.write({'domain': 'https://custom.test.domain.com'})
+            self.open_new_session()
+            response = self.pos_session.load_data([])
+
+            self.assertEqual(response['pos.config'][0]['_base_url'], company_website.domain)
 
     def test_invoice_past_refund(self):
         """ Test invoicing a past refund
@@ -1337,6 +1352,25 @@ class TestPoSBasicConfig(TestPoSCommon):
         self.assertEqual(len(order.payment_ids), 1, 'Order should have one payment')
         self.assertEqual(self.env['account.move'].search_count([('pos_order_ids', 'in', order.ids)]), 1, 'Order should have one invoice')
 
+    def test_invoice_paid_with_cash_change_same_receivable_account(self):
+        """ Test that when the default_pos_receivable_account and the partner
+        account_receivable are the same, an invoiced order paid in cash
+        with change is correctly marked as paid.
+        """
+        self.company.account_default_pos_receivable_account_id = self.customer.property_account_receivable_id
+        self.open_new_session()
+
+        order_data = self.create_ui_order_data(
+            [(self.product1, 1)],
+            pos_order_ui_args={'amount_return': -5},
+            payments=[(self.cash_pm1, 15)],
+            customer=self.customer,
+            is_invoiced=True,
+        )
+        res = self.env['pos.order'].sync_from_ui([order_data])
+        order = self.env['pos.order'].browse(res['pos.order'][0]['id'])
+        self.assertEqual(order.account_move.payment_state, 'paid')
+
     def test_pos_archived_combination(self):
         product = self.env['product.template'].create({
             'name': 'Product Test',
@@ -1408,6 +1442,56 @@ class TestPoSBasicConfig(TestPoSCommon):
         self.assertEqual(len(product_data['_archived_combinations'][0]), 2, "Archived combination should have two values")
         self.assertTrue(all(value in product_data['_archived_combinations'][0] for value in first_variant.product_template_attribute_value_ids.ids), "Archived combination should match the first variant's attribute values")
 
+    def test_load_product_from_pos_archived_attribute_line(self):
+        """ Loading the archived variant of a past order must not link the archived
+        attribute line and variants to the template used for new sales. """
+        size_attribute, color_attribute = self.env['product.attribute'].create([{
+            'name': 'Size',
+            'create_variant': 'dynamic',
+            'value_ids': [(0, 0, {'name': 'S'}), (0, 0, {'name': 'M'})],
+        }, {
+            'name': 'Color',
+            'create_variant': 'always',
+            'value_ids': [(0, 0, {'name': 'Red'}), (0, 0, {'name': 'Blue'})],
+        }])
+        product = self.env['product.template'].create({
+            'name': 'Product Test',
+            'available_in_pos': True,
+            'list_price': 10,
+            'taxes_id': False,
+            'attribute_line_ids': [(0, 0, {
+                'attribute_id': size_attribute.id,
+                'value_ids': [(6, 0, size_attribute.value_ids.ids)],
+            }), (0, 0, {
+                'attribute_id': color_attribute.id,
+                'value_ids': [(6, 0, color_attribute.value_ids.ids)],
+            })],
+        })
+        size_line = product.attribute_line_ids.filtered(lambda l: l.attribute_id == size_attribute)
+        color_line = product.attribute_line_ids - size_line
+        sold_variant = product._create_product_variant(
+            product.attribute_line_ids.product_template_value_ids.filtered(lambda v: v.name in ('S', 'Red'))
+        )
+
+        self.open_new_session()
+        self._create_orders([{'pos_order_lines_ui_args': [(sold_variant, 1)]}])
+
+        # The sold variant can't be deleted, so removing the line archives both
+        product.write({'attribute_line_ids': [(2, size_line.id)]})
+        self.assertFalse(size_line.active)
+        self.assertFalse(sold_variant.active)
+
+        # Same call as when the POS loads a past order containing the archived variant
+        result = self.env['product.template'].with_context(load_archived=True).load_product_from_pos(
+            self.config.id, [('product_variant_ids.id', 'in', sold_variant.ids)]
+        )
+        product_data = next(item for item in result['product.template'] if item['id'] == product.id)
+        self.assertEqual(product_data['attribute_line_ids'], color_line.ids, "The archived attribute line should not be linked to the template")
+        self.assertNotIn(sold_variant.id, product_data['product_variant_ids'], "The archived variant should not be linked to the template")
+        # The archived records are still loaded so that the past order can be displayed
+        self.assertIn(sold_variant.id, [p['id'] for p in result['product.product']])
+        self.assertIn(size_line.id, [l['id'] for l in result['product.template.attribute.line']])
+
     def test_refunded_order_id(self):
         """
         An order containing refunded lines from two different orders is no longer allowed,
@@ -1473,3 +1557,209 @@ class TestPoSBasicConfig(TestPoSCommon):
         test_payment_method.journal_id = False
         test_journal.action_archive()
         self.assertFalse(test_journal.active, "Journal should be archived when not linked to a POS payment method.")
+
+    def test_refund_ship_later_cancels_picking(self):
+        self.config.write({
+            'ship_later': True,
+            'payment_method_ids': [(6, 0, self.cash_pm1.ids)],
+        })
+        self.open_new_session()
+
+        shipping_date = fields.Date.today() + relativedelta(days=1)
+        orders_map = self._create_orders([
+            {
+                'pos_order_lines_ui_args': [(self.product1, 2)],
+                'payments': [(self.cash_pm1, 20)],
+                'uuid': 'SHIP-LATER-REFUND',
+                'customer': self.customer,
+                'pos_order_ui_args': {
+                    'shipping_date': fields.Date.to_string(shipping_date),
+                },
+            }
+        ])
+        order = orders_map['SHIP-LATER-REFUND']
+        self.assertEqual(order.state, 'paid')
+        self.assertTrue(order.picking_ids)
+        self.assertTrue(order.picking_ids.filtered(lambda p: p.state not in ('done', 'cancel')))
+
+        refund_action = order.refund()
+        refund_order = self.env['pos.order'].browse(refund_action['res_id'])
+        payment_context = {"active_ids": [refund_order.id], "active_id": refund_order.id}
+        make_payment = self.env['pos.make.payment'].with_context(**payment_context).create({
+            'payment_method_id': self.cash_pm1.id,
+            'amount': -20,
+        })
+        make_payment.check()
+        self.assertEqual(refund_order.state, 'paid')
+
+        order._invalidate_cache()
+        self.assertEqual(set(order.picking_ids.mapped('state')), {'cancel'})
+        self.assertFalse(refund_order.picking_ids)
+
+    def test_partial_refund_ship_later_reduces_picking(self):
+        """Test that partial refunds before delivery reduce the picking quantities:
+        - product1 (2 units): fully refunded → move cancelled
+        - product2 (3 units): partially refunded (1 unit) → move qty reduced to 2
+        - product3 (2 units): not refunded at all → move qty unchanged
+        """
+        self.config.write({
+            'ship_later': True,
+            'payment_method_ids': [(6, 0, self.cash_pm1.ids)],
+        })
+        self.open_new_session()
+
+        shipping_date = fields.Date.today() + relativedelta(days=1)
+        # product1: 2 * $10 = $20, product2: 3 * $20 = $60, product3: 2 * $30 = $60
+        orders_map = self._create_orders([
+            {
+                'pos_order_lines_ui_args': [(self.product1, 2), (self.product2, 3), (self.product3, 2)],
+                'payments': [(self.cash_pm1, 20 + 60 + 60)],
+                'uuid': 'SHIP-LATER-PARTIAL',
+                'customer': self.customer,
+                'pos_order_ui_args': {
+                    'shipping_date': fields.Date.to_string(shipping_date),
+                },
+            }
+        ])
+        order = orders_map['SHIP-LATER-PARTIAL']
+        self.assertEqual(order.state, 'paid')
+        self.assertTrue(order.picking_ids)
+
+        # Verify initial move quantities
+        picking = order.picking_ids.filtered(lambda p: p.state not in ('done', 'cancel'))
+        self.assertTrue(picking)
+        product1_move = picking.move_ids.filtered(lambda m: m.product_id == self.product1)
+        product2_move = picking.move_ids.filtered(lambda m: m.product_id == self.product2)
+        product3_move = picking.move_ids.filtered(lambda m: m.product_id == self.product3)
+        self.assertEqual(product1_move.product_uom_qty, 2.0)
+        self.assertEqual(product2_move.product_uom_qty, 3.0)
+        self.assertEqual(product3_move.product_uom_qty, 2.0)
+
+        # Create refund order (starts as full refund of all lines)
+        refund_action = order.refund()
+        refund_order = self.env['pos.order'].browse(refund_action['res_id'])
+
+        # Remove product3 from refund (not refunded at all)
+        refund_order.lines.filtered(lambda l: l.product_id == self.product3).unlink()
+        # Reduce product2 refund to 1 unit (partial refund, was -3)
+        refund_order.lines.filtered(lambda l: l.product_id == self.product2).write({'qty': -1})
+        refund_order._compute_prices()
+
+        # product1: -2 * $10 = -$20, product2: -1 * $20 = -$20 → total refund = -$40
+        payment_context = {"active_ids": [refund_order.id], "active_id": refund_order.id}
+        make_payment = self.env['pos.make.payment'].with_context(**payment_context).create({
+            'payment_method_id': self.cash_pm1.id,
+            'amount': -(20 + 20),
+        })
+        make_payment.check()
+        self.assertEqual(refund_order.state, 'paid')
+
+        order._invalidate_cache()
+        picking._invalidate_cache()
+
+        # Original picking should still exist and stay reserved (ready)
+        self.assertEqual(picking.state, 'assigned')
+
+        # product1 move should be completely removed (fully refunded, not just greyed out)
+        self.assertFalse(
+            picking.move_ids.filtered(lambda m: m.product_id == self.product1),
+            "Fully-refunded move for product1 should be deleted from the picking."
+        )
+
+        # product2 move should be reduced from 3 to 2 (1 unit refunded)
+        product2_move._invalidate_cache()
+        self.assertEqual(product2_move.product_uom_qty, 2.0)
+        self.assertIn(product2_move.state, ('draft', 'confirmed', 'assigned'))
+
+        # product3 move should be unchanged (not refunded)
+        product3_move._invalidate_cache()
+        self.assertEqual(product3_move.product_uom_qty, 2.0)
+        self.assertIn(product3_move.state, ('draft', 'confirmed', 'assigned'))
+
+        # No return picking should be created since nothing was delivered
+        self.assertFalse(refund_order.picking_ids)
+
+    def test_partial_refund_ship_later_removes_fully_refunded_move(self):
+        """Test that a fully-refunded move is completely removed from the picking
+        (not left as a greyed-out/cancelled move).
+
+        Scenario: buy 2x A + 1x B + 1x C, then cancel 1x A and 1x B.
+        Expected picking: 1x A and 1x C — B should be gone entirely, not greyed out.
+        """
+        self.config.write({
+            'ship_later': True,
+            'payment_method_ids': [(6, 0, self.cash_pm1.ids)],
+        })
+        self.open_new_session()
+
+        shipping_date = fields.Date.today() + relativedelta(days=1)
+        # product1=A: 2 * $10 = $20, product2=B: 1 * $20 = $20, product3=C: 1 * $30 = $30
+        orders_map = self._create_orders([
+            {
+                'pos_order_lines_ui_args': [(self.product1, 2), (self.product2, 1), (self.product3, 1)],
+                'payments': [(self.cash_pm1, 20 + 20 + 30)],
+                'uuid': 'SHIP-LATER-REMOVE-MOVE',
+                'customer': self.customer,
+                'pos_order_ui_args': {
+                    'shipping_date': fields.Date.to_string(shipping_date),
+                },
+            }
+        ])
+        order = orders_map['SHIP-LATER-REMOVE-MOVE']
+        self.assertEqual(order.state, 'paid')
+
+        picking = order.picking_ids.filtered(lambda p: p.state not in ('done', 'cancel'))
+        self.assertTrue(picking)
+
+        # Create refund: remove product3 (C) line → only refunding 1x A and 1x B
+        refund_action = order.refund()
+        refund_order = self.env['pos.order'].browse(refund_action['res_id'])
+        refund_order.lines.filtered(lambda l: l.product_id == self.product3).unlink()
+        # Reduce A refund to 1 unit
+        refund_order.lines.filtered(lambda l: l.product_id == self.product1).write({'qty': -1})
+        refund_order._compute_prices()
+
+        # 1x A refund = -$10, 1x B refund = -$20 → total = -$30
+        payment_context = {"active_ids": [refund_order.id], "active_id": refund_order.id}
+        make_payment = self.env['pos.make.payment'].with_context(**payment_context).create({
+            'payment_method_id': self.cash_pm1.id,
+            'amount': -(10 + 20),
+        })
+        make_payment.check()
+        self.assertEqual(refund_order.state, 'paid')
+
+        picking._invalidate_cache()
+
+        # Picking should still be active (C not refunded)
+        self.assertIn(picking.state, ('draft', 'confirmed', 'assigned'))
+
+        # A (product1) move should be reduced to 1 unit
+        product1_move = picking.move_ids.filtered(lambda m: m.product_id == self.product1 and m.state != 'cancel')
+        self.assertEqual(len(product1_move), 1)
+        self.assertEqual(product1_move.product_uom_qty, 1.0)
+
+        # C (product3) move should be unchanged at 1 unit
+        product3_move = picking.move_ids.filtered(lambda m: m.product_id == self.product3 and m.state != 'cancel')
+        self.assertEqual(len(product3_move), 1)
+        self.assertEqual(product3_move.product_uom_qty, 1.0)
+
+        # B (product2) move should be completely removed — not just greyed out
+        product2_move_all = picking.move_ids.filtered(lambda m: m.product_id == self.product2)
+        self.assertFalse(
+            product2_move_all,
+            "Fully-refunded move for product2 (B) should be deleted from the picking, not left as a cancelled/greyed-out move."
+        )
+
+        # No return picking should be created
+        self.assertFalse(refund_order.picking_ids)
+
+    def test_archive_delete_special_product(self):
+        special_product = self.env.ref('point_of_sale.product_product_tip')
+        with self.assertRaisesRegex(UserError, "You cannot archive a product that is set as a special product in a Point of Sale configuration. Please change the configuration first."):
+            special_product.action_archive()
+        with self.assertRaisesRegex(UserError, "You cannot archive a product that is set as a special product in a Point of Sale configuration. Please change the configuration first."):
+            special_product.product_variant_ids[0].action_archive()
+        with self.assertRaisesRegex(UserError, "You cannot archive a product that is set as a special product in a Point of Sale configuration. Please change the configuration first."):
+            special_product.unlink()
+        with self.assertRaisesRegex(UserError, "You cannot archive a product that is set as a special product in a Point of Sale configuration. Please change the configuration first."):
+            special_product.product_variant_ids[0].unlink()

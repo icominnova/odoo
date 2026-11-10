@@ -1,7 +1,15 @@
 import { addBusMessageHandler, busModels } from "@bus/../tests/bus_test_helpers";
-import { after, before, expect, getFixture, registerDebugInfo, test } from "@odoo/hoot";
+import {
+    after,
+    before,
+    expect,
+    getFixture,
+    mockPermission,
+    registerDebugInfo,
+    test,
+} from "@odoo/hoot";
 import { hover as hootHover, queryFirst, resize } from "@odoo/hoot-dom";
-import { Deferred, microTick } from "@odoo/hoot-mock";
+import { Deferred } from "@odoo/hoot-mock";
 import {
     MockServer,
     asyncStep,
@@ -23,7 +31,8 @@ import {
 } from "@web/../tests/web_test_helpers";
 
 import { CHAT_HUB_KEY } from "@mail/core/common/chat_hub_model";
-import { click, contains } from "./mail_test_helpers_contains";
+import { Store } from "@mail/core/common/store_service";
+import { click, contains, TIMEOUT } from "./mail_test_helpers_contains";
 
 import { closeStream, mailGlobal } from "@mail/utils/common/misc";
 import { Component, onMounted, onPatched, onWillDestroy, status } from "@odoo/owl";
@@ -80,6 +89,17 @@ import { Network, Rtc } from "@mail/discuss/call/common/rtc_service";
 import { UPDATE_EVENT } from "@mail/discuss/call/common/peer_to_peer";
 
 export * from "./mail_test_helpers_contains";
+
+const { AudioContext } = window;
+
+/**
+ * Audio context that processes audio without rendering it to any output device.
+ */
+class SilentAudioContext extends AudioContext {
+    constructor(options) {
+        super({ ...options, sinkId: { type: "none" } });
+    }
+}
 
 before(prepareRegistriesWithCleanup);
 export const registryNamesToCloneWithCleanup = [];
@@ -183,11 +203,20 @@ export function onRpcAfter(route, callback) {
     const handler = registry.category("mail.mock_rpc").get(route);
     patchWithCleanup(handler, { after: callback });
 }
+/** @type {Map<string, string>} */
+const globalArchs = new Map();
 
-let archs = {};
+/**
+ * @param {Record<string, string>} newArchs
+ */
 export function registerArchs(newArchs) {
-    archs = newArchs;
-    after(() => (archs = {}));
+    if (!globalArchs.size) {
+        after(() => globalArchs.clear());
+    }
+    globalArchs.clear();
+    for (const [key, value] of Object.entries(newArchs)) {
+        globalArchs.set(key, value);
+    }
 }
 
 export function onlineTest(...args) {
@@ -247,15 +276,16 @@ export async function openView({ context, res_model, res_id, views, domain, ...p
         type,
         resModel: res_model,
         resId: res_id,
-        arch: params?.arch || archs[viewId || res_model + `,false,` + type] || undefined,
+        arch: params?.arch || globalArchs.get(viewId || res_model + `,false,` + type) || undefined,
         viewId: params?.arch || viewId,
         ...params,
     });
     await getService("action").doAction(action, { props: options });
 }
 
-let tabs = [];
-after(() => (tabs = []));
+/** @type {Set<HTMLElement>} */
+const globalTabs = new Set();
+
 /**
  * Add an item to the "Switch Tab" dropdown. If it doesn't exist, create the
  * dropdown and add the item afterwards.
@@ -265,13 +295,16 @@ after(() => (tabs = []));
  * item.
  */
 async function addSwitchTabDropdownItem(rootTarget, tabTarget) {
-    tabs.push(tabTarget);
+    if (!globalTabs.size) {
+        after(() => globalTabs.clear());
+    }
+    globalTabs.add(tabTarget);
     const zIndexMainTab = 100000;
     let dropdownDiv = rootTarget.querySelector(".o-mail-multi-tab-dropdown");
     const onClickDropdownItem = (e) => {
         const dropdownToggle = dropdownDiv.querySelector(".dropdown-toggle");
         dropdownToggle.innerText = `Switch Tab (${e.target.innerText})`;
-        tabs.forEach((tab) => (tab.style.zIndex = -zIndexMainTab));
+        globalTabs.forEach((tab) => (tab.style.zIndex = -zIndexMainTab));
         if (e.target.innerText !== "Hoot") {
             tabTarget.style.zIndex = zIndexMainTab;
         }
@@ -287,7 +320,7 @@ async function addSwitchTabDropdownItem(rootTarget, tabTarget) {
         dropdownDiv.classList.add("o-mail-multi-tab-dropdown");
         dropdownDiv.innerHTML = `
             <button class="btn btn-primary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                Switch Tab (${tabs.length})
+                Switch Tab (${globalTabs.size})
             </button>
             <ul class="dropdown-menu">
                 <li><a class="dropdown-item">Hoot</a></li>
@@ -296,7 +329,7 @@ async function addSwitchTabDropdownItem(rootTarget, tabTarget) {
         dropdownDiv.querySelector("a").onclick = onClickDropdownItem;
         rootTarget.appendChild(dropdownDiv);
     }
-    const tabIndex = tabs.length;
+    const tabIndex = globalTabs.size;
     const li = document.createElement("li");
     const a = document.createElement("a");
     li.appendChild(a);
@@ -322,6 +355,7 @@ export async function start(options) {
             after(() => this.clear());
         },
     });
+    preventActualMediaUsage();
     if (!MockServer.current) {
         await startServer();
     }
@@ -446,7 +480,7 @@ export async function patchUiSize({ height, size, width }) {
 }
 
 function createAudioStream() {
-    const ctx = new window.AudioContext();
+    const ctx = new SilentAudioContext();
     const dest = ctx.createMediaStreamDestination();
     after(() => {
         closeStream(dest.stream);
@@ -500,6 +534,32 @@ export function mockGetMedia() {
         },
     });
     return streams;
+}
+
+/**
+ * Prevents tests from using the actual microphone, camera, screen and speakers:
+ * media requests that are not mocked by the test get synthetic streams, and
+ * audio is processed without being rendered to an output device.
+ *
+ * The prototype is patched so that the test's own mocks on `navigator.mediaDevices`
+ * (e.g. `mockGetMedia`, denied permissions) take precedence regardless of order.
+ */
+function preventActualMediaUsage() {
+    patchWithCleanup(MediaDevices.prototype, {
+        async getUserMedia(constraints) {
+            return constraints?.audio ? createAudioStream() : createVideoStream();
+        },
+        async getDisplayMedia() {
+            return createVideoStream();
+        },
+    });
+    if (window.AudioContext === AudioContext) {
+        patchWithCleanup(window, { AudioContext: SilentAudioContext });
+    }
+    if (browser.AudioContext === AudioContext) {
+        // not already mocked by the test, e.g. with `patchVoiceMessageAudio`
+        patchWithCleanup(browser, { AudioContext: SilentAudioContext });
+    }
 }
 
 /**
@@ -594,39 +654,15 @@ export async function makeMockRtcNetwork({ env, channelId }) {
  * based on the given value. Note that when `requestPermissionResult` is passed,
  * the `change` event of the `Permissions` API will also be triggered.
  *
- * @param {"default" | "denied" | "granted"} permission
- * @param {"default" | "denied" | "granted"} requestPermissionResult
+ * @param {PermissionName} requestPermissionResult
  */
-export function patchBrowserNotification(permission = "default", requestPermissionResult) {
-    if (!browser.Notification || !browser.navigator.permissions) {
-        return;
-    }
-    const notificationQueries = [];
-    patchWithCleanup(browser.navigator.permissions, {
-        async query({ name }) {
-            const result = await super.query(...arguments);
-            if (name === "notifications") {
-                Object.defineProperty(result, "state", {
-                    get: () => (permission === "default" ? "prompt" : permission),
-                });
-                notificationQueries.push(result);
-            }
-            return result;
-        },
-    });
-    patchWithCleanup(browser.Notification, {
-        permission,
-        isPatched: true,
+export function patchBrowserNotification(requestPermissionResult) {
+    mockPermission("notifications", "prompt");
+
+    patchWithCleanup(Notification, {
         requestPermission() {
-            if (!requestPermissionResult) {
-                return super.requestPermission(...arguments);
-            }
-            this.permission = requestPermissionResult;
-            for (const query of notificationQueries) {
-                query.permission = requestPermissionResult;
-                query.dispatchEvent(new Event("change"));
-            }
-            return requestPermissionResult;
+            mockPermission("notifications", requestPermissionResult);
+            return super.requestPermission();
         },
     });
 }
@@ -725,7 +761,7 @@ export async function isInViewportOf(childSelector, parentSelector) {
     await contains(parentSelector);
     await contains(childSelector);
     const inViewportDeferred = new Deferred();
-    const failTimeout = setTimeout(() => check({ crashOnFail: true }), 3000);
+    const failTimeout = setTimeout(() => check({ crashOnFail: true }), TIMEOUT);
     const check = ({ crashOnFail = false } = {}) => {
         const parent = queryFirst(parentSelector);
         const child = queryFirst(childSelector);
@@ -795,27 +831,32 @@ export const STORE_FETCH_ROUTES = ["/mail/action", "/mail/data"];
  *  and the specific params should be logged in asyncStep. By default only the name is logged.
  */
 export function listenStoreFetch(nameOrNames = [], { logParams = [], onRpc: onRpcOverride } = {}) {
-    async function registerStep(request, name, params) {
-        const res = await onRpcOverride?.(request);
-        if (logParams.includes(name)) {
-            asyncStep(`store fetch: ${name} - ${JSON.stringify(params)}`);
-        } else {
-            asyncStep(`store fetch: ${name}`);
-        }
-        return res;
+    const namesToRegister = typeof nameOrNames === "string" ? [nameOrNames] : nameOrNames;
+    function isRegistered(name) {
+        return namesToRegister.length === 0 || namesToRegister.includes(name);
     }
-    async function registerSteps(request, fetchParams) {
-        const namesToRegister = typeof nameOrNames === "string" ? [nameOrNames] : nameOrNames;
+    patchWithCleanup(Store.prototype, {
+        async fetchStoreData(name, params) {
+            const res = await super.fetchStoreData(...arguments);
+            if (isRegistered(name)) {
+                if (logParams.includes(name)) {
+                    asyncStep(`store fetch: ${name} - ${JSON.stringify(params)}`);
+                } else {
+                    asyncStep(`store fetch: ${name}`);
+                }
+            }
+            return res;
+        },
+    });
+    if (!onRpcOverride) {
+        return;
+    }
+    async function callOverride(request, fetchParams) {
         let res;
         for (const fetchParam of fetchParams) {
             const name = typeof fetchParam === "string" ? fetchParam : fetchParam[0];
-            const params = typeof fetchParam === "string" ? undefined : fetchParam[1];
-            if (namesToRegister.length > 0) {
-                if (namesToRegister.some((namesToRegister) => namesToRegister === name)) {
-                    res = await registerStep(request, name, params);
-                }
-            } else {
-                res = await registerStep(request, name, params);
+            if (isRegistered(name)) {
+                res = await onRpcOverride(request);
             }
         }
         return res;
@@ -824,19 +865,18 @@ export function listenStoreFetch(nameOrNames = [], { logParams = [], onRpc: onRp
      * The fetch could happen through any of those routes depending on various conditions.
      * Most tests don't care about which route is used, so we just listen to all of them.
      */
-    onRpc("/mail/action", async (request) => {
-        const { params } = await request.json();
-        return registerSteps(request, params.fetch_params);
-    });
-    onRpc("/mail/data", async (request) => {
-        const { params } = await request.json();
-        return registerSteps(request, params.fetch_params);
-    });
+    for (const route of STORE_FETCH_ROUTES) {
+        onRpc(route, async (request) => {
+            const { params } = await request.json();
+            return callOverride(request, params.fetch_params);
+        });
+    }
 }
 
 /**
- * Waits for the given name or names of store fetch parameters to have been fetched from the server,
- * in the given order. Expected names have to be registered with listenStoreFetch beforehand.
+ * Waits for the given name(s) of store fetch parameters to have been fetched
+ * and applied to the store, in the given order. Expected names have to be registered with
+ * listenStoreFetch beforehand.
  * If other asyncStep are resolving in the same flow, they must be provided to stepsAfter (if they
  * are resolved after the fetch) or stepsBefore (if they are resolved before the fetch). The order
  * can be ignored with ignoreOrder option.
@@ -868,13 +908,6 @@ export async function waitStoreFetch(
         ],
         { ignoreOrder }
     );
-    /**
-     * Extra tick necessary to ensure the RPC is fully processed before resolving.
-     * This is necessary because the asyncStep in onRpc is not synchronous with the moment
-     * the RPC result is resolved and processed in the business code. Removing this tick
-     * won't make everything fail, but it might create subtle race conditions.
-     */
-    await microTick();
 }
 
 export function userContext() {
@@ -940,7 +973,7 @@ export function patchVoiceMessageAudio() {
             }
             /** @returns {AudioBuffer} */
             decodeAudioData(...args) {
-                return new AudioContext().decodeAudioData(...args);
+                return new SilentAudioContext().decodeAudioData(...args);
             }
         },
         AudioWorkletNode: class {

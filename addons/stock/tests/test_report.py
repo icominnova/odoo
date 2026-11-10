@@ -3,6 +3,7 @@
 
 from datetime import date, datetime, timedelta
 from re import findall
+from unittest.mock import patch
 
 from odoo.tests import Form, TransactionCase
 from odoo import Command
@@ -2097,3 +2098,95 @@ class TestReports(TestReportsCommon):
         self.assertEqual(picking_out.move_ids.mapped('quantity'), [0.0, 2.0])
         self.env['report.stock.report_reception'].action_assign(out_move.ids, [1.0], picking_in.move_ids.ids)
         self.assertEqual(picking_out.move_ids.mapped('quantity'), [1.0, 2.0])
+
+    def test_stock_reception_ignores_moves_without_source_document(self):
+        report = self.env['report.stock.report_reception']
+        picking_out = self.env['stock.picking'].create({
+            'picking_type_id': self.ref('stock.picking_type_out'),
+            'location_id': self.stock_location.id,
+            'location_dest_id': self.ref('stock.stock_location_customers'),
+            'move_ids': [Command.create({
+                'product_id': self.product.id,
+                'product_uom': self.ref('uom.product_uom_unit'),
+                'product_uom_qty': 1.0,
+            })],
+        })
+        out_move = picking_out.move_ids
+        self.env.ref('stock.picking_type_out').reservation_method = 'at_confirm'
+        picking_out.action_confirm()
+
+        picking_in = self.env['stock.picking'].create({
+            'picking_type_id': self.ref('stock.picking_type_in'),
+            'location_id': self.ref('stock.stock_location_suppliers'),
+            'location_dest_id': self.stock_location.id,
+            'move_ids': [Command.create({
+                'product_id': self.product.id,
+                'product_uom': self.ref('uom.product_uom_unit'),
+                'product_uom_qty': 1.0,
+            })],
+        })
+        picking_in.action_confirm()
+        picking_in.button_validate()
+        in_move = picking_in.move_ids
+        report.action_assign(out_move.ids, [1.0], [in_move.ids])
+
+        original_get_source_document = self.env.registry['stock.move']._get_source_document
+
+        def _get_source_document(move):
+            if move.id == out_move.id:
+                return move.env['stock.picking']
+            return original_get_source_document(move)
+
+        with patch.object(self.env.registry['stock.move'], '_get_source_document', _get_source_document):
+            self.assertFalse(report._get_report_values(docids=[picking_in.id])['sources_to_lines'])
+            self.assertTrue(report.action_unassign(out_move.id, 1.0, in_move.ids))
+
+        self.assertFalse(in_move.move_dest_ids)
+
+    def test_delivery_slip_product_description_with_whitespace(self):
+        """ Test that product name is not printed twice on the delivery slip when
+        the product name has leading/trailing whitespace compared to description_picking.
+        """
+        product = self.env['product.product'].create({
+            'name': '  Customizable Desk  ',
+            'is_storable': True,
+        })
+        picking_out = self.env['stock.picking'].create({
+            'picking_type_id': self.ref('stock.picking_type_out'),
+            'location_id': self.stock_location.id,
+            'location_dest_id': self.ref('stock.stock_location_customers'),
+            'move_ids': [Command.create({
+                'product_id': product.id,
+                'product_uom': self.ref('uom.product_uom_unit'),
+                'product_uom_qty': 1.0,
+                'description_picking': 'Customizable Desk',
+            })],
+        })
+        picking_out.action_confirm()
+
+        html = self.env['ir.actions.report']._render_qweb_html('stock.report_deliveryslip', [picking_out.id])[0]
+        self.assertEqual(len(findall(rb'Customizable Desk', html)), 1)
+
+    def test_incoming_qty_follows_operation_type_change(self):
+        """ Changing the operation type of a receipt to another warehouse's one must also move
+        the final location of its moves, so the forecasted incoming qty is counted there. """
+        wh_1 = self.env.ref('stock.warehouse0')
+        wh_1.reception_steps = 'two_steps'
+        picking = self.env['stock.picking'].create({
+            'picking_type_id': self.ref('stock.picking_type_in'),
+            'location_id': self.ref('stock.stock_location_suppliers'),
+            'location_dest_id': wh_1.wh_input_stock_loc_id.id,
+            'move_ids': [Command.create({
+                'product_id': self.product.id,
+                'product_uom_qty': 1,
+                'location_id': self.supplier_location.id,
+                'location_dest_id': wh_1.wh_input_stock_loc_id.id,
+                'location_final_id': wh_1.lot_stock_id.id,
+            })],
+        })
+        picking.action_confirm()
+
+        picking.picking_type_id = self.wh_2.in_type_id
+        self.assertEqual(picking.move_ids.location_final_id, self.wh_2.lot_stock_id)
+        self.assertEqual(self.product.with_context(warehouse_id=wh_1.id).incoming_qty, 0)
+        self.assertEqual(self.product.with_context(warehouse_id=self.wh_2.id).incoming_qty, 1)

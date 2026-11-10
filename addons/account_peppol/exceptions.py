@@ -1,6 +1,8 @@
 from typing import Callable
+from markupsafe import Markup
 
-from odoo.tools import LazyTranslate
+from odoo.tools.translate import LazyTranslate
+from odoo.addons.account_peppol.tools.peppol_errors import render_peppol_errors
 
 _lt = LazyTranslate(__name__)
 
@@ -45,6 +47,8 @@ STANDARD_EXCEPTION_CODE_MESSAGES_MAP: dict[int, Callable[..., str]] = {
     707: lambda: _lt('You have reached the limit of documents you can send today. Retry later. Please contact the support if you think you need to increase that limit.'),
     708: lambda: _lt('You are not authorized to change the contact email.'),
 }
+# Messages that we must show the full error instead of a generic one.
+STANDARD_EXCEPTION_ALLOWED_MESSAGES = (105, 106)
 
 
 # Errors from the ebMS standard (stored as `ebms_code`)
@@ -110,13 +114,13 @@ def _get_translation_lambda_message(translation_lambda: Callable[..., str], args
         return translation_lambda(*dummy_args)
 
 
-def get_peppol_error_message(env, error_vals: dict):
+def get_peppol_error_message(env, error_vals: dict, move=None):
     """
     Helper to process the error dictionary returned from the IAP response.
     It will only get the code (or EBMS code) and map it to the correct translated message.
     :param dict error_vals: the dictionary of encoded error json generated from the `_json` method in `peppol_proxy`
     :return: the translated error message
-    :rtype: str
+    :rtype: Markup
     """
     # handles errors raised directly from jsonrpc routes instead of being caught and converted
     if error_vals.get('data', {}).get('context'):
@@ -125,14 +129,18 @@ def get_peppol_error_message(env, error_vals: dict):
         # Error with ebMS code is originally from PeppolInboundError
         # In most case, ebMS message will be better and more specific, except for when the code is 4 (general "Other" message)
         error_message = get_ebms_message(env, error_vals)
-    else:
+    elif (strd_code := error_vals.get('code')) and strd_code not in STANDARD_EXCEPTION_ALLOWED_MESSAGES:
         error_message = get_exception_message(env, error_vals)
+    else:
+        error_message = error_vals.get('message', 'Not able to retrieve error message')
 
-    return env._(
-        "Peppol Error [code=%(error_code)s]: %(error_subject)s\n%(error_message)s",
-        error_code=error_vals['code'],
-        error_subject=error_vals.get('subject', ''),
-        error_message=error_message,
+    return (
+        Markup("%(peppol_error)s [code=%(error_code)s] : %(error_subject)s") % {
+            'peppol_error': env._("Peppol Error"),
+            'error_code': error_vals['code'],
+            'error_subject': Markup("<strong>%s</strong>") % error_vals.get('subject', ''),
+        }
+        + render_peppol_errors(move, env._("%s", error_message))
     )
 
 

@@ -1,10 +1,9 @@
-<Invoice xmlns="urn:oasis:names:specification:ubl:schema:xsd:Invoice-2" xmlns:cac="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-2" xmlns:cbc="urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2">
+<CreditNote xmlns="urn:oasis:names:specification:ubl:schema:xsd:CreditNote-2" xmlns:cac="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-2" xmlns:cbc="urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2">
 	<cbc:CustomizationID>urn:cen.eu:en16931:2017#compliant#urn:fdc:peppol.eu:2017:poacc:selfbilling:3.0</cbc:CustomizationID>
 	<cbc:ProfileID>urn:fdc:peppol.eu:2017:poacc:selfbilling:01:1.0</cbc:ProfileID>
 	<cbc:ID>___ignore___</cbc:ID>
 	<cbc:IssueDate>___ignore___</cbc:IssueDate>
-	<cbc:DueDate>___ignore___</cbc:DueDate>
-	<cbc:InvoiceTypeCode>389</cbc:InvoiceTypeCode>
+	<cbc:CreditNoteTypeCode>261</cbc:CreditNoteTypeCode>
 	<cbc:DocumentCurrencyCode>EUR</cbc:DocumentCurrencyCode>
 	<cac:OrderReference>
 		<cbc:ID>___ignore___</cbc:ID>
@@ -19,7 +18,7 @@
 		<cac:Party>
 			<cbc:EndpointID schemeID="0208">0477472701</cbc:EndpointID>
 			<cac:PartyIdentification>
-				<cbc:ID>0477472701</cbc:ID>
+				<cbc:ID schemeID="0208">0477472701</cbc:ID>
 			</cac:PartyIdentification>
 			<cac:PartyName>
 				<cbc:Name>partner_be</cbc:Name>
@@ -40,7 +39,7 @@
 			</cac:PartyTaxScheme>
 			<cac:PartyLegalEntity>
 				<cbc:RegistrationName>partner_be</cbc:RegistrationName>
-				<cbc:CompanyID>0477472701</cbc:CompanyID>
+				<cbc:CompanyID schemeID="0208">0477472701</cbc:CompanyID>
 			</cac:PartyLegalEntity>
 			<cac:Contact>
 				<cbc:Name>partner_be</cbc:Name>
@@ -51,7 +50,7 @@
 		<cac:Party>
 			<cbc:EndpointID schemeID="0208">0202239951</cbc:EndpointID>
 			<cac:PartyIdentification>
-				<cbc:ID>0202239951</cbc:ID>
+				<cbc:ID schemeID="0208">0202239951</cbc:ID>
 			</cac:PartyIdentification>
 			<cac:PartyName>
 				<cbc:Name>company_1_data</cbc:Name>
@@ -72,7 +71,7 @@
 			</cac:PartyTaxScheme>
 			<cac:PartyLegalEntity>
 				<cbc:RegistrationName>company_1_data</cbc:RegistrationName>
-				<cbc:CompanyID>0202239951</cbc:CompanyID>
+				<cbc:CompanyID schemeID="0208">0202239951</cbc:CompanyID>
 			</cac:PartyLegalEntity>
 			<cac:Contact>
 				<cbc:Name>company_1_data</cbc:Name>
@@ -124,12 +123,11 @@
 		<cbc:PrepaidAmount currencyID="EUR">0.00</cbc:PrepaidAmount>
 		<cbc:PayableAmount currencyID="EUR">121.00</cbc:PayableAmount>
 	</cac:LegalMonetaryTotal>
-	<cac:InvoiceLine>
+	<cac:CreditNoteLine>
 		<cbc:ID>___ignore___</cbc:ID>
-		<cbc:InvoicedQuantity unitCode="C62">1.0</cbc:InvoicedQuantity>
+		<cbc:CreditedQuantity unitCode="C62">1.0</cbc:CreditedQuantity>
 		<cbc:LineExtensionAmount currencyID="EUR">100.00</cbc:LineExtensionAmount>
 		<cac:Item>
-			<cbc:Description>Test Product</cbc:Description>
 			<cbc:Name>Test Product</cbc:Name>
 			<cac:ClassifiedTaxCategory>
 				<cbc:ID>S</cbc:ID>
@@ -142,5 +140,5 @@
 		<cac:Price>
 			<cbc:PriceAmount currencyID="EUR">100.0</cbc:PriceAmount>
 		</cac:Price>
-	</cac:InvoiceLine>
-</Invoice>
+	</cac:CreditNoteLine>
+</CreditNote>

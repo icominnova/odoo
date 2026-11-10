@@ -315,7 +315,7 @@ class TestAccountMove(AccountTestInvoicingCommon):
         readonly_fields = ('invoice_line_ids', 'line_ids', 'invoice_date', 'date', 'partner_id',
                            'invoice_payment_term_id', 'currency_id', 'fiscal_position_id', 'invoice_cash_rounding_id')
         for field in readonly_fields:
-            with self.assertRaisesRegex(UserError, "You cannot modify the following readonly fields on a posted move"):
+            with self.assertRaisesRegex(UserError, "You cannot modify the following readonly fields on the posted move %s" % self.test_move.name):
                 self.test_move.write({field: False})
 
     def test_misc_move_onchange(self):
@@ -938,6 +938,81 @@ class TestAccountMove(AccountTestInvoicingCommon):
             {'name': 'credit', 'debit': 0.0,   'credit': 100.0, 'account_id': income_account.id, 'tax_ids': caba_tax.ids, 'tax_line_id': False},
         ])
 
+    def test_always_exigible_caba_bank_reco_discount(self):
+        """ When doing bank reconciliation, it's possible to apply directly some discount at reconciliation. For example, a 10% discount due to
+        early payment. In such case, the move written in the bank journal will contain a receivable line, as well as a base and tax line in order
+        to reduce the declared tax amounts. This test makes sure this works well with cash basis taxes, checking the computation of
+        always_tax_exigible.
+        """
+        tax_account = self.company_data['default_account_tax_sale']
+        receivable_account = self.company_data['default_account_receivable']
+        income_account = self.company_data['default_account_revenue']
+        bank_account = self.company_data['default_journal_bank'].default_account_id
+
+        tax_account.reconcile = True
+
+        caba_tax = self.env['account.tax'].create({
+            'name': "CABA",
+            'amount_type': 'percent',
+            'amount': 20.0,
+            'tax_exigibility': 'on_payment',
+            'cash_basis_transition_account_id': self.safe_copy(tax_account).id,
+            'invoice_repartition_line_ids': [
+                (0, 0, {
+                    'repartition_type': 'base',
+                }),
+                (0, 0, {
+                    'repartition_type': 'tax',
+                    'account_id': tax_account.id,
+                }),
+            ],
+            'refund_repartition_line_ids': [
+                (0, 0, {
+                    'repartition_type': 'base',
+                }),
+                (0, 0, {
+                    'repartition_type': 'tax',
+                    'account_id': tax_account.id,
+                }),
+            ],
+        })
+
+        move_form = Form(self.env['account.move'].with_context(default_move_type='entry'))
+
+        move_form.journal_id = self.company_data['default_journal_bank']
+
+        # Receivable line ; will be reconciled with the invoice (assuming the total of the invoice is here 100, tax included)
+        with move_form.line_ids.new() as receivable_line:
+            receivable_line.name = 'receivable'
+            receivable_line.account_id = receivable_account
+            receivable_line.credit = 100
+
+        # Bank line
+        with move_form.line_ids.new() as bank_line:
+            bank_line.name = 'bank'
+            bank_line.account_id = bank_account
+            bank_line.debit = 90
+
+        # 10% discount
+        with move_form.line_ids.new() as discount_line:
+            discount_line.name = 'discount'
+            discount_line.account_id = income_account
+            discount_line.debit = 8.33  # So that base + tax amounts to 10
+            discount_line.tax_ids.clear()
+            discount_line.tax_ids.add(caba_tax)
+
+        move = move_form.save()
+
+        self.assertTrue(move.always_tax_exigible)
+
+        self.assertRecordValues(move.line_ids.sorted(lambda x: x.balance), [
+            # pylint: disable=C0326
+            {'name': 'receivable', 'debit':  0.0,  'credit': 100.0, 'account_id': receivable_account.id, 'tax_ids': [],           'tax_line_id': False},
+            {'name': 'CABA',       'debit':  1.67, 'credit':   0.0, 'account_id': tax_account.id,        'tax_ids': [],           'tax_line_id': caba_tax.id},
+            {'name': 'discount',   'debit':  8.33, 'credit':   0.0, 'account_id': income_account.id,     'tax_ids': caba_tax.ids, 'tax_line_id': False},
+            {'name': 'bank',       'debit': 90.0,  'credit':   0.0, 'account_id': bank_account.id,       'tax_ids': [],           'tax_line_id': False},
+        ])
+
     def test_misc_with_taxes_reverse(self):
         test_account = self.company_data['default_account_revenue']
 
@@ -1402,3 +1477,131 @@ class TestAccountMove(AccountTestInvoicingCommon):
         }])
         move.line_ids.account_id = shared_account
         move.action_post()
+
+    def test_post_invoice_fails_with_tax_and_journal_company_inconsistency(self):
+        """
+        Ensure that an invoice cannot be posted when at least one line tax
+        belongs to a different company than the journal.
+
+        The company check of the ORM only runs on the written fields, so moving
+        a draft invoice to another company keeps the taxes of the former company.
+        The inconsistency would then only be detected when resetting to draft.
+        """
+        tax = self.company_data['default_tax_purchase']
+        company_branch, company_b = self.env['res.company'].create([
+            {
+                'name': 'Company Branch',
+                'parent_id': self.env.company.id,
+                'country_id': self.env.company.country_id.id,
+            },
+            {
+                'name': 'Company B',
+                'country_id': self.env.company.country_id.id,
+            },
+        ])
+        self.env.user.company_ids |= company_branch | company_b
+        journal_branch, journal_b = self.env['account.journal'].create([
+            {
+                'name': 'Company Branch Purchase Journal',
+                'type': 'purchase',
+                'code': 'CBrP',
+                'company_id': company_branch.id,
+            },
+            {
+                'name': 'Company B Purchase Journal',
+                'type': 'purchase',
+                'code': 'CBP',
+                'company_id': company_b.id,
+            },
+        ])
+        invoice = self.init_invoice('in_invoice', products=self.product_a, taxes=tax)
+        invoice = invoice.with_context(allowed_company_ids=(self.env.company | company_branch | company_b).ids)
+
+        # Ensure branch company aren't considered as inconsistency
+        invoice.write({'company_id': company_branch.id, 'journal_id': journal_branch.id})
+        invoice.action_post()
+        invoice.button_draft()
+
+        # Ensure posting fails when the tax's company is different than the journal's company,
+        # even if the accounts are shared between the two companies
+        for account in invoice.line_ids.account_id:
+            account.write({
+                'company_ids': [Command.link(company_b.id)],
+                'code_mapping_ids': [Command.create({'company_id': company_b.id, 'code': account.code})],
+            })
+        invoice.write({'name': '/', 'company_id': company_b.id, 'journal_id': journal_b.id})
+        with self.assertRaisesRegex(UserError, rf"The entry is using taxes \({tax.display_name}\) from a different company\."):
+            invoice.action_post()
+
+    def test_journal_entry_analytic_distribution_search_is_set(self):
+        """ Verify searching on analytic_distribution with 'is set', 'is not set'."""
+        analytic_plan = self.env['account.analytic.plan'].create({'name': 'Plan'})
+        analytic_account = self.env['account.analytic.account'].create({
+            'name': "Test Account",
+            'plan_id': analytic_plan.id,
+        })
+        self.assertFalse(self.env['account.move.line'].search([('analytic_distribution', '!=', False)]))
+        self.test_move.line_ids[0]['analytic_distribution'] = {str(analytic_account.id): 100}
+        self.assertEqual(
+            self.env['account.move.line'].search([('analytic_distribution', '!=', False)]),
+            self.test_move.line_ids[0],
+            ""
+        )
+
+    def test_modify_zero_line_in_locked_period(self):
+        """
+        Ensure that zero-amount lines in a locked period cannot be modified or reset to draft, but can be safely unlinked.
+        """
+        posted_move = self.env['account.move'].create({
+            'move_type': 'entry',
+            'date': '2024-01-01',
+            'line_ids': [
+                Command.create({
+                    'name': 'zero line 1',
+                    'account_id': self.company_data['default_account_revenue'].id,
+                }),
+                Command.create({
+                    'name': 'zero line 2',
+                    'account_id': self.company_data['default_account_expense'].id,
+                }),
+            ]
+        })
+        posted_move.action_post()
+
+        posted_move.company_id.sudo().write({
+            'fiscalyear_lock_date': '2025-01-01',
+        })
+
+        with self.assertRaisesRegex(UserError, "You cannot add/modify entries prior to and inclusive of"), self.cr.savepoint():
+            posted_move.line_ids[0].write({'account_id': self.company_data['default_account_expense'].id})
+
+        posted_move.line_ids.unlink()
+
+        self.assertFalse(posted_move.line_ids, "The zero-amount lines should have been successfully deleted.")
+
+    def test_invoice_line_name_uses_invoice_partner_language(self):
+        """Test that when an invoice is created for an invoice contact (that has a different language with
+        respect to its parent contact) also the name of the product in the invoice is in the correct language."""
+        self.env['res.lang']._activate_lang('fr_FR')
+        self.partner_a.lang = 'en_US'
+
+        invoice_contact = self.env['res.partner'].create({
+            'name': 'Invoice Contact',
+            'type': 'invoice',
+            'parent_id': self.partner_a.id,
+            'lang': 'fr_FR',
+        })
+
+        self.product_a.update_field_translations('description_sale', {
+            'en_US': 'Water Bottle',
+            'fr_FR': 'Bouteille d\'eau',
+        })
+
+        invoice = self.env['account.move'].create({
+            'move_type': 'out_invoice',
+            'partner_id': invoice_contact.id,
+            'invoice_line_ids': [Command.create({'product_id': self.product_a.id})],
+        })
+
+        line = invoice.invoice_line_ids.filtered(lambda l: l.product_id == self.product_a)[:1]
+        self.assertEqual(line.name, "product_a\nBouteille d'eau")

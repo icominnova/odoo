@@ -14,15 +14,17 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 19.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-01-25 18:35+0000\n"
-"PO-Revision-Date: 2025-10-08 18:37+0000\n"
-"Last-Translator: \n"
-"Language-Team: \n"
+"POT-Creation-Date: 2026-11-06 17:37+0000\n"
+"PO-Revision-Date: 2026-08-02 19:08+0000\n"
+"Last-Translator: Anonymous <noreply@weblate.org>\n"
+"Language-Team: Uzbek <https://translate.odoo.com/projects/odoo-19/"
+"website_sale/uz/>\n"
 "Language: uz\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
+"X-Generator: Weblate 2026.6.1\n"
 
 #. module: website_sale
 #: model_terms:ir.ui.view,arch_db:website_sale.products
@@ -143,45 +145,11 @@ msgid "1 Column"
 msgstr "1 ustun"
 
 #. module: website_sale
-#: model:ir.model.fields.selection,name:website_sale.selection__website__product_page_image_width__100_pc
-msgid "100 %"
-msgstr ""
-
-#. module: website_sale
 #. odoo-javascript
 #: code:addons/website_sale/static/src/website_builder/products_list_page_option.xml:0
 #, fuzzy
 msgid "2 Columns"
 msgstr "2 ustun"
-
-#. module: website_sale
-#: model:ir.model.fields.selection,name:website_sale.selection__website__product_page_image_width__33_pc
-msgid "33 %"
-msgstr ""
-
-#. module: website_sale
-#: model:ir.model.fields.selection,name:website_sale.selection__website__product_page_image_width__50_pc
-msgid "50 %"
-msgstr ""
-
-#. module: website_sale
-#: model:ir.model.fields.selection,name:website_sale.selection__website__product_page_image_width__66_pc
-msgid "66 %"
-msgstr ""
-
-#. module: website_sale
-#: model_terms:ir.ui.view,arch_db:website_sale.confirmation
-#, fuzzy
-msgid ""
-"<a role=\"button\" t-att-href=\"order.partner_id.signup_prepare() and "
-"order.partner_id.with_context(relative_url=True)._get_signup_url()\" "
-"class=\"btn btn-primary o_translate_inline\">Sign Up</a>\n"
-"                    <span class=\"align-middle\">to follow your order.</span>"
-msgstr ""
-"<a role=\"button\" t-att-href=\"order.partner_id.signup_prepare() va "
-"order.partner_id.with_context(relative_url=True)._get_signup_url()\" "
-"class=\"btn btn-primary o_translate_inline\">Ro‘yxatdan o‘tish</a> <span "
-"class=\"align-middle\">buyurtmangizni kuzatib borish uchun.</span>"
 
 #. module: website_sale
 #: model_terms:ir.ui.view,arch_db:website_sale.o_wsale_offcanvas
@@ -400,6 +368,11 @@ msgstr ""
 #, fuzzy
 msgid "<span class=\"align-middle\">Already have an account?</span>"
 msgstr "<span class=\"align-middle\">Hisobingiz bormi?</span>"
+
+#. module: website_sale
+#: model_terms:ir.ui.view,arch_db:website_sale.confirmation
+msgid "<span class=\"align-middle\">to follow your order.</span>"
+msgstr ""
 
 #. module: website_sale
 #: model_terms:ir.ui.view,arch_db:website_sale.s_dynamic_snippet_products_preview_data
@@ -640,38 +613,6 @@ msgstr "<span>nashr qilinganidan keyin kun.</span>"
 #, fuzzy
 msgid "<span>for</span>"
 msgstr "<span>uchun</span>"
-
-#. module: website_sale
-#: model_terms:ir.ui.view,arch_db:website_sale.cart
-#, fuzzy
-msgid ""
-"<strong>\n"
-"                                <a class=\"o_translate_inline\" t-attf-"
-"href=\"/shop/cart/?id={{id}}&amp;access_token={{access_token}}"
-"&amp;revive_method=merge\">Click here</a>\n"
-"                            </strong> if you want to merge your previous "
-"cart into current cart."
-msgstr ""
-"<strong><a class=\"o_translate_inline\" t-attf-href=\"/shop/cart/?id={{id}}"
-"&amp;access_token={{access_token}}&amp;revive_method=merge\">Avvalgi "
-"savatchangizni joriy savatchangizga birlashtirmoqchi bo‘lsangiz, shu yerni "
-"bosing</a></strong>"
-
-#. module: website_sale
-#: model_terms:ir.ui.view,arch_db:website_sale.cart
-#, fuzzy
-msgid ""
-"<strong>\n"
-"                                <a class=\"o_translate_inline\" t-attf-"
-"href=\"/shop/cart/?id={{id}}&amp;access_token={{access_token}}"
-"&amp;revive_method=squash\">Click here</a>\n"
-"                            </strong> if you want to restore your previous "
-"cart. Your current cart will be replaced with your previous cart."
-msgstr ""
-"<strong><a class=\"o_translate_inline\" t-attf-href=\"/shop/cart/?id={{id}}"
-"&amp;access_token={{access_token}}&amp;revive_method=squash\">Avvalgi "
-"savatchangizni tiklashni istasangiz, shu yerni bosing</a></strong>. Joriy "
-"savatchangiz avvalgi savatchangiz bilan almashtiriladi."
 
 #. module: website_sale
 #: model_terms:ir.ui.view,arch_db:website_sale.product
@@ -1456,6 +1397,12 @@ msgid "Bordered"
 msgstr "Chegaralangan"
 
 #. module: website_sale
+#. odoo-javascript
+#: code:addons/website_sale/static/src/website_builder/product_page_option.xml:0
+msgid "Bottom"
+msgstr ""
+
+#. module: website_sale
 #. odoo-python
 #: code:addons/website_sale/models/website_snippet_filter.py:0
 #, fuzzy
@@ -1821,6 +1768,11 @@ msgid ""
 msgstr ""
 "Birinchi mahsulotingizni yaratish uchun yuqori o‘ng burchakdagi <i>'Yangi'</"
 "i> tugmasini bosing."
+
+#. module: website_sale
+#: model_terms:ir.ui.view,arch_db:website_sale.cart
+msgid "Click here"
+msgstr ""
 
 #. module: website_sale
 #. odoo-javascript
@@ -3800,6 +3752,7 @@ msgstr "Tartib"
 
 #. module: website_sale
 #. odoo-javascript
+#: code:addons/website_sale/static/src/website_builder/product_page_option.xml:0
 #: code:addons/website_sale/static/src/website_builder/product_ribbon_options.xml:0
 #: model:ir.model.fields.selection,name:website_sale.selection__product_ribbon__position__left
 #, fuzzy
@@ -3844,6 +3797,12 @@ msgstr "Qator jami soliqlarni ko‘rsatish"
 #, fuzzy
 msgid "Link Color"
 msgstr "Havola rangi"
+
+#. module: website_sale
+#. odoo-python
+#: code:addons/website_sale/controllers/cart.py:0
+msgid "Linked lines must be added to the cart with their parent."
+msgstr ""
 
 #. module: website_sale
 #. odoo-javascript
@@ -5680,10 +5639,16 @@ msgstr "Umumiy qidirish"
 #. module: website_sale
 #: model_terms:ir.ui.view,arch_db:website_sale.o_wsale_offcanvas
 #: model_terms:ir.ui.view,arch_db:website_sale.product
+#: model_terms:ir.ui.view,arch_db:website_sale.product_search
 #: model_terms:ir.ui.view,arch_db:website_sale.products
 #, fuzzy
 msgid "Search in"
 msgstr "Ichidan qidirish"
+
+#. module: website_sale
+#: model_terms:ir.ui.view,arch_db:website_sale.filter_radio_and_multi_attributes
+msgid "Search {{0}} ({{1}})"
+msgstr ""
 
 #. module: website_sale
 #: model_terms:ir.ui.view,arch_db:website_sale.products
@@ -6030,6 +5995,11 @@ msgid "Sidebar"
 msgstr "Yon panel"
 
 #. module: website_sale
+#: model_terms:ir.ui.view,arch_db:website_sale.confirmation
+msgid "Sign Up"
+msgstr ""
+
+#. module: website_sale
 #: model_terms:ir.ui.view,arch_db:website_sale.address
 #, fuzzy
 msgid "Sign in"
@@ -6092,6 +6062,14 @@ msgstr "Divanlar"
 #, fuzzy
 msgid "Sold out"
 msgstr "Sotilgan"
+
+#. module: website_sale
+#. odoo-python
+#: code:addons/website_sale/controllers/main.py:0
+msgid ""
+"Some products in your cart are not available for purchase in your country. "
+"Please remove them or contact us."
+msgstr ""
 
 #. module: website_sale
 #. odoo-python
@@ -6462,6 +6440,14 @@ msgstr ""
 
 #. module: website_sale
 #. odoo-python
+#: code:addons/website_sale/controllers/cart.py:0
+msgid ""
+"The number of selected combo items must match the number of available combo "
+"choices."
+msgstr ""
+
+#. module: website_sale
+#. odoo-python
 #: code:addons/website_sale/controllers/payment.py:0
 #, fuzzy
 msgid "The order has been cancelled."
@@ -6610,6 +6596,24 @@ msgstr "Bu mahsulotning yaroqli kombinatsiyasi yo‘q"
 #, fuzzy
 msgid "This product is no longer available."
 msgstr "Bu mahsulot endi mavjud emas"
+
+#. module: website_sale
+#. odoo-python
+#: code:addons/website_sale/models/sale_order.py:0
+msgid "This product is not available (anymore) in this unit of measure."
+msgstr ""
+
+#. module: website_sale
+#. odoo-python
+#: code:addons/website_sale/controllers/main.py:0
+msgid "This product is not available for purchase in your country."
+msgstr ""
+
+#. module: website_sale
+#. odoo-python
+#: code:addons/website_sale/controllers/cart.py:0
+msgid "This product is part of a combo and can't be updated individually."
+msgstr ""
 
 #. module: website_sale
 #: model_terms:ir.ui.view,arch_db:website_sale.products_item
@@ -6872,6 +6876,14 @@ msgid "Video URL"
 msgstr "Video URL manzili"
 
 #. module: website_sale
+#. odoo-javascript
+#: code:addons/website_sale/static/src/interactions/website_sale.js:0
+msgid "View Less"
+msgstr ""
+
+#. module: website_sale
+#. odoo-javascript
+#: code:addons/website_sale/static/src/interactions/website_sale.js:0
 #: model_terms:ir.ui.view,arch_db:website_sale.filter_radio_and_multi_attributes
 #, fuzzy
 msgid "View More"
@@ -7245,6 +7257,12 @@ msgid "You can't use a video as the product's main image."
 msgstr "Mahsulotning asosiy tasviri sifatida videodan foydalanish mumkin emas."
 
 #. module: website_sale
+#. odoo-python
+#: code:addons/website_sale/controllers/cart.py:0
+msgid "You cannot add a combo item separately from its combo."
+msgstr ""
+
+#. module: website_sale
 #: model_terms:ir.actions.act_window,help:website_sale.sale_report_action_carts
 #: model_terms:ir.actions.act_window,help:website_sale.sale_report_action_dashboard
 #, fuzzy
@@ -7472,6 +7490,18 @@ msgid "hours."
 msgstr "soat."
 
 #. module: website_sale
+#: model_terms:ir.ui.view,arch_db:website_sale.cart
+msgid "if you want to merge your previous cart into current cart."
+msgstr ""
+
+#. module: website_sale
+#: model_terms:ir.ui.view,arch_db:website_sale.cart
+msgid ""
+"if you want to restore your previous cart. Your current cart will be "
+"replaced with your previous cart."
+msgstr ""
+
+#. module: website_sale
 #: model_terms:ir.ui.view,arch_db:website_sale.products
 #, fuzzy
 msgid "in category \""
@@ -7582,7 +7612,54 @@ msgid "terms &amp; conditions"
 msgstr "shartlar va qoidalar"
 
 #. module: website_sale
+#: model_terms:ir.ui.view,arch_db:website_sale.cart_combo_item_line
+msgid "x"
+msgstr ""
+
+#. module: website_sale
 #: model_terms:ir.ui.view,arch_db:website_sale.dynamic_filter_template_product_product_products_item
 #, fuzzy
 msgid "{{0}} image"
 msgstr "{{0}} ta rasm"
+
+#, fuzzy
+#~ msgid ""
+#~ "<a role=\"button\" t-att-href=\"order.partner_id.signup_prepare() and "
+#~ "order.partner_id.with_context(relative_url=True)._get_signup_url()\" "
+#~ "class=\"btn btn-primary o_translate_inline\">Sign Up</a>\n"
+#~ "                    <span class=\"align-middle\">to follow your order.</"
+#~ "span>"
+#~ msgstr ""
+#~ "<a role=\"button\" t-att-href=\"order.partner_id.signup_prepare() va "
+#~ "order.partner_id.with_context(relative_url=True)._get_signup_url()\" "
+#~ "class=\"btn btn-primary o_translate_inline\">Ro‘yxatdan o‘tish</a> <span "
+#~ "class=\"align-middle\">buyurtmangizni kuzatib borish uchun.</span>"
+
+#, fuzzy
+#~ msgid ""
+#~ "<strong>\n"
+#~ "                                <a class=\"o_translate_inline\" t-attf-"
+#~ "href=\"/shop/cart/?id={{id}}&amp;access_token={{access_token}}"
+#~ "&amp;revive_method=merge\">Click here</a>\n"
+#~ "                            </strong> if you want to merge your previous "
+#~ "cart into current cart."
+#~ msgstr ""
+#~ "<strong><a class=\"o_translate_inline\" t-attf-href=\"/shop/cart/?"
+#~ "id={{id}}&amp;access_token={{access_token}}"
+#~ "&amp;revive_method=merge\">Avvalgi savatchangizni joriy savatchangizga "
+#~ "birlashtirmoqchi bo‘lsangiz, shu yerni bosing</a></strong>"
+
+#, fuzzy
+#~ msgid ""
+#~ "<strong>\n"
+#~ "                                <a class=\"o_translate_inline\" t-attf-"
+#~ "href=\"/shop/cart/?id={{id}}&amp;access_token={{access_token}}"
+#~ "&amp;revive_method=squash\">Click here</a>\n"
+#~ "                            </strong> if you want to restore your "
+#~ "previous cart. Your current cart will be replaced with your previous cart."
+#~ msgstr ""
+#~ "<strong><a class=\"o_translate_inline\" t-attf-href=\"/shop/cart/?"
+#~ "id={{id}}&amp;access_token={{access_token}}"
+#~ "&amp;revive_method=squash\">Avvalgi savatchangizni tiklashni istasangiz, "
+#~ "shu yerni bosing</a></strong>. Joriy savatchangiz avvalgi savatchangiz "
+#~ "bilan almashtiriladi."

@@ -10,6 +10,7 @@ from odoo import _, api, fields, models
 from odoo.exceptions import ValidationError
 from odoo.addons.resource.models.utils import HOURS_PER_DAY
 from odoo.tools.float_utils import float_round
+from odoo.tools.intervals import Intervals
 
 
 class HrEmployee(models.Model):
@@ -139,22 +140,23 @@ class HrEmployee(models.Model):
             ('employee_id', 'in', self.ids),
             ('date_from', '<=', fields.Datetime.now()),
             ('date_to', '>=', fields.Datetime.now()),
-            ('holiday_status_id.time_type', '=', 'leave'),
             ('state', '=', 'validate'),
         ])
         leave_data = {}
         for holiday in holidays:
-            leave_data[holiday.employee_id.id] = {}
+            leave_data.setdefault(holiday.employee_id.id, {})
             leave_data[holiday.employee_id.id]['leave_date_from'] = holiday.date_from.date()
             back_on = holiday.employee_id._get_first_working_interval(holiday.date_to)
             leave_data[holiday.employee_id.id]['leave_date_to'] = back_on.date() if back_on else None
             leave_data[holiday.employee_id.id]['current_leave_state'] = holiday.state
+            leave_data[holiday.employee_id.id]['is_absent'] = leave_data[holiday.employee_id.id].get('is_absent') or holiday.holiday_status_id.time_type == 'leave'
 
         for employee in self:
-            employee.leave_date_from = leave_data.get(employee.id, {}).get('leave_date_from')
-            employee.leave_date_to = leave_data.get(employee.id, {}).get('leave_date_to')
-            employee.current_leave_state = leave_data.get(employee.id, {}).get('current_leave_state')
-            employee.is_absent = leave_data.get(employee.id) and leave_data.get(employee.id).get('current_leave_state') == 'validate'
+            employee_leave_data = leave_data.get(employee.id, {})
+            employee.leave_date_from = employee_leave_data.get('leave_date_from')
+            employee.leave_date_to = employee_leave_data.get('leave_date_to')
+            employee.current_leave_state = employee_leave_data.get('current_leave_state')
+            employee.is_absent = employee_leave_data and employee_leave_data.get('is_absent') and employee_leave_data.get('current_leave_state') == 'validate'
 
     @api.depends('parent_id')
     def _compute_leave_manager(self):
@@ -169,7 +171,7 @@ class HrEmployee(models.Model):
     def _compute_show_leaves(self):
         show_leaves = self.env.user.has_group('hr_holidays.group_hr_holidays_user')
         for employee in self:
-            if show_leaves or employee.user_id == self.env.user:
+            if show_leaves or employee.user_id == self.env.user or employee.leave_manager_id == self.env.user:
                 employee.show_leaves = True
             else:
                 employee.show_leaves = False
@@ -411,6 +413,11 @@ class HrEmployee(models.Model):
         return self.env.user.employee_id
 
     def _get_consumed_leaves(self, leave_types, target_date=False, ignore_future=False):
+        """ This method won't call `_get_future_leaves_on` for the allocations contained by this variable (it will only use the current value of
+            the `number_of_days` of the allocation, alias `number_of_hours_display`)
+
+            `precomputed_allocations`: context variable (recordset) which can be used to pass allocation that are considered to be already computed
+        """
         employees = self or self._get_contextual_employee()
         leaves_domain = [
             ('holiday_status_id', 'in', leave_types.ids),
@@ -486,10 +493,16 @@ class HrEmployee(models.Model):
                 'to_recheck_leaves': self.env['hr.leave']
             })
         )
+        precomputed_allocations = self.env.context.get('precomputed_allocations')
         for allocation in allocations:
             allocation_data = allocations_leaves_consumed[allocation.employee_id][allocation.holiday_status_id][allocation]
+            precomputed = False
+            if precomputed_allocations:
+                if allocation.id in precomputed_allocations.ids:
+                    allocation = precomputed_allocations.filtered(lambda alloc: alloc._origin.id == allocation.id)[0]
+                    precomputed = True
             future_leaves = 0
-            if allocation.allocation_type == 'accrual':
+            if allocation.allocation_type == 'accrual' and not precomputed and not ignore_future:
                 future_leaves = allocation._get_future_leaves_on(target_date)
             max_leaves = allocation.number_of_hours_display\
                 if allocation.holiday_status_id.request_unit in ['hour']\
@@ -513,7 +526,11 @@ class HrEmployee(models.Model):
                         allocations_with_date_to |= leave_allocation
                     else:
                         allocations_without_date_to |= leave_allocation
-                sorted_leave_allocations = allocations_with_date_to.sorted(key='date_to') + allocations_without_date_to
+                # Defines the order in which allocation will be used to take the leaves in priority
+                sorted_leave_allocations = (
+                    allocations_with_date_to.sorted(key='date_to') +
+                    allocations_without_date_to.filtered(lambda alloc: alloc.allocation_type == 'accrual') +
+                    allocations_without_date_to.filtered(lambda alloc: alloc.allocation_type == 'regular'))
 
                 if leave_type.request_unit in ['day', 'half_day']:
                     leave_duration_field = 'number_of_days'
@@ -620,3 +637,25 @@ class HrEmployee(models.Model):
 
     def _get_store_avatar_card_fields(self, target):
         return [*super()._get_store_avatar_card_fields(target), "leave_date_to"]
+
+    def _adjust_leaves(self, leave_intervals):
+        adjusted_leaves = Intervals([])
+        for (start, stop, leave) in leave_intervals:
+            tz = start.tzinfo
+            holiday = leave.holiday_id
+            leave_start = start
+            leave_stop = stop
+            if holiday and holiday.leave_type_request_unit == 'half_day':
+                if holiday.request_date_from_period == 'am':
+                    leave_start = datetime.combine(start.date(), time.min, tz)
+                if holiday.request_date_from_period == 'pm':
+                    leave_start = datetime.combine(start.date(), time(12), tz)
+                if holiday.request_date_to_period == 'am':
+                    leave_stop = datetime.combine(stop.date(), time(12), tz)
+                if holiday.request_date_to_period == 'pm':
+                    leave_stop = datetime.combine(stop.date() + timedelta(days=1), time.min, tz)
+            elif holiday and holiday.leave_type_request_unit == 'day':
+                leave_start = datetime.combine(start.date(), time.min, tz)
+                leave_stop = datetime.combine(stop.date() + timedelta(days=1), time.min, tz)
+            adjusted_leaves |= Intervals([(leave_start, leave_stop, leave)])
+        return adjusted_leaves

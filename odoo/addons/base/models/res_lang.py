@@ -31,6 +31,14 @@ class LangData(ReadonlyDict):
         except KeyError:
             raise AttributeError
 
+    def __eq__(self, other):
+        if isinstance(other, LangData):
+            return self.id == other.id
+        return super().__eq__(other)
+
+    def __hash__(self):
+        return hash(self.id)
+
 
 class LangDataDict(ReadonlyDict):
     """ A ``dict`` of :class:`LangData` objects indexed by some key, which returns
@@ -105,7 +113,7 @@ class ResLang(models.Model):
                 lang.flag_image_url = f"/base/static/img/country_flags/{lang.code.lower().rsplit('_')[-1]}.png"
 
     flag_image = fields.Image("Image")
-    flag_image_url = fields.Char(compute=_compute_field_flag_image_url)
+    flag_image_url = fields.Char(compute='_compute_field_flag_image_url')
 
     _name_uniq = models.Constraint(
         'unique(name)',
@@ -219,6 +227,14 @@ class ResLang(models.Model):
                 format = format.replace(pattern, replacement)
             return str(format)
 
+        def fix_grouping(grouping):
+            grouping = str(grouping).replace(' ', '')
+
+            if grouping in self._fields['grouping'].get_values(self.env):
+                return grouping
+
+            return '[3,0]'
+
         conv = locale.localeconv()
         lang_info = {
             'code': lang,
@@ -229,7 +245,7 @@ class ResLang(models.Model):
             'time_format' : fix_datetime_format(locale.nl_langinfo(locale.T_FMT)),
             'decimal_point' : fix_xa0(str(conv['decimal_point'])),
             'thousands_sep' : fix_xa0(str(conv['thousands_sep'])),
-            'grouping': str(conv.get('grouping') or '[3,0]'),
+            'grouping': fix_grouping(conv.get('grouping')),
         }
         try:
             return self.create(lang_info)

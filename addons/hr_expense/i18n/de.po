@@ -8,16 +8,16 @@
 # Martin Trigaux, 2023
 # Larissa Manderfeld, 2023
 #
-# "Dylan Kiss (dyki)" <dyki@odoo.com>, 2025.
+# "Dylan Kiss (dyki)" <dyki@odoo.com>, 2025, 2026.
 # "Larissa Manderfeld (lman)" <lman@odoo.com>, 2025, 2026.
 # Weblate <noreply-mt-weblate@weblate.org>, 2025.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-01-25 18:35+0000\n"
-"PO-Revision-Date: 2026-02-13 09:16+0000\n"
-"Last-Translator: \"Larissa Manderfeld (lman)\" <lman@odoo.com>\n"
+"POT-Creation-Date: 2026-10-30 17:37+0000\n"
+"PO-Revision-Date: 2026-08-02 13:07+0000\n"
+"Last-Translator: Anonymous <noreply@weblate.org>\n"
 "Language-Team: German <https://translate.odoo.com/projects/odoo-19/"
 "hr_expense/de/>\n"
 "Language: de\n"
@@ -25,27 +25,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Weblate 5.14.3\n"
-
-#. module: hr_expense
-#: model_terms:ir.ui.view,arch_db:hr_expense.report_expense
-msgid "$100.00"
-msgstr "100,00 €"
-
-#. module: hr_expense
-#: model_terms:ir.ui.view,arch_db:hr_expense.report_expense
-msgid "$120.00"
-msgstr "120,00 €"
-
-#. module: hr_expense
-#: model_terms:ir.ui.view,arch_db:hr_expense.report_expense
-msgid "$500.00"
-msgstr "500,00 €"
-
-#. module: hr_expense
-#: model_terms:ir.ui.view,arch_db:hr_expense.report_expense
-msgid "$600.00"
-msgstr "600,00 €"
+"X-Generator: Weblate 2026.6.1\n"
 
 #. module: hr_expense
 #. odoo-python
@@ -108,11 +88,6 @@ msgstr "(inkl."
 #: code:addons/hr_expense/models/hr_expense.py:0
 msgid "1 %(exp_cur)s = %(rate)s %(comp_cur)s"
 msgstr "1 %(exp_cur)s = %(rate)s %(comp_cur)s"
-
-#. module: hr_expense
-#: model_terms:ir.ui.view,arch_db:hr_expense.report_expense
-msgid "2023-08-11"
-msgstr "11-08-2023"
 
 #. module: hr_expense
 #. odoo-javascript
@@ -356,6 +331,11 @@ msgid "Attach a receipt - usually an image or a PDF file."
 msgstr "Hängen Sie einen Beleg an – meistens ein Bild oder eine PDF-Datei."
 
 #. module: hr_expense
+#: model:ir.model,name:hr_expense.model_ir_attachment
+msgid "Attachment"
+msgstr "Dateianhang"
+
+#. module: hr_expense
 #: model:ir.model.fields,field_description:hr_expense.field_hr_expense__message_attachment_count
 msgid "Attachment Count"
 msgstr "Anzahl Anhänge"
@@ -530,7 +510,7 @@ msgstr "Wechselkurs"
 #: model_terms:ir.ui.view,arch_db:hr_expense.hr_expense_template_register
 #: model_terms:ir.ui.view,arch_db:hr_expense.hr_expense_template_submitted_expenses
 msgid "Dear"
-msgstr "Hallo"
+msgstr "Guten Tag"
 
 #. module: hr_expense
 #: model:ir.model.fields,field_description:hr_expense.field_res_config_settings__hr_expense_alias_prefix
@@ -584,6 +564,7 @@ msgstr "Digitalisieren Sie Ihre Belege mit OCR und Künstlicher Intelligenz"
 #: model:ir.model.fields,field_description:hr_expense.field_hr_expense_split__display_name
 #: model:ir.model.fields,field_description:hr_expense.field_hr_expense_split_wizard__display_name
 #: model:ir.model.fields,field_description:hr_expense.field_ir_actions_report__display_name
+#: model:ir.model.fields,field_description:hr_expense.field_ir_attachment__display_name
 #: model:ir.model.fields,field_description:hr_expense.field_product_product__display_name
 #: model:ir.model.fields,field_description:hr_expense.field_product_template__display_name
 #: model:ir.model.fields,field_description:hr_expense.field_res_company__display_name
@@ -828,6 +809,7 @@ msgstr "Zu genehmende Ausgabe"
 #. module: hr_expense
 #. odoo-python
 #: code:addons/hr_expense/models/account_move.py:0
+#: code:addons/hr_expense/models/account_payment.py:0
 #: model:ir.model.fields,field_description:hr_expense.field_product_product__can_be_expensed
 #: model:ir.model.fields,field_description:hr_expense.field_product_template__can_be_expensed
 #: model:ir.ui.menu,name:hr_expense.menu_hr_expense_root
@@ -979,6 +961,11 @@ msgid "Hotel, plane ticket, taxi, etc."
 msgstr "Hotel, Flugtickets, Taxi usw."
 
 #. module: hr_expense
+#: model:ir.model.fields,field_description:hr_expense.field_account_tax__hr_expense_ids
+msgid "Hr Expense"
+msgstr ""
+
+#. module: hr_expense
 #: model:ir.model.fields,field_description:hr_expense.field_res_config_settings__hr_expense_alias_domain_id
 msgid "Hr Expense Alias Domain"
 msgstr "Alias-Domain für Personalausgaben"
@@ -1001,6 +988,7 @@ msgstr "Alias-Domain für Personalausgaben"
 #: model:ir.model.fields,field_description:hr_expense.field_hr_expense_split__id
 #: model:ir.model.fields,field_description:hr_expense.field_hr_expense_split_wizard__id
 #: model:ir.model.fields,field_description:hr_expense.field_ir_actions_report__id
+#: model:ir.model.fields,field_description:hr_expense.field_ir_attachment__id
 #: model:ir.model.fields,field_description:hr_expense.field_product_product__id
 #: model:ir.model.fields,field_description:hr_expense.field_product_template__id
 #: model:ir.model.fields,field_description:hr_expense.field_res_company__id
@@ -1357,7 +1345,7 @@ msgstr "Notizen ..."
 #. module: hr_expense
 #: model:ir.model.fields,field_description:hr_expense.field_hr_expense__message_needaction_counter
 msgid "Number of Actions"
-msgstr "Anzahl der Aktionen"
+msgstr "Anzahl Aktionen"
 
 #. module: hr_expense
 #: model:ir.model.fields,field_description:hr_expense.field_hr_expense__nb_attachment
@@ -1784,13 +1772,10 @@ msgstr "Scannen Sie diesen QR-Code, um die Odoo-App zu erhalten:"
 #: model:ir.model.fields,help:hr_expense.field_hr_employee__expense_manager_id
 msgid ""
 "Select the user responsible for approving \"Expenses\" of this employee.\n"
-"If empty, the approval is done by an Administrator or Approver (determined "
-"in settings/users)."
+"If empty, the approval is done by the department manager (if they are an "
+"expense approver), otherwise by the employee's manager. If there is none, "
+"the expense is auto-validated."
 msgstr ""
-"Wählen Sie den Benutzer, der für die Genehmigung der „Spesen“ dieses "
-"Mitarbeiters zuständig ist.\n"
-"Wenn keiner ausgewählt wird, wird die Genehmigung von einem Administrator "
-"oder Genehmiger durchgeführt (festgelegt in Einstellungen/Benutzer)."
 
 #. module: hr_expense
 #: model:ir.model.fields,field_description:hr_expense.field_hr_expense__selectable_payment_method_line_ids
@@ -1985,6 +1970,16 @@ msgstr ""
 "fortzufahren."
 
 #. module: hr_expense
+#. odoo-python
+#: code:addons/hr_expense/models/ir_actions_report.py:0
+msgid ""
+"The attachment (%(attachment_name)s) has not been added to the report due to "
+"the following error: '%(error)s'"
+msgstr ""
+"Der Anhang (%(attachment_name)s) wurde aufgrund des folgenden Fehlers nicht "
+"zum Bericht hinzugefügt: „%(error)s“"
+
+#. module: hr_expense
 #: model:ir.model.fields,help:hr_expense.field_res_company__expense_journal_id
 #: model:ir.model.fields,help:hr_expense.field_res_config_settings__expense_journal_id
 msgid "The company's default journal used when an employee expense is created."
@@ -1995,10 +1990,10 @@ msgstr ""
 #. module: hr_expense
 #. odoo-python
 #: code:addons/hr_expense/models/hr_expense.py:0
-msgid "The current user has no related employee. Please, create one."
+msgid ""
+"The current user has no related employee. Please, create one in %(company)s, "
+"or switch to a company where they have one."
 msgstr ""
-"Der aktuelle Benutzer hat keinen verknüpften Mitarbeiter. Bitte erstellen "
-"Sie einen."
 
 #. module: hr_expense
 #: model_terms:ir.ui.view,arch_db:hr_expense.hr_expense_template_register
@@ -2056,6 +2051,18 @@ msgstr "Sie können hier den Status all Ihrer aktuellen Spesen einsehen."
 #: model:ir.model.fields,help:hr_expense.field_hr_expense_split_wizard__split_possible
 msgid "The sum of after split shut remain the same"
 msgstr "Die Summe nach der Aufteilung bleibt gleich"
+
+#. module: hr_expense
+#. odoo-python
+#: code:addons/hr_expense/models/hr_expense.py:0
+msgid ""
+"The vendor is required for expenses using SEPA Credit Transfer as the "
+"payment method.\n"
+"Please set a vendor on the following expenses: %s"
+msgstr ""
+"Für Ausgaben mit der Zahlungsmethode „SEPA-Überweisung“ ist ein Lieferant "
+"erforderlich.\n"
+"Legen Sie für die folgenden Ausgaben einen Lieferanten fest: %s"
 
 #. module: hr_expense
 #. odoo-python
@@ -2315,6 +2322,31 @@ msgstr ""
 #. module: hr_expense
 #. odoo-python
 #: code:addons/hr_expense/models/hr_expense.py:0
+msgid "You can't add an attachment to an expense once it has been approved."
+msgstr ""
+"Sie können einer Spesenabrechnung keinen Anhang mehr hinzufügen, sobald sie "
+"genehmigt wurde."
+
+#. module: hr_expense
+#. odoo-python
+#: code:addons/hr_expense/models/ir_attachment.py:0
+msgid "You can't add attachments to an expense once it has been approved."
+msgstr ""
+"Sie können einer Spesenabrechnung keine Anhänge mehr hinzufügen, sobald sie "
+"genehmigt wurde."
+
+#. module: hr_expense
+#. odoo-python
+#: code:addons/hr_expense/models/ir_attachment.py:0
+msgid ""
+"You can't delete attachments from an expense once it has been submitted."
+msgstr ""
+"Anhänge können nach Einreichung einer Spesenabrechnung nicht mehr gelöscht "
+"werden."
+
+#. module: hr_expense
+#. odoo-python
+#: code:addons/hr_expense/models/hr_expense.py:0
 msgid ""
 "You can't post simultaneously employee-paid expenses belonging to different "
 "companies"
@@ -2408,6 +2440,15 @@ msgstr "Sie sind nicht berechtigt, diese Ausgabe zu bearbeiten."
 
 #. module: hr_expense
 #. odoo-python
+#: code:addons/hr_expense/models/hr_expense.py:0
+#: code:addons/hr_expense/wizard/hr_expense_post_wizard.py:0
+msgid "You don't have the access rights to modify this expense."
+msgstr ""
+"Sie verfügen nicht über die Zugriffsrechte, um diese Spesenabrechnung zu "
+"bearbeiten."
+
+#. module: hr_expense
+#. odoo-python
 #: code:addons/hr_expense/wizard/hr_expense_post_wizard.py:0
 msgid "You don't have the rights to create accounting entries."
 msgstr "Sie sind nicht berechtigt, Buchungen zu erstellen."
@@ -2461,7 +2502,7 @@ msgstr "z. B. Restaurants: nur Wochentage, für Mittagessen"
 #. module: hr_expense
 #: model_terms:ir.ui.view,arch_db:hr_expense.res_config_settings_view_form
 msgid "e.g. mycompany.com"
-msgstr "z. B. meinunternehmen.com"
+msgstr "z. B. meinunternehmen.de"
 
 #. module: hr_expense
 #: model_terms:ir.ui.view,arch_db:hr_expense.hr_expense_view_form
@@ -2497,6 +2538,36 @@ msgstr "OCR zum Ausfüllen von Daten aus einem Foto der Rechnung verwenden"
 #: model_terms:ir.ui.view,arch_db:hr_expense.hr_expense_view_form
 msgid "with the same receipt already exists."
 msgstr "mit demselben Beleg besteht bereits."
+
+#~ msgid ""
+#~ "Select the user responsible for approving \"Expenses\" of this employee.\n"
+#~ "If empty, the approval is done by an Administrator or Approver "
+#~ "(determined in settings/users)."
+#~ msgstr ""
+#~ "Wählen Sie den Benutzer, der für die Genehmigung der „Spesen“ dieses "
+#~ "Mitarbeiters zuständig ist.\n"
+#~ "Wenn keiner ausgewählt wird, wird die Genehmigung von einem Administrator "
+#~ "oder Genehmiger durchgeführt (festgelegt in Einstellungen/Benutzer)."
+
+#~ msgid "The current user has no related employee. Please, create one."
+#~ msgstr ""
+#~ "Der aktuelle Benutzer hat keinen verknüpften Mitarbeiter. Bitte erstellen "
+#~ "Sie einen."
+
+#~ msgid "$100.00"
+#~ msgstr "100,00 €"
+
+#~ msgid "$120.00"
+#~ msgstr "120,00 €"
+
+#~ msgid "$500.00"
+#~ msgstr "500,00 €"
+
+#~ msgid "$600.00"
+#~ msgstr "600,00 €"
+
+#~ msgid "2023-08-11"
+#~ msgstr "11-08-2023"
 
 #~ msgid ""
 #~ "New expenses are awaiting your approval.\n"

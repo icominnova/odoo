@@ -1,12 +1,17 @@
-import { expect, getFixture, test } from "@odoo/hoot";
 import {
+    animationFrame,
     clear,
     click,
+    Deferred,
     edit,
+    expect,
+    getFixture,
     hover,
     keyDown,
     keyUp,
     middleClick,
+    mockDate,
+    mockTimeZone,
     pointerDown,
     pointerUp,
     press,
@@ -17,17 +22,12 @@ import {
     queryOne,
     queryRect,
     queryText,
+    runAllTimers,
+    test,
+    tick,
     unload,
     waitFor,
-} from "@odoo/hoot-dom";
-import {
-    animationFrame,
-    Deferred,
-    mockDate,
-    mockTimeZone,
-    runAllTimers,
-    tick,
-} from "@odoo/hoot-mock";
+} from "@odoo/hoot";
 import { Component, markup, onRendered, onWillStart, useRef, xml } from "@odoo/owl";
 import { getPickerCell } from "@web/../tests/core/datetime/datetime_test_helpers";
 import {
@@ -1906,7 +1906,7 @@ test(`basic grouped list rendering with widget="handle" col`, async () => {
     expect(`thead th[data-name=int_field]`).toHaveCount(1);
     expect(`tr.o_group_header`).toHaveCount(2);
     expect(`th.o_group_name`).toHaveCount(2);
-    expect(`.o_group_header:eq(0) th`).toHaveCount(3); // group name + colspan 2 + cog placeholder
+    expect(`.o_group_header:eq(0) th`).toHaveCount(2); // group name + cog placeholder
     expect(`.o_group_header:eq(0) .o_list_number`).toHaveCount(0);
 });
 
@@ -1994,8 +1994,8 @@ test(`basic grouped list rendering 2 cols without selector`, async () => {
         groupBy: ["bar"],
         allowSelectors: false,
     });
-    expect(`.o_group_header:eq(0) th`).toHaveCount(3);
-    expect(`.o_group_header th:eq(0)`).toHaveAttribute("colspan", "1");
+    expect(`.o_group_header:eq(0) th`).toHaveCount(2);
+    expect(`.o_group_header th:eq(0)`).toHaveAttribute("colspan", "2");
 });
 
 test(`basic grouped list rendering 3 cols without selector`, async () => {
@@ -2006,8 +2006,8 @@ test(`basic grouped list rendering 3 cols without selector`, async () => {
         groupBy: ["bar"],
         allowSelectors: false,
     });
-    expect(`.o_group_header:eq(0) th`).toHaveCount(3);
-    expect(`.o_group_header th:eq(0)`).toHaveAttribute("colspan", "2");
+    expect(`.o_group_header:eq(0) th`).toHaveCount(2);
+    expect(`.o_group_header th:eq(0)`).toHaveAttribute("colspan", "3");
 });
 
 test(`basic grouped list rendering 3 cols without selector and with optional fields`, async () => {
@@ -2025,8 +2025,8 @@ test(`basic grouped list rendering 3 cols without selector and with optional fie
         groupBy: ["bar"],
         allowSelectors: false,
     });
-    expect(`.o_group_header:eq(0) th`).toHaveCount(3);
-    expect(`.o_group_header th:eq(0)`).toHaveAttribute("colspan", "2");
+    expect(`.o_group_header:eq(0) th`).toHaveCount(2);
+    expect(`.o_group_header th:eq(0)`).toHaveAttribute("colspan", "3");
 });
 
 test.tags("desktop");
@@ -2038,8 +2038,8 @@ test(`basic grouped list rendering 2 col with selector on desktop`, async () => 
         groupBy: ["bar"],
         allowSelectors: true,
     });
-    expect(`.o_group_header:eq(0) th`).toHaveCount(3);
-    expect(`.o_group_header th:eq(0)`).toHaveAttribute("colspan", "2");
+    expect(`.o_group_header:eq(0) th`).toHaveCount(2);
+    expect(`.o_group_header th:eq(0)`).toHaveAttribute("colspan", "3");
 });
 
 test.tags("mobile");
@@ -2051,8 +2051,8 @@ test(`basic grouped list rendering 2 col with selector on mobile`, async () => {
         groupBy: ["bar"],
         allowSelectors: true,
     });
-    expect(`.o_group_header:eq(0) th`).toHaveCount(3);
-    expect(`.o_group_header th:eq(0)`).toHaveAttribute("colspan", "1");
+    expect(`.o_group_header:eq(0) th`).toHaveCount(2);
+    expect(`.o_group_header th:eq(0)`).toHaveAttribute("colspan", "2");
 });
 
 test.tags("desktop");
@@ -2065,8 +2065,8 @@ test(`basic grouped list rendering 3 cols with selector on desktop`, async () =>
         allowSelectors: true,
     });
 
-    expect(`.o_group_header:eq(0) th`).toHaveCount(3);
-    expect(`.o_group_header th:eq(0)`).toHaveAttribute("colspan", "3");
+    expect(`.o_group_header:eq(0) th`).toHaveCount(2);
+    expect(`.o_group_header th:eq(0)`).toHaveAttribute("colspan", "4");
 });
 
 test.tags("mobile");
@@ -2079,8 +2079,8 @@ test(`basic grouped list rendering 3 cols with selector on mobile`, async () => 
         allowSelectors: true,
     });
 
-    expect(`.o_group_header:eq(0) th`).toHaveCount(3);
-    expect(`.o_group_header th:eq(0)`).toHaveAttribute("colspan", "2");
+    expect(`.o_group_header:eq(0) th`).toHaveCount(2);
+    expect(`.o_group_header th:eq(0)`).toHaveAttribute("colspan", "3");
 });
 
 test.tags("desktop");
@@ -4749,6 +4749,30 @@ test(`monetary aggregates in grouped list (!= currencies in same group, delete)`
     expect(`.o_group_header:last`).toHaveText("Yes (0)\n 0.00");
 });
 
+test(`monetary aggregates in grouped list: add a new group`, async () => {
+    onRpc("name_create", () => {
+        expect.step("name_create");
+    });
+    await mountView({
+        resModel: "foo",
+        type: "list",
+        arch: `
+            <list default_group_by="m2o">
+                <field name="foo"/>
+                <field name="amount" widget="monetary" sum="Sum"/>
+                <field name="currency_id"/>
+            </list>
+        `,
+    });
+    expect(queryAllTexts(".o_group_name")).toEqual(["Value 1 (3)", "Value 2 (1)"]);
+    expect(`.o_list_footer td > button`).toHaveText("Add a M2o");
+    await contains(`.o_list_footer td > button`).click();
+    await contains(`.o_list_footer td input`).edit("New group", { confirm: false });
+    await contains(`.o_list_footer .o_list_group_confirm`).click();
+    expect.verifySteps(["name_create"]);
+    expect(queryAllTexts(".o_group_name")).toEqual(["Value 1 (3)", "Value 2 (1)", "New group (0)"]);
+});
+
 test(`list with monetary field with attribute column_invisible="1"`, async () => {
     await mountView({
         resModel: "foo",
@@ -5039,7 +5063,7 @@ test(`aggregates monetary (currency field not set)`, async () => {
         "300.00",
         "0.00",
     ]);
-    expect(`tfoot`).toHaveText("$ 0.00?");
+    expect(`tfoot`).toHaveText("$ 2,000.00?");
 });
 
 test(`aggregates monetary (currency field not set on first record)`, async () => {
@@ -5063,7 +5087,7 @@ test(`aggregates monetary (currency field not set on first record)`, async () =>
         "300.00",
         "0.00",
     ]);
-    expect(`tfoot`).toHaveText("$ 0.00?");
+    expect(`tfoot`).toHaveText("$ 2,000.00?");
 });
 
 test(`aggregates monetary with custom digits (same currency)`, async () => {
@@ -6452,6 +6476,37 @@ test(`pager, grouped, with count limit reached`, async () => {
     });
     expect(`.o_group_header:first-of-type .o_pager_value`).toHaveText("1");
     expect(`.o_group_header:first-of-type .o_pager_limit`).toHaveText("2");
+});
+
+test.tags("desktop");
+test(`pager, grouped, with count limit reached and total above countLimit`, async () => {
+    Foo._records.push({ id: 398, foo: "blip" });
+    Foo._records.push({ id: 399, foo: "blip" });
+    Foo._records.push({ id: 400, foo: "blip" });
+    await mountView({
+        resModel: "foo",
+        type: "list",
+        arch: `<list limit="2" count_limit="3"><field name="foo"/><field name="bar"/></list>`,
+        groupBy: ["foo"],
+    });
+    expect(`.o_group_header`).toHaveCount(3, { message: "should have 3 groups" });
+
+    await contains(`.o_group_header:first-of-type`).click();
+    expect(`.o_group_header:first-of-type .o_pager:eq(0)`).toHaveCount(1, {
+        message: "first group should have a pager",
+    });
+    expect(`.o_group_header:first-of-type .o_pager_value`).toHaveText("1-2");
+    expect(`.o_group_header:first-of-type .o_pager_limit`).toHaveText("5", {
+        message:
+            "The true count being already computed, we can display it instead of the countLimit",
+    });
+
+    await contains(`.o_pager_next:eq(1)`).click();
+    expect(`.o_group_header:first-of-type .o_pager_value`).toHaveText("3-4");
+    expect(`.o_group_header:first-of-type .o_pager_limit`).toHaveText("5", {
+        message:
+            "The true count being already computed, we can display it instead of the countLimit",
+    });
 });
 
 test.tags("desktop");
@@ -10024,6 +10079,33 @@ test(`navigation: not moving down with keydown`, async () => {
 });
 
 test.tags("desktop");
+test(`no crash when keydown on x2many "Add a line" cell while record is in edit mode`, async () => {
+    Foo._records[0].o2m = [];
+
+    await mountView({
+        resModel: "foo",
+        type: "form",
+        arch: `
+            <form>
+                <field name="o2m">
+                    <list editable="bottom">
+                        <field name="name"/>
+                    </list>
+                </field>
+            </form>
+        `,
+        resId: 1,
+    });
+
+    await contains(`.o_field_x2many_list_row_add a`).click();
+    expect(`.o_selected_row`).toHaveCount(1);
+
+    await contains(".o_field_x2many_list_row_add a").keyDown("ArrowRight");
+
+    expect(`.o_form_view`).toHaveCount(1);
+});
+
+test.tags("desktop");
 test(`navigation: moving right with keydown from text field does not move the focus`, async () => {
     Foo._fields.foo = fields.Text();
 
@@ -11040,7 +11122,7 @@ test(`multi edit field with daterange widget (edition without using the picker)`
     await contains(
         `.o_data_row .o_data_cell .o_field_daterange[name='date_start'] input[data-field='date_start']`
     ).edit("2016-04-01 11:00:00", { confirm: "enter" });
-    expect(`.modal`).toHaveCount(1, {
+    expect(await waitFor(".modal")).toHaveCount(1, {
         message: "The confirm dialog should appear to confirm the multi edition.",
     });
     expect(queryAllTexts(`.modal-body .o_modal_changes td`)).toEqual([
@@ -19529,4 +19611,69 @@ test("scroll position is restored when coming back to list view", async () => {
     await animationFrame();
     expect(".o_list_renderer").toHaveCount(1);
     expect(".o_list_view").toHaveProperty("scrollTop", 200);
+});
+
+test.tags("desktop");
+test(`select menu navigation with hot keys`, async () => {
+    Bar._fields.stage = fields.Selection({
+        selection: [
+            ["aab", "aab"],
+            ["aac", "aac"],
+        ],
+    });
+
+    await mountView({
+        resModel: "foo",
+        type: "form",
+        arch: `
+            <form>
+                <field name="o2m">
+                    <list editable="top">
+                        <field name="stage"/>
+                    </list>
+                </field>
+            </form>
+        `,
+        resId: 1,
+    });
+    await contains(".o_field_x2many_list_row_add a").click();
+    await contains(`.o_field_widget[name=o2m] .o_data_row [name=stage] input`).click();
+    await press("Tab");
+    await animationFrame();
+    await press("Enter");
+    await animationFrame();
+
+    await contains(".o_field_x2many_list_row_add a").click();
+    await contains(`.o_field_widget[name=o2m] .o_data_row [name=stage] input`).click();
+    await press("ArrowLeft");
+    await animationFrame();
+    await press("ArrowLeft");
+    await animationFrame();
+    await press("Enter");
+    await animationFrame();
+
+    await contains(`.o_form_button_save`).click();
+    expect(queryAllTexts(`.o_field_x2many_list .o_data_row`)).toEqual(["aab", "aac"]);
+});
+
+test("should not crash in lists with groupby node and sample data", async () => {
+    Foo._records = [];
+    Bar._fields.bar_grouped = fields.Boolean({ default: false });
+
+    await mountView({
+        type: "list",
+        resModel: "foo",
+        arch: `
+            <list sample="1" default_group_by="m2o">
+                <groupby name="m2o">
+                    <field name="bar_grouped" invisible="1" />
+                    <button type="object" name="group_btn" string="Do Something" invisible="bar_grouped"/>
+                </groupby>
+                <field name="foo"/>
+                <field name="amount"/>
+                <field name="properties"/>
+            </list>`,
+    });
+
+    expect(queryAll(".o_group_header").length).toBeGreaterThan(0);
 });

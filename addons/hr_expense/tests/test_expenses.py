@@ -218,6 +218,24 @@ class TestExpenses(TestExpenseCommon):
         # Only possible if no expense linked to the account
         self.analytic_account_1.unlink()
 
+    def test_expense_no_cost_product_zero_quantity(self):
+        """ A zero quantity on a product without cost must not zero the receipt line """
+        expense = self.create_expenses({
+            'product_id': self.product_c.id,
+            'quantity': 0,
+            'total_amount_currency': 100.0,
+            'tax_ids': [Command.clear()],
+        })
+        self.assertEqual(expense.price_unit, 100.0)
+
+        expense.action_submit()
+        expense.action_approve()
+        self.post_expenses_with_wizard(expense)
+        self.assertRecordValues(expense.account_move_id.invoice_line_ids, [
+            {'quantity': 1.0, 'price_unit': 100.0, 'price_total': 100.0},
+        ])
+        self.assertEqual(expense.account_move_id.amount_total, 100.0)
+
     def test_expense_split_flow(self):
         """ Check Split Expense flow. """
         # Grant Analytic Accounting rights, to be able to modify analytic_distribution from the wizard
@@ -318,6 +336,27 @@ class TestExpenses(TestExpenseCommon):
                 'split_expense_origin_id': expense.id,
             }
         ])
+
+    def test_expense_split_approved_with_attachment(self):
+        """ Check splitting an approved expense with attachments does not raise an Access Error. """
+        expense = self.create_expenses({
+            'tax_ids': [Command.set(self.tax_purchase_a.ids)],
+            'analytic_distribution': {self.analytic_account_1.id: 100}
+        })
+        self.env['ir.attachment'].create({
+            'raw': b"receipt content",
+            'name': 'receipt.png',
+            'res_model': 'hr.expense',
+            'res_id': expense.id,
+        })
+        expense.action_submit()
+        expense.action_approve()
+        wizard = self.env['hr.expense.split.wizard'].browse(expense.action_split_wizard()['res_id'])
+        wizard.action_split_expense()
+        expenses_after_split = self.env['hr.expense'].search([('split_expense_origin_id', '=', expense.id)])
+
+        self.assertEqual(len(expenses_after_split), 2)
+        self.assertEqual(len(expenses_after_split.attachment_ids), 2)
 
     #############################################
     #  Test Multi-currency
@@ -705,6 +744,30 @@ class TestExpenses(TestExpenseCommon):
         expense_data = self.env['hr.expense'].with_user(self.expense_user_employee).get_expense_dashboard()
         self.assertEqual(expense_data['draft']['amount'], 3000.00)
 
+    def test_dashboard_waiting_reimbursement_posted_expense(self):
+        """ Check that an employee-paid expense stays in the "Waiting Reimbursement"
+            total once its move is posted, until the payment is actually made.
+        """
+        expense = self.create_expenses({
+            'name': 'Employee expense',
+            'payment_mode': 'own_account',
+            'total_amount_currency': 1000.00,
+            'employee_id': self.expense_employee.id,
+        })
+        expense.action_submit()
+        expense.action_approve()
+        self.post_expenses_with_wizard(expense)
+
+        self.assertEqual(expense.state, 'posted')
+        expense_data = self.env['hr.expense'].with_user(self.expense_user_employee).get_expense_dashboard()
+        self.assertEqual(expense_data['approved']['amount'], 1000.00)
+
+        self.get_new_payment(expense, 1000.00)
+
+        self.assertIn(expense.state, ('in_payment', 'paid'))
+        expense_data = self.env['hr.expense'].with_user(self.expense_user_employee).get_expense_dashboard()
+        self.assertEqual(expense_data['approved']['amount'], 0.00)
+
     def test_update_expense_price_on_product_standard_price(self):
         """
         Tests that updating the standard price of a product will update all the un-submitted
@@ -898,7 +961,6 @@ class TestExpenses(TestExpenseCommon):
         })
 
         self.create_expenses({'tax_ids': [Command.set(tax_expense.ids)]})
-        tax_expense.invalidate_model(fnames=['is_used'])
         self.assertTrue(tax_expense.is_used)
 
     def test_expense_by_company_with_caba_tax(self):
@@ -967,6 +1029,34 @@ class TestExpenses(TestExpenseCommon):
             expense.with_context(validate_analytic=True).action_approve()
         expense.analytic_distribution = {self.analytic_account_1.id: 100.00}
         expense.with_context(validate_analytic=True).action_approve()
+
+    def test_expense_mandatory_analytic_plan_autovalidated_submission(self):
+        """
+        Check that when an analytic plan has a mandatory applicability,
+        it gets correctly triggered when the expense is submitted
+        and approved automatically.
+        """
+        self.env['account.analytic.applicability'].create({
+            'business_domain': 'expense',
+            'analytic_plan_id': self.analytic_plan.id,
+            'applicability': 'mandatory',
+            'product_categ_id': self.product_a.categ_id.id,
+        })
+
+        expense = self.create_expenses({
+            'product_id': self.product_a.id,
+            'quantity': 350.00,
+            'payment_mode': 'company_account',
+        })
+
+        # Set the employee's manager to none to auto-approve the expense on submission
+        expense.employee_id.sudo().expense_manager_id = None
+
+        with self.assertRaises(ValidationError, msg="One or more lines require a 100% analytic distribution."):
+            expense.action_submit()
+        expense.analytic_distribution = {self.analytic_account_1.id: 100.00}
+        expense.action_submit()
+        self.assertEqual(expense.state, 'approved', "Expense should be approved after submission with analytic distribution set.")
 
     def test_expense_no_stealing_from_employees(self):
         """
@@ -1047,6 +1137,7 @@ class TestExpenses(TestExpenseCommon):
             'payment_method_line_id': sepa_ct_line.id,
             'total_amount_currency': 100.00,
             'currency_id': self.env.ref('base.EUR').id,
+            'vendor_id': self.partner_a.id,
         })
 
         expense.action_submit()
@@ -1095,3 +1186,119 @@ class TestExpenses(TestExpenseCommon):
 
         # Check that there is no fourth autobalancing line on the account move
         self.assertEqual(expense.account_move_id.line_ids.mapped('balance'), [86.96, 13.04, -100.0])
+
+    def test_remove_company_id_from_hr_expense(self):
+        expense = self.create_expenses({
+                'name': 'Company PC 1000 + 15%',
+                'employee_id': self.expense_employee.id,
+                'product_id': self.product_c.id,
+                'total_amount_currency': 1000.00,
+                'date': '2021-10-12',
+                'payment_mode': 'company_account',
+                'company_id': self.company_data['company'].id,
+                'tax_ids': [Command.set(self.tax_purchase_a.ids)],
+            })
+        form = Form(expense)
+        form.company_id = self.env['res.company']
+        self.assertEqual(form.is_editable, False)
+        form.company_id = self.env.company
+        self.assertEqual(form.is_editable, True)
+
+    def test_expense_branch_company(self):
+        """
+        Test that when an expense is created in a branch company, the associated move is also in the branch company.
+        """
+        branch_company = self.setup_other_company(name='Branch', parent_id=self.company_data['company'].id)['company']
+        employee = self.env['hr.employee'].sudo().create({
+            'name': 'Employee XYZ',
+            'company_id': branch_company.id,
+        })
+        allowed_companies = branch_company + self.company_data['company']
+        # Create an expense paid by company
+        expense_paid_by_company = self.env['hr.expense'].with_context(allowed_company_ids=allowed_companies.ids).create({
+            'employee_id': employee.id,
+            'name': 'Company expense',
+            'date': self.frozen_today,
+            'payment_mode': 'company_account',
+            'account_id': self.company_data['default_account_expense'].id,
+            'product_id': self.product_c.id,
+            'total_amount_currency': 1000.00,
+            'currency_id': self.company_data['currency'].id,
+            'company_id': branch_company.id,
+        })
+        expense_paid_by_company.action_submit()
+        expense_paid_by_company.action_approve()
+        expense_paid_by_company.action_post()
+
+        payment_move_company = expense_paid_by_company.account_move_id
+        self.assertEqual(payment_move_company.company_id, branch_company)
+        self.assertEqual(payment_move_company.origin_payment_id.company_id, branch_company)
+        # Create an expense paid by employee
+        expense_paid_by_employee = self.env['hr.expense'].with_context(allowed_company_ids=allowed_companies.ids).create({
+            'employee_id': employee.id,
+            'name': 'Employee expense',
+            'date': self.frozen_today,
+            'payment_mode': 'own_account',
+            'account_id': self.company_data['default_account_expense'].id,
+            'product_id': self.product_c.id,
+            'total_amount_currency': 2000.00,
+            'currency_id': self.company_data['currency'].id,
+            'company_id': branch_company.id,
+        })
+        expense_paid_by_employee.action_submit()
+        expense_paid_by_employee.action_approve()
+        self.post_expenses_with_wizard(expense_paid_by_employee)
+        self.assertEqual(expense_paid_by_employee.account_move_id.company_id, branch_company)
+
+    def test_attachments_on_multiple_posting_from_own_expense(self):
+        """ Checks that attachments are not leaked between moves when posting expenses from different employees. """
+        employee_2 = self.env['hr.employee'].sudo().create({
+            'name': 'expense_employee_2',
+            'user_id': self.expense_user_manager_2.id,
+            'expense_manager_id': self.expense_user_manager.id,
+            'work_contact_id': self.expense_user_manager_2.partner_id.id,
+        })
+        expenses = expense_1, expense_2 = self.create_expenses([
+            {'name': 'Employee 1 expense'},
+            {'name': 'Employee 2 expense', 'employee_id': employee_2.id},
+        ])
+        self.env['ir.attachment'].create([{
+            'raw': b"R0lGODdhAQABAIAAAP///////ywAAAAAAQABAAACAkQBADs=",
+            'name': f'file_{index}.png',
+            'res_model': 'hr.expense',
+            'res_id': expense.id,
+        } for index, expense in enumerate([expense_1] * 2 + [expense_2] * 3)])
+
+        expenses.action_submit()
+        expenses.action_approve()
+        self.post_expenses_with_wizard(expenses)
+
+        self.assertRecordValues(
+            expense_1.account_move_id.attachment_ids.sorted('name'),
+            [
+                {'name': 'file_0.png', 'res_model': 'account.move', 'res_id': expense_1.account_move_id.id},
+                {'name': 'file_1.png', 'res_model': 'account.move', 'res_id': expense_1.account_move_id.id},
+            ]
+        )
+        self.assertRecordValues(
+            expense_2.account_move_id.attachment_ids.sorted('name'),
+            [
+                {'name': 'file_2.png', 'res_model': 'account.move', 'res_id': expense_2.account_move_id.id},
+                {'name': 'file_3.png', 'res_model': 'account.move', 'res_id': expense_2.account_move_id.id},
+                {'name': 'file_4.png', 'res_model': 'account.move', 'res_id': expense_2.account_move_id.id},
+            ]
+        )
+
+    def test_delete_expense_with_attachment(self):
+        """ Deleting an expense should also delete its attachments """
+        expense = self.create_expenses()
+        attachment = self.env['ir.attachment'].create({
+            'raw': b"R0lGODdhAQABAIAAAP///////ywAAAAAAQABAAACAkQBADs=",
+            'name': 'file.png',
+            'res_model': 'hr.expense',
+            'res_id': expense.id,
+        })
+
+        expense.unlink()
+        self.assertFalse(expense.exists())
+        self.assertFalse(attachment.exists())

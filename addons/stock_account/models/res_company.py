@@ -51,11 +51,14 @@ class ResCompany(models.Model):
         if at_date and isinstance(at_date, str):
             at_date = fields.Date.from_string(at_date)
         last_closing_date = self._get_last_closing_date()
-        if at_date and last_closing_date and at_date < fields.Date.to_date(last_closing_date):
+        if at_date and last_closing_date and at_date < fields.Datetime.context_timestamp(self.with_context(tz=self._get_company_tz()), last_closing_date).date():
             raise UserError(self.env._('It exists closing entries after the selected date. Cancel them before generate an entry prior to them'))
-        aml_vals_list = self._action_close_stock_valuation(at_date=at_date)
+        aml_vals_list = self.with_context(allowed_company_ids=self.ids)._action_close_stock_valuation(at_date=at_date)
 
         if not aml_vals_list:
+            # if we come from cron there might be no move to create for this company, but some for other companies
+            if self.env.context.get('closing_cron'):
+                return
             # No account moves to create, so nothing to display.
             raise UserError(_("Everything is correctly closed"))
         if not self.account_stock_journal_id:
@@ -65,14 +68,15 @@ class ResCompany(models.Model):
 
         moves_vals = {
             'journal_id': self.account_stock_journal_id.id,
-            'date': at_date or fields.Date.today(),
+            'date': at_date or self._get_company_today(),
             'ref': _('Stock Closing'),
             'line_ids': [Command.create(aml_vals) for aml_vals in aml_vals_list],
+            'company_id': self.id,
         }
         account_move = self.env['account.move'].create(moves_vals)
         self._save_closing_id(account_move.id)
         if auto_post:
-            account_move._post()
+            account_move.with_context(tz=self._get_company_tz())._post()
 
         return {
             'type': 'ir.actions.act_window',
@@ -86,7 +90,7 @@ class ResCompany(models.Model):
         self.ensure_one()
         value_by_account: dict = defaultdict(float)
         if not accounts_by_product:
-            accounts_by_product = self._get_accounts_by_product()
+            accounts_by_product = self.with_context(prefetch_fields=False)._get_accounts_by_product()
         for product, accounts in accounts_by_product.items():
             account = accounts['valuation']
             product_value = product.with_context(to_date=at_date).total_value
@@ -98,9 +102,7 @@ class ResCompany(models.Model):
         if not accounts_by_product:
             accounts_by_product = self._get_accounts_by_product()
         account_data = defaultdict(float)
-        stock_valuation_accounts_ids = set()
-        for dummy, accounts in accounts_by_product.items():
-            stock_valuation_accounts_ids.add(accounts['valuation'].id)
+        stock_valuation_accounts_ids = {accounts['valuation'].id for accounts in accounts_by_product.values()}
         stock_valuation_accounts = self.env['account.account'].browse(stock_valuation_accounts_ids)
         domain = Domain([
             ('account_id', 'in', stock_valuation_accounts.ids),
@@ -134,16 +136,27 @@ class ResCompany(models.Model):
 
     @api.model
     def _cron_post_stock_valuation(self):
-        domain = Domain([('inventory_period', '=', 'daily'), ('inventory_valuation', '!=', 'real_time')])
-        if fields.Date.today() == fields.Date.today() + relativedelta(day=31):
-            domain = domain & Domain([('inventory_period', '=', 'monthly')])
+        domain = Domain([
+            ('inventory_period', 'in', ['daily', 'monthly']),
+        ])
         companies = self.env['res.company'].search(domain)
         for company in companies:
-            company.action_close_stock_valuation(auto_post=True)
+            today = company._get_company_today()
+            if company.inventory_period == 'monthly' and today != today + relativedelta(day=31):
+                continue
+            try:
+                company.with_context(closing_cron=True).action_close_stock_valuation(auto_post=True)
+            except UserError:
+                continue
+
+    def _get_valuation_product_domain(self):
+        return [('is_storable', '=', True)]
 
     def _get_accounts_by_product(self, products=None):
         if not products:
-            products = self.env['product.product'].with_company(self).search([('is_storable', '=', True)])
+            products = self.env['product.product'].with_company(self).search_fetch(
+                self._get_valuation_product_domain(), ['categ_id'],
+            )
 
         accounts_by_product = {}
         for product in products:
@@ -180,7 +193,7 @@ class ResCompany(models.Model):
         if last_closing_date:
             moves_base_domain &= Domain([('date', '>', last_closing_date)])
         if at_date:
-            moves_base_domain &= Domain([('date', '<=', at_date)])
+            moves_base_domain &= Domain([('date', '<=', self._to_datetime_upper_bound(at_date))])
         moves_in_domain = Domain([
             ('is_out', '=', True),
             ('company_id', '=', self.id),
@@ -264,7 +277,7 @@ class ResCompany(models.Model):
         """
         extra_balance = self._get_extra_balance(extra_aml_vals_list)
 
-        fiscal_year_date_from = self.compute_fiscalyear_dates(fields.Date.today())['date_from']
+        fiscal_year_date_from = self.compute_fiscalyear_dates(self._get_company_today())['date_from']
 
         amls_vals_list = []
         accounting_data_today = self.stock_accounting_value(accounts_by_product)
@@ -338,9 +351,12 @@ class ResCompany(models.Model):
             closing = self.env['account.move'].browse(closing_id).exists().filtered(lambda am: am.state == 'posted')
         if not closing:
             return False
-        am_state_field = self.env['ir.model.fields'].search([('model', '=', 'account.move'), ('name', '=', 'state')], limit=1)
+        am_state_field = self.env['ir.model.fields'].sudo().search([('model', '=', 'account.move'), ('name', '=', 'state')], limit=1)
         state_tracking = closing.message_ids.sudo().tracking_value_ids.filtered(lambda t: t.field_id == am_state_field).sorted('id')
-        return state_tracking[-1:].create_date or fields.Datetime.to_datetime(closing.date)
+        create_date = state_tracking[-1:].create_date
+        if create_date and fields.Datetime.context_timestamp(self.with_context(tz=self._get_company_tz()), create_date).date() == closing.date:
+            return create_date
+        return self._to_datetime_upper_bound(closing.date)
 
     def _save_closing_id(self, move_id):
         self.ensure_one()
@@ -353,6 +369,7 @@ class ResCompany(models.Model):
         self.env['ir.config_parameter'].sudo().set_param(key, ','.join(ids))
 
     def _set_category_defaults(self):
+        super()._set_category_defaults()
         for company in self:
             self.env['ir.default'].set('product.category', 'property_valuation', company.inventory_valuation, company_id=company.id)
             self.env['ir.default'].set('product.category', 'property_cost_method', company.cost_method, company_id=company.id)

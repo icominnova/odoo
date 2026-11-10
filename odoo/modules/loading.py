@@ -37,6 +37,8 @@ if typing.TYPE_CHECKING:
 
 _logger = logging.getLogger(__name__)
 
+MAX_REMOVED_MODULES = 50
+
 
 def load_data(env: Environment, idref: IdRef, mode: LoadMode, kind: LoadKind, package: ModuleNode) -> bool:
     """
@@ -70,7 +72,7 @@ def load_demo(env: Environment, package: ModuleNode, idref: IdRef, mode: LoadMod
         if package.manifest.get('demo') or package.manifest.get('demo_xml'):
             _logger.info("Module %s: loading demo", package.name)
             with env.cr.savepoint(flush=False):
-                load_data(env(su=True), idref, mode, kind='demo', package=package)
+                load_data(env(su=True, context=dict(env.context, install_demo=True)), idref, mode, kind='demo', package=package)
         return True
     except Exception:  # noqa: BLE001
         # If we could not install demo data for this module
@@ -90,6 +92,7 @@ def force_demo(env: Environment) -> None:
     """
     Forces the `demo` flag on all modules, and installs demo data for all installed modules.
     """
+    assert env.registry.ready
     env.cr.execute('UPDATE ir_module_module SET demo=True')
     env.cr.execute(
         "SELECT name FROM ir_module_module WHERE state IN ('installed', 'to upgrade', 'to remove')"
@@ -102,6 +105,13 @@ def force_demo(env: Environment) -> None:
         load_demo(env, package, {}, 'init')
 
     env['ir.module.module'].invalidate_model(['demo'])
+
+    # If demo data triggered module state changes (to install/upgrade/remove),
+    # commit and rebuild registry to process button_install/upgrade calls.
+    if env['ir.module.module'].search_count([('state', 'in', ('to install', 'to upgrade', 'to remove'))], limit=1):
+        env.cr.commit()
+        Registry.new(env.cr.dbname, update_module=True)
+        env.transaction.reset()
 
 
 def load_module_graph(
@@ -384,7 +394,7 @@ def load_modules(
 
         if update_module and tools.sql.table_exists(cr, 'ir_model_fields'):
             # determine the fields which are currently translated in the database
-            cr.execute("SELECT model || '.' || name, translate FROM ir_model_fields WHERE translate IS NOT NULL")
+            cr.execute("SELECT model || '.' || name, translate FROM ir_model_fields WHERE translate::text <> 'false'")
             registry._database_translated_fields = dict(cr.fetchall())
 
             # determine the fields which are currently company dependent in the database
@@ -519,7 +529,8 @@ def load_modules(
                 # trigger after a small delay to give time for assets to regenerate
                 vacuum_cron._trigger(at=datetime.datetime.now() + datetime.timedelta(minutes=1))
 
-            env.flush_all()
+            # Commit once everything is installed and clean
+            env.cr.commit()
 
         # STEP 5: Uninstall modules to remove
         if update_module:
@@ -528,16 +539,25 @@ def load_modules(
             cr.execute("SELECT name, id FROM ir_module_module WHERE state=%s", ('to remove',))
             modules_to_remove = dict(cr.fetchall())
             if modules_to_remove:
-                pkgs = reversed([p for p in graph if p.name in modules_to_remove])
-                for pkg in pkgs:
-                    uninstall_hook = pkg.manifest.get('uninstall_hook')
-                    if uninstall_hook:
-                        py_module = sys.modules['odoo.addons.%s' % (pkg.name,)]
-                        getattr(py_module, uninstall_hook)(env)
-                        env.flush_all()
+                static_modules, imported_modules = tools.partition(lambda m: m in graph, modules_to_remove)
+                if imported_modules:
+                    # remove all imported modules (not in graph) together to avoid checking dependencies between them
+                    removing_modules = imported_modules
+                else:
+                    # remove at most MAX_REMOVED_MODULES in inverse order of dependencies
+                    removing_modules = [p.name for p in reversed(list(graph)) if p.name in static_modules]
+                    removing_modules = removing_modules[:MAX_REMOVED_MODULES]
 
-                Module = env['ir.module.module']
-                Module.browse(modules_to_remove.values()).module_uninstall()
+                registry.uninstalling_modules = set(removing_modules)
+                if not imported_modules:
+                    for name in removing_modules:
+                        if (uninstall_hook := graph[name].manifest.get('uninstall_hook')):
+                            py_module = sys.modules[f'odoo.addons.{name}']
+                            getattr(py_module, uninstall_hook)(env)
+                            env.flush_all()
+                module = env['ir.module.module'].browse(map(modules_to_remove.__getitem__, removing_modules))
+                module.module_uninstall()
+
                 # Recursive reload, should only happen once, because there should be no
                 # modules to remove next time
                 cr.commit()

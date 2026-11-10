@@ -12,14 +12,16 @@
 # Matjaz Mozetic <m.mozetic@matmoz.si>, 2022
 # laznikd <laznik@mentis.si>, 2022
 # Jasmina Macur <jasmina@hbs.si>, 2022
-# "Tiffany Chang (tic)" <tic@odoo.com>, 2025.
+# "Tiffany Chang (tic)" <tic@odoo.com>, 2025, 2026.
+# NEDŽAD BEUS <nedzad.beus@implex.si>, 2026.
+# Jan Zorko <jan.zorko@implex.si>, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server saas~15.4\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-01-25 18:36+0000\n"
-"PO-Revision-Date: 2025-09-16 21:22+0000\n"
-"Last-Translator: \"Tiffany Chang (tic)\" <tic@odoo.com>\n"
+"POT-Creation-Date: 2026-10-24 17:37+0000\n"
+"PO-Revision-Date: 2026-09-10 11:12+0000\n"
+"Last-Translator: Jan Zorko <jan.zorko@implex.si>\n"
 "Language-Team: Slovenian <https://translate.odoo.com/projects/odoo-19/iap/sl/"
 ">\n"
 "Language: sl\n"
@@ -28,7 +30,7 @@ msgstr ""
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=4; plural=n%100==1 ? 0 : n%100==2 ? 1 : n%100==3 || "
 "n%100==4 ? 2 : 3;\n"
-"X-Generator: Weblate 5.12.2\n"
+"X-Generator: Weblate 2026.8.1\n"
 
 #. module: iap
 #: model_terms:ir.ui.view,arch_db:iap.iap_account_view_form
@@ -83,6 +85,11 @@ msgid "Company"
 msgstr "Podjetje"
 
 #. module: iap
+#: model:ir.model,name:iap.model_res_config_settings
+msgid "Config Settings"
+msgstr "Uredi nastavitve"
+
+#. module: iap
 #: model:ir.model.fields,field_description:iap.field_iap_account__create_uid
 #: model:ir.model.fields,field_description:iap.field_iap_service__create_uid
 msgid "Created by"
@@ -109,6 +116,7 @@ msgstr "Opis"
 #: model:ir.model.fields,field_description:iap.field_iap_account__display_name
 #: model:ir.model.fields,field_description:iap.field_iap_enrich_api__display_name
 #: model:ir.model.fields,field_description:iap.field_iap_service__display_name
+#: model:ir.model.fields,field_description:iap.field_res_config_settings__display_name
 msgid "Display Name"
 msgstr "Prikazani naziv"
 
@@ -148,7 +156,6 @@ msgstr "IAP Račun"
 
 #. module: iap
 #: model:ir.ui.menu,name:iap.iap_account_menu
-#: model_terms:ir.ui.view,arch_db:iap.iap_account_view_tree
 msgid "IAP Accounts"
 msgstr "IAP Računi"
 
@@ -166,8 +173,14 @@ msgstr "Storitev ponudnika dostopa do interneta IAP"
 #: model:ir.model.fields,field_description:iap.field_iap_account__id
 #: model:ir.model.fields,field_description:iap.field_iap_enrich_api__id
 #: model:ir.model.fields,field_description:iap.field_iap_service__id
+#: model:ir.model.fields,field_description:iap.field_res_config_settings__id
 msgid "ID"
 msgstr "ID"
+
+#. module: iap
+#: model_terms:ir.ui.view,arch_db:iap.iap_account_view_tree
+msgid "In-App Purchase Accounts"
+msgstr ""
 
 #. module: iap
 #: model:ir.model.fields,field_description:iap.field_iap_service__integer_balance
@@ -185,6 +198,11 @@ msgstr "Zadnji posodobil"
 #: model:ir.model.fields,field_description:iap.field_iap_service__write_date
 msgid "Last Updated on"
 msgstr "Zadnjič posodobljeno"
+
+#. module: iap
+#: model_terms:ir.ui.view,arch_db:iap.iap_account_view_tree
+msgid "Manage"
+msgstr ""
 
 #. module: iap
 #. odoo-javascript
@@ -236,6 +254,11 @@ msgid "Registered"
 msgstr "Registrirano"
 
 #. module: iap
+#: model_terms:ir.ui.view,arch_db:iap.iap_account_view_tree
+msgid "Rotate"
+msgstr ""
+
+#. module: iap
 #: model:ir.model.fields,field_description:iap.field_iap_account__service_id
 msgid "Service"
 msgstr "Storitev"
@@ -248,7 +271,7 @@ msgstr "Storitev zaklenjena"
 #. module: iap
 #: model:ir.model.fields,field_description:iap.field_iap_account__state
 msgid "State"
-msgstr "Zvezna država ali regija"
+msgstr "Stanje"
 
 #. module: iap
 #: model:ir.model.fields,field_description:iap.field_iap_account__service_name
@@ -259,8 +282,16 @@ msgstr "Tehnični naziv"
 #. module: iap
 #. odoo-python
 #: code:addons/iap/models/iap_account.py:0
-msgid "The IAP token provided is invalid or empty."
+msgid ""
+"The IAP server is unreachable and the information may not be up to date. "
+"Please try again later."
 msgstr ""
+
+#. module: iap
+#. odoo-python
+#: code:addons/iap/models/iap_account.py:0
+msgid "The IAP token provided is invalid or empty."
+msgstr "Navedeni IAP žeton je neveljaven ali prazen."
 
 #. module: iap
 #. odoo-python
@@ -271,6 +302,25 @@ msgid ""
 msgstr ""
 "Zahteva za storitev je potekla. Obrnite se na avtorja aplikacije. URL, s "
 "katerim se je poskušala povezati, je bil %s"
+
+#. module: iap
+#: model_terms:ir.ui.view,arch_db:iap.iap_account_view_tree
+msgid ""
+"This is useful if you think it may have leaked. It will also deactivate auto-"
+"refill if set. Are you sure to rotate your IAP token?"
+msgstr ""
+
+#. module: iap
+#. odoo-python
+#: code:addons/iap/models/iap_account.py:0
+msgid "Unable to rotate token, another process is busy. Please try later."
+msgstr ""
+
+#. module: iap
+#. odoo-python
+#: code:addons/iap/models/iap_account.py:0
+msgid "Unexpected while contacting IAP. Please contact the support."
+msgstr ""
 
 #. module: iap
 #: model:ir.model.fields,field_description:iap.field_iap_service__unit_name
@@ -299,9 +349,6 @@ msgstr "Oglejte si svoje storitve IAP in napolnite svoje kredite"
 
 #~ msgid "Cancel"
 #~ msgstr "Prekliči"
-
-#~ msgid "Config Settings"
-#~ msgstr "Uredi nastavitve"
 
 #~ msgid "Service Name"
 #~ msgstr "Ime storitve"

@@ -3,7 +3,8 @@ from odoo import api, fields, models, _, Command
 from odoo.exceptions import UserError, ValidationError
 from odoo.tools import frozendict
 
-from datetime import date
+from collections import defaultdict
+from datetime import timedelta
 import json
 
 class AccountPartialReconcile(models.Model):
@@ -112,6 +113,18 @@ class AccountPartialReconcile(models.Model):
 
         # Get the payments without journal entry to reset once the amount residual is reset
         to_update_payments = self._get_to_update_payments(from_state='paid')
+
+        # Get the links between the payments and the moves they are no longer reconciled with
+        moves_to_detach_per_payment = defaultdict(lambda: self.env['account.move'])
+        for partial in self:
+            # The moves of both reconciled lines (e.g. an invoice and the journal entry of a payment), at most 2 per partial
+            moves = (partial.debit_move_id | partial.credit_move_id).move_id
+            if (
+                (payment := moves.origin_payment_id)
+                and (linked_moves := (moves - payment.move_id) & payment.invoice_ids)
+            ):
+                moves_to_detach_per_payment[payment] |= linked_moves
+
         # Retrieve the CABA entries to reverse.
         moves_to_reverse = self.env['account.move'].search([('tax_cash_basis_rec_id', 'in', self.ids)])
         # Same for the exchange difference entries.
@@ -129,14 +142,27 @@ class AccountPartialReconcile(models.Model):
         # Remove the matching numbers before reversing the moves to avoid trying to remove the full twice.
         full_to_unlink.unlink()
 
+        for payment, moves in moves_to_detach_per_payment.items():
+            # Keep the link with the moves still reconciled with the payment through another partial
+            lines = payment.move_id.line_ids
+            still_reconciled_moves = (lines.matched_debit_ids.debit_move_id | lines.matched_credit_ids.credit_move_id).move_id
+            payment.invoice_ids -= (moves - still_reconciled_moves)
+
         # Reverse or unlink CABA/exchange move entries.
         if moves_to_reverse:
             not_draft_moves = moves_to_reverse.filtered(lambda m: m.state != 'draft')
             draft_moves = moves_to_reverse - not_draft_moves
-            default_values_list = [{
-                'date': move._get_accounting_date(move.date, move._affect_tax_report()),
-                'ref': move.env._('Reversal of: %s', move.name),
-            } for move in not_draft_moves]
+            default_values_list = []
+            for move in not_draft_moves:
+                has_tax = move._affect_tax_report()
+                # Keep the reversal in the origin's period
+                reversal_date = move.date
+                if lock_dates := move._get_violated_lock_dates(move.date, has_tax):
+                    reversal_date = lock_dates[-1][0] + timedelta(days=1)
+                default_values_list.append({
+                    'date': reversal_date,
+                    'ref': move.env._('Reversal of: %s', move.name),
+                })
             not_draft_moves._reverse_moves(default_values_list, cancel=True)
             draft_moves.unlink()
 
@@ -154,6 +180,8 @@ class AccountPartialReconcile(models.Model):
 
     def _get_to_update_payments(self, from_state):
         to_update = []
+        group_payments = defaultdict(float)
+        moves_in_group_payment = list()
         for partial in self:
             matched_payments = (partial.credit_move_id | partial.debit_move_id).move_id.matched_payment_ids
             to_check_payments = matched_payments.filtered(lambda payment: not payment.outstanding_account_id and payment.state == from_state)
@@ -165,6 +193,19 @@ class AccountPartialReconcile(models.Model):
                 if not payment.currency_id.compare_amounts(payment.amount_signed, amount):
                     to_update.append(payment)
                     break
+            # Group payments are not handled because the partial amount never matches the payment amount. It matches the invoice amount instead.
+            # If the partial amount matches the amount of an invoice linked to a group payment, the payment is set aside to potentially be set
+            # as "to update" when the total amount of the group payment will be covered.
+            if len(to_check_payments) == 1 and to_check_payments not in to_update and len(to_check_payments.invoice_ids) > 1 and (
+                moves := to_check_payments.invoice_ids.filtered(
+                    lambda m: m not in moves_in_group_payment and not to_check_payments.currency_id.compare_amounts(m.amount_total_signed, amount)
+                )
+            ):
+                moves_in_group_payment.append(moves[0])
+                group_payments[to_check_payments] += amount
+
+                if not to_check_payments.currency_id.compare_amounts(to_check_payments.amount_signed, group_payments[to_check_payments]):
+                    to_update.append(to_check_payments)
         return self.env['account.payment'].union(*to_update)
 
     @api.model
@@ -225,6 +266,8 @@ class AccountPartialReconcile(models.Model):
                         * partial:          The account.partial.reconcile record.
                         * percentage:       The reconciled percentage represented by the partial.
                         * payment_rate:     The applied rate of this partial.
+                        * settlement_date:  The date at which the reconciled amount has been paid. Used as
+                                            accounting date of the cash basis entry.
         '''
         tax_cash_basis_values_per_move = {}
 
@@ -232,7 +275,8 @@ class AccountPartialReconcile(models.Model):
             return {}
 
         for partial in self:
-            for move in {partial.debit_move_id.move_id, partial.credit_move_id.move_id}:
+            for field, counterpart_field in (('debit', 'credit'), ('credit', 'debit')):
+                move, counterpart_move = partial[f'{field}_move_id'].move_id, partial[f'{counterpart_field}_move_id'].move_id
 
                 # Collect data about cash basis.
                 if move.id in tax_cash_basis_values_per_move:
@@ -280,8 +324,10 @@ class AccountPartialReconcile(models.Model):
                     rate_amount = source_line.balance
                     rate_amount_currency = source_line.amount_currency
                     payment_date = move.date
+                    settlement_date = partial.max_date
                 else:
                     payment_date = counterpart_line.date
+                    settlement_date = payment_date
 
                 if move_values['currency'] == move.company_id.currency_id:
                     # Ignore the exchange difference.
@@ -322,6 +368,8 @@ class AccountPartialReconcile(models.Model):
                     'percentage': percentage,
                     'payment_rate': payment_rate,
                     'both_move_posted': partial.debit_move_id.move_id.state == 'posted' and partial.credit_move_id.move_id.state == 'posted',
+                    'settlement_date': settlement_date,
+                    'counterpart_move': counterpart_move,
                 }
 
                 # Add partials.
@@ -506,7 +554,6 @@ class AccountPartialReconcile(models.Model):
         :return: The newly created journal entries.
         '''
         tax_cash_basis_values_per_move = self._collect_tax_cash_basis_values()
-        today = fields.Date.context_today(self)
 
         moves_to_create_and_post = []
         moves_to_create_in_draft = []
@@ -522,7 +569,7 @@ class AccountPartialReconcile(models.Model):
                 # Init the journal entry.
                 journal = partial.company_id.tax_cash_basis_journal_id
                 lock_date = move.company_id._get_user_fiscal_lock_date(journal)
-                move_date = partial.max_date if partial.max_date > lock_date else today
+                move_date = max(partial_values['settlement_date'], lock_date + timedelta(days=1))
                 move_vals = {
                     'move_type': 'entry',
                     'date': move_date,
@@ -582,6 +629,8 @@ class AccountPartialReconcile(models.Model):
                         # Base line.
 
                         cb_line_vals = self._prepare_cash_basis_base_line_vals(line, balance, amount_currency)
+                        cb_line_vals['name'] = ' - '.join(filter(None, (line.move_id.name, partial_values['counterpart_move'].name)))
+
                         grouping_key = self._get_cash_basis_base_line_grouping_key_from_vals(cb_line_vals)
 
                     if grouping_key in partial_lines_to_create:

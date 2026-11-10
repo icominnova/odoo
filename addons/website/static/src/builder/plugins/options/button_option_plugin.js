@@ -154,6 +154,9 @@ class ButtonOptionPlugin extends Plugin {
                 // existing buttons) + custom ?
                 const styleClass = styleClasses.find((c) => siblingButtonEl.classList.contains(c));
                 const sizeClass = sizeClasses.find((c) => siblingButtonEl.classList.contains(c));
+                const roundedClass = ["rounded-circle", "rounded-pill"].find((c) =>
+                    siblingButtonEl.classList.contains(c)
+                );
 
                 if (styleClass) {
                     editingElement.classList.remove("btn-primary");
@@ -162,8 +165,8 @@ class ButtonOptionPlugin extends Plugin {
                 if (sizeClass) {
                     editingElement.classList.add(sizeClass);
                 }
-                if (siblingButtonEl.classList.contains("rounded-circle")) {
-                    editingElement.classList.add("rounded-circle");
+                if (roundedClass) {
+                    editingElement.classList.add(roundedClass);
                 }
             } else if (!siblingButtonEl) {
                 // To align with the editor's behavior, we need to enclose the
@@ -185,6 +188,14 @@ class ButtonOptionPlugin extends Plugin {
         }
         return { ...initialState, previousSiblingEl, nextSiblingEl };
     }
+}
+
+export class ButtonTranslationPlugin extends Plugin {
+    static id = "buttonTranslation";
+    /** @type {import("plugins").WebsiteResources} */
+    resources = {
+        force_background_translation_state_selectors: "a.btn",
+    };
 }
 
 registry.category("website-plugins").add(ButtonOptionPlugin.id, ButtonOptionPlugin);

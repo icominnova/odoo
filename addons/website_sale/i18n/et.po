@@ -21,14 +21,15 @@
 # JanaAvalah, 2023
 # Leaanika Randmets, 2023
 # Anna, 2023
-# Weblate <noreply-mt-weblate@weblate.org>, 2025.
+# Weblate <noreply-mt-weblate@weblate.org>, 2025, 2026.
+# Erik Köster <erik@officeplus.ee>, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-01-25 18:35+0000\n"
-"PO-Revision-Date: 2025-11-08 22:04+0000\n"
-"Last-Translator: Weblate <noreply-mt-weblate@weblate.org>\n"
+"POT-Creation-Date: 2026-11-06 17:37+0000\n"
+"PO-Revision-Date: 2026-09-12 08:32+0000\n"
+"Last-Translator: Erik Köster <erik@officeplus.ee>\n"
 "Language-Team: Estonian <https://translate.odoo.com/projects/odoo-19/"
 "website_sale/et/>\n"
 "Language: et\n"
@@ -36,7 +37,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Weblate 5.12.2\n"
+"X-Generator: Weblate 2026.8.1\n"
 
 #. module: website_sale
 #: model_terms:ir.ui.view,arch_db:website_sale.products
@@ -137,38 +138,9 @@ msgid "1 Column"
 msgstr ""
 
 #. module: website_sale
-#: model:ir.model.fields.selection,name:website_sale.selection__website__product_page_image_width__100_pc
-msgid "100 %"
-msgstr "100 %"
-
-#. module: website_sale
 #. odoo-javascript
 #: code:addons/website_sale/static/src/website_builder/products_list_page_option.xml:0
 msgid "2 Columns"
-msgstr ""
-
-#. module: website_sale
-#: model:ir.model.fields.selection,name:website_sale.selection__website__product_page_image_width__33_pc
-msgid "33 %"
-msgstr ""
-
-#. module: website_sale
-#: model:ir.model.fields.selection,name:website_sale.selection__website__product_page_image_width__50_pc
-msgid "50 %"
-msgstr "50 %"
-
-#. module: website_sale
-#: model:ir.model.fields.selection,name:website_sale.selection__website__product_page_image_width__66_pc
-msgid "66 %"
-msgstr "66 %"
-
-#. module: website_sale
-#: model_terms:ir.ui.view,arch_db:website_sale.confirmation
-msgid ""
-"<a role=\"button\" t-att-href=\"order.partner_id.signup_prepare() and "
-"order.partner_id.with_context(relative_url=True)._get_signup_url()\" "
-"class=\"btn btn-primary o_translate_inline\">Sign Up</a>\n"
-"                    <span class=\"align-middle\">to follow your order.</span>"
 msgstr ""
 
 #. module: website_sale
@@ -355,6 +327,11 @@ msgstr ""
 #. module: website_sale
 #: model_terms:ir.ui.view,arch_db:website_sale.address
 msgid "<span class=\"align-middle\">Already have an account?</span>"
+msgstr ""
+
+#. module: website_sale
+#: model_terms:ir.ui.view,arch_db:website_sale.confirmation
+msgid "<span class=\"align-middle\">to follow your order.</span>"
 msgstr ""
 
 #. module: website_sale
@@ -560,28 +537,6 @@ msgstr ""
 #. module: website_sale
 #: model_terms:ir.ui.view,arch_db:website_sale.product_ribbon_form_view
 msgid "<span>for</span>"
-msgstr ""
-
-#. module: website_sale
-#: model_terms:ir.ui.view,arch_db:website_sale.cart
-msgid ""
-"<strong>\n"
-"                                <a class=\"o_translate_inline\" t-attf-"
-"href=\"/shop/cart/?id={{id}}&amp;access_token={{access_token}}"
-"&amp;revive_method=merge\">Click here</a>\n"
-"                            </strong> if you want to merge your previous "
-"cart into current cart."
-msgstr ""
-
-#. module: website_sale
-#: model_terms:ir.ui.view,arch_db:website_sale.cart
-msgid ""
-"<strong>\n"
-"                                <a class=\"o_translate_inline\" t-attf-"
-"href=\"/shop/cart/?id={{id}}&amp;access_token={{access_token}}"
-"&amp;revive_method=squash\">Click here</a>\n"
-"                            </strong> if you want to restore your previous "
-"cart. Your current cart will be replaced with your previous cart."
 msgstr ""
 
 #. module: website_sale
@@ -1225,6 +1180,12 @@ msgid "Bordered"
 msgstr "Ääristatud"
 
 #. module: website_sale
+#. odoo-javascript
+#: code:addons/website_sale/static/src/website_builder/product_page_option.xml:0
+msgid "Bottom"
+msgstr "Alumine osa"
+
+#. module: website_sale
 #. odoo-python
 #: code:addons/website_sale/models/website_snippet_filter.py:0
 msgid "Box"
@@ -1445,7 +1406,7 @@ msgstr "Muuda asukohta"
 #. module: website_sale
 #: model:website.checkout.step,main_button_label:website_sale.checkout_step_delivery
 msgid "Checkout"
-msgstr "Väljaregistreerimine"
+msgstr "Vormista tellimus"
 
 #. module: website_sale
 #. odoo-javascript
@@ -1536,6 +1497,11 @@ msgid ""
 msgstr ""
 "Vajuta <i>\"Uus\"</i>nupule ülevalt paremast nurgast, et oma esimene toode "
 "luua."
+
+#. module: website_sale
+#: model_terms:ir.ui.view,arch_db:website_sale.cart
+msgid "Click here"
+msgstr "Kliki siin"
 
 #. module: website_sale
 #. odoo-javascript
@@ -3215,6 +3181,7 @@ msgstr "Paigutus"
 
 #. module: website_sale
 #. odoo-javascript
+#: code:addons/website_sale/static/src/website_builder/product_page_option.xml:0
 #: code:addons/website_sale/static/src/website_builder/product_ribbon_options.xml:0
 #: model:ir.model.fields.selection,name:website_sale.selection__product_ribbon__position__left
 msgid "Left"
@@ -3252,6 +3219,12 @@ msgstr "Vahesumma rida maksude kuvamiseks"
 #. odoo-javascript
 #: code:addons/website_sale/static/src/website_builder/products_design_panel.xml:0
 msgid "Link Color"
+msgstr ""
+
+#. module: website_sale
+#. odoo-python
+#: code:addons/website_sale/controllers/cart.py:0
+msgid "Linked lines must be added to the cart with their parent."
 msgstr ""
 
 #. module: website_sale
@@ -3754,7 +3727,7 @@ msgstr "Avatud müügitellimused"
 #. module: website_sale
 #: model_terms:ir.ui.view,arch_db:website_sale.brand_promotion
 msgid "Open Source eCommerce"
-msgstr "Open Source eCommerce"
+msgstr "avatud lähtekoodiga e-pood"
 
 #. module: website_sale
 #. odoo-javascript
@@ -3898,7 +3871,7 @@ msgstr "Parents And Self"
 #. odoo-python
 #: code:addons/website_sale/controllers/main.py:0
 msgid "Pay now"
-msgstr "Maksa kohe"
+msgstr "Esita tellimus"
 
 #. module: website_sale
 #: model:website.checkout.step,name:website_sale.checkout_step_payment
@@ -4043,7 +4016,7 @@ msgstr "Hind - kallimast odavamaks"
 #: code:addons/website_sale/models/website.py:0
 #: code:addons/website_sale/static/src/website_builder/shared.js:0
 msgid "Price - Low to High"
-msgstr "Hind - kallimast odavamaks"
+msgstr "Hind - odavamast kallimaks"
 
 #. module: website_sale
 #: model:ir.model.fields,field_description:website_sale.field_product_product__base_unit_price
@@ -4817,8 +4790,14 @@ msgstr ""
 #. module: website_sale
 #: model_terms:ir.ui.view,arch_db:website_sale.o_wsale_offcanvas
 #: model_terms:ir.ui.view,arch_db:website_sale.product
+#: model_terms:ir.ui.view,arch_db:website_sale.product_search
 #: model_terms:ir.ui.view,arch_db:website_sale.products
 msgid "Search in"
+msgstr ""
+
+#. module: website_sale
+#: model_terms:ir.ui.view,arch_db:website_sale.filter_radio_and_multi_attributes
+msgid "Search {{0}} ({{1}})"
 msgstr ""
 
 #. module: website_sale
@@ -5114,6 +5093,11 @@ msgid "Sidebar"
 msgstr "Kõrvalriba"
 
 #. module: website_sale
+#: model_terms:ir.ui.view,arch_db:website_sale.confirmation
+msgid "Sign Up"
+msgstr "Registreeru"
+
+#. module: website_sale
 #: model_terms:ir.ui.view,arch_db:website_sale.address
 msgid "Sign in"
 msgstr "Logi sisse"
@@ -5167,6 +5151,14 @@ msgstr "Diivanid"
 #: model:product.ribbon,name:website_sale.sold_out_ribbon
 msgid "Sold out"
 msgstr "Välja müüdud"
+
+#. module: website_sale
+#. odoo-python
+#: code:addons/website_sale/controllers/main.py:0
+msgid ""
+"Some products in your cart are not available for purchase in your country. "
+"Please remove them or contact us."
+msgstr ""
 
 #. module: website_sale
 #. odoo-python
@@ -5473,6 +5465,14 @@ msgstr ""
 
 #. module: website_sale
 #. odoo-python
+#: code:addons/website_sale/controllers/cart.py:0
+msgid ""
+"The number of selected combo items must match the number of available combo "
+"choices."
+msgstr ""
+
+#. module: website_sale
+#. odoo-python
 #: code:addons/website_sale/controllers/payment.py:0
 msgid "The order has been cancelled."
 msgstr "Tellimus on tühistatud."
@@ -5593,6 +5593,24 @@ msgstr "Tootel ei ole ühtegi kehtivat kombinatsiooni."
 #: model_terms:ir.ui.view,arch_db:website_sale.product_title
 msgid "This product is no longer available."
 msgstr "Seda toodet pole enam saadaval."
+
+#. module: website_sale
+#. odoo-python
+#: code:addons/website_sale/models/sale_order.py:0
+msgid "This product is not available (anymore) in this unit of measure."
+msgstr ""
+
+#. module: website_sale
+#. odoo-python
+#: code:addons/website_sale/controllers/main.py:0
+msgid "This product is not available for purchase in your country."
+msgstr ""
+
+#. module: website_sale
+#. odoo-python
+#: code:addons/website_sale/controllers/cart.py:0
+msgid "This product is part of a combo and can't be updated individually."
+msgstr ""
 
 #. module: website_sale
 #: model_terms:ir.ui.view,arch_db:website_sale.products_item
@@ -5808,6 +5826,14 @@ msgid "Video URL"
 msgstr "Video url"
 
 #. module: website_sale
+#. odoo-javascript
+#: code:addons/website_sale/static/src/interactions/website_sale.js:0
+msgid "View Less"
+msgstr ""
+
+#. module: website_sale
+#. odoo-javascript
+#: code:addons/website_sale/static/src/interactions/website_sale.js:0
 #: model_terms:ir.ui.view,arch_db:website_sale.filter_radio_and_multi_attributes
 msgid "View More"
 msgstr ""
@@ -6122,6 +6148,12 @@ msgid "You can't use a video as the product's main image."
 msgstr "Toote peamise pildina ei saa kasutada videot."
 
 #. module: website_sale
+#. odoo-python
+#: code:addons/website_sale/controllers/cart.py:0
+msgid "You cannot add a combo item separately from its combo."
+msgstr ""
+
+#. module: website_sale
 #: model_terms:ir.actions.act_window,help:website_sale.sale_report_action_carts
 #: model_terms:ir.actions.act_window,help:website_sale.sale_report_action_dashboard
 msgid "You don't have any order from the website"
@@ -6314,6 +6346,20 @@ msgid "hours."
 msgstr ""
 
 #. module: website_sale
+#: model_terms:ir.ui.view,arch_db:website_sale.cart
+msgid "if you want to merge your previous cart into current cart."
+msgstr "Kui te soovite ühendada oma eelmist korvi praegusega."
+
+#. module: website_sale
+#: model_terms:ir.ui.view,arch_db:website_sale.cart
+msgid ""
+"if you want to restore your previous cart. Your current cart will be "
+"replaced with your previous cart."
+msgstr ""
+"kui te soovite taastada eelmist korvi. Teie praegune korv asendatakse "
+"eelmisega."
+
+#. module: website_sale
 #: model_terms:ir.ui.view,arch_db:website_sale.products
 msgid "in category \""
 msgstr "kategoorias *"
@@ -6400,9 +6446,23 @@ msgid "terms &amp; conditions"
 msgstr "tingimused"
 
 #. module: website_sale
+#: model_terms:ir.ui.view,arch_db:website_sale.cart_combo_item_line
+msgid "x"
+msgstr ""
+
+#. module: website_sale
 #: model_terms:ir.ui.view,arch_db:website_sale.dynamic_filter_template_product_product_products_item
 msgid "{{0}} image"
 msgstr ""
+
+#~ msgid "100 %"
+#~ msgstr "100 %"
+
+#~ msgid "50 %"
+#~ msgstr "50 %"
+
+#~ msgid "66 %"
+#~ msgstr "66 %"
 
 #~ msgid ""
 #~ "\"Optional\" allows guests to register from the order confirmation email "
@@ -6639,9 +6699,6 @@ msgstr ""
 #~ msgid "Both"
 #~ msgstr "Mõlemad"
 
-#~ msgid "Bottom"
-#~ msgstr "Alumine osa"
-
 #~ msgid "Brand"
 #~ msgstr "Kaubamärk"
 
@@ -6704,9 +6761,6 @@ msgstr ""
 
 #~ msgid "City"
 #~ msgstr "Linn"
-
-#~ msgid "Click here"
-#~ msgstr "Kliki siin"
 
 #~ msgid "Compute shipping cost and ship with Easypost"
 #~ msgstr "Reaalse transpordihinna arvutamine ja saatmine Easypost'iga"
@@ -7109,9 +7163,6 @@ msgstr ""
 #~ msgid "Show b2b Fields"
 #~ msgstr "Näita B2B välju"
 
-#~ msgid "Sign Up"
-#~ msgstr "Registreeru"
-
 #~ msgid "Slanted"
 #~ msgstr "Viltu"
 
@@ -7253,16 +7304,6 @@ msgstr ""
 
 #~ msgid "eCommerce Shop"
 #~ msgstr "E-pood"
-
-#~ msgid "if you want to merge your previous cart into current cart."
-#~ msgstr "Kui te soovite ühendada oma eelmist korvi praegusega."
-
-#~ msgid ""
-#~ "if you want to restore your previous cart. Your current cart will be "
-#~ "replaced with your previous cart."
-#~ msgstr ""
-#~ "kui te soovite taastada eelmist korvi. Teie praegune korv asendatakse "
-#~ "eelmisega."
 
 #~ msgid "item(s))"
 #~ msgstr "ese(t))"

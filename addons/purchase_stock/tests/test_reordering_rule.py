@@ -4,7 +4,6 @@
 from datetime import datetime as dt, time
 from datetime import timedelta as td
 from json import loads
-from unittest import skip
 
 from odoo import SUPERUSER_ID, Command
 from odoo.fields import Date
@@ -356,6 +355,52 @@ class TestReorderingRule(TransactionCase):
 
         self.assertEqual(pol.product_qty, 2.0)
         self.assertEqual(rr.qty_to_order, 0.0)
+
+    def test_reordering_rule_replenishment_uom_float_residue(self):
+        """
+        A product P in m with RR 0-0 and mm as replenishment multiple.
+        Confirm a delivery with 10000 mm x P -> RFQ created for 10 m, kept in draft.
+        Confirm a second delivery with 300 mm x P: the RFQ must be increased by
+        0.3 m, the float residue of the forecast must not be rounded up to an extra mm.
+        """
+        uom_m = self.env.ref('uom.product_uom_meter')
+        uom_mm = self.env.ref('uom.product_uom_millimeter')
+        product = self.env['product.product'].create({
+            'name': 'Rail',
+            'is_storable': True,
+            'uom_id': uom_m.id,
+            'seller_ids': [
+                Command.create({'partner_id': self.partner.id}),
+                Command.create({'partner_id': self.partner.id, 'product_uom_id': uom_mm.id, 'sequence': 2}),
+            ],
+            'route_ids': [Command.set(self.buy_route.ids)],
+        })
+        warehouse = self.env['stock.warehouse'].search([('company_id', '=', self.env.company.id)], limit=1)
+        stock_location = warehouse.lot_stock_id
+        customer_location = self.env.ref('stock.stock_location_customers')
+        self.env['stock.warehouse.orderpoint'].create({
+            'location_id': stock_location.id,
+            'product_id': product.id,
+            'product_min_qty': 0,
+            'product_max_qty': 0,
+            'replenishment_uom_id': uom_mm.id,
+        })
+
+        for qty_mm, ordered_qty in ((10000, 10.0), (300, 10.3)):
+            self.env['stock.picking'].create({
+                'picking_type_id': warehouse.out_type_id.id,
+                'location_id': stock_location.id,
+                'location_dest_id': customer_location.id,
+                'move_ids': [Command.create({
+                    'product_id': product.id,
+                    'product_uom_qty': qty_mm,
+                    'product_uom': uom_mm.id,
+                    'location_id': stock_location.id,
+                    'location_dest_id': customer_location.id,
+                })],
+            }).action_confirm()
+            pol = self.env['purchase.order.line'].search([('product_id', '=', product.id)])
+            self.assertRecordValues(pol, [{'product_qty': ordered_qty, 'product_uom_id': uom_m.id, 'state': 'draft'}])
 
     def test_replenish_report_1(self):
         """Tests the auto generation of manual orderpoints.
@@ -794,7 +839,7 @@ class TestReorderingRule(TransactionCase):
         orderpoint.with_user(french_user).action_replenish()
         self.assertRecordValues(po_line, [{"name": "[A] produit en français", "product_qty": 9.0}])
         self.assertEqual(len(po_line.order_id.order_line), 1)
-        self.assertRecordValues(po_line.move_dest_ids, [{"product_uom_qty": 9.0}])
+        self.assertRecordValues(po_line.move_dest_ids, [{"product_uom_qty": 5.0}, {"product_uom_qty": 4.0}])
         orderpoint.product_min_qty = 10.0
         orderpoint.product_max_qty = 20.0
         # run the scheduler to test the use case where the user is always the SUPERUSER
@@ -910,7 +955,6 @@ class TestReorderingRule(TransactionCase):
             {'qty_forecast': 0, 'qty_to_order': 0},
         ])
 
-    @skip('Temporary to fast merge new valuation')
     def test_decrease_qty_multi_step_receipt(self):
         """ Two-steps receipt. An orderpoint generates a move from Input to Stock
         with 5 x Product01 and a purchase order to fulfill the need of that SM.
@@ -963,7 +1007,6 @@ class TestReorderingRule(TransactionCase):
             {'location_id': supplier_location_id, 'location_dest_id': input_location_id, 'product_qty': 4},
         ])
 
-    @skip('Temporary to fast merge new valuation')
     def test_decrease_qty_multi_step_receipt02(self):
         """
         Two-steps receipt. An orderpoint generates a move from Input to Stock
@@ -1475,3 +1518,35 @@ class TestReorderingRule(TransactionCase):
         self.product_01.seller_ids = False
         orderpoint.invalidate_recordset(fnames=['show_supply_warning'])
         self.assertTrue(orderpoint.show_supply_warning)
+
+    def test_replenish_expired_seller(self):
+        self.product_01.standard_price = 50.0
+        self.product_01.seller_ids.price = 100.0
+        warehouse = self.env['stock.warehouse'].search([('company_id', '=', self.env.company.id)], limit=1)
+        orderpoint = self.env['stock.warehouse.orderpoint'].with_user(2).create({
+            'warehouse_id': warehouse.id,
+            'location_id': warehouse.lot_stock_id.id,
+            'product_id': self.product_01.id,
+            'product_min_qty': 0.0,
+            'product_max_qty': 10.0,
+            'trigger': 'manual',
+        })
+        orderpoint.qty_to_order = 5.0
+        orderpoint.action_replenish()
+        po = self.env['purchase.order'].search([('partner_id', '=', self.partner.id)], order='id desc', limit=1)
+        self.assertRecordValues(po.order_line, [{
+            'product_id': self.product_01.id,
+            'product_qty': 5.0,
+            'price_unit': 100.0,
+        }])
+
+        # Expire the seller
+        self.product_01.seller_ids.date_end = Date.today() - td(days=1)
+        # Second replenishment with expired seller using the same orderpoint
+        orderpoint.qty_to_order = 1.0
+        orderpoint.action_replenish()
+        self.assertRecordValues(po.order_line, [{
+            'product_id': self.product_01.id,
+            'product_qty': 6.0,
+            'price_unit': 100.0,
+        }])

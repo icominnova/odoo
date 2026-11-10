@@ -18,29 +18,40 @@ import { TranslateWebpageOption } from "./translate_webpage_option";
  */
 class TranslateToAction extends BuilderAction {
     static id = "translateWebpageAI";
-    static dependencies = ["customizeTranslationTab"];
+    static dependencies = ["customizeTranslationTab", "translation", "history", "valueHistory"];
+
+    setup() {
+        this.canTimeout = false;
+    }
 
     async apply() {
         const translationState = this.dependencies.customizeTranslationTab.getTranslationState();
+        this.elToTranslationInfoMap = this.dependencies.translation.getElToTranslationInfoMap();
         try {
             translationState.isTranslating = true;
             const language = this.services.website.currentWebsite.metadata.langName;
             const { translationChunks, translationMap } = this.generateTranslationChunks(
                 this.editable
             );
-            if (translationChunks) {
-                const responses = await this.runTranslationChunks(translationChunks, language);
-                const failedNodeCount = this.applyTranslationsToDOM(translationMap, responses);
-                if (failedNodeCount > 0) {
-                    this.showNotification(
-                        _t(
-                            "%s text blocks were skipped during translation. Please try again.",
-                            failedNodeCount
-                        ),
-                        _t("Translation Error"),
-                        "danger"
-                    );
-                }
+            if (!translationChunks.length) {
+                this.showNotification(
+                    _t("No translatable content found in the current webpage."),
+                    _t("Translation Info"),
+                    "info"
+                );
+                return;
+            }
+            const responses = await this.runTranslationChunks(translationChunks, language);
+            const failedNodeCount = this.applyTranslationsToDOM(translationMap, responses);
+            if (failedNodeCount > 0) {
+                this.showNotification(
+                    _t(
+                        "%s text blocks were skipped during translation. Please try again.",
+                        failedNodeCount
+                    ),
+                    _t("Translation Error"),
+                    "danger"
+                );
             }
         } finally {
             translationState.isTranslating = false;
@@ -54,9 +65,23 @@ class TranslateToAction extends BuilderAction {
      *
      * @param {Node} el - Text node to evaluate
      * @return {boolean} True if the node should be skipped
+     *
+     * TODO: remove in master.
      */
     shouldSkipTranslation(el) {
-        const text = el.textContent.replace(/[\u200B-\u200D\uFEFF]/g, "").trim();
+        return this.shouldSkipTextTranslation(el.textContent);
+    }
+
+    /**
+     * Determines if a text value should be skipped for translation.
+     * Skip if it contains no letters/numbers or is likely an email, phone
+     * number or URL.
+     *
+     * @param {string} textValue - Text content of the node
+     * @return {boolean} True if the value should be skipped
+     */
+    shouldSkipTextTranslation(textValue) {
+        const text = textValue.replace(/[\u200B-\u200D\uFEFF]/g, "").trim();
         const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         const PHONE_REGEX = /^[+\d][\d\s\-().]{6,}$/;
         const URL_REGEX = /^(https?:\/\/)?([\w-]+\.)+[\w-]+(:\d+)?(\/[\w\-./?%&=]*)?(#\S*)?$/i;
@@ -78,16 +103,24 @@ class TranslateToAction extends BuilderAction {
      * @return {Object} { List of chunks, Map of original nodes by their IDs }
      */
     generateTranslationChunks(containerEl, limit = 2000) {
+        const seenShas = new Set();
         const elements = Array.from(
-            containerEl.querySelectorAll("[data-oe-translation-state='to_translate']")
-        ).filter(
-            (el) =>
-                // TODO: fix `o_frontend_to_backend_buttons` to have no
-                // attribute `data-oe-translation-state`
-                !el.closest(".o_not_editable, .o_frontend_to_backend_buttons") &&
-                // Skip attribute translations, will handle in task-5047714
-                !el.classList.contains("o_translatable_attribute")
-        );
+            containerEl.querySelectorAll("[data-oe-translation-state='to_translate']:not(.o_dirty)")
+        ).filter((el) => {
+            // TODO: fix `o_frontend_to_backend_buttons` to have no
+            // attribute `data-oe-translation-state`
+            if (el.closest(".o_not_editable, .o_frontend_to_backend_buttons, .o_brand_promotion")) {
+                return false;
+            }
+            const sha = el.dataset.oeTranslationSourceSha;
+            if (sha) {
+                if (seenShas.has(sha)) {
+                    return false;
+                }
+                seenShas.add(sha);
+            }
+            return true;
+        });
 
         const translationChunks = [];
         const translationMap = new Map();
@@ -101,35 +134,45 @@ class TranslateToAction extends BuilderAction {
             }
         };
 
+        const enqueueTranslation = (el, id, text, attr = null) => {
+            if (this.shouldSkipTextTranslation(text)) {
+                return;
+            }
+            const itemSize = JSON.stringify({ id, text }).length;
+            if (currentChunkLength + itemSize > limit && currentChunk.length) {
+                flushChunk();
+            }
+            currentChunk.push({ el, id, originalText: text });
+            const mapValue = attr ? { el, attribute: attr } : el;
+            translationMap.set(id, mapValue);
+            currentChunkLength += itemSize;
+        };
+
         for (const el of elements) {
-            const walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT);
-            while (walker.nextNode()) {
-                const nodeId = uniqueId("t_");
-                const node = walker.currentNode;
-                if (this.shouldSkipTranslation(node)) {
-                    continue;
+            // Special case: translate default values of textarea/input elements.
+            // They may also have `o_translatable_text` (e.g. when using placeholders).
+            if (el.classList.contains("o_translatable_text")) {
+                const text = el.textContent;
+                enqueueTranslation(el, uniqueId("ta_"), text, "textContent");
+            }
+            if (el.classList.contains("o_translatable_attribute")) {
+                for (const attr of ["alt", "title", "placeholder", "value"]) {
+                    if (el.hasAttribute(attr)) {
+                        const attrValue = el.getAttribute(attr);
+                        enqueueTranslation(el, uniqueId("ta_"), attrValue, attr);
+                    }
                 }
-                const text = node.textContent.trim();
-                const itemSize = JSON.stringify({ id: nodeId, text }).length;
-                if (currentChunkLength + itemSize > limit && currentChunk.length) {
-                    flushChunk();
+            } else {
+                const walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT);
+                while (walker.nextNode()) {
+                    const node = walker.currentNode;
+                    const text = node.textContent;
+                    enqueueTranslation(node, uniqueId("t_"), text);
                 }
-                currentChunk.push({ el: node, id: nodeId, originalText: text });
-                translationMap.set(nodeId, node);
-                currentChunkLength += itemSize;
             }
         }
         // If any chunk left, flush it
         flushChunk();
-
-        if (!translationMap.size) {
-            this.showNotification(
-                _t("No translatable content found in the current webpage."),
-                _t("Translation Info"),
-                "info"
-            );
-            return {};
-        }
         return { translationChunks, translationMap };
     }
 
@@ -147,6 +190,11 @@ class TranslateToAction extends BuilderAction {
                 "You are a translation assistant. Your goal is to translate multiple text blocks.\n" +
                 "Instructions:\n" +
                 "- Input will be an array of objects: [{id: string, text: string}, ...]\n" +
+                "- Strictly preserve the trailing and leading spaces in 'text'.\n" +
+                "- Only translate the 'text' field, without changing the meaning.\n" +
+                "    - Example:\n" +
+                "       -' Hello ' should be translated to ' Hola ' (with spaces preserved).\n" +
+                "-      -'Enhance Your' and 'Experience' should be translated separately, preserving their individual meanings.\n" +
                 "- Return ONLY valid JSON in the same array format, replacing 'text' with the translated text.\n" +
                 "- Do not add comments or extra fields.",
         };
@@ -172,14 +220,20 @@ class TranslateToAction extends BuilderAction {
         // Limit concurrency to avoid
         // "Oops, it looks like our AI is unreachable!" error
         // when too many requests are sent in a short time.
-        const concurrencyLimit = 5;
+        const concurrencyLimit = 3;
         const allResults = [];
         const executing = new Set();
         for (const task of tasks) {
             if (executing.size >= concurrencyLimit) {
                 await Promise.race(executing);
             }
-            const promise = task().finally(() => executing.delete(promise));
+            const promise = task()
+                .catch((error) => {
+                    // Ignore failed request to save successfull ones
+                    console.warn("Translation chunck failed:", error);
+                    return {};
+                })
+                .finally(() => executing.delete(promise));
             executing.add(promise);
             allResults.push(promise);
         }
@@ -195,33 +249,58 @@ class TranslateToAction extends BuilderAction {
      * @return {Number} Count of failed translation nodes
      */
     applyTranslationsToDOM(translationMap, responses) {
-        let numOfFailedTranslationNodes = 0;
+        let numOfFailedTranslationNodes = translationMap.size;
+
         for (const response of responses) {
             let translations;
             try {
                 translations = JSON.parse(response);
             } catch {
-                numOfFailedTranslationNodes += translationMap.size;
-                continue;
+                try {
+                    // Handle JSON structure AI errors:
+                    // - missing quote before closing curly brace
+                    // - double closing curly brace
+                    // - missing comma between array elements
+                    const ARRAY_ISSUE_REGEX = /(?:"?}}?,?)(\{"id":"t_)/g;
+                    translations = JSON.parse(response.replace(ARRAY_ISSUE_REGEX, '"},$1'));
+                } catch {
+                    continue;
+                }
             }
 
             for (const { id, text } of translations) {
                 const node = translationMap.get(id);
-                if (!node) {
+                if (!node || !text.trim()) {
                     continue;
                 }
-                const translated = (text || "").trim();
-                if (!translated) {
-                    numOfFailedTranslationNodes++;
-                    continue;
-                }
-                node.textContent = translated;
-                const parentEl = node.parentElement?.closest("[data-oe-translation-state]");
-                if (parentEl) {
-                    parentEl.dataset.oeTranslationState = "translated";
+                numOfFailedTranslationNodes--;
+                if (id.startsWith("t_")) {
+                    node.textContent = text;
+                    const parentEl = node.parentElement?.closest("[data-oe-translation-state]");
+                    if (parentEl) {
+                        parentEl.dataset.oeTranslationState = "translated";
+                    }
+                } else if (id.startsWith("ta_")) {
+                    const { el, attribute } = node;
+                    const attributeInfo = this.elToTranslationInfoMap.get(el)?.[attribute];
+                    if (attributeInfo && text != attributeInfo.translation) {
+                        const oldValue = attributeInfo.translation;
+                        this.dependencies.history.applyCustomMutation({
+                            apply: () => (attributeInfo.translation = text),
+                            revert: () => (attributeInfo.translation = oldValue),
+                        });
+                        el.dataset.oeTranslationState = "translated";
+                        if (attribute === "textContent" || attribute === "value") {
+                            this.dependencies.valueHistory.setValue(el, text);
+                        } else {
+                            el.setAttribute(attribute, text);
+                        }
+                    }
                 }
             }
         }
+        this.dependencies.history.addStep();
+
         return numOfFailedTranslationNodes;
     }
 

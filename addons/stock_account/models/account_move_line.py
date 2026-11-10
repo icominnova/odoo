@@ -31,8 +31,8 @@ class AccountMoveLine(models.Model):
         self.ensure_one()
         if not self.product_id.is_storable:
             return False
-        moves = self._get_stock_moves()
-        return all(not m.is_dropship for m in moves)
+        moves = self.sudo()._get_stock_moves()
+        return all(not m._is_dropshipped() for m in moves)
 
     def _get_gross_unit_price(self):
         if self.product_uom_id.is_zero(self.quantity):
@@ -53,12 +53,12 @@ class AccountMoveLine(models.Model):
         """
         self.ensure_one()
 
-        original_line = self.move_id.reversed_entry_id.line_ids.filtered(
-            lambda l: l.display_type == 'cogs' and l.product_id == self.product_id and
-            l.product_uom_id == self.product_uom_id and l.price_unit >= 0)
-        original_line = original_line and original_line[0]
-        if original_line:
-            return original_line.price_unit
+        # Use original invoice price_unit if there is one and product is not fifo
+        if self.product_id.cost_method in ['standard', 'average']:
+            original_lines = self._get_lines_from_original_invoice()
+            original_line = original_lines and original_lines[0]
+            if original_line:
+                return original_line.price_unit
 
         if not self.product_id or self.product_uom_id.is_zero(self.quantity):
             return self.price_unit
@@ -71,15 +71,28 @@ class AccountMoveLine(models.Model):
                 price_unit = self.product_id.standard_price
             else:
                 price_unit = self.product_id._run_fifo(cogs_qty) / cogs_qty if cogs_qty else 0
-        return (price_unit * cogs_qty - self._get_posted_cogs_value()) / self.quantity
+        line_quantity_uom = self.product_uom_id._compute_quantity(self.quantity, self.product_id.uom_id)
+        cogs_value = (price_unit * cogs_qty - self._get_posted_cogs_value()) / line_quantity_uom
+        # The COGS of a credit note is signed when its lines are created
+        return -cogs_value if self.move_id.move_type == 'out_refund' else cogs_value
 
     def _get_stock_moves(self):
         return self.env['stock.move']
 
     def _get_cogs_qty(self):
         self.ensure_one()
-        return self.quantity
+        return (
+            self.product_uom_id._compute_quantity(self.quantity, self.product_id.uom_id)
+            * (-1 if self.move_id.move_type == "out_refund" else 1)
+        )
 
     def _get_posted_cogs_value(self):
         self.ensure_one()
         return 0
+
+    def _get_lines_from_original_invoice(self):
+        valuation_account = self.product_id.product_tmpl_id.get_product_accounts(fiscal_pos=self.move_id.fiscal_position_id)['stock_valuation']
+        return self.move_id.reversed_entry_id.line_ids.filtered(
+            lambda l: l.display_type == 'cogs' and l.product_id == self.product_id and
+            l.product_uom_id == self.product_uom_id and l.account_id == valuation_account
+        )

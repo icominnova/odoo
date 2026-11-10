@@ -1,10 +1,14 @@
 import math
 
+from lxml import etree
 from num2words import num2words
 
 from odoo import api, models
 from odoo.exceptions import UserError
-from odoo.tools import html2plaintext
+from odoo.tools import float_round, html2plaintext
+
+# InvoiceTypeCodes representing refunds in Nilvera documents.
+TR_REFUND_TYPE_CODES = {'IADE', 'TEVKIFATIADE'}
 
 
 class AccountEdiXmlUblTr(models.AbstractModel):
@@ -65,7 +69,7 @@ class AccountEdiXmlUblTr(models.AbstractModel):
             'cbc:CreditNoteTypeCode': {'_text': 'IADE'} if vals['document_type'] == 'credit_note' else None,
             'cbc:PricingCurrencyCode': {'_text': invoice.currency_id.name.upper()}
                 if vals['currency_id'] != vals['company_currency_id'] else None,
-            'cbc:LineCountNumeric': {'_text': len(invoice.line_ids)},
+            'cbc:LineCountNumeric': {'_text': len(invoice.line_ids.filtered(lambda line: line.display_type == 'product'))},
             'cbc:BuyerReference': None,  # Nilvera will reject any <BuyerReference> tag, so remove it
             'cbc:Note': {
                 '_text': html2plaintext(invoice.narration, include_references=False) if invoice.narration else None,
@@ -94,17 +98,17 @@ class AccountEdiXmlUblTr(models.AbstractModel):
         ]
         if vals['invoice'].currency_id.name != 'TRY':
             document_node['cbc:Note'].append({'_text': self._l10n_tr_get_amount_integer_partn_text_note(invoice.amount_residual, vals['invoice'].currency_id), 'note_attrs': {}})
-            document_node['cbc:Note'].append({'_text': self._l10n_tr_get_invoice_currency_exchange_rate(invoice)})
+            document_node['cbc:Note'].append({'_text': f'KUR : {self._l10n_tr_get_currency_conversion_rate(invoice):.6f} TL'})
 
     @api.model
     def _l10n_tr_get_amount_integer_partn_text_note(self, amount, currency):
         sign = math.copysign(1.0, amount)
         amount_integer_part, amount_decimal_part = divmod(abs(amount), 1)
-        amount_decimal_part = int(amount_decimal_part * 100)
+        amount_decimal_part = round(amount_decimal_part * 100)
 
         text_i = num2words(amount_integer_part * sign, lang="tr") or 'Sifir'
         text_d = num2words(amount_decimal_part * sign, lang="tr") or 'Sifir'
-        return f'YALNIZ : {text_i} {currency.name} {text_d} {currency.currency_subunit_label}'.upper()
+        return f'YALNIZ : {text_i} {currency.name} {text_d} {currency.with_context(lang="tr_TR").currency_subunit_label}'.upper()
 
     def _add_invoice_delivery_nodes(self, document_node, vals):
         super()._add_invoice_delivery_nodes(document_node, vals)
@@ -115,15 +119,16 @@ class AccountEdiXmlUblTr(models.AbstractModel):
         else:
             document_node['cac:Delivery'] = None
 
-    def _l10n_tr_get_invoice_currency_exchange_rate(self, invoice):
-        conversion_rate = self.env['res.currency']._get_conversion_rate(
-            from_currency=invoice.currency_id,
-            to_currency=invoice.company_currency_id,
-            company=invoice.company_id,
-            date=invoice.invoice_date,
-        )
-        # Nilvera Portal accepts the exchange rate for 6 decimals places only.
-        return f'KUR : {conversion_rate:.6f} TL'
+    def _l10n_tr_get_currency_conversion_rate(self, invoice):
+        """Return the exchange rate: 1 [invoice currency] = X TRY, rounded to 6 decimals."""
+        company_currency_to_try_rate = self.env['res.currency']._get_conversion_rate(
+            invoice.company_id.currency_id,
+            self.env.ref('base.TRY'),
+            invoice.company_id,
+            invoice.invoice_date
+            )
+
+        return float_round(company_currency_to_try_rate / invoice.invoice_currency_rate, 6)
 
     def _add_invoice_payment_means_nodes(self, document_node, vals):
         # EXTENDS account.edi.xml.ubl_21
@@ -134,11 +139,12 @@ class AccountEdiXmlUblTr(models.AbstractModel):
 
     def _add_invoice_exchange_rate_nodes(self, document_node, vals):
         invoice = vals['invoice']
-        if vals['currency_id'] != vals['company_currency_id']:
+
+        if vals['currency_name'] != 'TRY':
             document_node['cac:PricingExchangeRate'] = {
                 'cbc:SourceCurrencyCode': {'_text': vals['currency_name']},
-                'cbc:TargetCurrencyCode': {'_text': vals['company_currency_id'].name},
-                'cbc:CalculationRate': {'_text': round(invoice.currency_id._get_conversion_rate(invoice.currency_id, invoice.company_id.currency_id, invoice.company_id, invoice.invoice_date), 6)},
+                'cbc:TargetCurrencyCode': {'_text': 'TRY'},
+                'cbc:CalculationRate': {'_text': self._l10n_tr_get_currency_conversion_rate(invoice)},
                 'cbc:Date': {'_text': invoice.invoice_date},
             }
 
@@ -315,16 +321,59 @@ class AccountEdiXmlUblTr(models.AbstractModel):
         # EXTENDS account.edi.xml.ubl_20
         partner_vals = super()._import_retrieve_partner_vals(tree, role)
         partner_vals.update({
-            'vat': self._find_value(f'.//cac:Accounting{role}Party/cac:Party//cac:PartyIdentification//cbc:ID[string-length(text()) > 5]', tree),
+            'vat': self._find_value(f".//cac:{role}Party/cac:Party/cac:PartyIdentification/cbc:ID[@schemeID='VKN' or @schemeID='TCKN']", tree),
         })
         return partner_vals
 
-    def _import_fill_invoice_form(self, invoice, tree, qty_factor):
+    def _get_import_document_amount_sign(self, tree):
         # EXTENDS account.edi.xml.ubl_20
-        logs = super()._import_fill_invoice_form(invoice, tree, qty_factor)
+        move_type, qty_factor = super()._get_import_document_amount_sign(tree)
+
+        invoice_type_code = tree.findtext('.//{*}InvoiceTypeCode')
+        if invoice_type_code in TR_REFUND_TYPE_CODES:
+            return 'refund', qty_factor
+
+        return move_type, qty_factor
+
+    def _import_lines(self, record, tree, xpath, document_type=False, tax_type=False, qty_factor=1):
+        # EXTENDS account_edi_common
+        # In UBL-TR (GİB e-Fatura guide), IADE and TEVKIFATIADE refunds are <Invoice> documents with
+        # cac:InvoiceLine lines, see tests/test_files/refund/refund_iade.xml.
+        if xpath == './{*}CreditNoteLine' and etree.QName(tree).localname == 'Invoice':
+            xpath = './{*}InvoiceLine'
+            document_type = {'in_refund': 'in_invoice', 'out_refund': 'out_invoice'}.get(document_type, document_type)
+        return super()._import_lines(record, tree, xpath, document_type=document_type, tax_type=tax_type, qty_factor=qty_factor)
+
+    def _l10n_tr_match_refund_reversed_entry(self, invoice, tree):
+        if invoice.move_type not in {'in_refund', 'out_refund'}:
+            return
+
+        order_reference = tree.findtext('./{*}OrderReference/{*}ID')
+        if not order_reference:
+            return
+
+        invoice_type = 'in_invoice' if invoice.move_type == 'in_refund' else 'out_invoice'
+
+        # If more than one move has the same ref, avoid guessing and let the user link it manually.
+        original_moves = self.env['account.move'].search([
+            ('ref', '=', order_reference),
+            ('company_id', '=', invoice.company_id.id),
+            ('move_type', '=', invoice_type),
+        ], limit=2)
+
+        if len(original_moves) == 1:
+            invoice.reversed_entry_id = original_moves.id
+
+    def _import_fill_invoice(self, invoice, tree, qty_factor):
+        # EXTENDS account.edi.xml.ubl_20
+        logs = super()._import_fill_invoice(invoice, tree, qty_factor)
 
         # ==== Nilvera UUID ====
         if uuid_node := tree.findtext('./{*}UUID'):
             invoice.l10n_tr_nilvera_uuid = uuid_node
+            # Like the documents fetched from Nilvera, an imported document was already issued: never send it again.
+            invoice.l10n_tr_nilvera_send_status = 'succeed'
+
+        self._l10n_tr_match_refund_reversed_entry(invoice, tree)
 
         return logs

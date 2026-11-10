@@ -26,6 +26,18 @@
     width: 30px;
 }
 
+.address-cell {
+    max-width: 180px;
+}
+
+.address-text {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    overflow: hidden;
+}
+
 @include media-breakpoint-down(sm) {
     .screen-full-width {
         flex-direction: column;
@@ -51,9 +63,6 @@
         grid-template-areas: 
             "buttons pagination"
             "search search";
-    }
-    .search .fields {
-        z-index: 2;
     }
 }
 

@@ -111,6 +111,30 @@ class TestFiscalPosition(common.TransactionCase):
 
         self.assertEqual(mapped_taxes, self.dst1_tax | self.dst2_tax)
 
+    def test_duplicate_replacement_tax(self):
+        self.env.company.country_id = self.us
+        self.env['account.tax.group'].create({
+            'name': 'Test Tax Group',
+            'company_id': self.env.company.id,
+        })
+        source_tax = self.env['account.tax'].create({'name': 'Domestic 21%', 'amount': 21})
+        fiscal_position = self.fp.create({'name': 'Replacement taxes'})
+        replacement_tax = self.env['account.tax'].create({
+            'name': 'Foreign 19%',
+            'amount': 19,
+            'fiscal_position_ids': [Command.set(fiscal_position.ids)],
+            'original_tax_ids': [Command.set(source_tax.ids)],
+        })
+        self.assertEqual(fiscal_position.map_tax(source_tax), replacement_tax)
+
+        duplicate_tax = replacement_tax.copy()
+
+        mapped_taxes = fiscal_position.map_tax(source_tax)
+        self.assertEqual(mapped_taxes, replacement_tax)
+        self.assertEqual(mapped_taxes.compute_all(100)['total_included'], 119)
+        self.assertEqual(duplicate_tax.fiscal_position_ids, fiscal_position)
+        self.assertFalse(duplicate_tax.original_tax_ids)
+
     def test_30_fp_delivery_address(self):
         # Make sure the billing company is from Belgium (within the EU)
         self.env.company.vat = 'BE0477472701'
@@ -249,7 +273,11 @@ class TestFiscalPosition(common.TransactionCase):
             'code': 'PP',
             'country_group_ids': [Command.set(country_group.ids + a_country_group.ids)],
         })
-        self.env.company.country_id = my_country
+        # Match the fiscal country even when the company address is in another country.
+        self.env.company.write({
+            'country_id': self.us.id,
+            'account_fiscal_country_id': my_country.id,
+        })
 
         # AT case - no sequence, one country_id
         fp_1, fp_2, fp_3 = self.env['account.fiscal.position'].create([{
@@ -343,3 +371,80 @@ class TestFiscalPosition(common.TransactionCase):
             'sequence': sequence
         } for sequence in range(1, 3)])
         self.assertEqual(self.fp._get_fiscal_position(self.jc), fiscal_positions[0])
+
+    def test_get_fiscal_position_child_company_user(self):
+        """A user restricted to a child company must not get an AccessError when
+        _get_first_matching_fpos sorts by company.parent_ids, because the parent
+        company is outside that user's allowed companies.
+        """
+        parent_company = self.env['res.company'].create({'name': 'Test Parent'})
+        child_company = self.env['res.company'].create({'name': 'Test Child', 'parent_id': parent_company.id})
+
+        child_user = common.new_test_user(
+            self.env,
+            login='child_user_fp_test',
+            groups='base.group_user',
+            company_id=child_company.id,
+            company_ids=[Command.set([child_company.id])],
+        )
+
+        # Two fiscal positions so sorted() actually calls the key function.
+        fp1 = self.env['account.fiscal.position'].with_company(child_company).create({
+            'name': 'Child FP 1',
+            'auto_apply': True,
+            'country_id': self.be.id,
+            'sequence': 10,
+        })
+        self.env['account.fiscal.position'].with_company(child_company).create({
+            'name': 'Child FP 2',
+            'auto_apply': True,
+            'country_id': self.be.id,
+            'sequence': 20,
+        })
+
+        partner = self.env['res.partner'].create({
+            'name': 'Belgian Partner',
+            'country_id': self.be.id,
+        })
+
+        self.env.flush_all()
+        self.env.invalidate_all()
+
+        # Must not raise AccessError for the inaccessible parent company
+        result = self.env['account.fiscal.position'].with_user(child_user).with_company(child_company)._get_fiscal_position(partner)
+        self.assertEqual(result, fp1)
+
+    def test_fiscal_position_vat_matching(self):
+        """
+        Verify fiscal position auto-matching based on VAT validity:
+        - A valid VAT matches a `vat_required` fiscal position.
+        - A '/' VAT is treated as no VAT and matches a non-`vat_required` fiscal position.
+        - An empty VAT matches a non-`vat_required` fiscal position.
+        """
+        # Reset any existing FP
+        self.env['account.fiscal.position'].search([]).auto_apply = False
+
+        fp_vat = self.fp.create({
+            'name': 'FP with VAT',
+            'auto_apply': True,
+            'vat_required': True,
+            'sequence': 10,
+        })
+        fp_no_vat = self.fp.create({
+            'name': 'FP without VAT',
+            'auto_apply': True,
+            'vat_required': False,
+            'sequence': 20,
+        })
+
+        partner_with_vat, partner_slash_vat, partner_without_vat = self.env['res.partner'].create([
+            {
+                'name': 'BE VAT',
+                'vat': vat,
+                'country_id': self.be.id,
+            } for vat in ('BE0477472701', '/', '')
+        ])
+
+        self.assertEqual(fp_vat, self.env['account.fiscal.position']._get_fiscal_position(partner_with_vat))
+        self.assertEqual(fp_no_vat, self.env['account.fiscal.position']._get_fiscal_position(partner_slash_vat))
+        self.assertEqual(fp_no_vat, self.env['account.fiscal.position']._get_fiscal_position(partner_without_vat))

@@ -8,14 +8,15 @@
 # Michal Veselý <michal@veselyberanek.net>, 2022
 # Martin Trigaux, 2022
 # Jiří Podhorecký, 2022
-# "Dylan Kiss (dyki)" <dyki@odoo.com>, 2025.
-# Weblate <noreply-mt-weblate@weblate.org>, 2025.
+# "Dylan Kiss (dyki)" <dyki@odoo.com>, 2025, 2026.
+# Weblate <noreply-mt-weblate@weblate.org>, 2025, 2026.
+# "Marta (wacm)" <wacm@odoo.com>, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0beta\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-01-25 18:37+0000\n"
-"PO-Revision-Date: 2025-11-11 17:16+0000\n"
+"POT-Creation-Date: 2026-04-10 18:40+0000\n"
+"PO-Revision-Date: 2026-08-07 19:10+0000\n"
 "Last-Translator: Weblate <noreply-mt-weblate@weblate.org>\n"
 "Language-Team: Czech <https://translate.odoo.com/projects/odoo-19/uom/cs/>\n"
 "Language: cs\n"
@@ -24,7 +25,7 @@ msgstr ""
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=4; plural=(n == 1 && n % 1 == 0) ? 0 : (n >= 2 && n "
 "<= 4 && n % 1 == 0) ? 1: (n % 1 != 0 ) ? 2 : 3;\n"
-"X-Generator: Weblate 5.12.2\n"
+"X-Generator: Weblate 2026.6.1\n"
 
 #. module: uom
 #: model:ir.model.fields,field_description:uom.field_uom_uom__factor
@@ -69,7 +70,7 @@ msgstr "Dny"
 #. module: uom
 #: model:ir.model.fields,field_description:uom.field_uom_uom__display_name
 msgid "Display Name"
-msgstr "Zobrazovací název"
+msgstr "Zobrazovaný název"
 
 #. module: uom
 #: model:uom.uom,name:uom.product_uom_dozen
@@ -99,6 +100,11 @@ msgid "KWH"
 msgstr ""
 
 #. module: uom
+#: model:uom.uom,name:uom.product_uom_litre
+msgid "L"
+msgstr ""
+
+#. module: uom
 #: model:ir.model.fields,field_description:uom.field_uom_uom__write_uid
 msgid "Last Updated by"
 msgstr "Naposledy upraveno uživatelem"
@@ -115,13 +121,15 @@ msgstr "Spravovat více měrných jednotek"
 
 #. module: uom
 #: model:uom.uom,name:uom.product_uom_minute
+#, fuzzy
 msgid "Minutes"
-msgstr ""
+msgstr "Minut"
 
 #. module: uom
 #: model:uom.uom,name:uom.product_uom_pack_6
+#, fuzzy
 msgid "Pack of 6"
-msgstr ""
+msgstr "Balení po 6 kusech"
 
 #. module: uom
 #: model:ir.model.fields,field_description:uom.field_uom_uom__parent_path
@@ -228,8 +236,9 @@ msgstr ""
 
 #. module: uom
 #: model:ir.model.fields,field_description:uom.field_uom_uom__name
+#, fuzzy
 msgid "Unit Name"
-msgstr ""
+msgstr "Název jednotky"
 
 #. module: uom
 #: model:uom.uom,name:uom.product_uom_unit
@@ -285,6 +294,11 @@ msgid "ft³"
 msgstr "ft³"
 
 #. module: uom
+#: model:uom.uom,name:uom.product_uom_gram
+msgid "g"
+msgstr ""
+
+#. module: uom
 #: model:uom.uom,name:uom.product_uom_gal
 msgid "gal (US)"
 msgstr "gal (US)"
@@ -313,6 +327,11 @@ msgstr "km"
 #: model:uom.uom,name:uom.product_uom_lb
 msgid "lb"
 msgstr "lb"
+
+#. module: uom
+#: model:uom.uom,name:uom.product_uom_meter
+msgid "m"
+msgstr ""
 
 #. module: uom
 #: model:uom.uom,name:uom.product_uom_mile

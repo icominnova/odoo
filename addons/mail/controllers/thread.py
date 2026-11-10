@@ -147,12 +147,22 @@ class ThreadController(http.Controller):
             ).ids,
         }
 
-    def _prepare_message_data(self, post_data, *, thread, **kwargs):
+    def _prepare_message_data(self, post_data, *, thread, from_create=True, **kwargs):
         res = {
             key: value
             for key, value in post_data.items()
             if key in thread._get_allowed_message_params()
         }
+        if from_create:
+            if not request.env.user._is_internal() or not thread.sudo(False).with_context(
+                allowed_company_ids=[]
+            ).has_access(
+                thread._mail_get_operation_for_mail_message_operation("create").get(thread)
+            ):
+                res["message_type"] = "comment"
+                res["subtype_xmlid"] = "mail.mt_comment"
+            else:
+                res.setdefault("message_type", "comment")
         if (attachment_ids := post_data.get("attachment_ids")) is not None:
             attachments = request.env["ir.attachment"].browse(map(int, attachment_ids))
             if not attachments._has_attachments_ownership(post_data.get("attachment_tokens")):
@@ -194,7 +204,6 @@ class ThreadController(http.Controller):
                     )
                 ),
             ).ids
-        res.setdefault("message_type", "comment")
         return res
 
     @http.route("/mail/message/post", methods=["POST"], type="jsonrpc", auth="public")
@@ -220,6 +229,9 @@ class ThreadController(http.Controller):
             })
         thread = self._get_thread_with_access_for_post(thread_model, thread_id, **kwargs)
         if not thread:
+            raise NotFound()
+        partner, guest = request.env["res.partner"]._get_current_persona()
+        if thread_model == "discuss.channel" and not partner and not guest:
             raise NotFound()
         if not self._get_thread_with_access(thread_model, thread_id, mode="write"):
             thread = thread.with_context(mail_post_autofollow_author_skip=True, mail_post_autofollow=False)

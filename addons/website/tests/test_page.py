@@ -2,6 +2,10 @@
 
 from lxml import html
 from unittest.mock import patch
+from freezegun import freeze_time
+from datetime import date
+
+import werkzeug
 
 from odoo.addons.website.controllers.main import Website
 from odoo.addons.http_routing.tests.common import MockRequest
@@ -102,6 +106,45 @@ class TestPage(common.TransactionCase):
         Page.clone_page(self.page_1.id, clone_menu=True)
         cloned_generic_page_2 = Page.search([('url', '=', '/page_1-1'), ('id', '!=', self.page_1.id)])
         self.assertEqual(len(cloned_generic_page_2), 1, "A generic page being cloned should create a specific page with a new URL if there is already a specific page with that URL")
+
+    def test_clone_page_edited_in_default_language(self):
+        self.env['res.lang']._activate_lang('fr_FR')
+        website = self.env['website'].get_current_website()
+
+        self.assertEqual(website.default_lang_id.code, 'en_US')
+
+        view = self.env['ir.ui.view'].create({
+            'name': 'Repro View',
+            'type': 'qweb',
+            'arch': '<div>Original</div>',
+            'key': 'test.repro_view',
+        })
+
+        view.with_context(lang='fr_FR').arch = '<div>Original FR</div>'
+        page = self.env['website.page'].create({
+            'view_id': view.id,
+            'url': '/repro',
+            'website_id': website.id,
+        })
+
+        view.with_context(
+            lang=website.default_lang_id.code, delay_translations=True,
+        ).arch = '<div>Edited</div>'
+        view.invalidate_recordset(['arch_db'])
+        self.assertEqual(view.with_context(lang='fr_FR').arch, '<div>Original FR</div>',
+                         "confirmed fr_FR translation should still be the stale one")
+        self.assertEqual(view.with_context(lang='fr_FR', check_translations=True).arch, '<div>Edited</div>',
+                         "latest fr_FR content lives in the delayed translation slot")
+
+        dup_url = self.env['website.page'].with_context(lang='fr_FR').clone_page(page.id, clone_menu=False)
+        dup = self.env['website.page'].search([('url', '=', dup_url), ('id', '!=', page.id)])
+        self.assertEqual(len(dup), 1, "The page should have been duplicated")
+
+        self.assertEqual(
+            dup.with_context(lang='fr_FR').arch,
+            '<div>Edited</div>',
+            "Duplicating an edited page must use its latest (delayed) content, not the stale confirmed translation",
+        )
 
     def test_cow_page(self):
         Menu = self.env['website.menu']
@@ -205,6 +248,63 @@ class TestPage(common.TransactionCase):
         self.assertTrue(website_id not in pages.mapped('website_id').ids, "The website from which we deleted the generic page should not have a specific one.")
         self.assertTrue(website_id not in View.search([('name', 'in', ('Base', 'Extension'))]).mapped('website_id').ids, "Same for views")
 
+    def test_open_website_url_default_website(self):
+        default_website = self.env.ref('website.default_website')
+        default_website.domain = 'https://mysite.odoo.com'
+        self.page_1.write({'website_id': default_website.id})
+        action = self.page_1.with_context(website_id=default_website.id).open_website_url()
+        self.assertNotEqual(action.get('type'), 'ir.actions.act_url',
+            "Page on default website should not redirect to real domain")
+
+        other_website = self.env['website'].create({
+            'name': 'Other Website',
+            'domain': 'https://example.com',
+            'sequence': 20,
+        })
+        self.page_1.write({'website_id': other_website.id})
+        action = self.page_1.with_context(website_id=default_website.id).open_website_url()
+        self.assertEqual(action.get('type'), 'ir.actions.act_url',
+            "Page on non-default website with domain should redirect to real domain")
+
+    def test_copy_password_protected_view(self):
+        """ Tests that the duplication of a password-protected view also copies
+        the password. Tests that it works for designers, who cannot read the
+        password. """
+        designer = common.new_test_user(self.env, login='designer', groups='base.group_user,website.group_website_designer')
+        View = self.env['ir.ui.view'].with_user(designer)
+        protected_view = View.create({
+            'name': 'Protected',
+            'type': 'qweb',
+            'arch': '<div>protected</div>',
+            'key': 'test.protected_view',
+            'visibility': 'password',
+        })
+        protected_view.visibility_password_display = 'secret'
+        cloned_view = protected_view.copy()
+        self.assertTrue(protected_view.sudo().visibility_password)
+        self.assertEqual(cloned_view.sudo().visibility_password, protected_view.sudo().visibility_password)
+
+    def test_no_crypt_context_crash_if_password_is_falsy(self):
+        """ Tests that _handle_visibility does not crash if a password-protected
+        view has a falsy visibility_password. Old databases can contain such
+        views, because duplication of a password-protected page did not copy
+        the password. """
+        View = self.env['ir.ui.view']
+        empty_password_view = View.create({
+            'name': 'Broken clone',
+            'type': 'qweb',
+            'arch': '<div>clone</div>',
+            'key': 'test.broken_clone_view',
+            'visibility': 'password',
+        })
+        public_user = self.env.ref('base.public_user')
+        website = self.env['website'].browse(1)
+        with MockRequest(self.env(user=public_user), website=website) as mock_request:
+            mock_request.params = {'visibility_password': 'secret'}
+            self.assertFalse(empty_password_view._handle_visibility(do_raise=False))
+            with self.assertRaises(werkzeug.exceptions.Forbidden):
+                empty_password_view._handle_visibility(do_raise=True)
+
 
 @tagged('-at_install', 'post_install')
 class WithContext(HttpCase):
@@ -240,6 +340,51 @@ class WithContext(HttpCase):
         r = self.url_open(specific_page.url)
         self.assertEqual(r.status_code, 200, "Admin should see the specific unpublished page")
         self.assertEqual('I am a specific page' in r.text, True, "Admin should see the specific unpublished page")
+
+    def test_unpublished_page_deactivated_user(self):
+        designer = common.new_test_user(
+            self.env,
+            login='designer',
+            groups='base.group_user,website.group_website_designer',
+        )
+        self.page.is_published = False
+
+        self.authenticate(designer.login, designer.login)
+        r = self.url_open(self.page.url)
+        self.assertEqual(r.status_code, 200, "Website Designers should see unpublished pages")
+
+        designer.active = False
+        r = self.url_open(self.page.url)
+        self.assertEqual(r.status_code, 404, "Deactivated users should be logged out before serving fallback pages")
+
+    def test_unpublished_page_no_cache(self):
+        """Ensure that a previously-published page that is now unpublished will not be cached."""
+        self.authenticate(None, None)
+
+        with freeze_time(date(2025, 12, 30)):
+            r = self.url_open(self.page.url)
+        self.assertEqual(r.status_code, 200, "Restricted users should see the published page")
+
+        self.page.write({'is_published': False})
+
+        with freeze_time(date(2025, 12, 31)):
+            r = self.url_open(self.page.url)
+        self.assertEqual(r.status_code, 404, "Restricted users should see a 404 as the page is unpublished")
+
+    def test_page_cache_host_indexability(self):
+        """Cached HTML must preserve the current host's robots directive."""
+        self.env.ref('website.default_website').domain = 'https://example.com'
+        self.authenticate(None, None)
+
+        for hosts in [('preview.example.com', 'example.com'), ('example.com', 'preview.example.com')]:
+            with self.subTest(hosts=hosts):
+                self.env.registry.clear_cache()
+                # Warm the cache on one host, then visit the same page on the other.
+                for host in hosts:
+                    response = self.url_open(self.page.url, headers={'Host': host})
+                    self.assertEqual(response.status_code, 200)
+                    noindex = html.fromstring(response.content).xpath('//meta[@name="robots"]/@content')
+                    self.assertEqual(noindex, ['noindex'] if host == 'preview.example.com' else [], host)
 
     @mute_logger('odoo.addons.rpc.controllers.xmlrpc')
     def test_search(self):
@@ -619,6 +764,65 @@ class WithContext(HttpCase):
 
 
 @tagged('-at_install', 'post_install')
+class TestPageInMenu(common.TransactionCase):
+
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        cls.website = cls.env.ref('website.default_website')
+        cls.page = cls.env['website.page'].create({
+            'name': 'In Menu Page',
+            'type': 'qweb',
+            'arch': '<div>content</div>',
+            'key': 'test.in_menu_page',
+            'url': '/in-menu-page',
+            'website_id': cls.website.id,
+        })
+        # A menu tree other than the main menu
+        other_menu = cls.env['website.menu'].create({
+            'name': 'Other Menu',
+            'url': '#',
+            'website_id': cls.website.id,
+        })
+        cls.other_entry = cls.env['website.menu'].create({
+            'name': 'In Menu Page',
+            'url': cls.page.url,
+            'page_id': cls.page.id,
+            'parent_id': other_menu.id,
+            'website_id': cls.website.id,
+        })
+
+    def _page_properties(self):
+        return self.env['website.page.properties'].create({
+            'target_model_id': self.page.id,
+            'website_id': self.website.id,
+            'url': self.page.url,
+        })
+
+    def _main_menu_entries(self):
+        return self.env['website.menu'].search([
+            ('page_id', '=', self.page.id),
+            ('parent_id', '=', self.website.menu_id.id),
+        ])
+
+    def test_in_menu_ignores_other_menu_trees(self):
+        self.assertFalse(self.page.is_in_menu)
+        properties = self._page_properties()
+        self.assertFalse(properties.is_in_menu)
+
+        properties.is_in_menu = True
+        self.assertEqual(len(self._main_menu_entries()), 1, "Switching 'In Menu' on should add the page to the main menu")
+        self.page.invalidate_recordset(['menu_ids', 'is_in_menu'])
+        self.assertTrue(self.page.is_in_menu)
+
+        properties = self._page_properties()
+        self.assertTrue(properties.is_in_menu)
+        properties.is_in_menu = False
+        self.assertFalse(self._main_menu_entries(), "Switching 'In Menu' off should remove the page from the main menu")
+        self.assertTrue(self.other_entry.exists(), "'In Menu' should not remove the entries of other menu trees")
+
+
+@tagged('-at_install', 'post_install')
 class TestNewPage(common.TransactionCase):
     def test_new_page_used_key(self):
         website = self.env.ref('website.default_website')
@@ -628,3 +832,29 @@ class TestNewPage(common.TransactionCase):
         pages = self.env['website.page'].search([('url', '=', '/snippets')])
         self.assertEqual(len(pages), 1, "Exactly one page should be at /snippets.")
         self.assertNotEqual(pages.key, "website.snippets", "Page's key cannot be website.snippets.")
+
+    def test_pagenew_links_menu_without_leading_slash(self):
+        website = self.env.ref('website.default_website')
+        controller = Website()
+
+        menus = self.env['website.menu'].create([
+            {
+                'name': 'Without space and slash',
+                'url': 'foobar',
+                'website_id': website.id,
+            },
+            {
+                'name': 'With space and without slash',
+                'url': 'bar baz',
+                'website_id': website.id,
+            },
+        ])
+
+        with MockRequest(self.env, website=website):
+            for menu in menus:
+                controller.pagenew(path=menu.url)
+
+                self.assertTrue(
+                    menu.page_id,
+                    f"Menu '{menu.name}' was not linked to the created page."
+                )

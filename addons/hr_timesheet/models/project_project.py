@@ -86,14 +86,12 @@ class ProjectProject(models.Model):
         sql = SQL("""(
             SELECT Project.id
               FROM project_project AS Project
-              JOIN project_task AS Task
-                ON Project.id = Task.project_id
+              JOIN account_analytic_line AS aal
+                ON Project.id = aal.project_id
              WHERE Project.allocated_hours > 0
                AND Project.allow_timesheets = TRUE
-               AND Task.parent_id IS NULL
-               AND Task.state IN ('01_in_progress', '02_changes_requested', '03_approved', '04_waiting_normal')
           GROUP BY Project.id
-            HAVING Project.allocated_hours - SUM(Task.effective_hours) < 0
+            HAVING Project.allocated_hours - SUM(aal.unit_amount) < 0
         )""")
         return [('id', operator, sql)]
 
@@ -135,16 +133,7 @@ class ProjectProject(models.Model):
         """ Create an analytic account if project allow timesheet and don't provide one
             Note: create it before calling super() to avoid raising the ValidationError from _check_allow_timesheet
         """
-        defaults = self.default_get(['allow_timesheets', 'account_id', 'is_template'])
-        analytic_accounts_vals = [
-            vals for vals in vals_list
-            if (
-                vals.get('allow_timesheets', defaults.get('allow_timesheets')) and
-                not vals.get('account_id', defaults.get('account_id')) and not vals.get('is_template', defaults.get('is_template'))
-            )
-        ]
-
-        if analytic_accounts_vals:
+        if analytic_accounts_vals := self._get_processed_analytic_account_vals(vals_list):
             analytic_accounts = self.env['account.analytic.account'].create(self._get_values_analytic_account_batch(analytic_accounts_vals))
             for vals, analytic_account in zip(analytic_accounts_vals, analytic_accounts):
                 vals['account_id'] = analytic_account.id
@@ -205,6 +194,22 @@ class ProjectProject(models.Model):
         if not self.env.context.get('from_embedded_action'):
             action['display_name'] = _("%(name)s's Timesheets", name=self.name)
         return action
+
+    def _get_processed_analytic_account_vals(self, vals_list):
+        """
+        Filters the values list to return the values for analytic accounts creation.
+        Allows values modifications through overrides.
+        """
+        defaults = self.default_get(['allow_timesheets', 'account_id', 'is_template'])
+        analytic_accounts_vals = []
+        for vals in vals_list:
+            if (
+                vals.get('allow_timesheets', defaults.get('allow_timesheets'))
+                and not vals.get('account_id', defaults.get('account_id'))
+                and not vals.get('is_template', defaults.get('is_template'))
+            ):
+                analytic_accounts_vals.append(vals)
+        return analytic_accounts_vals
 
     # ----------------------------
     #  Project Updates

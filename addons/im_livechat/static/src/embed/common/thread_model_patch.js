@@ -57,14 +57,14 @@ patch(Thread.prototype, {
          * @type {Deferred}
          */
         this.readyToSwapDeferred = new Deferred();
-        this.chatbot = fields.One("Chatbot");
         this._toggleChatbot = fields.Attr(false, {
             compute() {
-                return this.chatbot && !this.livechat_end_dt;
+                return Boolean(this.chatbot && !this.chatbot.completed && !this.livechat_end_dt);
             },
             onUpdate() {
+                const shouldToggle = this._toggleChatbot;
                 this.isLoadedDeferred.then(() => {
-                    if (this._toggleChatbot) {
+                    if (shouldToggle) {
                         this.chatbot.start();
                     } else {
                         this.chatbot?.stop();
@@ -80,6 +80,16 @@ patch(Thread.prototype, {
                     : null;
             },
         });
+        this.storeAsActiveVisitorLivechats = fields.One("Store", {
+            /** @this {import("models").Thread} */
+            compute() {
+                return !this.livechat_end_dt &&
+                    (this.self_member_id?.eq(this.livechatVisitorMember) || this.isTransient)
+                    ? this.store
+                    : null;
+            },
+            inverse: "activeVisitorLivechats",
+        });
         this.requested_by_operator = false;
     },
     /** @returns {boolean} */
@@ -92,12 +102,22 @@ patch(Thread.prototype, {
     },
 
     get avatarUrl() {
-        if (this.channel_type === "livechat") {
-            return this.livechat_operator_id.avatarUrl;
+        if (this.channel_type !== "livechat") {
+            return super.avatarUrl;
         }
-        return super.avatarUrl;
+        if (this.livechatVisitorMember && this.self_member_id?.notEq(this.livechatVisitorMember)) {
+            return this.livechatVisitorMember.avatarUrl;
+        }
+        return this.livechat_operator_id.avatarUrl;
     },
     get displayName() {
+        if (
+            this.channel_type === "livechat" &&
+            this.livechatVisitorMember &&
+            this.self_member_id?.notEq(this.livechatVisitorMember)
+        ) {
+            return this.self_member_id.custom_channel_name || this.livechatVisitorMember.name;
+        }
         if (this.channel_type === "livechat" && this.livechat_operator_id) {
             return this.getPersonaName(this.livechat_operator_id);
         }
@@ -125,8 +145,10 @@ patch(Thread.prototype, {
                     extraData.selected_answer_id
                 );
             }
+            const authorModelName = this.store.self?.Model.getName();
             const temporaryMsg = this.store["mail.message"].insert({
-                author_id: this.store.self,
+                author_id: authorModelName === "res.partner" ? this.store.self : undefined,
+                author_guest_id: authorModelName === "mail.guest" ? this.store.self : undefined,
                 body: await generateEmojisOnHtml(body, { allowEmojiLoading: false }),
                 id: this.store.getNextTemporaryId(),
                 model: "discuss.channel",
@@ -134,9 +156,15 @@ patch(Thread.prototype, {
                 thread: this,
             });
             this.messages.push(temporaryMsg);
-            this?.chatbot?._simulateTyping(2 ** 31 - 1);
+            if (this.chatbot?.currentStep?.step_type !== "free_input_multi") {
+                this?.chatbot?._simulateTyping(2 ** 31 - 1);
+            }
             const thread = await this.store.env.services["im_livechat.livechat"].persist(this);
-            temporaryMsg.author_id = this.store.self; // Might have been created after persist.
+            if (this.store.self_partner) {
+                temporaryMsg.author_id = this.store.self_partner; // Might have been created after persist.
+            } else {
+                temporaryMsg.author_guest_id = this.store.self_guest;
+            }
             if (!thread) {
                 return;
             }
@@ -144,7 +172,13 @@ patch(Thread.prototype, {
             return thread.post(...arguments).then(() => thread.readyToSwapDeferred.resolve());
         }
         const message = await super.post(...arguments);
-        await this.chatbot?.processAnswer(message);
+        if (this.chatbot?.currentStep?.step_type === "free_input_multi") {
+            // Multi-line answers are processed after a debounce delay: do not wait to swap
+            // temporary thread with persisted one.
+            this.chatbot.processAnswer(message);
+        } else {
+            await this.chatbot?.processAnswer(message);
+        }
         return message;
     },
 
@@ -168,7 +202,7 @@ patch(Thread.prototype, {
             return text;
         }
         if (this.chatbot.completed) {
-            return _t("This livechat conversation has ended");
+            return _t("This livechat conversation has ended.");
         }
         if (
             this.chatbot.currentStep?.step_type === "question_selection" &&

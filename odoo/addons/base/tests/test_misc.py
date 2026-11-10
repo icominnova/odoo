@@ -108,6 +108,9 @@ class TestFormatLangDate(TransactionCase):
         self.assertEqual(misc.format_datetime(lang.env, datetime_str, tz='Europe/Brussels', dt_format=fmt_fr, lang_code='fr_FR'), '31 janvier 2017 à 11:33:00 +0100')
         self.assertEqual(misc.format_datetime(lang.with_context(lang='zh_CN').env, datetime_str, tz='Europe/Brussels', dt_format=fmt_us, lang_code='en_US'), 'January 31, 2017 at 11:33:00 AM +0100')
 
+        # Check given 'short' format
+        self.assertEqual(misc.format_datetime(lang.with_context(lang='fr_FR').env, datetime_str, tz='America/New_York', dt_format='short'), '31/01/2017 05:33')
+
         # -- test `time`
         time_part = datetime.time(16, 30, 22)
         time_part_tz = datetime.time(16, 30, 22, tzinfo=pytz.timezone('America/New_York'))  # 4:30 PM timezoned
@@ -130,6 +133,9 @@ class TestFormatLangDate(TransactionCase):
         # Check given `lang_code` overwites context lang
         self.assertEqual(misc.format_time(lang.with_context(lang='fr_FR').env, time_part, time_format='ah:mm', lang_code='zh_CN'), '\u4e0b\u53484:30')
         self.assertEqual(misc.format_time(lang.with_context(lang='zh_CN').env, time_part, time_format='ah:mm', lang_code='fr_FR'), 'PM4:30')
+
+        # Check given 'short' format
+        self.assertEqual(misc.format_time(lang.with_context(lang='fr_FR').env, time_part, time_format='short'), '16:30')
 
     def test_02_tz(self):
         self.env.user.tz = 'Europe/Brussels'
@@ -512,11 +518,27 @@ class TestUrlJoin(BaseCase):
             ('http://test.example.com', 'https://test2.example.com'),
             ('https://test.example.com', 'http://test.example.com'),
             ('https://example.com/p?example=test', 'https://example.com/q?example=example'),
+            ('http://example.com/b', 'http://example.com/bc'),
+            ('http://example.com/api/v1', 'http://example.com/api/v10/users'),
+            ('http://example.com/b', 'http://example.com/b%2Fc'),
         ]
         for base, extra in to_fail:
             with self.subTest(base=base, extra=extra):
                 with self.assertRaises(ValueError):
                     urls.urljoin(base, extra)
+
+    def test_absolute_url_under_base_path(self):
+        to_pass = [
+            ('http://example.com', 'http://example.com', 'http://example.com'),
+            ('http://example.com', 'http://example.com/c', 'http://example.com/c'),
+            ('http://example.com/b', 'http://example.com/b', 'http://example.com/b'),
+            ('http://example.com/b', 'http://example.com/b/c', 'http://example.com/b/c'),
+            ('http://example.com/b/', 'http://example.com/b/c', 'http://example.com/b/c'),
+            ('http://example.com/b', 'http://example.com/b/c?q=1#f', 'http://example.com/b/c?q=1#f'),
+        ]
+        for base, extra, expected in to_pass:
+            with self.subTest(base=base, extra=extra):
+                self.assertEqual(urls.urljoin(base, extra), expected)
 
     def test_dot_segments_not_allowed(self):
         urls_with_dot = [
@@ -613,6 +635,26 @@ class TestMiscToken(TransactionCase):
         token = base64.urlsafe_b64encode(token[:1] + new_timestamp + token[9:]).decode()
         self.assertIsNone(misc.verify_hash_signed(self.env, 'test', token))
 
+    def test_custom_secret(self):
+        payload = {'value': 123456, 'name': 'bob'}
+        token = misc.hash_sign(self.env, 'test', payload, expiration_hours=24, secret='very_secret')
+
+        self.assertEqual(misc.verify_hash_signed(self.env, 'test', token, secret='very_secret'), payload)
+        self.assertEqual(misc.verify_hash_signed(self.env, 'test', token, secret=b'very_secret'), payload)
+        self.assertIsNone(misc.verify_hash_signed(self.env, 'test', token, secret='other'))
+        self.assertIsNone(misc.verify_hash_signed(self.env, 'test', token))
+
+    def test_default_secret(self):
+        payload = ["str1", "str2", "str3", 4, 5]
+        db_secret = self.env['ir.config_parameter'].sudo().get_param('database.secret')
+
+        token_default = misc.hash_sign(self.env, 'test', payload, expiration_hours=24)
+        token_explicit = misc.hash_sign(self.env, 'test', payload, expiration_hours=24, secret=db_secret)
+
+        self.assertEqual(misc.verify_hash_signed(self.env, 'test', token_default), payload)
+        self.assertEqual(misc.verify_hash_signed(self.env, 'test', token_explicit), payload)
+        self.assertEqual(misc.verify_hash_signed(self.env, 'test', token_default, secret=db_secret), payload)
+
 
 class TestFormatAmountFunction(TransactionCase):
     @classmethod
@@ -678,6 +720,28 @@ class TestFormatAmountFunction(TransactionCase):
         # Has effect on number having trailing zeroes - currency position after
         self.currency_object_format_amount.position = "after"
         self.assert_format_amount(1.0000, "1%sfA" % "\N{NO-BREAK SPACE}", False)
+
+    def test_trailing_false_on_currency_without_decimal_places(self):
+        self.currency_object_format_amount.rounding = 1
+        self.assertEqual(self.currency_object_format_amount.decimal_places, 0)
+        for lang_code, separator in [('en_US', ','), ('GFL', '#')]:
+            for position in ['before', 'after']:
+                self.currency_object_format_amount.position = position
+                for amount, formatted_amount in [
+                    (0, '0'),
+                    (10, '10'),
+                    (100, '100'),
+                    (123, '123'),
+                    (-100, '-\N{ZERO WIDTH NO-BREAK SPACE}100'),
+                    (10000, f'10{separator}000'),
+                ]:
+                    with self.subTest(lang_code=lang_code, position=position, amount=amount):
+                        expected = (
+                            f'fA\N{NO-BREAK SPACE}{formatted_amount}'
+                            if position == 'before'
+                            else f'{formatted_amount}\N{NO-BREAK SPACE}fA'
+                        )
+                        self.assert_format_amount(amount, expected, False, lang_code)
 
     def test_trailing_false_on_number_having_trailing_zeroes_with_kilikili_language(self):
         # Here the amount is first will be given decimal separator and thousandth separator as

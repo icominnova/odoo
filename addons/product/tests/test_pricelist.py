@@ -53,6 +53,43 @@ class TestPricelist(ProductVariantsCommon):
         cls.env.user.group_ids += cls.env.ref('product.group_product_pricelist')
         cls.uom_ton = cls.env.ref('uom.product_uom_ton')
 
+    def test_pricelist_item_ids_hides_archived_products(self):
+        archived_variant = self.env['product.product'].create({'name': 'Archived variant'})
+        archived_template = self.env['product.template'].create({'name': 'Archived template'})
+        pricelist = self.env['product.pricelist'].create({
+            'name': 'Visibility pricelist',
+            'item_ids': [
+                Command.create({'applied_on': '3_global', 'fixed_price': 1}),
+                Command.create({
+                    'applied_on': '0_product_variant',
+                    'product_id': self.usb_adapter.id,
+                    'fixed_price': 2,
+                }),
+                Command.create({
+                    'applied_on': '0_product_variant',
+                    'product_id': archived_variant.id,
+                    'fixed_price': 3,
+                }),
+                Command.create({
+                    'applied_on': '1_product',
+                    'product_tmpl_id': self.usb_adapter.product_tmpl_id.id,
+                    'fixed_price': 4,
+                }),
+                Command.create({
+                    'applied_on': '1_product',
+                    'product_tmpl_id': archived_template.id,
+                    'fixed_price': 5,
+                }),
+            ],
+        })
+        archived_variant.active = False
+        archived_template.active = False
+        pricelist.invalidate_recordset(['item_ids'])
+        self.assertEqual(
+            sorted(pricelist.item_ids.mapped('fixed_price')),
+            [1, 2, 4],
+        )
+
     def test_10_discount(self):
         # Make sure the price using a pricelist is the same than without after
         # applying the computation manually
@@ -464,3 +501,16 @@ class TestPricelist(ProductVariantsCommon):
         self.assertEqual(pricelist.item_ids.applied_on, "1_product")
         # check that product_id is cleared
         self.assertFalse(pricelist.item_ids.product_id)
+
+    def test_pricelist_item_creation_from_product_variant_form(self):
+        """Creating a pricelist rule from a product variant's own form should
+        keep the variant it was created from, instead of dropping it because
+        `applied_on` was wrongly left on `1_product`."""
+        sofa_1 = self.product_template_sofa.product_variant_ids[0]
+        with Form(sofa_1) as product_form:
+            with product_form.pricelist_rule_ids.new() as item_form:
+                item_form.fixed_price = 50
+        item = sofa_1.pricelist_rule_ids
+        self.assertEqual(item.applied_on, "0_product_variant")
+        self.assertEqual(item.product_id, sofa_1)
+        self.assertEqual(item.product_tmpl_id, self.product_template_sofa)

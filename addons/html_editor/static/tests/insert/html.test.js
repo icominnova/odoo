@@ -8,6 +8,7 @@ import { cleanHints } from "../_helpers/dispatch";
 import { MAIN_PLUGINS } from "@html_editor/plugin_sets";
 import { addStep } from "../_helpers/user_actions";
 import { Plugin } from "@html_editor/plugin";
+import { waitFor } from "@odoo/hoot-dom";
 
 function span(text) {
     const span = document.createElement("span");
@@ -305,8 +306,17 @@ describe("collapsed selection", () => {
         );
         editor.shared.history.addStep();
         cleanHints(editor);
+        // Insertion triggers selectionchange & addStep creates selection
+        // placeholder.fixSelectionInsideEditableRoot moves selection into it,
+        // trigger another selectionchange that removes selection placeholder.
+        // So we must wait for the o-we-hint.
+        await waitFor(".o-we-hint");
+        cleanHints(editor);
         expect(getContent(editor.editable, { sortAttrs: true })).toBe(
-            `<p data-selection-placeholder=""><br></p><p contenteditable="false" data-oe-protected="true">in[]</p><p data-selection-placeholder="" style="margin: -9px 0px 8px;"><br></p>`
+            unformat(`
+                <p data-selection-placeholder=""><br></p>
+                <p contenteditable="false" data-oe-protected="true">in</p>
+                <p>[]<br></p>`)
         );
     });
 
@@ -392,6 +402,42 @@ describe("collapsed selection", () => {
         editor.shared.dom.insert("notasurprise");
         addStep(editor);
         expect(getContent(el)).toBe(`<p class="first">?</p><p class="second">surprise[]!</p>`);
+    });
+
+    test("should normalize complex table with mixed rowspan/colspan", async () => {
+        const { el, editor } = await setupEditor(`<p>[]<br></p>`);
+        editor.shared.dom.insert(
+            parseHTML(
+                editor.document,
+                `<table><tbody><tr><td rowspan="2" colspan="2">A</td><td>B</td></tr><tr><td colspan="2">C</td></tr><tr><td>D</td><td rowspan="2">E</td><td>F</td></tr><tr><td colspan="2">G</td></tr></tbody></table>`
+            )
+        );
+        editor.shared.history.addStep();
+        expect(getContent(el)).toBe(
+            `<p data-selection-placeholder=""><br></p><table><tbody><tr><td>A</td><td><p><br></p></td><td>B</td><td><p><br></p></td></tr><tr><td><p><br></p></td><td><p><br></p></td><td>C</td><td><p><br></p></td></tr><tr><td>D</td><td>E</td><td>F</td><td><p><br></p></td></tr><tr><td>G</td><td><p><br></p></td><td><p><br></p></td><td><p o-we-hint-text='Type "/" for commands' class="o-we-hint">[]<br></p></td></tr></tbody></table><p data-selection-placeholder=""><br></p>`
+        );
+    });
+
+    test("should keep the BR at the end of an inline followed by text", async () => {
+        await testEditor({
+            contentBefore: `<p><strong>a[]<br></strong>c</p>`,
+            stepFunction: async (editor) => {
+                editor.shared.dom.insert("b");
+                editor.shared.history.addStep();
+            },
+            contentAfter: `<p><strong>ab[]<br></strong>c</p>`,
+        });
+    });
+
+    test("should remove the BR at the end of an inline ending its block", async () => {
+        await testEditor({
+            contentBefore: `<p><strong>a[]<br></strong></p>`,
+            stepFunction: async (editor) => {
+                editor.shared.dom.insert("b");
+                editor.shared.history.addStep();
+            },
+            contentAfter: `<p><strong>ab[]</strong></p>`,
+        });
     });
 });
 
@@ -626,5 +672,64 @@ describe("not collapsed selection", () => {
             },
             contentAfter: '<p><a href="#">link</a></p><p><a href="#">link</a>[]</p>',
         });
+    });
+
+    test("should insert content without creating a new line at the start", async () => {
+        const { el, editor } = await setupEditor(
+            `<p>
+                <span>[abc</span>
+                <br>
+                <span>def]</span>
+            </p>`,
+            {}
+        );
+        editor.shared.dom.insert(
+            parseHTML(editor.document, "<div>123</div><div><br></div><div>456</div>")
+        );
+        expect(getContent(el)).toBe(
+            `<div class="o-paragraph">123</div><div class="o-paragraph"><br></div><div class="o-paragraph">456[]</div><p o-we-hint-text='Type "/" for commands' class="o-we-hint">
+                <span data-oe-zws-empty-inline="">\u200b</span><span data-oe-zws-empty-inline="">\u200b</span>
+            <br></p>`
+        );
+    });
+});
+
+test("Should create a list element around `li`", async () => {
+    await testEditor({
+        contentBefore: unformat(`
+            <div id="wrapwrap">
+                <header>
+                    <nav>
+                        <ul>
+                            <li>
+                                <div style="display: flex;">
+                                    <small>[abc]</small>
+                                </div>
+                            </li>
+                        </ul>
+                    </nav>
+                </header>
+                <main>I will escape wrapwrap</main>
+            </div>
+        `),
+        stepFunction: async (editor) => {
+            editor.shared.dom.insert(parseHTML(editor.document, "<ul><li>abc</li></ul>"));
+        },
+        contentAfter: unformat(`
+            <div id="wrapwrap">
+                <header>
+                    <nav>
+                        <ul>
+                            <li>
+                                <div style="display: flex;">
+                                    <small><ul><li>abc[]</li></ul></small>
+                                </div>
+                            </li>
+                        </ul>
+                    </nav>
+                </header>
+                <main>I will escape wrapwrap</main>
+            </div>
+        `),
     });
 });

@@ -23,17 +23,14 @@ import {
 } from "@mail/../tests/mail_test_helpers";
 import { describe, expect, test } from "@odoo/hoot";
 import { mockDate, tick } from "@odoo/hoot-mock";
-import { EventBus } from "@odoo/owl";
 import {
     Command,
     contains as webContains,
     getService,
-    patchWithCleanup,
     preloadBundle,
     serverState,
     withUser,
 } from "@web/../tests/web_test_helpers";
-import { browser } from "@web/core/browser/browser";
 
 import { rpc } from "@web/core/network/rpc";
 
@@ -305,6 +302,40 @@ test("Close emoji picker in chat window with ESCAPE does not also close the chat
     await click("button[title='Add Emojis']");
     triggerHotkey("Escape");
     await contains(".o-EmojiPicker", { count: 0 });
+    await contains(".o-mail-ChatWindow");
+});
+
+test.tags("focus required");
+test("Closing seen-by dialog on ESCAPE should not close the chat window", async () => {
+    const pyEnv = await startServer();
+    const partnerId = pyEnv["res.partner"].create({ name: "Demo User" });
+    const channelId = pyEnv["discuss.channel"].create({
+        channel_type: "chat",
+        channel_member_ids: [
+            Command.create({ partner_id: serverState.partnerId }),
+            Command.create({ partner_id: partnerId }),
+        ],
+    });
+    const messageId = pyEnv["mail.message"].create({
+        author_id: serverState.partnerId,
+        body: "Hello",
+        model: "discuss.channel",
+        res_id: channelId,
+    });
+    const [memberId] = pyEnv["discuss.channel.member"].search([
+        ["channel_id", "=", channelId],
+        ["partner_id", "=", partnerId],
+    ]);
+    pyEnv["discuss.channel.member"].write([memberId], {
+        seen_message_id: messageId,
+    });
+    setupChatHub({ opened: [channelId] });
+    await start();
+    await contains(".o-mail-ChatWindow");
+    await click(".o-mail-MessageSeenIndicator");
+    await contains(".o-mail-MessageSeenIndicatorDialog :focus");
+    triggerHotkey("Escape");
+    await contains(".o-mail-MessageSeenIndicatorDialog", { count: 0 });
     await contains(".o-mail-ChatWindow");
 });
 
@@ -898,12 +929,6 @@ test("Notification settings rendering in chatwindow", async () => {
 });
 
 test("open channel in chat window from push notification", async () => {
-    patchWithCleanup(window.navigator, {
-        serviceWorker: Object.assign(new EventBus(), {
-            register: () => Promise.resolve(),
-            ready: Promise.resolve(),
-        }),
-    });
     const pyEnv = await startServer();
     const [channelId, salesId] = pyEnv["discuss.channel"].create([
         { name: "General" },
@@ -913,7 +938,7 @@ test("open channel in chat window from push notification", async () => {
     await start();
     await contains(".o-mail-ChatWindow", { text: "Sales" });
     await contains(".o-mail-ChatWindow", { text: "General", count: 0 });
-    browser.navigator.serviceWorker.dispatchEvent(
+    navigator.serviceWorker.dispatchEvent(
         new MessageEvent("message", {
             data: { action: "OPEN_CHANNEL", data: { id: channelId } },
         })

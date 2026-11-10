@@ -7,18 +7,18 @@
 # Foldi Robert <foldirobert@nexterp.ro>, 2022
 # Martin Trigaux, 2022
 # Cozmin Candea <office@terrabit.ro>, 2023
-# Dorin Hongu <dhongu@gmail.com>, 2023, 2025.
-# "Tiffany Chang (tic)" <tic@odoo.com>, 2025.
-# Weblate <noreply-mt-weblate@weblate.org>, 2025.
-# Ciocoiu Beatrice-Flavia <ciocoiuflavia008@gmail.com>, 2025.
-# Gabriela Apostu <gabriela@terrabit.ro>, 2025.
+# Dorin Hongu <dhongu@gmail.com>, 2023, 2025, 2026.
+# "Tiffany Chang (tic)" <tic@odoo.com>, 2025, 2026.
+# Weblate <noreply-mt-weblate@weblate.org>, 2025, 2026.
+# Ciocoiu Beatrice-Flavia <ciocoiuflavia008@gmail.com>, 2025, 2026.
+# Gabriela Apostu <gabriela@terrabit.ro>, 2025, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-01-25 18:35+0000\n"
-"PO-Revision-Date: 2025-12-05 10:58+0000\n"
-"Last-Translator: Gabriela Apostu <gabriela@terrabit.ro>\n"
+"POT-Creation-Date: 2026-11-06 17:37+0000\n"
+"PO-Revision-Date: 2026-08-02 19:30+0000\n"
+"Last-Translator: Ciocoiu Beatrice-Flavia <ciocoiuflavia008@gmail.com>\n"
 "Language-Team: Romanian <https://translate.odoo.com/projects/odoo-19/hr/ro/"
 ">\n"
 "Language: ro\n"
@@ -27,7 +27,7 @@ msgstr ""
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=3; plural=n==1 ? 0 : (n==0 || (n%100 > 0 && n%100 < "
 "20)) ? 1 : 2;\n"
-"X-Generator: Weblate 5.14.3\n"
+"X-Generator: Weblate 2026.6.1\n"
 
 #. module: hr
 #. odoo-python
@@ -1192,7 +1192,6 @@ msgid "Attachment Count"
 msgstr "Număr atașamente"
 
 #. module: hr
-#: model_terms:ir.ui.view,arch_db:hr.res_users_view_form
 #: model_terms:ir.ui.view,arch_db:hr.res_users_view_form_preferences
 msgid "Attendance PIN"
 msgstr "PIN de prezență"
@@ -3801,6 +3800,18 @@ msgstr ""
 
 #. module: hr
 #. odoo-javascript
+#: code:addons/hr/static/src/components/avatar_card/avatar_card_popover_patch.xml:0
+msgid "Open Contact Profile"
+msgstr ""
+
+#. module: hr
+#. odoo-javascript
+#: code:addons/hr/static/src/components/avatar_card/avatar_card_popover_patch.xml:0
+msgid "Open Employee Profile (activates company)"
+msgstr ""
+
+#. module: hr
+#. odoo-javascript
 #: code:addons/hr/static/src/core/web/thread_actions.js:0
 msgid "Open Profile"
 msgstr "Deschide profilul"
@@ -4780,16 +4791,6 @@ msgid "Temporary"
 msgstr "Temporar"
 
 #. module: hr
-#. odoo-python
-#: code:addons/hr/models/hr_employee.py:0
-msgid ""
-"The Badge ID must be alphanumeric without any accents and no longer than 18 "
-"characters."
-msgstr ""
-"ID-ul de ecuson trebuie să fie alfanumeric, fără diacritice și să nu "
-"depășească 18 caractere."
-
-#. module: hr
 #: model:ir.model.constraint,message:hr.constraint_hr_employee_barcode_uniq
 msgid ""
 "The Badge ID must be unique, this one is already assigned to another "
@@ -4797,6 +4798,14 @@ msgid ""
 msgstr ""
 "ID-ul de Ecuson trebuie să fie unic, acesta este deja atribuit unui alt "
 "angajat."
+
+#. module: hr
+#. odoo-python
+#: code:addons/hr/models/hr_employee.py:0
+msgid ""
+"The Badge ID must contain only printable ASCII characters, without spaces, "
+"and be no longer than 18 characters."
+msgstr ""
 
 #. module: hr
 #: model:ir.model.fields,help:hr.field_hr_departure_reason__country_code
@@ -4894,6 +4903,12 @@ msgid ""
 msgstr ""
 "Câmpurile „%s” pe care încercați să le citiți nu sunt disponibile pentru "
 "profilurile publice ale angajaților."
+
+#. module: hr
+#. odoo-python
+#: code:addons/hr/models/hr_employee.py:0
+msgid "The following employees have the same work email address: %s"
+msgstr ""
 
 #. module: hr
 #. odoo-python
@@ -5223,9 +5238,25 @@ msgid "Version"
 msgstr "Version"
 
 #. module: hr
+#: model:ir.model.fields,field_description:hr.field_hr_employee__version_revision
+msgid "Version Revision"
+msgstr ""
+
+#. module: hr
 #: model:ir.model.fields,field_description:hr.field_hr_employee__versions_count
 msgid "Versions Count"
 msgstr "Număr versiuni"
+
+#. module: hr
+#: model_terms:ir.ui.view,arch_db:hr.hr_version_list_view
+msgid "View"
+msgstr ""
+
+#. module: hr
+#. odoo-javascript
+#: code:addons/hr/static/src/components/avatar_card/avatar_card_popover_patch.xml:0
+msgid "View Profile"
+msgstr ""
 
 #. module: hr
 #: model_terms:ir.ui.view,arch_db:hr.view_employee_form
@@ -5582,6 +5613,12 @@ msgstr "Nu aveți acces la acest document."
 
 #. module: hr
 #. odoo-python
+#: code:addons/hr/wizard/hr_bank_account_allocation_wizard_line.py:0
+msgid "You do not have the rights to trust or un-trust accounts."
+msgstr ""
+
+#. module: hr
+#. odoo-python
 #: code:addons/hr/models/hr_employee.py:0
 msgid "You need to set a valid work email address for %s"
 msgstr "Aveți nevoie să setați o adresă de e-mail de lucru validă pentru %s"
@@ -5822,6 +5859,13 @@ msgstr ""
 #: model:ir.model.fields,field_description:hr.field_hr_employee__work_permit_name
 msgid "work_permit_name"
 msgstr "nume_permis_muncă"
+
+#~ msgid ""
+#~ "The Badge ID must be alphanumeric without any accents and no longer than "
+#~ "18 characters."
+#~ msgstr ""
+#~ "ID-ul de ecuson trebuie să fie alfanumeric, fără diacritice și să nu "
+#~ "depășească 18 caractere."
 
 #~ msgid "Cannot archive the only active record of an employee."
 #~ msgstr "Nu se poate arhiva singura înregistrare activă a unui angajat."

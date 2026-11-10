@@ -3,16 +3,16 @@
 # * hr
 #
 # Translators:
-# "Dylan Kiss (dyki)" <dyki@odoo.com>, 2025.
-# "Anastasiia Koroleva (koan)" <koan@odoo.com>, 2025.
-# Weblate <noreply-mt-weblate@weblate.org>, 2025.
+# "Dylan Kiss (dyki)" <dyki@odoo.com>, 2025, 2026.
+# "Anastasiia Koroleva (koan)" <koan@odoo.com>, 2025, 2026.
+# Weblate <noreply-mt-weblate@weblate.org>, 2025, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 17.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-01-25 18:35+0000\n"
-"PO-Revision-Date: 2025-11-08 21:53+0000\n"
-"Last-Translator: Weblate <noreply-mt-weblate@weblate.org>\n"
+"POT-Creation-Date: 2026-11-06 17:37+0000\n"
+"PO-Revision-Date: 2026-09-08 14:11+0000\n"
+"Last-Translator: \"Anastasiia Koroleva (koan)\" <koan@odoo.com>\n"
 "Language-Team: Russian <https://translate.odoo.com/projects/odoo-19/hr/ru/>\n"
 "Language: ru\n"
 "MIME-Version: 1.0\n"
@@ -21,7 +21,7 @@ msgstr ""
 "Plural-Forms: nplurals=4; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
 "n%10<=4 && (n%100<12 || n%100>14) ? 1 : n%10==0 || (n%10>=5 && n%10<=9) || "
 "(n%100>=11 && n%100<=14)? 2 : 3);\n"
-"X-Generator: Weblate 5.12.2\n"
+"X-Generator: Weblate 2026.8.1\n"
 
 #. module: hr
 #. odoo-python
@@ -160,6 +160,8 @@ msgid ""
 "<i class=\"fa fa-envelope fa-fw me-1 text-primary\" title=\"Work Email\" "
 "invisible=\"login == work_email\"/>"
 msgstr ""
+"<i class=\"fa fa-envelope fa-fw me-1 text-primary\" title=\"Рабочий e-mail\" "
+"invisible=\"login == work_email\"/>"
 
 #. module: hr
 #: model_terms:ir.ui.view,arch_db:hr.hr_employee_public_view_form
@@ -179,6 +181,10 @@ msgid ""
 "                            <i class=\"fa fa-fw fa-key me-1 text-primary\" "
 "title=\"Login\" invisible=\"login == work_email\"/>"
 msgstr ""
+"<i class=\"fa fa-fw fa-envelope me-1 text-primary\" title=\"Логин / E-mail\" "
+"invisible=\"login != work_email\"/>\n"
+"                            <i class=\"fa fa-fw fa-key me-1 text-primary\" "
+"title=\"Логин\" invisible=\"login == work_email\"/>"
 
 #. module: hr
 #: model_terms:ir.ui.view,arch_db:hr.hr_employee_public_view_kanban
@@ -429,7 +435,7 @@ msgstr "<span invisible=\"not contract_date_start\">до</span>"
 #. module: hr
 #: model_terms:ir.ui.view,arch_db:hr.view_partner_bank_form_inherit_hr
 msgid "<span invisible=\"not employee_salary_amount_is_percentage\">%</span>"
-msgstr ""
+msgstr "<span invisible=\"not employee_salary_amount_is_percentage\">%</span>"
 
 #. module: hr
 #: model_terms:ir.ui.view,arch_db:hr.view_employee_form
@@ -1130,7 +1136,7 @@ msgstr ""
 "ищем опытного и талантливого сотрудника.\n"
 "                               <br><br>\n"
 "                                Эта должность требует как <b>творческого "
-"подхода, так и строгость в выполнении задач</b>, поэтому мы ищем кандидата с "
+"подхода, так и строгости в выполнении задач</b>, поэтому мы ищем кандидата с "
 "нестандартным мышлением.\n"
 "                                Мы ожидаем от кандидата проактивности и "
 "стремления довести начатое до конца. Успешный кандидат\n"
@@ -1227,7 +1233,6 @@ msgid "Attachment Count"
 msgstr "Количество вложений"
 
 #. module: hr
-#: model_terms:ir.ui.view,arch_db:hr.res_users_view_form
 #: model_terms:ir.ui.view,arch_db:hr.res_users_view_form_preferences
 msgid "Attendance PIN"
 msgstr "ПИН-код для учета посещаемости"
@@ -1432,7 +1437,7 @@ msgstr "Отменить"
 #. odoo-python
 #: code:addons/hr/models/hr_version.py:0
 msgid "Cannot archive all the active versions of an employee."
-msgstr ""
+msgstr "Нельзя отправить в архив все активные версии карточки сотрудника."
 
 #. module: hr
 #. odoo-python
@@ -1448,7 +1453,7 @@ msgstr ""
 #. odoo-python
 #: code:addons/hr/models/hr_version.py:0
 msgid "Cannot unassign all the active versions of an employee."
-msgstr ""
+msgstr "Нельзя снять назначение со всех активных версий карточки сотрудника."
 
 #. module: hr
 #: model:ir.model.fields,field_description:hr.field_hr_employee__certificate
@@ -2179,7 +2184,7 @@ msgstr "Документ"
 #. module: hr
 #: model_terms:ir.ui.view,arch_db:hr.view_employee_form
 msgid "Documents"
-msgstr ""
+msgstr "Документы"
 
 #. module: hr
 #: model:ir.model.fields,field_description:hr.field_hr_employee__driving_license
@@ -2402,7 +2407,7 @@ msgstr "Развитие сотрудников – один из ключевы
 #: model_terms:ir.ui.view,arch_db:hr.hr_contract_template_form_view
 #: model_terms:ir.ui.view,arch_db:hr.view_employee_form
 msgid "Employee will be excluded from Pay Runs"
-msgstr ""
+msgstr "Сотрудник будет исключен из расчета заработной платы"
 
 #. module: hr
 #: model:ir.model.fields,field_description:hr.field_res_users__employee_bank_account_ids
@@ -3683,7 +3688,7 @@ msgstr "Шаблон не найден"
 #. odoo-javascript
 #: code:addons/hr/static/src/components/versions_timeline/versions_timeline.js:0
 msgid "No contract"
-msgstr ""
+msgstr "Нет трудового договора"
 
 #. module: hr
 #: model_terms:hr.job,website_description:hr.job_consultant
@@ -3699,7 +3704,7 @@ msgstr ""
 #. module: hr
 #: model_terms:ir.ui.view,arch_db:hr.view_employee_form
 msgid "No user linked"
-msgstr ""
+msgstr "Нет связанного пользователя"
 
 #. module: hr
 #: model_terms:hr.job,website_description:hr.job_consultant
@@ -3836,6 +3841,18 @@ msgstr ""
 "Обнаружена циклическая цепочка подчинения, и ни один сотрудник в этой "
 "цепочке не связан с пользователем.                         Проверьте, чтобы "
 "каждый сотрудник подчинялся корректному менеджеру."
+
+#. module: hr
+#. odoo-javascript
+#: code:addons/hr/static/src/components/avatar_card/avatar_card_popover_patch.xml:0
+msgid "Open Contact Profile"
+msgstr "Открыть профиль контакта"
+
+#. module: hr
+#. odoo-javascript
+#: code:addons/hr/static/src/components/avatar_card/avatar_card_popover_patch.xml:0
+msgid "Open Employee Profile (activates company)"
+msgstr "Открыть профиль сотрудника (активирует компанию)"
 
 #. module: hr
 #. odoo-javascript
@@ -4608,7 +4625,7 @@ msgstr "Отображение значков часов"
 #. module: hr
 #: model_terms:ir.ui.view,arch_db:hr.hr_version_search_view
 msgid "Show all records whose next activity date is past"
-msgstr ""
+msgstr "Показать все записи с просроченной датой следующего дела"
 
 #. module: hr
 #: model:ir.model.fields,field_description:hr.field_hr_employee__birthday_public_display
@@ -4819,21 +4836,19 @@ msgid "Temporary"
 msgstr "Временная"
 
 #. module: hr
-#. odoo-python
-#: code:addons/hr/models/hr_employee.py:0
-msgid ""
-"The Badge ID must be alphanumeric without any accents and no longer than 18 "
-"characters."
-msgstr ""
-"Идентификатор бейджа должен быть буквенно‑цифровым, без диакритики и не "
-"длиннее 18 символов."
-
-#. module: hr
 #: model:ir.model.constraint,message:hr.constraint_hr_employee_barcode_uniq
 msgid ""
 "The Badge ID must be unique, this one is already assigned to another "
 "employee."
 msgstr "ID бейджа должен быть уникальным, он уже присвоен другому сотруднику."
+
+#. module: hr
+#. odoo-python
+#: code:addons/hr/models/hr_employee.py:0
+msgid ""
+"The Badge ID must contain only printable ASCII characters, without spaces, "
+"and be no longer than 18 characters."
+msgstr ""
 
 #. module: hr
 #: model:ir.model.fields,help:hr.field_hr_departure_reason__country_code
@@ -4934,6 +4949,12 @@ msgstr ""
 
 #. module: hr
 #. odoo-python
+#: code:addons/hr/models/hr_employee.py:0
+msgid "The following employees have the same work email address: %s"
+msgstr "У следующих сотрудников совпадает рабочий e-mail: %s"
+
+#. module: hr
+#. odoo-python
 #: code:addons/hr/models/res_users.py:0
 msgid "The following fields were modified by %s"
 msgstr "Следующие поля были изменены на %s"
@@ -5006,7 +5027,7 @@ msgstr "У этого сотрудника уже есть пользовате�
 #. odoo-python
 #: code:addons/hr/models/hr_employee.py:0
 msgid "This field %(field_name)s doesn't exist on this model (hr.version)."
-msgstr ""
+msgstr "Поле %(field_name)s отсутствует в этой модели (hr.version)."
 
 #. module: hr
 #: model:ir.model.fields,help:hr.field_hr_employee__tz
@@ -5260,9 +5281,25 @@ msgid "Version"
 msgstr "Версия"
 
 #. module: hr
+#: model:ir.model.fields,field_description:hr.field_hr_employee__version_revision
+msgid "Version Revision"
+msgstr "Редакция версии"
+
+#. module: hr
 #: model:ir.model.fields,field_description:hr.field_hr_employee__versions_count
 msgid "Versions Count"
 msgstr "Количество версий"
+
+#. module: hr
+#: model_terms:ir.ui.view,arch_db:hr.hr_version_list_view
+msgid "View"
+msgstr "Просмотр"
+
+#. module: hr
+#. odoo-javascript
+#: code:addons/hr/static/src/components/avatar_card/avatar_card_popover_patch.xml:0
+msgid "View Profile"
+msgstr "Просмотреть профиль"
 
 #. module: hr
 #: model_terms:ir.ui.view,arch_db:hr.view_employee_form
@@ -5621,6 +5658,12 @@ msgstr "У вас нет доступа к этому документу."
 
 #. module: hr
 #. odoo-python
+#: code:addons/hr/wizard/hr_bank_account_allocation_wizard_line.py:0
+msgid "You do not have the rights to trust or un-trust accounts."
+msgstr ""
+
+#. module: hr
+#. odoo-python
 #: code:addons/hr/models/hr_employee.py:0
 msgid "You need to set a valid work email address for %s"
 msgstr ""
@@ -5865,6 +5908,13 @@ msgstr "работа"
 #: model:ir.model.fields,field_description:hr.field_hr_employee__work_permit_name
 msgid "work_permit_name"
 msgstr "work_permit_name"
+
+#~ msgid ""
+#~ "The Badge ID must be alphanumeric without any accents and no longer than "
+#~ "18 characters."
+#~ msgstr ""
+#~ "Идентификатор бейджа должен быть буквенно‑цифровым, без диакритики и не "
+#~ "длиннее 18 символов."
 
 #~ msgid "Cannot archive the only active record of an employee."
 #~ msgstr "Невозможно архивировать единственную активную запись сотрудника."

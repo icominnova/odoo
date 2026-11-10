@@ -338,6 +338,19 @@ class TestAccountAccount(TestAccountMergeCommon):
         with self.assertRaises(UserError):
             account.reconcile = False
 
+    def test_toggle_reconcile_cash_basis_transition_account(self):
+        account = self.company_data['default_account_assets']
+        account.reconcile = True
+        self.env['account.tax'].create({
+            'name': 'cash basis tax',
+            'amount': 10.0,
+            'tax_exigibility': 'on_payment',
+            'cash_basis_transition_account_id': account.id,
+        })
+
+        with self.assertRaises(ValidationError):
+            account.reconcile = False
+
     def test_remove_account_from_account_group(self):
         """Test if an account is well removed from account group"""
         group = self.env['account.group'].create({
@@ -390,6 +403,19 @@ class TestAccountAccount(TestAccountMergeCommon):
         alternate_code = self.env['account.account']._search_new_account_code(alternate_account.code)
         new_account.code = alternate_code
         self.assertEqual(new_account.account_type, existing_account.account_type)
+
+    def test_compute_account_type_on_code_change(self):
+        """ Changing the code should recompute account_type and reconcile too, since reconcile depends on it. """
+        receivable_account = self.company_data['default_account_receivable']
+
+        new_code = self.env['account.account']._search_new_account_code(receivable_account.code)
+        with Form(self.env['account.account']) as account_form:
+            account_form.name = "A new account"
+            account_form.code = new_code
+
+        account = account_form.record
+        self.assertEqual(account.account_type, 'asset_receivable')
+        self.assertTrue(account.reconcile)
 
     def test_get_closest_parent_account(self):
         self.env['account.account'].create({
@@ -1073,3 +1099,84 @@ class TestAccountAccount(TestAccountMergeCommon):
         # get the accounts from the parent company with the branch user
         accounts = self.env['account.account'].with_user(branch_user.id).search([('company_ids', 'parent_of', [branch.id])])
         self.assertEqual(len(accounts), 1, "Branch user should have access to the accounts of the parent company")
+
+    def test_search_account_with_existing_code(self):
+        """ Ensure that we can properly search records by code, even if they are inactive """
+        example_account = self.env["account.account"].search([], limit=1)
+        found = self.env["account.account"].search([("code", "=ilike", example_account.code)])
+        self.assertEqual(found, example_account)
+
+        example_account.active = False
+        found = self.env["account.account"].search([("code", "=ilike", example_account.code), ("active", "=", False)])
+        not_found = self.env["account.account"].search([("code", "=ilike", example_account.code)])
+        self.assertEqual(found, example_account)
+        self.assertFalse(not_found)
+
+    def test_no_multi_company_on_bank_cash_accounts(self):
+        """Ensure multiple companies cannot be selected on bank and cash accounts."""
+        parent_company = self.env['res.company'].create([{
+            'name': "Parent Company",
+        }])
+        branch = self.env['res.company'].create([{
+            'name': "Branch Company",
+            'parent_id': parent_company.id,
+        }])
+        account = self.env['account.account'].create({
+            'code': 'TE1000',
+            'name': 'Bank Account Test',
+            'account_type': 'asset_cash',
+            'company_ids': [Command.link(parent_company.id)],
+        })
+        with self.assertRaisesRegex(ValidationError, "Bank & Cash accounts cannot be shared between companies."):
+            account.write({'company_ids': [Command.link(branch.id)]})
+
+    def test_duplicate_entry_update_amount_recomputes_totals(self):
+        """Ensure totals are recomputed after updating a duplicated journal entry."""
+        move = self.env['account.move'].create({
+            'move_type': 'entry',
+            'journal_id': self.company_data['default_journal_misc'].id,
+            'line_ids': [
+                Command.create({
+                    'account_id': self.company_data['default_account_revenue'].id,
+                    'balance': -1000.0,
+                }),
+                Command.create({
+                    'account_id': self.company_data['default_account_expense'].id,
+                    'balance': 1000.0,
+                }),
+            ],
+        })
+        move_copy = move.copy()
+        debit_line = move_copy.line_ids.filtered(lambda line: line.debit)
+        credit_line = move_copy.line_ids.filtered(lambda line: line.credit)
+        self.assertRecordValues(debit_line, [{
+            'debit': 1000.0,
+            'balance': 1000.0,
+            'amount_currency': 1000.0,
+            'price_subtotal': 1000.0,
+            'price_total': 1000.0,
+        }])
+        move_copy.write({
+            'line_ids': [
+                Command.update(debit_line.id, {
+                    'debit': 1500.0,
+                }),
+                Command.update(credit_line.id, {
+                    'credit': 1500.0,
+                }),
+            ],
+        })
+        self.assertRecordValues(debit_line, [{
+            'debit': 1500.0,
+            'balance': 1500.0,
+            'amount_currency': 1500.0,
+            'price_subtotal': 1500.0,
+            'price_total': 1500.0,
+        }])
+        self.assertRecordValues(credit_line, [{
+            'credit': 1500.0,
+            'balance': -1500.0,
+            'amount_currency': -1500.0,
+            'price_subtotal': -1500.0,
+            'price_total': -1500.0,
+        }])

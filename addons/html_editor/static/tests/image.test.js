@@ -1,4 +1,4 @@
-import { expect, test } from "@odoo/hoot";
+import { expect, mockFetch, test } from "@odoo/hoot";
 import {
     click,
     dblclick,
@@ -15,6 +15,7 @@ import { base64Img, setupEditor } from "./_helpers/editor";
 import { getContent, moveSelectionOutsideEditor, setContent } from "./_helpers/selection";
 import { insertText, undo } from "./_helpers/user_actions";
 import { expectElementCount } from "./_helpers/ui_expectations";
+import { getFetchedMimetype } from "@html_editor/utils/image";
 
 test("image can be selected", async () => {
     const { plugins } = await setupEditor(`
@@ -296,10 +297,11 @@ test("Can preview an image", async () => {
         <img class="img-fluid test-image" src="${base64Img}">
     `);
     await click("img.test-image");
-    await waitFor(".o-we-toolbar");
+    await expectElementCount(".o-we-toolbar", 1);
     await click(".o-we-toolbar button[name='image_preview']");
     await animationFrame();
-    expect(".o-FileViewer").toHaveCount(1);
+    await expectElementCount(".o-we-toolbar", 0);
+    await expectElementCount(".o-FileViewer", 1);
 });
 
 test("Can transform an image", async () => {
@@ -497,6 +499,17 @@ test("Can delete an image", async () => {
     expect(".test-image").toHaveCount(0);
 });
 
+test("Can delete an image with display block style applied", async () => {
+    await setupEditor(`
+        <p><img class="img-fluid test-image d-block" src="${base64Img}"></p>
+    `);
+    await click("img");
+    await expectElementCount(".o-we-toolbar button[name='image_delete']", 1);
+    await click("button[name='image_delete']");
+    await animationFrame();
+    await expectElementCount(".test-image", 0);
+});
+
 test("Deleting an image that is alone inside `p` should set selection at start of `p`", async () => {
     const { el } = await setupEditor(`<p><img>[]</p>`);
     await click("img");
@@ -651,4 +664,17 @@ test("should select image on pointerdown", async () => {
     const selectedNode = selectionPlugin.getTargetedNodes()[0];
 
     expect(selectedNode.tagName).toBe("IMG");
+});
+
+test("Correctly determine the mimetype of an image with wrong extension", async () => {
+    const imgSrc = "/web/image/wrongExtension.jpeg";
+    mockFetch((url) => {
+        if (url === imgSrc) {
+            return new Response("", { headers: new Headers([["content-Type", "image/png"]]) });
+        }
+    });
+    const imageEl = document.createElement("img");
+    imageEl.setAttribute("src", imgSrc);
+    const mimetype = await getFetchedMimetype(imageEl);
+    expect(mimetype).toBe("image/png");
 });

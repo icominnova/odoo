@@ -6,16 +6,17 @@
 # Martin Trigaux, 2022
 # Abe Manyo, 2023
 #
-# "Dylan Kiss (dyki)" <dyki@odoo.com>, 2025.
+# "Dylan Kiss (dyki)" <dyki@odoo.com>, 2025, 2026.
 # "Abe Manyo (abem)" <abem@odoo.com>, 2025, 2026.
-# Weblate <noreply-mt-weblate@weblate.org>, 2025.
+# Weblate <noreply-mt-weblate@weblate.org>, 2025, 2026.
+# "Nurul Aini Akrima Sabila (nuaas)" <nuaas@odoo.com>, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-01-25 18:36+0000\n"
-"PO-Revision-Date: 2026-01-06 08:43+0000\n"
-"Last-Translator: \"Abe Manyo (abem)\" <abem@odoo.com>\n"
+"POT-Creation-Date: 2026-10-24 17:37+0000\n"
+"PO-Revision-Date: 2026-11-04 06:33+0000\n"
+"Last-Translator: \"Nurul Aini Akrima Sabila (nuaas)\" <nuaas@odoo.com>\n"
 "Language-Team: Indonesian <https://translate.odoo.com/projects/odoo-19/"
 "im_livechat/id/>\n"
 "Language: id\n"
@@ -23,7 +24,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Generator: Weblate 5.14.3\n"
+"X-Generator: Weblate 2026.8.1\n"
 
 #. module: im_livechat
 #. odoo-python
@@ -93,15 +94,10 @@ msgid ""
 "* 'Show with notification' is 'Show' in addition to a floating text just "
 "next to the button.\n"
 "* 'Open automatically' displays the button and automatically opens the "
-"conversation pane.\n"
+"conversation pane on larger screens. On small screens, this behaves like "
+"'Show'.\n"
 "* 'Hide' hides the chat button on the pages.\n"
 msgstr ""
-"* 'Tunjukkan' menampilkan tombol chat pada halaman.\n"
-"* 'Tunjukkan dengan notifikasi' adalah 'Tunjukkan' ditambah teks mengambang "
-"persis di sebelah tombol.\n"
-"* 'Buka otomatis' menampilkan tombol dan secara otomatis membuka jendela "
-"percakapan.\n"
-"* 'Sembunyikan' menyembunyikkan tombol chat pada halaman.\n"
 
 #. module: im_livechat
 #: model_terms:ir.ui.view,arch_db:im_livechat.im_livechat_channel_view_kanban
@@ -136,19 +132,6 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:im_livechat.im_livechat_channel_view_form
 msgid "<span class=\"o_stat_text\">Sessions</span>"
 msgstr ""
-
-#. module: im_livechat
-#: model_terms:ir.ui.view,arch_db:im_livechat.im_livechat_channel_view_kanban
-msgid ""
-"<span groups=\"im_livechat.im_livechat_group_manager\">Configure Channel</"
-"span>\n"
-"                                <span groups=\"!"
-"im_livechat.im_livechat_group_manager\">View Channel</span>"
-msgstr ""
-"<span groups=\"im_livechat.im_livechat_group_manager\">Konfigurasi Channel</"
-"span>\n"
-"                                <span groups=\"!"
-"im_livechat.im_livechat_group_manager\">Lihat Channel</span>"
 
 #. module: im_livechat
 #: model_terms:ir.ui.view,arch_db:im_livechat.im_livechat_channel_view_form
@@ -279,7 +262,7 @@ msgstr "Agen-Age"
 #. module: im_livechat
 #: model:ir.model.fields,field_description:im_livechat.field_discuss_channel__livechat_agent_history_ids
 msgid "Agents (History)"
-msgstr "Agen-Agen (Sejarah)"
+msgstr "Agen-Agen (Riwayat)"
 
 #. module: im_livechat
 #: model_terms:ir.ui.view,arch_db:im_livechat.im_livechat_channel_view_form
@@ -396,7 +379,7 @@ msgstr "Bots"
 #. module: im_livechat
 #: model:ir.model.fields,field_description:im_livechat.field_discuss_channel__livechat_bot_history_ids
 msgid "Bots (History)"
-msgstr "Bots (Sejarah)"
+msgstr "Bots (Riwayat)"
 
 #. module: im_livechat
 #: model:ir.model.fields,field_description:im_livechat.field_im_livechat_channel__button_background_color
@@ -422,7 +405,7 @@ msgstr "Durasi Panggilan"
 #. module: im_livechat
 #: model:ir.model.fields,field_description:im_livechat.field_im_livechat_channel_member_history__call_history_ids
 msgid "Call History"
-msgstr "Sejarah Panggilan"
+msgstr "Riwayat Panggilan"
 
 #. module: im_livechat
 #: model:ir.ui.menu,name:im_livechat.canned_responses
@@ -435,7 +418,7 @@ msgstr "Tanggapan Otomatis"
 msgid ""
 "Cannot create history as it is only available for live chats: %(histories)s."
 msgstr ""
-"Tidak dapat membuat sejarah karena hanya tersedia untuk live chat: %"
+"Tidak dapat membuat riwayat karena hanya tersedia untuk live chat: %"
 "(histories)s."
 
 #. module: im_livechat
@@ -528,7 +511,7 @@ msgstr "Pesan Chatbot"
 #. module: im_livechat
 #: model:ir.model.fields,field_description:im_livechat.field_discuss_channel__chatbot_message_ids
 msgid "Chatbot Messages"
-msgstr "Pesan-Pesan Chatbot"
+msgstr "Pesan Chatbot"
 
 #. module: im_livechat
 #: model_terms:ir.ui.view,arch_db:im_livechat.chatbot_script_view_form
@@ -614,6 +597,11 @@ msgid "Configuration"
 msgstr "Konfigurasi"
 
 #. module: im_livechat
+#: model_terms:ir.ui.view,arch_db:im_livechat.im_livechat_channel_view_kanban
+msgid "Configure Channel"
+msgstr ""
+
+#. module: im_livechat
 #: model:ir.model,name:im_livechat.model_res_partner
 msgid "Contact"
 msgstr "Kontak"
@@ -652,6 +640,8 @@ msgid "Countries"
 msgstr "Negara"
 
 #. module: im_livechat
+#. odoo-javascript
+#: code:addons/im_livechat/static/src/core/web/livechat_channel_info_list.xml:0
 #: model:ir.model.fields,field_description:im_livechat.field_discuss_channel__country_id
 #: model:ir.model.fields,field_description:im_livechat.field_im_livechat_channel_member_history__session_country_id
 #: model_terms:ir.ui.view,arch_db:im_livechat.discuss_channel_looking_for_help_view_search
@@ -661,6 +651,12 @@ msgstr "Negara"
 #: model_terms:ir.ui.view,arch_db:im_livechat.im_livechat_report_channel_view_search
 msgid "Country"
 msgstr "Negara"
+
+#. module: im_livechat
+#. odoo-javascript
+#: code:addons/im_livechat/static/src/core/web/livechat_channel_info_list.xml:0
+msgid "Country & Language"
+msgstr ""
 
 #. module: im_livechat
 #: model:ir.model.fields,field_description:im_livechat.field_im_livechat_report_channel__country_id
@@ -737,7 +733,7 @@ msgstr "Pelanggan-Pelanggan (Tamu-Tamu)"
 #. module: im_livechat
 #: model:ir.model.fields,field_description:im_livechat.field_discuss_channel__livechat_customer_history_ids
 msgid "Customers (History)"
-msgstr "Pelanggan-Pelanggan (Sejarah)"
+msgstr "Pelanggan-Pelanggan (Riwayat)"
 
 #. module: im_livechat
 #: model:ir.model.fields,field_description:im_livechat.field_discuss_channel__livechat_customer_partner_ids
@@ -873,6 +869,7 @@ msgstr "Saluran Diskusi"
 #: model:ir.model.fields,field_description:im_livechat.field_im_livechat_conversation_tag__display_name
 #: model:ir.model.fields,field_description:im_livechat.field_im_livechat_expertise__display_name
 #: model:ir.model.fields,field_description:im_livechat.field_im_livechat_report_channel__display_name
+#: model:ir.model.fields,field_description:im_livechat.field_ir_qweb__display_name
 #: model:ir.model.fields,field_description:im_livechat.field_ir_websocket__display_name
 #: model:ir.model.fields,field_description:im_livechat.field_mail_message__display_name
 #: model:ir.model.fields,field_description:im_livechat.field_rating_rating__display_name
@@ -1085,12 +1082,8 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:im_livechat.im_livechat_channel_view_form
 msgid ""
 "Go to <strong>Website</strong> &gt; <strong>Configuration</strong> &gt; "
-"<strong>Settings</strong> &gt; <strong>Email</strong> &amp; "
-"<strong>Marketing.</strong>"
+"<strong>Settings</strong> &gt; <strong>General.</strong>"
 msgstr ""
-"Kunjungi <strong>Website</strong> &gt; <strong>Konfigurasi</strong> &gt; "
-"<strong>Pengaturan</strong> &gt; <strong>Email</strong> &amp; "
-"<strong>Marketing.</strong>"
 
 #. module: im_livechat
 #. odoo-javascript
@@ -1200,7 +1193,7 @@ msgstr "Riwayat"
 #. module: im_livechat
 #: model:ir.model.constraint,message:im_livechat.constraint_im_livechat_channel_member_history_partner_id_or_guest_3b134909
 msgid "History should either be linked to a partner or a guest but not both"
-msgstr "Sejarah harus baik terhubung ke partner atau tamu tapi tidak keduanya"
+msgstr "Riwayat harus baik terhubung ke partner atau tamu tapi tidak keduanya"
 
 #. module: im_livechat
 #: model_terms:chatbot.script.step,message:im_livechat.chatbot_script_welcome_step_pricing
@@ -1269,6 +1262,7 @@ msgstr "Saya memiliki pertanyaan mengenai harga"
 #: model:ir.model.fields,field_description:im_livechat.field_im_livechat_conversation_tag__id
 #: model:ir.model.fields,field_description:im_livechat.field_im_livechat_expertise__id
 #: model:ir.model.fields,field_description:im_livechat.field_im_livechat_report_channel__id
+#: model:ir.model.fields,field_description:im_livechat.field_ir_qweb__id
 #: model:ir.model.fields,field_description:im_livechat.field_ir_websocket__id
 #: model:ir.model.fields,field_description:im_livechat.field_mail_message__id
 #: model:ir.model.fields,field_description:im_livechat.field_rating_rating__id
@@ -1423,12 +1417,12 @@ msgstr "Bergabung dengan Chat"
 #. module: im_livechat
 #: model:ir.model,name:im_livechat.model_discuss_call_history
 msgid "Keep the call history"
-msgstr "Simpan sejarah panggilan"
+msgstr "Simpan riwayat panggilan"
 
 #. module: im_livechat
 #: model:ir.model,name:im_livechat.model_im_livechat_channel_member_history
 msgid "Keep the channel member history"
-msgstr "Simpan sejarah anggota channel"
+msgstr "Simpan riwayat anggota channel"
 
 #. module: im_livechat
 #: model:ir.model.fields,field_description:im_livechat.field_digest_digest__kpi_livechat_conversations_value
@@ -1458,6 +1452,8 @@ msgid "Lang of the visitor of the channel."
 msgstr "Bahasa pengunjung channel."
 
 #. module: im_livechat
+#. odoo-javascript
+#: code:addons/im_livechat/static/src/core/web/livechat_channel_info_list.xml:0
 #: model:ir.model.fields,field_description:im_livechat.field_discuss_channel__livechat_lang_id
 #: model:ir.model.fields,field_description:im_livechat.field_im_livechat_report_channel__lang_id
 #: model_terms:ir.ui.view,arch_db:im_livechat.discuss_channel_looking_for_help_view_search
@@ -1611,7 +1607,7 @@ msgstr "Keahlian Live Chat"
 #. module: im_livechat
 #: model_terms:ir.ui.view,arch_db:im_livechat.view_partner_form
 msgid "Live Chat History"
-msgstr "Sejarah Live Chat"
+msgstr "Riwayat Live Chat"
 
 #. module: im_livechat
 #: model:ir.model.fields,field_description:im_livechat.field_discuss_channel__livechat_note
@@ -1668,12 +1664,12 @@ msgstr "Jumlah Channel Livechat"
 #. module: im_livechat
 #: model:ir.model.fields,field_description:im_livechat.field_discuss_channel__livechat_channel_member_history_ids
 msgid "Livechat Channel Member History"
-msgstr "Sejarah Anggota Channel Livechat"
+msgstr "Riwayat Anggota Channel Livechat"
 
 #. module: im_livechat
 #: model:ir.model,name:im_livechat.model_im_livechat_channel_rule
 msgid "Livechat Channel Rules"
-msgstr "Peraturan-Peraturan Channel Livechat"
+msgstr "Peraturan Channel Livechat"
 
 #. module: im_livechat
 #: model:ir.model.fields.selection,name:im_livechat.selection__discuss_channel__channel_type__livechat
@@ -1713,7 +1709,7 @@ msgstr "Livechat Mencocokkan Bahasa yang Sesuai"
 #. module: im_livechat
 #: model:ir.model.fields,field_description:im_livechat.field_discuss_channel_member__livechat_member_history_ids
 msgid "Livechat Member History"
-msgstr "Sejarah Anggota Livechat"
+msgstr "Riwayat Anggota Livechat"
 
 #. module: im_livechat
 #: model:ir.model.fields,field_description:im_livechat.field_discuss_channel_member__livechat_member_type
@@ -1741,7 +1737,7 @@ msgstr "Hasil Livechat"
 #. module: im_livechat
 #: model:ir.model.fields,field_description:im_livechat.field_discuss_call_history__livechat_participant_history_ids
 msgid "Livechat Participant History"
-msgstr "Sejarah Peserta Livechat"
+msgstr "Riwayat Peserta Livechat"
 
 #. module: im_livechat
 #: model:ir.model.fields,field_description:im_livechat.field_discuss_channel__livechat_status
@@ -1817,7 +1813,7 @@ msgstr "Anggota"
 #: model:ir.ui.menu,name:im_livechat.menu_member_history
 #: model_terms:ir.ui.view,arch_db:im_livechat.im_livechat_channel_member_history_view_tree
 msgid "Member History"
-msgstr "Sejarah Anggota"
+msgstr "Riwayat Anggota"
 
 #. module: im_livechat
 #: model_terms:ir.ui.view,arch_db:im_livechat.im_livechat_channel_member_history_view_search
@@ -1828,7 +1824,7 @@ msgstr "Tipe Anggota"
 #. module: im_livechat
 #: model:ir.model.constraint,message:im_livechat.constraint_im_livechat_channel_member_history_member_id_unique
 msgid "Members can only be linked to one history"
-msgstr "Anggota hanya dapat dihubungkan ke satu sejarah"
+msgstr "Anggota hanya dapat dihubungkan ke satu riwayat"
 
 #. module: im_livechat
 #: model:ir.model,name:im_livechat.model_mail_message
@@ -1856,7 +1852,7 @@ msgstr "Manajer per Sesi"
 #. module: im_livechat
 #: model_terms:ir.ui.view,arch_db:im_livechat.discuss_channel_view_kanban
 msgid "Messages:"
-msgstr "Pesan-Pesan:"
+msgstr "Pesan:"
 
 #. module: im_livechat
 #: model:ir.model.fields.selection,name:im_livechat.selection__discuss_channel__livechat_week_day__0
@@ -1961,7 +1957,7 @@ msgstr "Belum ada data!"
 #. odoo-python
 #: code:addons/im_livechat/models/res_partner.py:0
 msgid "No history found"
-msgstr "Tidak ada sejarah yang ditemukan"
+msgstr "Tidak ada riwayat yang ditemukan"
 
 #. module: im_livechat
 #. odoo-javascript
@@ -1991,8 +1987,8 @@ msgid ""
 "Note about the session, visible to all internal users having access to the "
 "session."
 msgstr ""
-"Catatan mengenai sesi, tampak untuk semua user-user internal yang memiliki "
-"akses ke sesi."
+"Catatan mengenai sesi, tampak untuk semua user internal yang memiliki akses "
+"ke sesi."
 
 #. module: im_livechat
 #. odoo-javascript
@@ -2059,12 +2055,12 @@ msgstr "Odoo"
 #. module: im_livechat
 #: model:ir.model.constraint,message:im_livechat.constraint_im_livechat_channel_member_history_channel_id_guest_id_unique
 msgid "One guest can only be linked to one history on a channel"
-msgstr "Satu tamu hanya dapat terhubung ke satu sejarah di channel"
+msgstr "Satu tamu hanya dapat terhubung ke satu riwayat di channel"
 
 #. module: im_livechat
 #: model:ir.model.constraint,message:im_livechat.constraint_im_livechat_channel_member_history_channel_id_partner_id_unique
 msgid "One partner can only be linked to one history on a channel"
-msgstr "Satu partner hanya dapat terhubung ke satu sejarah di channel"
+msgstr "Satu partner hanya dapat terhubung ke satu riwayat di channel"
 
 #. module: im_livechat
 #: model_terms:ir.ui.view,arch_db:im_livechat.discuss_channel_view_search
@@ -2074,7 +2070,7 @@ msgstr "Sedang Berlangsung"
 #. module: im_livechat
 #: model_terms:ir.ui.view,arch_db:im_livechat.im_livechat_channel_view_form
 msgid "Ongoing Sessions"
-msgstr "Sesi-Sesi yang Sedang Berlangsung"
+msgstr "Sesi Berlangsung"
 
 #. module: im_livechat
 #: model:ir.model.fields,field_description:im_livechat.field_chatbot_script_step__triggering_answer_ids
@@ -2180,6 +2176,11 @@ msgid "Question"
 msgstr "Pertanyaan"
 
 #. module: im_livechat
+#: model:ir.model,name:im_livechat.model_ir_qweb
+msgid "Qweb"
+msgstr ""
+
+#. module: im_livechat
 #. odoo-python
 #: code:addons/im_livechat/controllers/main.py:0
 #: model:ir.model,name:im_livechat.model_rating_rating
@@ -2211,7 +2212,7 @@ msgstr "Menilai Rata-Rata Teks"
 #. module: im_livechat
 #: model:ir.model.fields,field_description:im_livechat.field_discuss_channel__rating_last_feedback
 msgid "Rating Last Feedback"
-msgstr "Nilai Feedback Terakhir"
+msgstr "Nilai Masukan Terakhir"
 
 #. module: im_livechat
 #: model:ir.model.fields,field_description:im_livechat.field_discuss_channel__rating_last_image
@@ -2396,7 +2397,7 @@ msgstr "Langkah Skrip"
 #. module: im_livechat
 #: model:ir.model.fields,field_description:im_livechat.field_chatbot_script__script_step_ids
 msgid "Script Steps"
-msgstr "Langkah-Langkah Skrip"
+msgstr "Langkah Skrip"
 
 #. module: im_livechat
 #: model_terms:ir.ui.view,arch_db:im_livechat.im_livechat_agent_history_view_search
@@ -2406,13 +2407,13 @@ msgstr "Cari Agen"
 #. module: im_livechat
 #: model_terms:ir.ui.view,arch_db:im_livechat.im_livechat_channel_member_history_view_search
 msgid "Search History"
-msgstr "Sejarah Pencarian"
+msgstr "Riwayat Pencarian"
 
 #. module: im_livechat
 #: model_terms:ir.ui.view,arch_db:im_livechat.discuss_channel_looking_for_help_view_search
 #: model_terms:ir.ui.view,arch_db:im_livechat.discuss_channel_view_search
 msgid "Search history"
-msgstr "Sejarah pencarian"
+msgstr "Riwayat pencarian"
 
 #. module: im_livechat
 #. odoo-javascript
@@ -2563,7 +2564,7 @@ msgstr "Sumber"
 #: model_terms:ir.ui.view,arch_db:im_livechat.res_users_form_view
 #: model_terms:ir.ui.view,arch_db:im_livechat.res_users_form_view_simple_modif
 msgid "Spoken Languages"
-msgstr ""
+msgstr "Bahasa Percakapan"
 
 #. module: im_livechat
 #: model:ir.model.fields,field_description:im_livechat.field_im_livechat_report_channel__start_date
@@ -2584,7 +2585,7 @@ msgstr "Jam Mulai sesi"
 #: model_terms:ir.actions.act_window,help:im_livechat.discuss_channel_action
 #: model_terms:ir.actions.act_window,help:im_livechat.discuss_channel_action_from_livechat_channel
 msgid "Start a conversation to populate your chat history."
-msgstr "Cari percakapan untuk mengisi sejarah chat Anda."
+msgstr "Cari percakapan untuk mengisi riwayat chat Anda."
 
 #. module: im_livechat
 #. odoo-javascript
@@ -2691,6 +2692,12 @@ msgid "Thank you for your feedback"
 msgstr "Terima kasih untuk feedback Anda"
 
 #. module: im_livechat
+#. odoo-python
+#: code:addons/im_livechat/models/im_livechat_channel.py:0
+msgid "The URL Regex '%(regex)s' is not valid."
+msgstr ""
+
+#. module: im_livechat
 #: model:ir.model.fields,help:im_livechat.field_im_livechat_channel_rule__channel_id
 msgid "The channel of the rule"
 msgstr "Channel dari peraturan"
@@ -2756,8 +2763,8 @@ msgstr ""
 #. odoo-javascript
 #: code:addons/im_livechat/static/src/core/common/thread_model_patch.js:0
 #: code:addons/im_livechat/static/src/embed/common/thread_model_patch.js:0
-msgid "This livechat conversation has ended"
-msgstr "Percakapan livechat ini telah berakhir"
+msgid "This livechat conversation has ended."
+msgstr ""
 
 #. module: im_livechat
 #: model:ir.model.fields,help:im_livechat.field_res_users_settings__livechat_username
@@ -2933,6 +2940,11 @@ msgid "User's raw answer"
 msgstr "Jawaban mentah user"
 
 #. module: im_livechat
+#: model_terms:ir.ui.view,arch_db:im_livechat.im_livechat_channel_view_kanban
+msgid "View Channel"
+msgstr ""
+
+#. module: im_livechat
 #. odoo-javascript
 #: code:addons/im_livechat/static/src/core/web/livechat_channel_info_list.xml:0
 msgid "View Contact"
@@ -3001,7 +3013,7 @@ msgstr "Pesan situs"
 #. module: im_livechat
 #: model:ir.model.fields,help:im_livechat.field_discuss_channel__website_message_ids
 msgid "Website communication history"
-msgstr "Sejarah komunikasi situs"
+msgstr "Riwayat komunikasi situs"
 
 #. module: im_livechat
 #: model:ir.model.fields.selection,name:im_livechat.selection__discuss_channel__livechat_week_day__2
@@ -3231,6 +3243,44 @@ msgstr "detik"
 #: model:ir.model,name:im_livechat.model_ir_websocket
 msgid "websocket message handling"
 msgstr "penanganan pesan websocket"
+
+#~ msgid ""
+#~ "* 'Show' displays the chat button on the pages.\n"
+#~ "* 'Show with notification' is 'Show' in addition to a floating text just "
+#~ "next to the button.\n"
+#~ "* 'Open automatically' displays the button and automatically opens the "
+#~ "conversation pane.\n"
+#~ "* 'Hide' hides the chat button on the pages.\n"
+#~ msgstr ""
+#~ "* 'Tunjukkan' menampilkan tombol chat pada halaman.\n"
+#~ "* 'Tunjukkan dengan notifikasi' adalah 'Tunjukkan' ditambah teks "
+#~ "mengambang persis di sebelah tombol.\n"
+#~ "* 'Buka otomatis' menampilkan tombol dan secara otomatis membuka jendela "
+#~ "percakapan.\n"
+#~ "* 'Sembunyikan' menyembunyikkan tombol chat pada halaman.\n"
+
+#~ msgid ""
+#~ "Go to <strong>Website</strong> &gt; <strong>Configuration</strong> &gt; "
+#~ "<strong>Settings</strong> &gt; <strong>Email</strong> &amp; "
+#~ "<strong>Marketing.</strong>"
+#~ msgstr ""
+#~ "Kunjungi <strong>Website</strong> &gt; <strong>Konfigurasi</strong> &gt; "
+#~ "<strong>Pengaturan</strong> &gt; <strong>Email</strong> &amp; "
+#~ "<strong>Marketing.</strong>"
+
+#~ msgid "This livechat conversation has ended"
+#~ msgstr "Percakapan livechat ini telah berakhir"
+
+#~ msgid ""
+#~ "<span groups=\"im_livechat.im_livechat_group_manager\">Configure Channel</"
+#~ "span>\n"
+#~ "                                <span groups=\"!"
+#~ "im_livechat.im_livechat_group_manager\">View Channel</span>"
+#~ msgstr ""
+#~ "<span groups=\"im_livechat.im_livechat_group_manager\">Konfigurasi "
+#~ "Channel</span>\n"
+#~ "                                <span groups=\"!"
+#~ "im_livechat.im_livechat_group_manager\">Lihat Channel</span>"
 
 #~ msgid " (copy)"
 #~ msgstr "(salin)"

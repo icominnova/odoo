@@ -42,9 +42,15 @@ class CrmLead(models.Model):
 
     def _get_partner_email_update(self, force_void=True):
         self.ensure_one()
-        if self.env.user._is_portal() and self.partner_id.user_id:
+        if 'lead_no_partner_update' in self.env.context:
             return False
         return super()._get_partner_email_update(force_void)
+
+    def _get_partner_phone_update(self, force_void=True):
+        self.ensure_one()
+        if 'lead_no_partner_update' in self.env.context:
+            return False
+        return super()._get_partner_phone_update(force_void)
 
     def write(self, vals):
         if self.env.user._is_portal() and not self.env.su:
@@ -282,7 +288,7 @@ class CrmLead(models.Model):
             'city', 'zip', 'state_id', 'country_id']
         if any([key not in fields for key in values]):
             raise UserError(_("Not allowed to update the following field(s): %s.", ", ".join([key for key in values if not key in fields])))
-        return self.sudo().write(values)
+        return self.sudo().with_context(lead_no_partner_update=True).write(values)
 
     def update_stage_from_portal(self, stage_id):
         """ Allow portal users to update the stage of their assigned leads """
@@ -352,9 +358,9 @@ class CrmLead(models.Model):
         # Allow readonly posting for assigned users, to avoid ACLs issue in frontend
         # as they do not have write access anymore on the lead itself, just specific
         # controllers and UI
-        assigned = self.filtered(
-            lambda lead: lead.partner_assigned_id == self.env.user.partner_id
-        ) if message_operation == "create" else self.browse()
+        assigned = self.filtered_domain([
+            ('partner_assigned_id', 'child_of', self.env.user.commercial_partner_id.id),
+        ]) if message_operation == "create" else self.browse()
         result = super()._mail_get_operation_for_mail_message_operation(message_operation)
         result.update(dict.fromkeys(assigned, 'read'))
         return result

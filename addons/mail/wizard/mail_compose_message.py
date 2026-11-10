@@ -54,8 +54,9 @@ class MailComposeMessage(models.TransientModel):
         may have to give a huge list of IDs that won't fit into res_ids field.
         """
         # support subtype xmlid, like ``message_post``, when easier than using ``ref``
+        composer = self
         if self.env.context.get('default_subtype_xmlid'):
-            self = self.with_context(
+            composer = composer.with_context(
                 default_subtype_id=self.env['ir.model.data']._xmlid_to_res_id(
                     self.env.context['default_subtype_xmlid']
                 )
@@ -63,8 +64,17 @@ class MailComposeMessage(models.TransientModel):
         # deprecated record context management
         if 'default_res_id' in self.env.context:
             raise ValueError(_("Deprecated usage of 'default_res_id', should use 'default_res_ids'."))
+        if (
+            'body' in fields
+            and self.env.context.get('default_body')
+            and self.env.context.get('body_contains_signature_only')
+            and super().default_get(['template_id']).get('template_id')
+        ):
+            ctx = dict(composer.env.context)
+            ctx.pop('default_body', None)
+            composer = composer.with_context(ctx)
 
-        result = super().default_get(fields)
+        result = super(MailComposeMessage, composer).default_get(fields)
 
         # when being in new mode, create_uid is not granted -> ACLs issue may arise
         if 'create_uid' in fields and 'create_uid' not in result:
@@ -511,8 +521,13 @@ class MailComposeMessage(models.TransientModel):
         When not having a template, recipients may come from the parent in
         comment mode, to be sure to notify the same people. """
         for composer in self:
-            if (composer.template_id and composer.composition_mode == 'comment'
-                and not composer.composition_batch):
+            template = composer.template_id
+            # Use template in comment mode only if there are no partners yet or if the template specifies different ones
+            # as suggested recipients should normally not change and we don't want to re-add them every time
+            if (template and composer.composition_mode == 'comment'
+                and not composer.composition_batch
+                and (not template.use_default_to or not composer.partner_ids)
+            ):
                 res_ids = composer._evaluate_res_ids() or [0]
                 rendered_values = composer._generate_template_for_composer(
                     res_ids,
@@ -750,7 +765,17 @@ class MailComposeMessage(models.TransientModel):
     def action_send_mail(self):
         """ Used for action button that do not accept arguments. """
         self._action_send_mail(auto_commit=False)
-        return {'type': 'ir.actions.act_window_close'}
+        res_ids = self._evaluate_res_ids()
+        record_name = False
+        if self.model and len(res_ids) == 1 and self.composition_mode == 'comment':
+            record_name = self.env[self.model].browse(res_ids[0]).display_name
+        return {
+            "type": "ir.actions.client",
+            "tag": "action_send_mail_callback",
+            "params": {
+                "record_name": record_name,
+            },
+        }
 
     def _action_send_mail(self, auto_commit=False):
         """ Process the wizard content and proceed with sending the related
@@ -850,9 +875,8 @@ class MailComposeMessage(models.TransientModel):
             # running several times on same records in case of issue
             if auto_commit is True:
                 counter_mails_done += len(prepared_mail_values_filtered)
-                self.env['ir.cron']._notify_progress(done=counter_mails_done,
+                self.env['ir.cron']._commit_progress(processed=counter_mails_done,
                                                       remaining=len(res_ids) - counter_mails_done)
-                self.env.cr.commit()
             self.env.invalidate_all()
 
         return mails_sudo
@@ -1250,7 +1274,8 @@ class MailComposeMessage(models.TransientModel):
                 if self.template_id:
                     new_mail_message_values['email_add_signature'] = False
                 message_inmem = self.env['mail.message'].new(new_mail_message_values)
-                for _lang, render_values, recipients_group_data in record._notify_get_classified_recipients_iterator(
+                layout_record = record if isinstance(record, self.pool['mail.thread']) else self.env['mail.thread']
+                for _lang, render_values, recipients_group_data in layout_record._notify_get_classified_recipients_iterator(
                     message_inmem,
                     [{
                         'active': True,
@@ -1270,7 +1295,7 @@ class MailComposeMessage(models.TransientModel):
                     model_description=False,  # force dynamic computation
                     force_email_lang=lang,
                 ):
-                    mail_body = record._notify_by_email_render_layout(
+                    mail_body = layout_record._notify_by_email_render_layout(
                         message_inmem,
                         recipients_group_data,
                         msg_vals=msg_vals,

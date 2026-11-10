@@ -75,6 +75,21 @@ export function checkProduct(name, price, quantity = "1") {
     };
 }
 
+export function removeProduct(name) {
+    return {
+        content: `Remove product ${name} from the cart`,
+        trigger: `.product-cart-item:has(div:contains("${name}")) button:has(.fa-trash-o)`,
+        run: "click",
+    };
+}
+
+export function checkNoProduct(name) {
+    return {
+        content: `Check that product ${name} is no longer in the cart`,
+        trigger: `.order_box:not(:has(.product-cart-item div:contains("${name}")))`,
+    };
+}
+
 export function checkAttribute(productName, attributes) {
     let attributeString = "";
     let attributeStringReadable = "";
@@ -140,13 +155,16 @@ export function cancelOrder() {
 
 export function checkSlotUnavailable(slotValue) {
     return {
-        content: `Check that the first available slot is not ${slotValue}`,
+        content: `Check that ${slotValue} is not available`,
         trigger: ".slot-select",
         run: () => {
             const select = document.querySelector(".slot-select");
-            // select[0] and select[1] are header values
-            if (select[2].innerText === slotValue) {
-                throw new Error(`${slotValue} should not be available`);
+            const options = select.querySelectorAll("option");
+            const targetOption = Array.from(options).find((option) =>
+                option.textContent.includes(slotValue)
+            );
+            if (targetOption) {
+                throw new Error(`${slotValue} is still available`);
             }
         },
     };

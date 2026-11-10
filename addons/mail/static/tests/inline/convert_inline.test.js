@@ -9,6 +9,7 @@ import {
     listGroupToTable,
     normalizeColors,
     normalizeRem,
+    toInline,
 } from "@mail/views/web/fields/html_mail_field/convert_inline";
 import { beforeEach, describe, expect, getFixture, test } from "@odoo/hoot";
 import { enableTransitions } from "@odoo/hoot-mock";
@@ -22,6 +23,9 @@ import {
 
 const TEST_WIDTH = 800;
 const TEST_HEIGHT = 600;
+
+const base64Img =
+    "data:image/png;base64, iVBORw0KGgoAAAANSUhEUgAAAAUA\n        AAAFCAYAAACNbyblAAAAHElEQVQI12P4//8/w38GIAXDIBKE0DHxgljNBAAO\n            9TXL0Y4OHwAAAABJRU5ErkJggg==";
 
 let editable;
 function testConvertGrid({ before, after, title, stepFunction }) {
@@ -460,8 +464,8 @@ describe("Convert Bootstrap grids to tables", () => {
                     /<td[^>]*>\(0, 0\)<\/td>/,
                     `<td>` +
                         `<table cellspacing="0" cellpadding="0" border="0" width="100%" align="center" ` +
-                        `role="presentation" style="width: 100% !important; border-collapse: collapse; text-align: inherit; ` +
-                        `font-size: unset; line-height: inherit;"><tr>` +
+                        `role="presentation" style="width: 100% !important; border-collapse: separate; border-spacing: 0px; text-align: inherit; ` +
+                        `font-size: unset; line-height: inherit; height: 100%;"><tr>` +
                         `<td class="card-header"><span>HEADER</span></td>` +
                         `</tr></table></td>`
                 )
@@ -469,8 +473,8 @@ describe("Convert Bootstrap grids to tables", () => {
                     /<td[^>]*>\(1, 0\)<\/td>/,
                     `<td>` +
                         `<table cellspacing="0" cellpadding="0" border="0" width="100%" align="center" ` +
-                        `role="presentation" style="width: 100% !important; border-collapse: collapse; text-align: inherit; ` +
-                        `font-size: unset; line-height: inherit;"><tr>` +
+                        `role="presentation" style="width: 100% !important; border-collapse: separate; border-spacing: 0px; text-align: inherit; ` +
+                        `font-size: unset; line-height: inherit; height: 100%;"><tr>` +
                         `<td class="card-body"><h2 class="card-title">TITLE</h2><small>BODY <img></small></td>` +
                         `</tr></table></td>`
                 )
@@ -478,8 +482,8 @@ describe("Convert Bootstrap grids to tables", () => {
                     /<td[^>]*>\(2, 0\)<\/td>/,
                     `<td>` +
                         `<table cellspacing="0" cellpadding="0" border="0" width="100%" align="center" ` +
-                        `role="presentation" style="width: 100% !important; border-collapse: collapse; text-align: inherit; ` +
-                        `font-size: unset; line-height: inherit;"><tr>` +
+                        `role="presentation" style="width: 100% !important; border-collapse: separate; border-spacing: 0px; text-align: inherit; ` +
+                        `font-size: unset; line-height: inherit; height: 100%;"><tr>` +
                         `<td class="card-footer"><a href="#" class="btn">FOOTER</a></td>` +
                         `</tr></table></td>`
                 ),
@@ -757,6 +761,47 @@ describe("Convert snippets and mailing bodies to tables", () => {
         editable = document.createElement("div");
     });
 
+    test.tags("desktop");
+    test("keep the vertical alignment of a row when stacking its columns", async () => {
+        const wrappersAlignment = async (rowClasses, columnClasses = []) => {
+            editable = document.createElement("div");
+            editable.style.setProperty("width", TEST_WIDTH + "px");
+            getFixture().append(editable);
+            editable.innerHTML = `<div class="container o_mail_wrapper"><div class="row"><div class="col-3"><p>Issue<br><strong>#42</strong></p></div><div class="col-9"><p style="height: 100px">Logo</p></div></div></div>`;
+            editable.querySelector(".row").classList.add(...rowClasses);
+            editable.querySelector(".col-3").classList.add(...columnClasses);
+            await toInline(editable, getCSSRules(document));
+            return {
+                wrappers: [...editable.querySelectorAll("div.o_stacking_wrapper")].map(
+                    (wrapper) => wrapper.style.verticalAlign
+                ),
+                mso: [...editable.innerHTML.matchAll(/valign="(\w+)"/g)].map((match) => match[1]),
+            };
+        };
+        expect(await wrappersAlignment(["align-items-center"])).toEqual(
+            { wrappers: ["middle", "middle"], mso: ["middle", "middle"] },
+            { message: "should have kept the columns vertically centered" }
+        );
+        expect(await wrappersAlignment(["align-items-end"])).toEqual(
+            { wrappers: ["bottom", "bottom"], mso: ["bottom", "bottom"] },
+            { message: "should have kept the columns aligned to the bottom" }
+        );
+        expect(await wrappersAlignment(["align-items-center"], ["align-self-end"])).toEqual(
+            { wrappers: ["bottom", "middle"], mso: ["bottom", "middle"] },
+            { message: "should have aligned a column on its own alignment over the row's" }
+        );
+        expect(
+            await wrappersAlignment(["flex-column", "flex-md-row", "align-items-center"])
+        ).toEqual(
+            { wrappers: ["middle", "middle"], mso: ["middle", "middle"] },
+            { message: "should have kept the columns centered when the row is horizontal" }
+        );
+        expect(await wrappersAlignment(["flex-column", "align-items-center"])).toEqual(
+            { wrappers: ["top", "top"], mso: ["top", "top"] },
+            { message: "should not have read a horizontal alignment as a vertical one" }
+        );
+    });
+
     test("convert snippets to tables", async () => {
         editable.innerHTML = `<div class="o_mail_snippet_general"><div>Snippet</div></div>`;
         addTables(editable);
@@ -886,6 +931,23 @@ describe("Convert classes to inline styles", () => {
             }
         );
         styleSheet.deleteRule(0);
+    });
+
+    test("strip theme color classes after inlining their styles", async () => {
+        const bgColor = "rgb(17, 24, 39)";
+        const style = document.createElement("style");
+        style.textContent = `.bg-o-color-5 { background-color: ${bgColor} !important; }`;
+        const fixture = getFixture();
+        fixture.append(style);
+
+        editable.innerHTML = `<div class="bg-o-color-5 keep-me">Hello</div>`;
+        fixture.append(editable);
+
+        classToStyle(editable, getCSSRules(editable.ownerDocument));
+
+        const block = editable.querySelector(".keep-me");
+        expect(block).toHaveStyle({ backgroundColor: bgColor });
+        expect(block).not.toHaveClass("bg-o-color-5");
     });
 
     test("simplify border/margin/padding styles", async () => {
@@ -1325,6 +1387,21 @@ describe("Convert classes to inline styles", () => {
             { message: "should have removed all specific flex styles" }
         );
         styleSheet.deleteRule(0);
+        styleSheet.insertRule(
+            `
+            .test-inline-flex {
+                display: inline-flex;
+            }
+        `,
+            0
+        );
+        editable.innerHTML = `<div class="test-inline-flex"></div>`;
+        classToStyle(editable, getCSSRules(editable.ownerDocument));
+        expect(editable).toHaveInnerHTML(
+            `<div class="test-inline-flex" style="box-sizing:border-box;display:inline-block;"></div>`,
+            { message: "should have replaced the inline-flex display with inline-block" }
+        );
+        styleSheet.deleteRule(0);
 
         // @todo to adapt when hoot has a better way to remove it
     });
@@ -1348,6 +1425,7 @@ describe("Convert classes to inline styles", () => {
             body {
                 background-color: red;
                 color: white;
+                direction: rtl;
                 font-size: 50px;
                 div {
                     border-color: ${borderColor} !important;
@@ -1356,10 +1434,10 @@ describe("Convert classes to inline styles", () => {
         `,
             0
         );
-        iframeEditable.innerHTML = `<div class="o_layout" style="padding: 50px;"></div>`;
+        iframeEditable.innerHTML = `<div class="o_layout" style="padding: 50px;">Test</div>`;
         classToStyle(iframeEditable, getCSSRules(iframeEditable.ownerDocument));
         expect(iframeEditable).toHaveInnerHTML(
-            `<div class="o_layout" style="border-radius:0px;border-style:none;margin:0px;box-sizing:border-box;border-left-color:${borderColor};border-bottom-color:${borderColor};border-right-color:${borderColor};border-top-color:${borderColor};border-left-width:0px;border-bottom-width:0px;border-right-width:0px;border-top-width:0px;font-size:50px;color:white;background-color:red;padding: 50px;"></div>`,
+            `<div class="o_layout" style="border-radius:0px;border-style:none;margin:0px;box-sizing:border-box;border-left-color:${borderColor};border-bottom-color:${borderColor};border-right-color:${borderColor};border-top-color:${borderColor};border-left-width:0px;border-bottom-width:0px;border-right-width:0px;border-top-width:0px;font-size:50px;direction:rtl;color:white;background-color:red;padding: 50px;">Test</div>`,
             { message: "should have given all styles of body to .o_layout" }
         );
         styleSheet.deleteRule(0);
@@ -1514,7 +1592,7 @@ describe("Should not convert blacklisted class to inline styles", () => {
         classToStyle(editable, getCSSRules(editable.ownerDocument));
 
         expect(editable).toHaveInnerHTML(
-            `<a contenteditable="false" href="#" class="o_mail_redirect" style="text-decoration: none; padding: 0rem 0.1rem; margin: 0rem 0.0875rem; box-sizing: border-box; overflow-wrap: unset;">@Marc Demo</a> Testing!`,
+            `<a contenteditable="false" href="#" class="o_mail_redirect" style="text-decoration:none;box-sizing:border-box;overflow-wrap:unset;">@Marc Demo</a> Testing!`,
             {
                 message: "blacklisted class styles should remain unconverted",
             }
@@ -1530,8 +1608,61 @@ describe("Should not convert blacklisted class to inline styles", () => {
         editable.innerHTML = `<a contenteditable="false" href="#" class="o_mail_redirect test-style">@Marc Demo</a> Testing!`;
         classToStyle(editable, getCSSRules(editable.ownerDocument));
         expect(editable).toHaveInnerHTML(
-            `<a contenteditable="false" href="#" class="o_mail_redirect test-style" style="text-decoration: none; padding: 0rem 0.1rem; margin: 0rem 0.0875rem; box-sizing: border-box; background-color: yellow; overflow-wrap: unset;"> @Marc Demo </a> Testing!`,
+            `<a contenteditable="false" href="#" class="o_mail_redirect test-style" style="text-decoration:none;box-sizing:border-box;background-color:yellow;overflow-wrap:unset;"> @Marc Demo </a> Testing!`,
             { message: "styles marked !important should override blacklisted class restrictions" }
+        );
+    });
+
+    test("should not convert blacklisted class of an element in the document", async () => {
+        getFixture().append(editable);
+        editable.innerHTML = `<a contenteditable="false" href="#" class="o_mail_redirect">@Marc Demo</a> Testing!`;
+
+        classToStyle(editable, getCSSRules(editable.ownerDocument));
+
+        const style = editable.querySelector("a").style;
+        const properties = [
+            "border-radius",
+            "display",
+            "font-weight",
+            "margin",
+            "outline-style",
+            "padding",
+            "text-decoration",
+        ];
+        expect(
+            Object.fromEntries(properties.map((name) => [name, style.getPropertyValue(name)]))
+        ).toEqual(
+            {
+                "border-radius": "",
+                display: "",
+                "font-weight": "",
+                margin: "",
+                "outline-style": "",
+                padding: "",
+                "text-decoration": "none",
+            },
+            { message: "only the styles of the blacklisted class should remain unconverted" }
+        );
+    });
+
+    test("should not convert grouped style of a blacklisted class over a class having less specificity", async () => {
+        styleSheet.insertRule(`
+            .test-radius {
+                border-radius: 2px;
+            }
+        `);
+        getFixture().append(editable);
+        editable.innerHTML = `<a contenteditable="false" href="#" class="o_mail_redirect test-radius">@Marc Demo</a> Testing!`;
+
+        classToStyle(editable, getCSSRules(editable.ownerDocument));
+
+        const style = editable.querySelector("a").style;
+        expect({
+            "border-radius": style.getPropertyValue("border-radius"),
+            "text-decoration": style.getPropertyValue("text-decoration"),
+        }).toEqual(
+            { "border-radius": "", "text-decoration": "none" },
+            { message: "a less specific class should not bring back the blacklisted radius" }
         );
     });
 
@@ -1544,11 +1675,18 @@ describe("Should not convert blacklisted class to inline styles", () => {
         editable.innerHTML = `<a contenteditable="false" href="#" class="o_mail_redirect test-color">@Marc Demo</a> Testing!`;
         classToStyle(editable, getCSSRules(editable.ownerDocument));
         expect(editable).toHaveInnerHTML(
-            `<a contenteditable="false" href="#" class="o_mail_redirect test-color" style="text-decoration: none; padding: 0rem 0.1rem; margin: 0rem 0.0875rem; box-sizing: border-box; overflow-wrap: unset;"> @Marc Demo </a> Testing!`,
+            `<a contenteditable="false" href="#" class="o_mail_redirect test-color" style="text-decoration:none;box-sizing:border-box;overflow-wrap:unset;"> @Marc Demo </a> Testing!`,
             {
                 message:
                     "should ignore styles from lower specificity class in favor of blacklisted class",
             }
         );
+    });
+
+    test("should set display block on mx-auto and ms-auto images", async () => {
+        editable.innerHTML = `<img class="mx-auto" src="${base64Img}"/><img class="ms-auto" src="${base64Img}"/>`;
+        await toInline(editable, []);
+        expect(editable.querySelector("img.mx-auto").style.display).toBe("block");
+        expect(editable.querySelector("img.ms-auto").style.display).toBe("block");
     });
 });

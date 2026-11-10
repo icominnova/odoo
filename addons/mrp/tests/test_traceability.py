@@ -354,6 +354,50 @@ class TestTraceability(TestMrpCommon):
         mo.button_mark_done()
         self.assertEqual(mo.state, 'done')
 
+    def test_SN_manufactured_out_of_order(self):
+        """
+        Ensure that, when consuming serials before producing them, future production and assignation of
+        these serials work properly.
+        """
+        self.product_2.tracking = 'serial'
+        serial = self.env['stock.lot'].create({
+            'name': 'SN_PROD',
+            'product_id': self.product_2.id,
+        })
+        # First MO will consume a not-yet produced serial
+        mo_upper = self.env['mrp.production'].create({
+            'product_id': self.product_3.id,
+            'product_qty': 1,
+            'bom_id': False,
+            'move_raw_ids': [
+                Command.create({
+                    'product_id': self.product_2.id,
+                    'product_uom_qty': 1,
+                })
+            ]
+        })
+        mo_upper.action_confirm()
+        # Force the creation of a move line
+        mo_upper.move_raw_ids.quantity = 1
+        mo_upper.move_raw_ids.move_line_ids.write({
+            'lot_id': serial.id,
+            'picked': True,
+        })
+        mo_upper.button_mark_done()
+        # Second MO produces the same serial product that was consumed.
+        mo_lower = self.env['mrp.production'].create({
+            'product_id': self.product_2.id,
+            'product_qty': 1,
+            'bom_id': False,
+        })
+        mo_lower.action_confirm()
+        mo_lower.action_generate_serial()
+        mo_lower.action_clear_lot_producing_ids()
+        mo_lower.action_generate_serial()
+        produced_SN = mo_lower.lot_producing_ids
+        mo_lower.button_mark_done()
+        self.assertEqual(mo_lower.finished_move_line_ids.lot_id, produced_SN)
+
     def test_tracked_and_manufactured_component(self):
         """ Suppose this structure:
             productA --|- 1 x productB --|- 1 x productC
@@ -621,11 +665,12 @@ class TestTraceability(TestMrpCommon):
         mo.action_generate_serial()
         self.assertEqual(mo.lot_producing_ids[:1].name, "TEST/0000002")
 
-        p_final.lot_sequence_id.prefix = 'xx%(doy)sxx'
-        # generate serial lot_3 from the MO (next from sequence)
-        mo.lot_producing_ids = self.env['stock.lot']
-        mo.action_generate_serial()
-        self.assertIn(datetime.now().strftime('%j'), mo.lot_producing_ids.name)
+        with freeze_time(datetime.now()):
+            p_final.lot_sequence_id.prefix = 'xx%(doy)sxx'
+            # generate serial lot_3 from the MO (next from sequence)
+            mo.lot_producing_ids = self.env['stock.lot']
+            mo.action_generate_serial()
+            self.assertIn(datetime.now(self.env.tz).strftime('%j'), mo.lot_producing_ids.name)
 
     def test_use_customized_serial_sequence(self):
         """
@@ -694,6 +739,25 @@ class TestTraceability(TestMrpCommon):
         third_mo.action_confirm()
         third_serials_wizard = Form.from_action(self.env, third_mo.action_generate_serial())
         self.assertEqual(third_serials_wizard.lot_name, 'TEST0000006')
+
+    def test_split_and_assign_serials(self):
+        """ Confirm a MO for 3 serial numbers. generate 3 serial number and split the mo"""
+        mo, _, _, _, _ = self.generate_mo(tracking_final='serial', qty_final=3)
+        mo.action_confirm()
+
+        wizard = self.env['mrp.production.serials'].with_context(active_id=mo.id).create({
+            'production_id': mo.id,
+            'serial_numbers': 'SN001\nSN002\nSN003',
+        })
+        wizard.action_split_and_assign_serials()
+
+        split_mos = self.env['mrp.production'].search([('production_group_id', '=', mo.production_group_id.id)])
+        self.assertEqual(len(split_mos), 3)
+
+        serials = ['SN001', 'SN002', 'SN003']
+        for smo in split_mos:
+            self.assertIn(smo.lot_producing_ids.name, serials)
+            self.assertNotEqual(smo.state, 'done')
 
     @freeze_time('2024-02-03')
     def test_interpolation_in_batch_serials(self):

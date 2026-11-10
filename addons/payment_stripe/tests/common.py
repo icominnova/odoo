@@ -51,6 +51,13 @@ class StripeCommon(PaymentCommon):
             'status': 'succeeded',
             **cls.notification_amount_and_currency,
         }
+        cls.void_payment_data = {
+            'data': {
+                'captured': False,
+                'object': cls.refund_object,
+            },
+            'type': 'charge.refunded',
+        }
         cls.refund_payment_data = {
             'data': {
                 'object': {
@@ -96,21 +103,4 @@ class StripeCommon(PaymentCommon):
                 'mandate_options': mandate_options,
             }},
             'status': 'succeeded',
-        }
-
-    def _mock_payment_intent_request(self, *args, **kwargs):
-        return {
-            'object': 'payment_intent',
-            'id': 'pi_XXXX',
-            'customer': 'cus_XXXX',
-            'description': self.reference,
-            'payment_method': {
-                'id': 'pm_XXXX',
-                'type': 'card',
-                'card': {'brand': 'dummy'},
-            },
-            'amount': self.amount,
-            'amount_received': self.amount,
-            'status': 'succeeded',
-            'currency': self.currency.name.lower(),
         }

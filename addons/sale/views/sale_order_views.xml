@@ -463,6 +463,7 @@
                             nolabel="1"
                             invisible="state in ['draft', 'sent']"
                             readonly="state in ['cancel', 'sale']"/>
+                        <field name="show_update_pricelist" invisible="1"/>
                         <label for="pricelist_id"
                                groups="product.group_product_pricelist"
                                invisible="not has_active_pricelist"/>
@@ -599,7 +600,6 @@
                             <list
                                 string="Sales Order Lines"
                                 editable="bottom"
-                                limit="200"
                                 decoration-warning="(state in ['draft', 'sent'] and is_product_archived) or sale_line_warn_msg"
                             >
                                 <control>
@@ -908,7 +908,7 @@
                             </group>
                         </group>
                     </page>
-                    <page groups="base.group_no_one" string="Customer Signature" name="customer_signature" invisible="not require_signature and not signed_by and not signature and not signed_on">
+                    <page groups="base.group_no_one" string="Customer Signature" name="customer_signature" invisible="1">
                         <group>
                             <field name="signed_by" readonly="signature"/>
                             <field name="signed_on" readonly="signature"/>
@@ -1076,7 +1076,7 @@
             <a
                 role="button"
                 class="btn btn-secondary"
-                href="https://www.odoo.com/documentation/latest/_downloads/312a470653db882b08ad72eb30cb4088/sample_quotation.pdf"
+                href="https://www.odoo.com/documentation/latest/_downloads/4c54b867f6472b9cbcc233b4821d5c7b/sample_quotation.pdf"
                 target="_blank"
             >
                 Check a sample. It's clean!
@@ -1113,7 +1113,7 @@
             <a
                 role="button"
                 class="btn btn-secondary"
-                href="https://www.odoo.com/documentation/latest/_downloads/312a470653db882b08ad72eb30cb4088/sample_quotation.pdf"
+                href="https://www.odoo.com/documentation/latest/_downloads/4c54b867f6472b9cbcc233b4821d5c7b/sample_quotation.pdf"
                 target="_blank"
             >
                 Check a sample. It's clean!

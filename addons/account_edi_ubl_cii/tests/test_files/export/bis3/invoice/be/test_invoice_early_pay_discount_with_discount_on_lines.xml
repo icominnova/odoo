@@ -19,7 +19,7 @@
 		<cac:Party>
 			<cbc:EndpointID schemeID="0208">0202239951</cbc:EndpointID>
 			<cac:PartyIdentification>
-				<cbc:ID>0202239951</cbc:ID>
+				<cbc:ID schemeID="0208">0202239951</cbc:ID>
 			</cac:PartyIdentification>
 			<cac:PartyName>
 				<cbc:Name>company_1_data</cbc:Name>
@@ -40,7 +40,7 @@
 			</cac:PartyTaxScheme>
 			<cac:PartyLegalEntity>
 				<cbc:RegistrationName>company_1_data</cbc:RegistrationName>
-				<cbc:CompanyID>0202239951</cbc:CompanyID>
+				<cbc:CompanyID schemeID="0208">0202239951</cbc:CompanyID>
 			</cac:PartyLegalEntity>
 			<cac:Contact>
 				<cbc:Name>company_1_data</cbc:Name>
@@ -51,7 +51,7 @@
 		<cac:Party>
 			<cbc:EndpointID schemeID="0208">0477472701</cbc:EndpointID>
 			<cac:PartyIdentification>
-				<cbc:ID>0477472701</cbc:ID>
+				<cbc:ID schemeID="0208">0477472701</cbc:ID>
 			</cac:PartyIdentification>
 			<cac:PartyName>
 				<cbc:Name>partner_be</cbc:Name>
@@ -72,7 +72,7 @@
 			</cac:PartyTaxScheme>
 			<cac:PartyLegalEntity>
 				<cbc:RegistrationName>partner_be</cbc:RegistrationName>
-				<cbc:CompanyID>0477472701</cbc:CompanyID>
+				<cbc:CompanyID schemeID="0208">0477472701</cbc:CompanyID>
 			</cac:PartyLegalEntity>
 			<cac:Contact>
 				<cbc:Name>partner_be</cbc:Name>
@@ -110,7 +110,7 @@
 		<cbc:ChargeIndicator>false</cbc:ChargeIndicator>
 		<cbc:AllowanceChargeReasonCode>64</cbc:AllowanceChargeReasonCode>
 		<cbc:AllowanceChargeReason>Conditional cash/payment discount</cbc:AllowanceChargeReason>
-		<cbc:Amount currencyID="EUR">355.71</cbc:Amount>
+		<cbc:Amount currencyID="EUR">355.7</cbc:Amount>
 		<cac:TaxCategory>
 			<cbc:ID>S</cbc:ID>
 			<cbc:Percent>21.0</cbc:Percent>
@@ -123,7 +123,7 @@
 		<cbc:ChargeIndicator>true</cbc:ChargeIndicator>
 		<cbc:AllowanceChargeReasonCode>ZZZ</cbc:AllowanceChargeReasonCode>
 		<cbc:AllowanceChargeReason>Conditional cash/payment discount</cbc:AllowanceChargeReason>
-		<cbc:Amount currencyID="EUR">355.71</cbc:Amount>
+		<cbc:Amount currencyID="EUR">355.7</cbc:Amount>
 		<cac:TaxCategory>
 			<cbc:ID>E</cbc:ID>
 			<cbc:Percent>0.0</cbc:Percent>
@@ -133,10 +133,10 @@
 		</cac:TaxCategory>
 	</cac:AllowanceCharge>
 	<cac:TaxTotal>
-		<cbc:TaxAmount currencyID="EUR">3660.19</cbc:TaxAmount>
+		<cbc:TaxAmount currencyID="EUR">3660.20</cbc:TaxAmount>
 		<cac:TaxSubtotal>
-			<cbc:TaxableAmount currencyID="EUR">17429.50</cbc:TaxableAmount>
-			<cbc:TaxAmount currencyID="EUR">3660.19</cbc:TaxAmount>
+			<cbc:TaxableAmount currencyID="EUR">17429.51</cbc:TaxableAmount>
+			<cbc:TaxAmount currencyID="EUR">3660.20</cbc:TaxAmount>
 			<cac:TaxCategory>
 				<cbc:ID>S</cbc:ID>
 				<cbc:Percent>21.0</cbc:Percent>
@@ -146,7 +146,7 @@
 			</cac:TaxCategory>
 		</cac:TaxSubtotal>
 		<cac:TaxSubtotal>
-			<cbc:TaxableAmount currencyID="EUR">355.71</cbc:TaxableAmount>
+			<cbc:TaxableAmount currencyID="EUR">355.70</cbc:TaxableAmount>
 			<cbc:TaxAmount currencyID="EUR">0.00</cbc:TaxAmount>
 			<cac:TaxCategory>
 				<cbc:ID>E</cbc:ID>
@@ -161,11 +161,11 @@
 	<cac:LegalMonetaryTotal>
 		<cbc:LineExtensionAmount currencyID="EUR">17785.21</cbc:LineExtensionAmount>
 		<cbc:TaxExclusiveAmount currencyID="EUR">17785.21</cbc:TaxExclusiveAmount>
-		<cbc:TaxInclusiveAmount currencyID="EUR">21445.40</cbc:TaxInclusiveAmount>
-		<cbc:AllowanceTotalAmount currencyID="EUR">355.71</cbc:AllowanceTotalAmount>
-		<cbc:ChargeTotalAmount currencyID="EUR">355.71</cbc:ChargeTotalAmount>
+		<cbc:TaxInclusiveAmount currencyID="EUR">21445.41</cbc:TaxInclusiveAmount>
+		<cbc:AllowanceTotalAmount currencyID="EUR">355.70</cbc:AllowanceTotalAmount>
+		<cbc:ChargeTotalAmount currencyID="EUR">355.70</cbc:ChargeTotalAmount>
 		<cbc:PrepaidAmount currencyID="EUR">0.00</cbc:PrepaidAmount>
-		<cbc:PayableAmount currencyID="EUR">21445.40</cbc:PayableAmount>
+		<cbc:PayableAmount currencyID="EUR">21445.41</cbc:PayableAmount>
 	</cac:LegalMonetaryTotal>
 	<cac:InvoiceLine>
 		<cbc:ID>___ignore___</cbc:ID>
@@ -180,7 +180,6 @@
 			<cbc:BaseAmount currencyID="EUR">3615.00</cbc:BaseAmount>
 		</cac:AllowanceCharge>
 		<cac:Item>
-			<cbc:Description>product_a</cbc:Description>
 			<cbc:Name>product_a</cbc:Name>
 			<cac:ClassifiedTaxCategory>
 				<cbc:ID>S</cbc:ID>
@@ -207,7 +206,6 @@
 			<cbc:BaseAmount currencyID="EUR">12384.00</cbc:BaseAmount>
 		</cac:AllowanceCharge>
 		<cac:Item>
-			<cbc:Description>product_a</cbc:Description>
 			<cbc:Name>product_a</cbc:Name>
 			<cac:ClassifiedTaxCategory>
 				<cbc:ID>S</cbc:ID>
@@ -234,7 +232,6 @@
 			<cbc:BaseAmount currencyID="EUR">1597.50</cbc:BaseAmount>
 		</cac:AllowanceCharge>
 		<cac:Item>
-			<cbc:Description>product_a</cbc:Description>
 			<cbc:Name>product_a</cbc:Name>
 			<cac:ClassifiedTaxCategory>
 				<cbc:ID>S</cbc:ID>
@@ -261,7 +258,6 @@
 			<cbc:BaseAmount currencyID="EUR">222.75</cbc:BaseAmount>
 		</cac:AllowanceCharge>
 		<cac:Item>
-			<cbc:Description>product_a</cbc:Description>
 			<cbc:Name>product_a</cbc:Name>
 			<cac:ClassifiedTaxCategory>
 				<cbc:ID>S</cbc:ID>
@@ -288,7 +284,6 @@
 			<cbc:BaseAmount currencyID="EUR">1107.00</cbc:BaseAmount>
 		</cac:AllowanceCharge>
 		<cac:Item>
-			<cbc:Description>product_a</cbc:Description>
 			<cbc:Name>product_a</cbc:Name>
 			<cac:ClassifiedTaxCategory>
 				<cbc:ID>S</cbc:ID>
@@ -315,7 +310,6 @@
 			<cbc:BaseAmount currencyID="EUR">397.50</cbc:BaseAmount>
 		</cac:AllowanceCharge>
 		<cac:Item>
-			<cbc:Description>product_a</cbc:Description>
 			<cbc:Name>product_a</cbc:Name>
 			<cac:ClassifiedTaxCategory>
 				<cbc:ID>S</cbc:ID>
@@ -342,7 +336,6 @@
 			<cbc:BaseAmount currencyID="EUR">537.50</cbc:BaseAmount>
 		</cac:AllowanceCharge>
 		<cac:Item>
-			<cbc:Description>product_a</cbc:Description>
 			<cbc:Name>product_a</cbc:Name>
 			<cac:ClassifiedTaxCategory>
 				<cbc:ID>S</cbc:ID>
@@ -369,7 +362,6 @@
 			<cbc:BaseAmount currencyID="EUR">800.00</cbc:BaseAmount>
 		</cac:AllowanceCharge>
 		<cac:Item>
-			<cbc:Description>product_a</cbc:Description>
 			<cbc:Name>product_a</cbc:Name>
 			<cac:ClassifiedTaxCategory>
 				<cbc:ID>S</cbc:ID>
@@ -396,7 +388,6 @@
 			<cbc:BaseAmount currencyID="EUR">1383.75</cbc:BaseAmount>
 		</cac:AllowanceCharge>
 		<cac:Item>
-			<cbc:Description>product_a</cbc:Description>
 			<cbc:Name>product_a</cbc:Name>
 			<cac:ClassifiedTaxCategory>
 				<cbc:ID>S</cbc:ID>
@@ -423,7 +414,6 @@
 			<cbc:BaseAmount currencyID="EUR">499.20</cbc:BaseAmount>
 		</cac:AllowanceCharge>
 		<cac:Item>
-			<cbc:Description>product_a</cbc:Description>
 			<cbc:Name>product_a</cbc:Name>
 			<cac:ClassifiedTaxCategory>
 				<cbc:ID>S</cbc:ID>
@@ -450,7 +440,6 @@
 			<cbc:BaseAmount currencyID="EUR">499.20</cbc:BaseAmount>
 		</cac:AllowanceCharge>
 		<cac:Item>
-			<cbc:Description>product_a</cbc:Description>
 			<cbc:Name>product_a</cbc:Name>
 			<cac:ClassifiedTaxCategory>
 				<cbc:ID>S</cbc:ID>
@@ -477,7 +466,6 @@
 			<cbc:BaseAmount currencyID="EUR">451.80</cbc:BaseAmount>
 		</cac:AllowanceCharge>
 		<cac:Item>
-			<cbc:Description>product_a</cbc:Description>
 			<cbc:Name>product_a</cbc:Name>
 			<cac:ClassifiedTaxCategory>
 				<cbc:ID>S</cbc:ID>
@@ -504,7 +492,6 @@
 			<cbc:BaseAmount currencyID="EUR">1072.80</cbc:BaseAmount>
 		</cac:AllowanceCharge>
 		<cac:Item>
-			<cbc:Description>product_a</cbc:Description>
 			<cbc:Name>product_a</cbc:Name>
 			<cac:ClassifiedTaxCategory>
 				<cbc:ID>S</cbc:ID>
@@ -531,7 +518,6 @@
 			<cbc:BaseAmount currencyID="EUR">1792.80</cbc:BaseAmount>
 		</cac:AllowanceCharge>
 		<cac:Item>
-			<cbc:Description>product_a</cbc:Description>
 			<cbc:Name>product_a</cbc:Name>
 			<cac:ClassifiedTaxCategory>
 				<cbc:ID>S</cbc:ID>
@@ -558,7 +544,6 @@
 			<cbc:BaseAmount currencyID="EUR">748.80</cbc:BaseAmount>
 		</cac:AllowanceCharge>
 		<cac:Item>
-			<cbc:Description>product_a</cbc:Description>
 			<cbc:Name>product_a</cbc:Name>
 			<cac:ClassifiedTaxCategory>
 				<cbc:ID>S</cbc:ID>
@@ -585,7 +570,6 @@
 			<cbc:BaseAmount currencyID="EUR">253.20</cbc:BaseAmount>
 		</cac:AllowanceCharge>
 		<cac:Item>
-			<cbc:Description>product_a</cbc:Description>
 			<cbc:Name>product_a</cbc:Name>
 			<cac:ClassifiedTaxCategory>
 				<cbc:ID>S</cbc:ID>
@@ -612,7 +596,6 @@
 			<cbc:BaseAmount currencyID="EUR">579.60</cbc:BaseAmount>
 		</cac:AllowanceCharge>
 		<cac:Item>
-			<cbc:Description>product_a</cbc:Description>
 			<cbc:Name>product_a</cbc:Name>
 			<cac:ClassifiedTaxCategory>
 				<cbc:ID>S</cbc:ID>
@@ -639,7 +622,6 @@
 			<cbc:BaseAmount currencyID="EUR">696.00</cbc:BaseAmount>
 		</cac:AllowanceCharge>
 		<cac:Item>
-			<cbc:Description>product_a</cbc:Description>
 			<cbc:Name>product_a</cbc:Name>
 			<cac:ClassifiedTaxCategory>
 				<cbc:ID>S</cbc:ID>
@@ -666,7 +648,6 @@
 			<cbc:BaseAmount currencyID="EUR">483.00</cbc:BaseAmount>
 		</cac:AllowanceCharge>
 		<cac:Item>
-			<cbc:Description>product_a</cbc:Description>
 			<cbc:Name>product_a</cbc:Name>
 			<cac:ClassifiedTaxCategory>
 				<cbc:ID>S</cbc:ID>
@@ -693,7 +674,6 @@
 			<cbc:BaseAmount currencyID="EUR">720.00</cbc:BaseAmount>
 		</cac:AllowanceCharge>
 		<cac:Item>
-			<cbc:Description>product_a</cbc:Description>
 			<cbc:Name>product_a</cbc:Name>
 			<cac:ClassifiedTaxCategory>
 				<cbc:ID>S</cbc:ID>
@@ -720,7 +700,6 @@
 			<cbc:BaseAmount currencyID="EUR">480.00</cbc:BaseAmount>
 		</cac:AllowanceCharge>
 		<cac:Item>
-			<cbc:Description>product_a</cbc:Description>
 			<cbc:Name>product_a</cbc:Name>
 			<cac:ClassifiedTaxCategory>
 				<cbc:ID>S</cbc:ID>
@@ -747,7 +726,6 @@
 			<cbc:BaseAmount currencyID="EUR">346.50</cbc:BaseAmount>
 		</cac:AllowanceCharge>
 		<cac:Item>
-			<cbc:Description>product_a</cbc:Description>
 			<cbc:Name>product_a</cbc:Name>
 			<cac:ClassifiedTaxCategory>
 				<cbc:ID>S</cbc:ID>
@@ -774,7 +752,6 @@
 			<cbc:BaseAmount currencyID="EUR">203.00</cbc:BaseAmount>
 		</cac:AllowanceCharge>
 		<cac:Item>
-			<cbc:Description>product_a</cbc:Description>
 			<cbc:Name>product_a</cbc:Name>
 			<cac:ClassifiedTaxCategory>
 				<cbc:ID>S</cbc:ID>
@@ -801,7 +778,6 @@
 			<cbc:BaseAmount currencyID="EUR">641.10</cbc:BaseAmount>
 		</cac:AllowanceCharge>
 		<cac:Item>
-			<cbc:Description>product_a</cbc:Description>
 			<cbc:Name>product_a</cbc:Name>
 			<cac:ClassifiedTaxCategory>
 				<cbc:ID>S</cbc:ID>
@@ -828,7 +804,6 @@
 			<cbc:BaseAmount currencyID="EUR">122.40</cbc:BaseAmount>
 		</cac:AllowanceCharge>
 		<cac:Item>
-			<cbc:Description>product_a</cbc:Description>
 			<cbc:Name>product_a</cbc:Name>
 			<cac:ClassifiedTaxCategory>
 				<cbc:ID>S</cbc:ID>
@@ -855,7 +830,6 @@
 			<cbc:BaseAmount currencyID="EUR">122.40</cbc:BaseAmount>
 		</cac:AllowanceCharge>
 		<cac:Item>
-			<cbc:Description>product_a</cbc:Description>
 			<cbc:Name>product_a</cbc:Name>
 			<cac:ClassifiedTaxCategory>
 				<cbc:ID>S</cbc:ID>
@@ -882,7 +856,6 @@
 			<cbc:BaseAmount currencyID="EUR">117.00</cbc:BaseAmount>
 		</cac:AllowanceCharge>
 		<cac:Item>
-			<cbc:Description>product_a</cbc:Description>
 			<cbc:Name>product_a</cbc:Name>
 			<cac:ClassifiedTaxCategory>
 				<cbc:ID>S</cbc:ID>
@@ -901,7 +874,6 @@
 		<cbc:InvoicedQuantity unitCode="C62">-1.0</cbc:InvoicedQuantity>
 		<cbc:LineExtensionAmount currencyID="EUR">-1337.83</cbc:LineExtensionAmount>
 		<cac:Item>
-			<cbc:Description>product_a</cbc:Description>
 			<cbc:Name>product_a</cbc:Name>
 			<cac:ClassifiedTaxCategory>
 				<cbc:ID>S</cbc:ID>

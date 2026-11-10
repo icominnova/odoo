@@ -10,6 +10,14 @@ const CONSOLE_COLOR = "#F5B427";
 
 export class PosConfig extends Base {
     static pythonModel = "pos.config";
+    static excludedLazyGetters = [
+        "hasCashRounding",
+        "hasGlobalRounding",
+        "displayBigTrackingNumber",
+        "displayTrackingNumber",
+        "receiptLogoUrl",
+        "receiptCompanyLogoUrl",
+    ];
 
     initState() {
         super.initState();
@@ -139,6 +147,10 @@ export class PosConfig extends Base {
             available_pricelists.add(this.pricelist_id);
         }
         return Array.from(available_pricelists);
+    }
+
+    get autoPrint() {
+        return this.iface_print_auto;
     }
 }
 

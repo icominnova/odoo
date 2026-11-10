@@ -19,8 +19,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-01-25 18:36+0000\n"
-"PO-Revision-Date: 2026-02-04 16:39+0000\n"
+"POT-Creation-Date: 2026-06-05 19:29+0000\n"
+"PO-Revision-Date: 2026-11-04 14:37+0000\n"
 "Last-Translator: \"Marta (wacm)\" <wacm@odoo.com>\n"
 "Language-Team: Polish <https://translate.odoo.com/projects/odoo-19/"
 "mrp_account/pl/>\n"
@@ -29,19 +29,9 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=4; plural=(n==1 ? 0 : (n%10>=2 && n%10<=4) && "
-"(n%100<12 || n%100>14) ? 1 : n!=1 && (n%10>=0 && n%10<=1) || "
-"(n%10>=5 && n%10<=9) || (n%100>=12 && n%100<=14) ? 2 : 3);\n"
-"X-Generator: Weblate 5.14.3\n"
-
-#. module: mrp_account
-#: model_terms:ir.ui.view,arch_db:mrp_account.report_wip
-msgid "$1000"
-msgstr "$1000"
-
-#. module: mrp_account
-#: model_terms:ir.ui.view,arch_db:mrp_account.report_wip
-msgid "$5000"
-msgstr "$5000"
+"(n%100<12 || n%100>14) ? 1 : n!=1 && (n%10>=0 && n%10<=1) || (n%10>=5 && "
+"n%10<=9) || (n%100>=12 && n%100<=14) ? 2 : 3);\n"
+"X-Generator: Weblate 2026.8.1\n"
 
 #. module: mrp_account
 #. odoo-python
@@ -54,11 +44,6 @@ msgstr "%(value)s za %(quantity)s%(unit)s z %(production)s"
 #: code:addons/mrp_account/models/mrp_production.py:0
 msgid "%s - Labour"
 msgstr "%s - Praca"
-
-#. module: mrp_account
-#: model_terms:ir.ui.view,arch_db:mrp_account.report_wip
-msgid "2023-08-15"
-msgstr "2023-08-15"
 
 #. module: mrp_account
 #: model_terms:ir.ui.view,arch_db:mrp_account.view_move_form_inherit_mrp_account
@@ -108,7 +93,7 @@ msgstr "<span>Jednostka miary </span>"
 #. module: mrp_account
 #: model:ir.model.constraint,message:mrp_account.constraint_mrp_account_wip_accounting_line_check_debit_credit
 msgid "A single line cannot be both credit and debit."
-msgstr "Jedna linia nie może być jednocześnie kredytem i debetem."
+msgstr "Jedna pozycja nie może być jednocześnie kredytem i debetem."
 
 #. module: mrp_account
 #: model:ir.model.fields,field_description:mrp_account.field_mrp_account_wip_accounting_line__account_id
@@ -126,11 +111,6 @@ msgid "Account move line to be created when posting WIP account move"
 msgstr ""
 "Pozycja zapisu księgowego do utworzenia przy publikowaniu zapisu księgowego "
 "WIP"
-
-#. module: mrp_account
-#: model_terms:ir.ui.view,arch_db:mrp_account.report_wip
-msgid "Acme Corp."
-msgstr "Acme Corp."
 
 #. module: mrp_account
 #: model:ir.model,name:mrp_account.model_account_analytic_account
@@ -178,6 +158,11 @@ msgstr "Zest. mat."
 #: model:ir.model.fields,field_description:mrp_account.field_account_analytic_line__category
 msgid "Category"
 msgstr "Kategoria"
+
+#. module: mrp_account
+#: model:ir.model,name:mrp_account.model_res_company
+msgid "Companies"
+msgstr "Firmy"
 
 #. module: mrp_account
 #: model:ir.actions.server,name:mrp_account.action_compute_price_bom_product
@@ -266,6 +251,7 @@ msgstr "Odrzuć"
 #: model:ir.model.fields,field_description:mrp_account.field_product_product__display_name
 #: model:ir.model.fields,field_description:mrp_account.field_product_template__display_name
 #: model:ir.model.fields,field_description:mrp_account.field_report_mrp_report_mo_overview__display_name
+#: model:ir.model.fields,field_description:mrp_account.field_res_company__display_name
 #: model:ir.model.fields,field_description:mrp_account.field_stock_account_stock_valuation_report__display_name
 #: model:ir.model.fields,field_description:mrp_account.field_stock_move__display_name
 msgid "Display Name"
@@ -307,6 +293,7 @@ msgstr "Dodatkowy koszt jednostkowy"
 #: model:ir.model.fields,field_description:mrp_account.field_product_product__id
 #: model:ir.model.fields,field_description:mrp_account.field_product_template__id
 #: model:ir.model.fields,field_description:mrp_account.field_report_mrp_report_mo_overview__id
+#: model:ir.model.fields,field_description:mrp_account.field_res_company__id
 #: model:ir.model.fields,field_description:mrp_account.field_stock_account_stock_valuation_report__id
 #: model:ir.model.fields,field_description:mrp_account.field_stock_move__id
 msgid "ID"
@@ -331,11 +318,6 @@ msgstr "Pozycja zapisu"
 #: model:ir.model.fields,field_description:mrp_account.field_mrp_account_wip_accounting_line__label
 msgid "Label"
 msgstr "Etykieta"
-
-#. module: mrp_account
-#: model_terms:ir.ui.view,arch_db:mrp_account.report_wip
-msgid "Laptop"
-msgstr "Laptop"
 
 #. module: mrp_account
 #: model:ir.model.fields,field_description:mrp_account.field_mrp_account_wip_accounting__write_uid
@@ -365,7 +347,7 @@ msgstr "Ręczne wprowadzanie"
 #: model:ir.model.fields.selection,name:mrp_account.selection__account_analytic_applicability__business_domain__manufacturing_order
 #: model:ir.model.fields.selection,name:mrp_account.selection__account_analytic_line__category__manufacturing_order
 msgid "Manufacturing Order"
-msgstr "Zamówienie produkcji"
+msgstr "Zlecenie produkcyjne"
 
 #. module: mrp_account
 #. odoo-python
@@ -446,11 +428,6 @@ msgid "Production Account"
 msgstr "Konto produkcyjne"
 
 #. module: mrp_account
-#: model_terms:ir.ui.view,arch_db:mrp_account.report_wip
-msgid "REF123"
-msgstr "REF123"
-
-#. module: mrp_account
 #: model:ir.model.fields,field_description:mrp_account.field_mrp_account_wip_accounting__reference
 msgid "Reference"
 msgstr "Odnośnik"
@@ -486,7 +463,7 @@ msgstr "Pokaż wycenę"
 #. module: mrp_account
 #: model:ir.model,name:mrp_account.model_stock_move
 msgid "Stock Move"
-msgstr "Przesunięcie"
+msgstr "Ruch magazynowy"
 
 #. module: mrp_account
 #: model:ir.model,name:mrp_account.model_stock_account_stock_valuation_report
@@ -536,11 +513,6 @@ msgstr "Suma Ma"
 #: model_terms:ir.ui.view,arch_db:mrp_account.view_wip_accounting_form
 msgid "Total Debit"
 msgstr "Suma Winien"
-
-#. module: mrp_account
-#: model_terms:ir.ui.view,arch_db:mrp_account.report_wip
-msgid "Units"
-msgstr "Jednostki"
 
 #. module: mrp_account
 #. odoo-python
@@ -643,6 +615,27 @@ msgstr "Dziennik produktywności gniazda produkcyjnego"
 #: code:addons/mrp_account/models/mrp_workorder.py:0
 msgid "[WC] %s"
 msgstr "[GP] %s"
+
+#~ msgid "Acme Corp."
+#~ msgstr "Acme Corp."
+
+#~ msgid "Laptop"
+#~ msgstr "Laptop"
+
+#~ msgid "REF123"
+#~ msgstr "REF123"
+
+#~ msgid "Units"
+#~ msgstr "Jednostki"
+
+#~ msgid "$1000"
+#~ msgstr "$1000"
+
+#~ msgid "$5000"
+#~ msgstr "$5000"
+
+#~ msgid "2023-08-15"
+#~ msgstr "2023-08-15"
 
 #~ msgid ""
 #~ "Analytic account in which cost and revenue entries will take        place "

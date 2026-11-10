@@ -2,7 +2,7 @@
 
 import { PosOrder } from "@point_of_sale/app/models/pos_order";
 import { patch } from "@web/core/utils/patch";
-import { qrCodeSrc } from "@point_of_sale/utils";
+import { generateQRCodeDataUrl } from "@point_of_sale/utils";
 
 patch(PosOrder.prototype, {
     setup() {
@@ -12,10 +12,14 @@ patch(PosOrder.prototype, {
         }
     },
 
+    isSACompany() {
+        return this.company.country_id?.code === "SA";
+    },
+
     isInvoiceMandatoryForSA() {
         // Zatca enforces invoice, but for settlement due, invoices are not needed
         // Only applicable if enterprise:pos_settle_due module is installed
-        return this.isSACompany() && !this.is_settling_account;
+        return this.isSACompany() && !this.is_settlement() && !this.is_settling_account;
     },
 
     isToInvoice() {
@@ -40,7 +44,7 @@ patch(PosOrder.prototype, {
         is_settling_account is only applicable if enterprise:pos_settle_due module is installed
         */
         super.setPartner(partner);
-        if (this.is_settling_account) {
+        if (this.isSACompany() && !this.isInvoiceMandatoryForSA()) {
             this.setToInvoice(false);
         }
     },
@@ -50,7 +54,10 @@ patch(PosOrder.prototype, {
     },
     generateQrcode() {
         if (!this.notLegal && this.isSACompany()) {
-            return qrCodeSrc(this.l10n_sa_invoice_qr_code_str);
+            return generateQRCodeDataUrl(this.l10n_sa_invoice_qr_code_str, {
+                width: 180,
+                height: 180,
+            });
         }
         return false;
     },

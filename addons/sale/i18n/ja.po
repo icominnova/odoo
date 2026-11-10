@@ -6,7 +6,7 @@
 # Martin Trigaux, 2022
 # 江口和志 <sandwhale1010@gmail.com>, 2023
 # Andy Yiu, 2023
-# Ryoko Tsuda <ryoko@quartile.co>, 2023, 2025.
+# Ryoko Tsuda <ryoko@quartile.co>, 2023, 2025, 2026.
 # Yoshi Tashiro (Quartile) <tashiro@roomsfor.hk>, 2023
 # Tatsuki Kanda, 2023
 # "Dylan Kiss (dyki)" <dyki@odoo.com>, 2025.
@@ -17,8 +17,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-02-06 18:36+0000\n"
-"PO-Revision-Date: 2026-02-06 09:13+0000\n"
+"POT-Creation-Date: 2026-10-24 17:38+0000\n"
+"PO-Revision-Date: 2026-09-07 10:11+0000\n"
 "Last-Translator: \"Junko Augias (juau)\" <juau@odoo.com>\n"
 "Language-Team: Japanese <https://translate.odoo.com/projects/odoo-19/sale/ja/"
 ">\n"
@@ -27,7 +27,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Generator: Weblate 5.14.3\n"
+"X-Generator: Weblate 2026.8.1\n"
 
 #. module: sale
 #. odoo-javascript
@@ -102,32 +102,6 @@ msgid ""
 "sales."
 msgstr ""
 "100％無料です！きれいな見積書を作成し、販売を追跡する時間を節約できます。"
-
-#. module: sale
-#: model_terms:ir.ui.view,arch_db:sale.report_saleorder_document
-msgid "2023-12-31"
-msgstr "2023-12-31"
-
-#. module: sale
-#: model_terms:ir.ui.view,arch_db:sale.report_saleorder_document
-msgid "25.00"
-msgstr "25.00"
-
-#. module: sale
-#: model_terms:ir.ui.view,arch_db:sale.report_saleorder_document
-#: model_terms:ir.ui.view,arch_db:sale.sale_order_portal_content
-msgid "27.00"
-msgstr "27.00"
-
-#. module: sale
-#: model_terms:ir.ui.view,arch_db:sale.report_saleorder_document
-msgid "30.00"
-msgstr "30.00"
-
-#. module: sale
-#: model_terms:ir.ui.view,arch_db:sale.sale_order_portal_content
-msgid "31.05"
-msgstr "31.05"
 
 #. module: sale
 #. odoo-javascript
@@ -901,22 +875,68 @@ msgstr ""
 "</div>"
 
 #. module: sale
+#: model:mail.template,body_html:sale.email_template_proforma
+msgid ""
+"<div style=\"margin: 0px; padding: 0px;\">\n"
+"    <p style=\"margin: 0px; padding: 0px; font-size: 13px;\">\n"
+"        Hello,\n"
+"        <br/><br/>\n"
+"        <t t-if=\"object.state in ('draft', 'sent')\">\n"
+"            Your Pro forma invoice for quotation <span style=\"font-weight: "
+"bold;\" t-out=\"object.name or ''\">S00052</span>\n"
+"        </t>\n"
+"        <t t-else=\"\">\n"
+"            Your Pro forma invoice for order <span style=\"font-weight: bold;"
+"\" t-out=\"object.name or ''\">S00052</span>\n"
+"        </t>\n"
+"        <t t-if=\"object.origin\">\n"
+"            (with reference: <t t-out=\"object.origin or ''\"/> )\n"
+"        </t>\n"
+"        amounting in <span style=\"font-weight: bold;\" t-"
+"out=\"format_amount(object.amount_total, object.currency_id) or ''\">$ "
+"10.00</span> is available.\n"
+"        <br/><br/>\n"
+"        Do not hesitate to contact us if you have any questions.\n"
+"        <t t-if=\"not is_html_empty(object.user_id.signature)\" data-o-mail-"
+"quote-container=\"1\">\n"
+"            <div data-o-mail-quote=\"1\">--<br data-o-mail-quote=\"1\"/><t t-"
+"out=\"object.user_id.signature or ''\" data-o-mail-quote=\"1\">Mitchell "
+"Admin</t></div>\n"
+"        </t>\n"
+"    </p>\n"
+"</div>\n"
+"            "
+msgstr ""
+
+#. module: sale
 #: model:mail.template,body_html:sale.email_template_edi_sale
 msgid ""
 "<div style=\"margin: 0px; padding: 0px;\">\n"
 "    <p style=\"margin: 0px; padding: 0px; font-size: 13px;\">\n"
-"        <t t-set=\"doc_name\" t-value=\"'quotation' if object.state in "
-"('draft', 'sent') else 'order'\"/>\n"
 "        Hello,\n"
 "        <br/><br/>\n"
-"        Your <t t-out=\"doc_name or ''\">quotation</t> <span style=\"font-"
-"weight: bold;\" t-out=\"object.name or ''\"/>\n"
-"        <t t-if=\"object.origin\">\n"
-"            (with reference: <t t-out=\"object.origin or ''\">S00052</t> )\n"
-"        </t>\n"
-"        amounting in <span style=\"font-weight: bold;\" t-"
+"        <t t-if=\"object.state in ('draft', 'sent')\">\n"
+"            Your quotation <span style=\"font-weight: bold;\" t-"
+"out=\"object.name or ''\"/>\n"
+"            <t t-if=\"object.origin\">\n"
+"                (with reference: <t t-out=\"object.origin or ''\">S00052</"
+"t> )\n"
+"            </t>\n"
+"            amounting in <span style=\"font-weight: bold;\" t-"
 "out=\"format_amount(object.amount_total, object.currency_id) or ''\">$ "
 "10.00</span> is ready for review.\n"
+"        </t>\n"
+"        <t t-else=\"\">\n"
+"            Your order <span style=\"font-weight: bold;\" t-"
+"out=\"object.name or ''\"/>\n"
+"            <t t-if=\"object.origin\">\n"
+"                (with reference: <t t-out=\"object.origin or ''\">S00052</"
+"t> )\n"
+"            </t>\n"
+"            amounting in <span style=\"font-weight: bold;\" t-"
+"out=\"format_amount(object.amount_total, object.currency_id) or ''\">$ "
+"10.00</span> is ready for review.\n"
+"        </t>\n"
 "        <br/>\n"
 "        <t t-set=\"documents\" t-value=\"object._get_product_documents()\"/"
 ">\n"
@@ -950,110 +970,6 @@ msgid ""
 "</div>\n"
 "            "
 msgstr ""
-"<div style=\"margin: 0px; padding: 0px;\">\n"
-"    <p style=\"margin: 0px; padding: 0px; font-size: 13px;\">\n"
-"        <t t-set=\"doc_name\" t-value=\"'quotation' if object.state in "
-"('draft', 'sent') else 'order'\"/>\n"
-"        いつもご利用いただきありがとうございます。\n"
-"        <br/><br/>\n"
-"        <t t-out=\"doc_name or ''\">見積書</t> <span style=\"font-weight: "
-"bold;\" t-out=\"object.name or ''\"/>\n"
-"        <t t-if=\"object.origin\">\n"
-"            (参照番号: <t t-out=\"object.origin or ''\">S00052</t> )\n"
-"        </t>\n"
-"        金額： <span style=\"font-weight: bold;\" t-"
-"out=\"format_amount(object.amount_total, object.currency_id) or ''\">$ "
-"10.00</span>のご用意ができました。ご確認をお願いたします。\n"
-"        <br/>\n"
-"        <t t-set=\"documents\" t-value=\"object._get_product_documents()\"/"
-">\n"
-"        <t t-if=\"documents\">\n"
-"            <br/>\n"
-"            <t t-if=\"len(documents)&gt;1\">\n"
-"                追加で関連ドキュメントをお送りいたします:\n"
-"            </t>\n"
-"            <t t-else=\"\">\n"
-"                追加で関連ドキュメントをお送りいたします:\n"
-"            </t>\n"
-"            <ul style=\"margin-bottom: 0;\">\n"
-"                <t t-foreach=\"documents\" t-as=\"document\">\n"
-"                    <li style=\"font-size: 13px;\">\n"
-"                        <a t-out=\"document.ir_attachment_id.name\" t-att-"
-"href=\"object.get_portal_url('/document/' + str(document.id))\" t-att-"
-"target=\"target\"/>\n"
-"                    </li>\n"
-"                </t>\n"
-"            </ul>\n"
-"        </t>\n"
-"        <br/>\n"
-"        何かご不明な点がございましたら、お気軽にお問い合わせください。よろし"
-"くお願いいたします。\n"
-"        <t t-if=\"not is_html_empty(object.user_id.signature)\" data-o-mail-"
-"quote-container=\"1\">\n"
-"            <div data-o-mail-quote=\"1\">--<br data-o-mail-quote=\"1\"/><t t-"
-"out=\"object.user_id.signature or ''\" data-o-mail-quote=\"1\">Mitchell "
-"Admin</t></div>\n"
-"        </t>\n"
-"    </p>\n"
-"</div>\n"
-"            "
-
-#. module: sale
-#: model:mail.template,body_html:sale.email_template_proforma
-msgid ""
-"<div style=\"margin: 0px; padding: 0px;\">\n"
-"    <p style=\"margin: 0px; padding: 0px; font-size: 13px;\">\n"
-"        <t t-set=\"doc_name\" t-value=\"'quotation' if object.state in "
-"('draft', 'sent') else 'order'\"/>\n"
-"        Hello,\n"
-"        <br/><br/>\n"
-"        Your Pro forma invoice for <t t-out=\"doc_name or ''\">quotation</t> "
-"<span style=\"font-weight: bold;\" t-out=\"object.name or ''\">S00052</"
-"span>\n"
-"        <t t-if=\"object.origin\">\n"
-"            (with reference: <t t-out=\"object.origin or ''\"/> )\n"
-"        </t>\n"
-"        amounting in <span style=\"font-weight: bold;\" t-"
-"out=\"format_amount(object.amount_total, object.currency_id) or ''\">$ "
-"10.00</span> is available.\n"
-"        <br/><br/>\n"
-"        Do not hesitate to contact us if you have any questions.\n"
-"        <t t-if=\"not is_html_empty(object.user_id.signature)\" data-o-mail-"
-"quote-container=\"1\">\n"
-"            <div data-o-mail-quote=\"1\">--<br data-o-mail-quote=\"1\"/><t t-"
-"out=\"object.user_id.signature or ''\" data-o-mail-quote=\"1\">Mitchell "
-"Admin</t></div>\n"
-"        </t>\n"
-"    </p>\n"
-"</div>\n"
-"            "
-msgstr ""
-"<div style=\"margin: 0px; padding: 0px;\">\n"
-"    <p style=\"margin: 0px; padding: 0px; font-size: 13px;\">\n"
-"        <t t-set=\"doc_name\" t-value=\"'quotation' if object.state in "
-"('draft', 'sent') else 'order'\"/>\n"
-"        いつもお世話になっております。\n"
-"        <br/><br/>\n"
-"        <t t-out=\"doc_name or ''\">見積書</t> <span style=\"font-weight: "
-"bold;\" t-out=\"object.name or ''\">S00052</span>\n"
-"        <t t-if=\"object.origin\">\n"
-"            (参照番号: <t t-out=\"object.origin or ''\"/> )\n"
-"        </t>\n"
-"        金額 <span style=\"font-weight: bold;\" t-"
-"out=\"format_amount(object.amount_total, object.currency_id) or ''\">$ "
-"10.00</span> の仮請求書のご用意ができました。ご確認をお願いいたします。\n"
-"        <br/><br/>\n"
-"         ご不明な点がございましたら、お気軽にお問合せ下さい。よろしくお願いい"
-"たします。\n"
-"        <t t-if=\"not is_html_empty(object.user_id.signature)\" data-o-mail-"
-"quote-container=\"1\">\n"
-"                      <div data-o-mail-quote=\"1\">--<br data-o-mail-"
-"quote=\"1\"/><t t-out=\"object.user_id.signature or ''\" data-o-mail-"
-"quote=\"1\">Mitchell Admin</t></div>\n"
-"        </t>\n"
-"   </p>\n"
-"</div>\n"
-"            "
 
 #. module: sale
 #: model_terms:ir.ui.view,arch_db:sale.sale_order_portal_template
@@ -1153,15 +1069,6 @@ msgstr ""
 "is_product_archived\"/>"
 
 #. module: sale
-#: model_terms:ir.ui.view,arch_db:sale.res_config_settings_view_form
-msgid ""
-"<span class=\"fa fa-lg fa-building-o p-2\" title=\"Values set here are "
-"company-specific.\" groups=\"base.group_multi_company\"/>"
-msgstr ""
-"<span class=\"fa fa-lg fa-building-o p-2\" title=\"Values set here are "
-"company-specific.\" groups=\"base.group_multi_company\"/>"
-
-#. module: sale
 #: model_terms:ir.ui.view,arch_db:sale.crm_team_salesteams_view_form
 msgid "<span class=\"flex-grow-1\">/ Month</span>"
 msgstr "<span class=\"flex-grow-1\">/ 月</span>"
@@ -1245,8 +1152,27 @@ msgstr "<span>警告: このオーダは以下と重複している可能性が�
 
 #. module: sale
 #: model_terms:ir.ui.view,arch_db:sale.report_saleorder_document
-msgid "<strong class=\"d-block mt-3\">Shipping Address</strong>"
-msgstr "<strong class=\"d-block mt-3\">配送先</strong>"
+msgid ""
+"<strong>\n"
+"                            Invoicing Address\n"
+"                        </strong>"
+msgstr ""
+
+#. module: sale
+#: model_terms:ir.ui.view,arch_db:sale.report_saleorder_document
+msgid ""
+"<strong>\n"
+"                            Shipping Address\n"
+"                        </strong>"
+msgstr ""
+
+#. module: sale
+#: model_terms:ir.ui.view,arch_db:sale.report_saleorder_document
+msgid ""
+"<strong>\n"
+"                        Invoicing and Shipping Address\n"
+"                    </strong>"
+msgstr ""
 
 #. module: sale
 #: model_terms:ir.ui.view,arch_db:sale.report_saleorder_document
@@ -1524,7 +1450,7 @@ msgstr "グリッドビューからオーダに複数のバリアントを追加
 #. odoo-javascript
 #: code:addons/sale/static/src/js/combo_configurator_dialog/combo_configurator_dialog.xml:0
 msgid "Add to order"
-msgstr "オーダへ追加"
+msgstr "オーダに追加"
 
 #. module: sale
 #: model:ir.actions.act_window,name:sale.mail_followers_edit_action_from_sale
@@ -1731,7 +1657,7 @@ msgstr "属性"
 #. module: sale
 #: model:ir.model.fields,field_description:sale.field_sale_order__authorized_transaction_ids
 msgid "Authorized Transactions"
-msgstr "承認されたトランザクション"
+msgstr "承認された取引"
 
 #. module: sale
 #: model:ir.model.fields,field_description:sale.field_res_config_settings__automatic_invoice
@@ -2119,11 +2045,6 @@ msgid "Connect with your software!"
 msgstr "自社のシステムと連携"
 
 #. module: sale
-#: model_terms:ir.ui.view,arch_db:sale.report_saleorder_document
-msgid "Connect your software"
-msgstr "自社のシステムと連携"
-
-#. module: sale
 #: model_terms:ir.ui.view,arch_db:sale.res_config_settings_view_form
 msgid "Connectors"
 msgstr "コネクター"
@@ -2161,7 +2082,7 @@ msgstr "作成日"
 #. module: sale
 #: model_terms:ir.ui.view,arch_db:sale.view_sale_advance_payment_inv
 msgid "Create Draft"
-msgstr "ドラフトを作成"
+msgstr "下書きを作成"
 
 #. module: sale
 #: model:ir.model.fields,field_description:sale.field_sale_advance_payment_inv__advance_payment_method
@@ -2258,7 +2179,7 @@ msgstr "作成日"
 msgid ""
 "Creation date of draft/sent orders,\n"
 "Confirmation date of confirmed orders."
-msgstr "ドラフト/送信済み注文の作成日、確認済オーダの確認日。"
+msgstr "下書き/送信済み注文の作成日、確認済オーダの確認日。"
 
 #. module: sale
 #: model:ir.model.fields,field_description:sale.field_sale_advance_payment_inv__currency_id
@@ -2572,7 +2493,7 @@ msgstr "割引"
 #. module: sale
 #: model:ir.model.fields,field_description:sale.field_sale_advance_payment_inv__display_draft_invoice_warning
 msgid "Display Draft Invoice Warning"
-msgstr "請求書ドラフトの警告を表示する"
+msgstr "請求書(下書き)の警告を表示"
 
 #. module: sale
 #: model:ir.model.fields,field_description:sale.field_account_analytic_applicability__display_name
@@ -2660,7 +2581,7 @@ msgstr "前受金額 (固定)"
 #. odoo-python
 #: code:addons/sale/models/sale_order_line.py:0
 msgid "Down Payment: %(date)s (Draft)"
-msgstr "前受金: %(date)s (ドラフト)"
+msgstr "前受金: %(date)s (下書き)"
 
 #. module: sale
 #. odoo-python
@@ -2721,7 +2642,7 @@ msgstr "前受金勘定"
 #: code:addons/sale/wizard/sale_make_invoice_advance.py:0
 #: model_terms:ir.ui.view,arch_db:sale.view_sale_advance_payment_inv
 msgid "Draft Invoices"
-msgstr "ドラフト請求書"
+msgstr "請求書(下書き)"
 
 #. module: sale
 #: model_terms:ir.ui.view,arch_db:sale.sale_order_portal_template
@@ -2958,7 +2879,7 @@ msgstr ""
 #. module: sale
 #: model_terms:ir.ui.view,arch_db:sale.res_config_settings_view_form
 msgid "Grant discounts on sales order lines"
-msgstr "販売オーダラインに値引適用"
+msgstr "販売オーダ明細に値引を適用"
 
 #. module: sale
 #: model:ir.model.fields,field_description:sale.field_sale_report__weight
@@ -3302,7 +3223,6 @@ msgid "Invoicing"
 msgstr "請求"
 
 #. module: sale
-#: model_terms:ir.ui.view,arch_db:sale.report_saleorder_document
 #: model_terms:ir.ui.view,arch_db:sale.sale_order_portal_content
 msgid "Invoicing Address"
 msgstr "請求先"
@@ -3325,7 +3245,6 @@ msgid "Invoicing Target"
 msgstr "請求目標"
 
 #. module: sale
-#: model_terms:ir.ui.view,arch_db:sale.report_saleorder_document
 #: model_terms:ir.ui.view,arch_db:sale.sale_order_portal_content
 msgid "Invoicing and Shipping Address"
 msgstr "請求および配送先"
@@ -3828,7 +3747,7 @@ msgstr "確認済の前払のみが考慮されます"
 #. odoo-python
 #: code:addons/sale/models/sale_order.py:0
 msgid "Only draft orders can be marked as sent directly."
-msgstr "送信済として直接マークできるのはドラフトオーダのみです"
+msgstr "送信済として直接マークできるのは下書きオーダのみです"
 
 #. module: sale
 #: model:ir.model.constraint,message:sale.constraint_product_attribute_custom_value_sol_custom_value_unique
@@ -3889,7 +3808,7 @@ msgstr "オーダ数"
 #: model_terms:ir.ui.view,arch_db:sale.view_order_product_search
 #: model_terms:ir.ui.view,arch_db:sale.view_sales_order_filter
 msgid "Order Date"
-msgstr "オーダ日"
+msgstr "注文日"
 
 #. module: sale
 #: model_terms:ir.ui.view,arch_db:sale.sale_order_portal_content
@@ -4591,7 +4510,7 @@ msgstr "キャンペーンによって生み出された収益"
 #. module: sale
 #: model:ir.model.fields,field_description:sale.field_sale_order__message_has_sms_error
 msgid "SMS Delivery error"
-msgstr "SMS送信エラー"
+msgstr "SMS配信エラー"
 
 #. module: sale
 #: model_terms:ir.ui.view,arch_db:sale.report_saleorder_document
@@ -5030,7 +4949,7 @@ msgstr "配送"
 #. module: sale
 #: model_terms:ir.ui.view,arch_db:sale.sale_order_portal_content
 msgid "Shipping Address"
-msgstr "配送住所"
+msgstr "配送先"
 
 #. module: sale
 #: model:ir.model.fields,field_description:sale.field_res_config_settings__module_delivery_shiprocket
@@ -5469,8 +5388,7 @@ msgstr ""
 #. module: sale
 #: model_terms:ir.ui.view,arch_db:sale.view_sale_advance_payment_inv
 msgid "The new invoice will deduct draft invoices linked to this sale order."
-msgstr ""
-"この販売オーダにリンクした請求書ドラフトから新しい請求書が控除されます。"
+msgstr "この販売オーダにリンクした請求書下書きから新しい請求書が控除されます。"
 
 #. module: sale
 #. odoo-python
@@ -5710,7 +5628,7 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:sale.view_order_product_search
 #: model_terms:ir.ui.view,arch_db:sale.view_sales_order_line_filter
 msgid "To Invoice"
-msgstr "未請求"
+msgstr "請求対象"
 
 #. module: sale
 #: model_terms:ir.ui.view,arch_db:sale.sale_order_view_search_inherit_sale
@@ -5794,17 +5712,17 @@ msgstr "タイプ名"
 #. module: sale
 #: model:ir.model.fields,help:sale.field_sale_order__activity_exception_decoration
 msgid "Type of the exception activity on record."
-msgstr "記録上の例外活動の種類。"
+msgstr "レコード上の例外の活動タイプ。"
 
 #. module: sale
 #: model_terms:ir.ui.view,arch_db:sale.view_order_form
 msgid "Type to find a customer..."
-msgstr "顧客を見つけるためにタイプ..."
+msgstr "タイプして顧客を検索..."
 
 #. module: sale
 #: model_terms:ir.ui.view,arch_db:sale.view_order_form
 msgid "Type to find a product..."
-msgstr "プロダクトを見つけるためにタイプ..."
+msgstr "タイプしてプロダクトを検索..."
 
 #. module: sale
 #: model:ir.model.fields,field_description:sale.field_res_config_settings__module_delivery_ups_rest
@@ -5961,10 +5879,14 @@ msgstr "有効期間"
 #. module: sale
 #: model:ir.model.fields,help:sale.field_sale_order__validity_date
 msgid ""
-"Validity of the order, after that you will not able to sign & pay the "
-"quotation."
+"Validity of the quotation. After this date, you will no longer be able to "
+"sign and pay it."
 msgstr ""
-"オーダの有効期限：有効期限を過ぎると、見積に署名することができなくなります。"
+
+#. module: sale
+#: model_terms:ir.ui.view,arch_db:sale.res_config_settings_view_form
+msgid "Values set here are company-specific."
+msgstr ""
 
 #. module: sale
 #: model_terms:ir.ui.view,arch_db:sale.res_config_settings_view_form
@@ -6089,17 +6011,6 @@ msgstr "確認済オーダの価格表を変えることはできません！"
 
 #. module: sale
 #. odoo-python
-#: code:addons/sale/models/product_product.py:0
-#: code:addons/sale/models/product_template.py:0
-msgid ""
-"You cannot change the product's type because it is already used in sales "
-"orders."
-msgstr ""
-"プロダクトの種類は、すでに販売オーダで使用されているため、変更することができ"
-"ません。"
-
-#. module: sale
-#. odoo-python
 #: code:addons/sale/models/sale_order_line.py:0
 msgid ""
 "You cannot change the type of a sale order line. Instead you should delete "
@@ -6136,6 +6047,16 @@ msgid ""
 msgstr ""
 "販売または購買するもの(在庫品、消耗品、サービス品等)は、プロダクトとして登録"
 "する必要があります。"
+
+#. module: sale
+#. odoo-python
+#: code:addons/sale/models/product_product.py:0
+#: code:addons/sale/models/product_template.py:0
+msgid ""
+"You should not change the product type because this product is already used "
+"in sales orders. Changing it may affect how the related order lines are "
+"delivered."
+msgstr ""
 
 #. module: sale
 #: model_terms:ir.ui.view,arch_db:sale.portal_my_home_sale
@@ -6266,11 +6187,6 @@ msgid "sale order"
 msgstr "販売注文"
 
 #. module: sale
-#: model_terms:ir.ui.view,arch_db:sale.report_saleorder_document
-msgid "to create quotes automatically."
-msgstr "自動的に見積書を作成します。"
-
-#. module: sale
 #: model_terms:ir.ui.view,arch_db:sale.sale_order_portal_template
 msgid "to learn all the ways to connect your software with"
 msgstr "自社システムとの連携方法について詳しくはこちら。"
@@ -6282,8 +6198,8 @@ msgstr "単位"
 
 #. module: sale
 #: model_terms:ir.ui.view,arch_db:sale.report_saleorder_document
-msgid "with"
-msgstr "と:"
+msgid "x"
+msgstr ""
 
 #. module: sale
 #: model_terms:ir.ui.view,arch_db:sale.sale_order_portal_pay_modal
@@ -6319,6 +6235,207 @@ msgid ""
 msgstr ""
 "{{ object.company_id.name }} {{ object.state in ('draft', 'sent') and '見積"
 "書' or 'オーダ' }} (参照 {{ object.name or 'n/a' }})"
+
+#~ msgid ""
+#~ "<div style=\"margin: 0px; padding: 0px;\">\n"
+#~ "    <p style=\"margin: 0px; padding: 0px; font-size: 13px;\">\n"
+#~ "        <t t-set=\"doc_name\" t-value=\"'quotation' if object.state in "
+#~ "('draft', 'sent') else 'order'\"/>\n"
+#~ "        Hello,\n"
+#~ "        <br/><br/>\n"
+#~ "        Your <t t-out=\"doc_name or ''\">quotation</t> <span style=\"font-"
+#~ "weight: bold;\" t-out=\"object.name or ''\"/>\n"
+#~ "        <t t-if=\"object.origin\">\n"
+#~ "            (with reference: <t t-out=\"object.origin or ''\">S00052</"
+#~ "t> )\n"
+#~ "        </t>\n"
+#~ "        amounting in <span style=\"font-weight: bold;\" t-"
+#~ "out=\"format_amount(object.amount_total, object.currency_id) or ''\">$ "
+#~ "10.00</span> is ready for review.\n"
+#~ "        <br/>\n"
+#~ "        <t t-set=\"documents\" t-value=\"object._get_product_documents()"
+#~ "\"/>\n"
+#~ "        <t t-if=\"documents\">\n"
+#~ "            <br/>\n"
+#~ "            <t t-if=\"len(documents)&gt;1\">\n"
+#~ "                Here are some additional documents that may interest "
+#~ "you:\n"
+#~ "            </t>\n"
+#~ "            <t t-else=\"\">\n"
+#~ "                Here is an additional document that may interest you:\n"
+#~ "            </t>\n"
+#~ "            <ul style=\"margin-bottom: 0;\">\n"
+#~ "                <t t-foreach=\"documents\" t-as=\"document\">\n"
+#~ "                    <li style=\"font-size: 13px;\">\n"
+#~ "                        <a t-out=\"document.ir_attachment_id.name\" t-att-"
+#~ "href=\"object.get_portal_url('/document/' + str(document.id))\" t-att-"
+#~ "target=\"target\"/>\n"
+#~ "                    </li>\n"
+#~ "                </t>\n"
+#~ "            </ul>\n"
+#~ "        </t>\n"
+#~ "        <br/>\n"
+#~ "        Do not hesitate to contact us if you have any questions.\n"
+#~ "        <t t-if=\"not is_html_empty(object.user_id.signature)\" data-o-"
+#~ "mail-quote-container=\"1\">\n"
+#~ "            <div data-o-mail-quote=\"1\">--<br data-o-mail-quote=\"1\"/"
+#~ "><t t-out=\"object.user_id.signature or ''\" data-o-mail-"
+#~ "quote=\"1\">Mitchell Admin</t></div>\n"
+#~ "        </t>\n"
+#~ "    </p>\n"
+#~ "</div>\n"
+#~ "            "
+#~ msgstr ""
+#~ "<div style=\"margin: 0px; padding: 0px;\">\n"
+#~ "    <p style=\"margin: 0px; padding: 0px; font-size: 13px;\">\n"
+#~ "        <t t-set=\"doc_name\" t-value=\"'quotation' if object.state in "
+#~ "('draft', 'sent') else 'order'\"/>\n"
+#~ "        いつもご利用いただきありがとうございます。\n"
+#~ "        <br/><br/>\n"
+#~ "        <t t-out=\"doc_name or ''\">見積書</t> <span style=\"font-weight: "
+#~ "bold;\" t-out=\"object.name or ''\"/>\n"
+#~ "        <t t-if=\"object.origin\">\n"
+#~ "            (参照番号: <t t-out=\"object.origin or ''\">S00052</t> )\n"
+#~ "        </t>\n"
+#~ "        金額： <span style=\"font-weight: bold;\" t-"
+#~ "out=\"format_amount(object.amount_total, object.currency_id) or ''\">$ "
+#~ "10.00</span>のご用意ができました。ご確認をお願いたします。\n"
+#~ "        <br/>\n"
+#~ "        <t t-set=\"documents\" t-value=\"object._get_product_documents()"
+#~ "\"/>\n"
+#~ "        <t t-if=\"documents\">\n"
+#~ "            <br/>\n"
+#~ "            <t t-if=\"len(documents)&gt;1\">\n"
+#~ "                追加で関連ドキュメントをお送りいたします:\n"
+#~ "            </t>\n"
+#~ "            <t t-else=\"\">\n"
+#~ "                追加で関連ドキュメントをお送りいたします:\n"
+#~ "            </t>\n"
+#~ "            <ul style=\"margin-bottom: 0;\">\n"
+#~ "                <t t-foreach=\"documents\" t-as=\"document\">\n"
+#~ "                    <li style=\"font-size: 13px;\">\n"
+#~ "                        <a t-out=\"document.ir_attachment_id.name\" t-att-"
+#~ "href=\"object.get_portal_url('/document/' + str(document.id))\" t-att-"
+#~ "target=\"target\"/>\n"
+#~ "                    </li>\n"
+#~ "                </t>\n"
+#~ "            </ul>\n"
+#~ "        </t>\n"
+#~ "        <br/>\n"
+#~ "        何かご不明な点がございましたら、お気軽にお問い合わせください。よろ"
+#~ "しくお願いいたします。\n"
+#~ "        <t t-if=\"not is_html_empty(object.user_id.signature)\" data-o-"
+#~ "mail-quote-container=\"1\">\n"
+#~ "            <div data-o-mail-quote=\"1\">--<br data-o-mail-quote=\"1\"/"
+#~ "><t t-out=\"object.user_id.signature or ''\" data-o-mail-"
+#~ "quote=\"1\">Mitchell Admin</t></div>\n"
+#~ "        </t>\n"
+#~ "    </p>\n"
+#~ "</div>\n"
+#~ "            "
+
+#~ msgid ""
+#~ "<div style=\"margin: 0px; padding: 0px;\">\n"
+#~ "    <p style=\"margin: 0px; padding: 0px; font-size: 13px;\">\n"
+#~ "        <t t-set=\"doc_name\" t-value=\"'quotation' if object.state in "
+#~ "('draft', 'sent') else 'order'\"/>\n"
+#~ "        Hello,\n"
+#~ "        <br/><br/>\n"
+#~ "        Your Pro forma invoice for <t t-out=\"doc_name or ''\">quotation</"
+#~ "t> <span style=\"font-weight: bold;\" t-out=\"object.name or ''\">S00052</"
+#~ "span>\n"
+#~ "        <t t-if=\"object.origin\">\n"
+#~ "            (with reference: <t t-out=\"object.origin or ''\"/> )\n"
+#~ "        </t>\n"
+#~ "        amounting in <span style=\"font-weight: bold;\" t-"
+#~ "out=\"format_amount(object.amount_total, object.currency_id) or ''\">$ "
+#~ "10.00</span> is available.\n"
+#~ "        <br/><br/>\n"
+#~ "        Do not hesitate to contact us if you have any questions.\n"
+#~ "        <t t-if=\"not is_html_empty(object.user_id.signature)\" data-o-"
+#~ "mail-quote-container=\"1\">\n"
+#~ "            <div data-o-mail-quote=\"1\">--<br data-o-mail-quote=\"1\"/"
+#~ "><t t-out=\"object.user_id.signature or ''\" data-o-mail-"
+#~ "quote=\"1\">Mitchell Admin</t></div>\n"
+#~ "        </t>\n"
+#~ "    </p>\n"
+#~ "</div>\n"
+#~ "            "
+#~ msgstr ""
+#~ "<div style=\"margin: 0px; padding: 0px;\">\n"
+#~ "    <p style=\"margin: 0px; padding: 0px; font-size: 13px;\">\n"
+#~ "        <t t-set=\"doc_name\" t-value=\"'quotation' if object.state in "
+#~ "('draft', 'sent') else 'order'\"/>\n"
+#~ "        いつもお世話になっております。\n"
+#~ "        <br/><br/>\n"
+#~ "        <t t-out=\"doc_name or ''\">見積書</t> <span style=\"font-weight: "
+#~ "bold;\" t-out=\"object.name or ''\">S00052</span>\n"
+#~ "        <t t-if=\"object.origin\">\n"
+#~ "            (参照番号: <t t-out=\"object.origin or ''\"/> )\n"
+#~ "        </t>\n"
+#~ "        金額 <span style=\"font-weight: bold;\" t-"
+#~ "out=\"format_amount(object.amount_total, object.currency_id) or ''\">$ "
+#~ "10.00</span> の仮請求書のご用意ができました。ご確認をお願いいたします。\n"
+#~ "        <br/><br/>\n"
+#~ "         ご不明な点がございましたら、お気軽にお問合せ下さい。よろしくお願"
+#~ "いいたします。\n"
+#~ "        <t t-if=\"not is_html_empty(object.user_id.signature)\" data-o-"
+#~ "mail-quote-container=\"1\">\n"
+#~ "                      <div data-o-mail-quote=\"1\">--<br data-o-mail-"
+#~ "quote=\"1\"/><t t-out=\"object.user_id.signature or ''\" data-o-mail-"
+#~ "quote=\"1\">Mitchell Admin</t></div>\n"
+#~ "        </t>\n"
+#~ "   </p>\n"
+#~ "</div>\n"
+#~ "            "
+
+#~ msgid "<strong class=\"d-block mt-3\">Shipping Address</strong>"
+#~ msgstr "<strong class=\"d-block mt-3\">配送先</strong>"
+
+#~ msgid ""
+#~ "Validity of the order, after that you will not able to sign & pay the "
+#~ "quotation."
+#~ msgstr ""
+#~ "オーダの有効期限：有効期限を過ぎると、見積に署名することができなくなりま"
+#~ "す。"
+
+#~ msgid ""
+#~ "You cannot change the product's type because it is already used in sales "
+#~ "orders."
+#~ msgstr ""
+#~ "プロダクトの種類は、すでに販売オーダで使用されているため、変更することがで"
+#~ "きません。"
+
+#~ msgid "Connect your software"
+#~ msgstr "自社のシステムと連携"
+
+#~ msgid "to create quotes automatically."
+#~ msgstr "自動的に見積書を作成します。"
+
+#~ msgid "with"
+#~ msgstr "と:"
+
+#~ msgid "2023-12-31"
+#~ msgstr "2023-12-31"
+
+#~ msgid "25.00"
+#~ msgstr "25.00"
+
+#~ msgid "27.00"
+#~ msgstr "27.00"
+
+#~ msgid "30.00"
+#~ msgstr "30.00"
+
+#~ msgid "31.05"
+#~ msgstr "31.05"
+
+#~ msgid ""
+#~ "<span class=\"fa fa-lg fa-building-o p-2\" title=\"Values set here are "
+#~ "company-specific.\" groups=\"base.group_multi_company\"/>"
+#~ msgstr ""
+#~ "<span class=\"fa fa-lg fa-building-o p-2\" title=\"Values set here are "
+#~ "company-specific.\" groups=\"base.group_multi_company\"/>"
 
 #~ msgid ""
 #~ "<div style=\"margin: 0px; padding: 0px;\">\n"

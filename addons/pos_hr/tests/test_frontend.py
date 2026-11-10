@@ -12,16 +12,11 @@ class TestPosHrHttpCommon(TestPointOfSaleHttpCommon):
 
         cls.env.user.group_ids += cls.env.ref('hr.group_hr_user')
 
-        cls.main_pos_config.write({"module_pos_hr": True})
-
         # Admin employee
-        cls.admin = cls.env.ref("hr.employee_admin").sudo().copy({
-            "date_version": '2000-01-01',
-            "company_id": cls.env.company.id,
-            "user_id": cls.pos_admin.id,
-            "name": "Mitchell Admin",
-            "pin": False,
-        })
+        cls.pos_admin.employee_id.name = "Mitchell Admin"
+        cls.admin = cls.pos_admin.employee_id
+
+        cls.main_pos_config.write({"module_pos_hr": True})
 
         # Managers
         cls.manager_user = new_test_user(
@@ -88,7 +83,8 @@ class TestUi(TestPosHrHttpCommon):
     def test_01_pos_hr_tour(self):
         self.pos_admin.write({
             "group_ids": [
-                (4, self.env.ref('account.group_account_invoice').id)
+                (4, self.env.ref('account.group_account_invoice').id),
+                (4, self.env.ref("product.group_product_manager").id),
             ]
         })
         self.main_pos_config.update({
@@ -281,4 +277,19 @@ class TestUi(TestPosHrHttpCommon):
             "/pos/ui?config_id=%d" % self.main_pos_config.id,
             "test_scan_employee_barcode_with_pos_hr_disabled",
             login="pos_admin"
+        )
+
+    def test_switch_cashier_with_badge(self):
+        """
+        Scanning a cashier's badge from the product screen should switch to
+        that cashier.
+        """
+        self.emp2.write({"pin": False, "barcode": "041222"})
+        self.emp3.barcode = "041333"
+        self.main_pos_config.with_user(self.pos_user).open_ui()
+        self.main_pos_config.current_session_id.set_opening_control(0, None)
+        self.start_tour(
+            "/pos/ui?config_id=%d" % self.main_pos_config.id,
+            "test_switch_cashier_with_badge",
+            login="pos_user",
         )

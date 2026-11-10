@@ -1,6 +1,5 @@
 import { Base } from "./base";
 import { RAW_SYMBOL } from "./utils";
-import { reactive } from "@odoo/owl";
 
 export class RecordStore {
     /**
@@ -20,7 +19,6 @@ export class RecordStore {
                 modelMap.set(key, new Map());
             }
         });
-        return reactive(this);
     }
 
     /**
@@ -49,7 +47,8 @@ export class RecordStore {
         this._updateIndex(record, (map, key, record, isArray = false) => {
             if (isArray) {
                 map.get(key)?.delete(record.id);
-            } else {
+            } else if (map.get(key)?.id === record.id) {
+                // the key may already belong to another record (e.g. swapped barcodes)
                 map.delete(key);
             }
         });
@@ -109,7 +108,20 @@ export class RecordStore {
      * @param {Array<Base>} - Map of records by ids.
      */
     getOrderedRecords(model) {
-        return Array.from(this.getRecordsMap(model, "id").values());
+        return Array.from(this.getRecordIterator(model));
+    }
+
+    /**
+     * Retrieves an iterator over the records in insertion order.
+     * @param model
+     * @returns {*}
+     */
+    getRecordIterator(model) {
+        return this.getRecordsMap(model, "id").values();
+    }
+
+    getFirstRecord(model) {
+        return this.getRecordsMap(model, "id").values().next().value;
     }
 
     /**

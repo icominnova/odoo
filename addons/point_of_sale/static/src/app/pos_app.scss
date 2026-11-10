@@ -6,11 +6,15 @@
     margin: 0;
     background-color: #f0eeee;
     color: $o-gray-900;
+    color-scheme: $o-webclient-color-scheme;
     -webkit-user-select: none;
        -moz-user-select: none;
             user-select: none;
     text-shadow: none;
-    touch-action: manipulation;
+}
+
+* {
+    touch-action: pan-x pan-y;
 }
 /*  ********* Generic element styling  ********* */
 

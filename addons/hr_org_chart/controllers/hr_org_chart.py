@@ -29,9 +29,10 @@ class HrOrgChartController(http.Controller):
             name=employee.name,
             link='/mail/view?model=%s&res_id=%s' % ('hr.employee.public', employee.id,),
             job_id=job.id,
-            job_name=job.name or '',
+            job_name=employee.job_title or '',
             direct_sub_count=len(employee.child_ids - employee),
             indirect_sub_count=employee.child_all_count,
+            write_date=int(employee.write_date.timestamp() * 1000) if employee.write_date else 0,  # ms for js; 0 when missing
         )
 
     @http.route('/hr/get_redirect_model', type='jsonrpc', auth='user')
@@ -43,7 +44,7 @@ class HrOrgChartController(http.Controller):
     @http.route('/hr/get_org_chart', type='jsonrpc', auth='user')
     def get_org_chart(self, employee_id, new_parent_id=None, **kw):
         employee = self._get_employee(employee_id, **kw)
-        new_parent = self._get_employee(new_parent_id, **kw)
+        new_parent = self._get_employee(new_parent_id, **kw).sudo()
         if not employee:  # to check
             return {
                 'managers': [],
@@ -56,7 +57,9 @@ class HrOrgChartController(http.Controller):
         max_level = (kw.get('context')['max_level'] or self._managers_level) + 1
         while current_parent and current != current_parent and employee.sudo() != current_parent and len(ancestors) < max_level:
             current = current_parent
-            current_parent = current.parent_id if current != employee or not new_parent else new_parent
+            current_parent = self._get_employee(
+                current.parent_id if current != employee or not new_parent else new_parent
+            )
             if current_parent in ancestors:
                 break
             ancestors += current

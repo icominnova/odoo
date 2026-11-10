@@ -22,14 +22,15 @@
 # JanaAvalah, 2023
 # Leaanika Randmets, 2023
 # Arma Gedonsky <armagedonsky@hot.ee>, 2023
-# Kristina Pešehodko <kristina@avalah.ee>, 2025.
-# Weblate <noreply-mt-weblate@weblate.org>, 2025.
+# Kristina Pešehodko <kristina@avalah.ee>, 2025, 2026.
+# Weblate <noreply-mt-weblate@weblate.org>, 2025, 2026.
+# Erik Köster <erik@officeplus.ee>, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-01-25 18:35+0000\n"
-"PO-Revision-Date: 2025-11-08 22:03+0000\n"
+"POT-Creation-Date: 2026-10-24 17:37+0000\n"
+"PO-Revision-Date: 2026-08-07 03:53+0000\n"
 "Last-Translator: Weblate <noreply-mt-weblate@weblate.org>\n"
 "Language-Team: Estonian <https://translate.odoo.com/projects/odoo-19/project/"
 "et/>\n"
@@ -38,12 +39,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Weblate 5.12.2\n"
-
-#. module: project
-#: model:ir.model.fields.selection,name:project.selection__project_project__privacy_visibility__portal
-msgid " All internal users and invited portal users"
-msgstr " Kõik ettevõttesisesed kasutajad ja kutsutud portaalikasutajad"
+"X-Generator: Weblate 2026.6.1\n"
 
 #. module: project
 #: model:ir.model.fields,field_description:project.field_project_project__rating_count
@@ -903,8 +899,10 @@ msgstr "Administraator"
 
 #. module: project
 #: model:res.groups,comment:project.group_project_manager
-msgid "Administrator can manage the employees' schedule"
-msgstr "Administraator saab hallata töötaja graafikut"
+msgid ""
+"Administrator: Can manage projects and stages, with access to reporting and "
+"configuration."
+msgstr ""
 
 #. module: project
 #. odoo-javascript
@@ -975,6 +973,11 @@ msgstr "Kõik ülesanded"
 #: model:ir.model.fields.selection,name:project.selection__project_project__privacy_visibility__employees
 msgid "All internal users"
 msgstr "Kõik ettevõttesisesed kasutajad"
+
+#. module: project
+#: model:ir.model.fields.selection,name:project.selection__project_project__privacy_visibility__portal
+msgid "All internal users and invited portal users"
+msgstr ""
 
 #. module: project
 #: model:ir.model.fields,field_description:project.field_project_task__allocated_hours
@@ -1345,7 +1348,7 @@ msgstr "Tühistatud"
 #: model:mail.message.subtype,name:project.mt_project_task_changes_requested
 #: model:mail.message.subtype,name:project.mt_task_changes_requested
 msgid "Changes Requested"
-msgstr "Muudatuste taotlused"
+msgstr "Muutmiseks"
 
 #. module: project
 #. odoo-javascript
@@ -2361,6 +2364,7 @@ msgid "Future"
 msgstr "Tulevik"
 
 #. module: project
+#: model_terms:ir.ui.view,arch_db:project.project_update_view_search
 #: model_terms:ir.ui.view,arch_db:project.view_project_project_filter
 #: model_terms:ir.ui.view,arch_db:project.view_task_search_form
 msgid "Future Activities"
@@ -2854,6 +2858,7 @@ msgid "Last Updated on"
 msgstr "Viimati uuendatud"
 
 #. module: project
+#: model_terms:ir.ui.view,arch_db:project.project_update_view_search
 #: model_terms:ir.ui.view,arch_db:project.view_project_project_filter
 #: model_terms:ir.ui.view,arch_db:project.view_task_search_form
 msgid "Late Activities"
@@ -3093,6 +3098,7 @@ msgid "Months"
 msgstr "Kuu järel"
 
 #. module: project
+#: model_terms:ir.ui.view,arch_db:project.project_update_view_search
 #: model_terms:ir.ui.view,arch_db:project.view_project_project_filter
 #: model_terms:ir.ui.view,arch_db:project.view_task_search_form
 msgid "My Activities"
@@ -4540,6 +4546,7 @@ msgid "Show Sub-Tasks"
 msgstr "Näita alamülesandeid"
 
 #. module: project
+#: model_terms:ir.ui.view,arch_db:project.project_update_view_search
 #: model_terms:ir.ui.view,arch_db:project.view_project_project_filter
 #: model_terms:ir.ui.view,arch_db:project.view_task_search_form
 msgid "Show all records whose next activity date is past"
@@ -5479,6 +5486,7 @@ msgid "Today"
 msgstr "Täna"
 
 #. module: project
+#: model_terms:ir.ui.view,arch_db:project.project_update_view_search
 #: model_terms:ir.ui.view,arch_db:project.view_project_project_filter
 #: model_terms:ir.ui.view,arch_db:project.view_task_search_form
 msgid "Today Activities"
@@ -5747,8 +5755,8 @@ msgstr "Kasutaja seaded"
 
 #. module: project
 #: model:res.groups,comment:project.group_project_user
-msgid "User can user the your employees' schedule"
-msgstr "Kasutaja saab kasutada Teie töötaja ajakava"
+msgid "User: Can manage tasks in projects shared with them."
+msgstr ""
 
 #. module: project
 #: model_terms:ir.ui.view,arch_db:project.view_project_kanban
@@ -6046,6 +6054,13 @@ msgid "Your managers decide which feedback is accepted"
 msgstr "Teie juhid otsustavad, milline tagasiside on aktsepteeritud"
 
 #. module: project
+#. odoo-javascript
+#: code:addons/project/static/src/views/analytic_account_form/analytic_account_form_controller.js:0
+#: code:addons/project/static/src/views/analytic_account_list/analytic_account_list_controller.js:0
+msgid "\\t- ${"
+msgstr ""
+
+#. module: project
 #: model_terms:ir.ui.view,arch_db:project.edit_project
 msgid "alias"
 msgstr "alias"
@@ -6291,6 +6306,15 @@ msgstr "👤 Määramata"
 #: code:addons/project/models/project_task.py:0
 msgid "🔒 Private"
 msgstr "🔒 Isiklik"
+
+#~ msgid " All internal users and invited portal users"
+#~ msgstr " Kõik ettevõttesisesed kasutajad ja kutsutud portaalikasutajad"
+
+#~ msgid "Administrator can manage the employees' schedule"
+#~ msgstr "Administraator saab hallata töötaja graafikut"
+
+#~ msgid "User can user the your employees' schedule"
+#~ msgstr "Kasutaja saab kasutada Teie töötaja ajakava"
 
 #~ msgid ""
 #~ "\n"

@@ -10,7 +10,8 @@ import { omit } from "@web/core/utils/objects";
 import { OdooPivotLoader } from "./odoo_pivot_loader";
 import { getRelationalFieldDefinition } from "./pivot_helpers";
 
-const { pivotRegistry, supportedPivotPositionalFormulaRegistry } = registries;
+const { pivotRegistry, supportedPivotPositionalFormulaRegistry, pivotNormalizationValueRegistry } =
+    registries;
 const {
     pivotTimeAdapter,
     toString,
@@ -74,13 +75,7 @@ export class OdooPivot {
         this.odooDataProvider = services.odooDataProvider;
 
         /** @protected @type {Object} */
-        this.context = omit(
-            definition.context,
-            ...Object.keys(user.context),
-            "pivot_measures",
-            "pivot_row_groupby",
-            "pivot_column_groupby"
-        );
+        this.context = this._purgeContext(definition.context);
 
         /** @protected */
         this.domainWithGlobalFilters = this.coreDefinition.domain;
@@ -90,7 +85,7 @@ export class OdooPivot {
      * @param {OdooPivotCoreDefinition} nextDefinition
      */
     onDefinitionChange(nextDefinition) {
-        this.context = omit(nextDefinition.context, ...Object.keys(user.context));
+        this.context = this._purgeContext(nextDefinition.context);
         const actualDefinition = this.coreDefinition;
         this.coreDefinition = nextDefinition;
         if (!deepEquals(actualDefinition.sortedColumn, nextDefinition.sortedColumn)) {
@@ -128,6 +123,24 @@ export class OdooPivot {
             }
         }
         this.load({ reload: true });
+    }
+
+    /**
+     * Remove the user context keys and the PivotView related keys, which would
+     * otherwise override the measures and groupbys of the definition.
+     *
+     * @protected
+     * @param {Object} context
+     * @returns {Object}
+     */
+    _purgeContext(context) {
+        return omit(
+            context,
+            ...Object.keys(user.context),
+            "pivot_measures",
+            "pivot_row_groupby",
+            "pivot_column_groupby"
+        );
     }
 
     /**
@@ -532,6 +545,17 @@ export class OdooPivot {
         );
     }
 
+    get source() {
+        const data = this.definition;
+        return {
+            resModel: data.model,
+            type: "pivot",
+            fields: data.measures.map((m) => m.fieldName),
+            groupby: [...data.columns, ...data.rows].map((dim) => dim.nameWithGranularity),
+            domain: this.getDomainWithGlobalFilters(),
+        };
+    }
+
     //--------------------------------------------------------------------------
     // Global filters
     //--------------------------------------------------------------------------
@@ -588,6 +612,15 @@ export class OdooPivotRuntimeDefinition extends PivotRuntimeDefinition {
                 dimension.nameWithGranularity = `${dimension.fieldName}:month`;
             }
         }
+    }
+
+    createPivotDimension(fields, dimension) {
+        const dim = super.createPivotDimension(fields, dimension);
+        const field = fields[dimension.fieldName];
+        if (field?.relation) {
+            dim.relation = field.relation;
+        }
+        return dim;
     }
 
     get domain() {
@@ -660,11 +693,11 @@ pivotRegistry.add("ODOO", {
         field.name !== "id" &&
         !field.name.includes(".") && // relational field path are not supported as measures (e.g. 'company_id.partner_id')
         field.store,
-    isGroupable: (field) => field.groupable,
     canHaveCustomGroup: (field) =>
         field.groupable &&
         !field.isCustomField &&
         ["many2one", "char", "one2many", "many2many", "selection"].includes(field.type),
+    isGroupable: (field) => field.groupable && pivotNormalizationValueRegistry.contains(field.type),
 });
 
 supportedPivotPositionalFormulaRegistry.add("ODOO", true);

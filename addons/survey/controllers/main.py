@@ -220,9 +220,16 @@ class Survey(http.Controller):
 
         access_data = self._get_access_data(survey_token, answer_token, ensure_token=False)
 
-        if answer_from_cookie and access_data['validity_code'] in ('answer_wrong_user', 'token_wrong'):
+        if answer_from_cookie and (
+            access_data['validity_code'] in ('answer_wrong_user', 'token_wrong')
+            or (access_data['survey_sudo'].session_state
+                and access_data['answer_sudo'].is_session_answer
+                and access_data['answer_sudo'].state == 'done')
+        ):
             # If the cookie had been generated for another user or does not correspond to any existing answer object
             # (probably because it has been deleted), ignore it and redo the check.
+            # Same if it is a leftover of a previous run of the session: a session answer is only marked
+            # done when the host ends its run, so it cannot belong to the run currently open.
             # The cookie will be replaced by a legit value when resolving the URL, so we don't clean it further here.
             access_data = self._get_access_data(survey_token, None, ensure_token=False)
 
@@ -246,8 +253,9 @@ class Survey(http.Controller):
 
         # When resuming survey, restore language  + always enforce that the language is supported by the survey
         lang = self._get_lang_with_fallback(answer_sudo.sudo(False))
-        url_from = f'/survey/{survey_sudo.access_token}/{answer_sudo.access_token}'
-        return request.redirect(self.env['ir.http']._url_for(url_from, lang.code))
+        response = request.redirect(self.env['ir.http']._url_for(f'/survey/{survey_sudo.access_token}', lang.code))
+        response.set_cookie(f'survey_{survey_sudo.access_token}', answer_sudo.access_token, max_age=60 * 60 * 24)
+        return response
 
     def _prepare_survey_data(self, survey_sudo, answer_sudo, **post):
         """ This method prepares all the data needed for template rendering, in function of the survey user input state.
@@ -415,8 +423,13 @@ class Survey(http.Controller):
             'background_image_url': background_image_url
         }
 
-    @http.route('/survey/<string:survey_token>/<string:answer_token>', type='http', auth='public', website=True)
-    def survey_display_page(self, survey_token, answer_token, **post):
+    @http.route([
+        '/survey/<string:survey_token>',
+        '/survey/<string:survey_token>/<string:answer_token>',
+    ], type='http', auth='public', website=True)
+    def survey_display_page(self, survey_token, answer_token=None, **post):
+        if not answer_token:
+            answer_token = request.httprequest.cookies.get('survey_%s' % survey_token)
         access_data = self._get_access_data(survey_token, answer_token, ensure_token=True)
         if access_data['validity_code'] is not True:
             return self._redirect_with_error(access_data, access_data['validity_code'])
@@ -602,6 +615,10 @@ class Survey(http.Controller):
 
             answer_sudo.last_displayed_page_id = page_or_question_id
 
+        # presence is used to check gamification challenges
+        if user := answer_sudo.partner_id.user_ids[:1]:
+            request.env['mail.presence']._update_presence(user, inactivity_period=0)
+
         return correct_answers, self._prepare_question_html(survey_sudo, answer_sudo)
 
     def _extract_comment_from_answers(self, question, answers):
@@ -668,7 +685,7 @@ class Survey(http.Controller):
             'is_html_empty': is_html_empty,
             'review': review,
             'survey': survey_sudo,
-            'answer': answer_sudo if survey_sudo.scoring_type != 'scoring_without_answers' else answer_sudo.browse(),
+            'answer': answer_sudo,
             'questions_to_display': answer_sudo._get_print_questions(),
             'scoring_display_correction': survey_sudo.scoring_type in ['scoring_with_answers', 'scoring_with_answers_after_page'] and answer_sudo,
             'format_datetime': lambda dt: format_datetime(request.env, dt, dt_format=False),

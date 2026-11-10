@@ -5,7 +5,7 @@ import odoo.tests
 from odoo.addons.point_of_sale.tests.common_setup_methods import setup_product_combo_items
 from odoo.addons.point_of_sale.tests.common import archive_products
 from odoo.addons.point_of_sale.tests.test_frontend import TestPointOfSaleHttpCommon
-from odoo import Command
+from odoo import Command, fields
 import json
 from datetime import datetime, timedelta
 
@@ -273,6 +273,25 @@ class TestFrontend(TestFrontendCommon):
     def test_07_split_bill_screen(self):
         # disable kitchen printer to avoid printing errors
         self.pos_config.is_order_printer = False
+
+        attribute = self.env['product.attribute'].create({
+            'name': 'Attribute',
+            'create_variant': 'always',
+        })
+        attribute_normal = self.env['product.attribute.value'].create({
+            'name': 'Normal',
+            'attribute_id': attribute.id,
+        })
+        attribute_zero = self.env['product.attribute.value'].create({
+            'name': 'Zero',
+            'attribute_id': attribute.id,
+        })
+
+        self.env['product.template.attribute.line'].create({
+            'product_tmpl_id': self.coca_cola_test.product_tmpl_id.id,
+            'attribute_id': attribute.id,
+            'value_ids': [Command.set([attribute_normal.id, attribute_zero.id])],
+        })
         self.pos_config.with_user(self.pos_user).open_ui()
         self.start_pos_tour('SplitBillScreenTour3')
         self.start_pos_tour('SplitBillScreenTourPay')
@@ -644,6 +663,21 @@ class TestFrontend(TestFrontendCommon):
         })
         self.start_pos_tour('test_guest_count_bank_payment')
 
+    def test_guest_count_defaults_to_table_seats(self):
+        """ A preset that does not force the guest selection keeps the table seats
+            as guest count, both on the receipt and on the stored order.
+        """
+        preset_eat_in = self.env['pos.preset'].create({'name': 'Eat in'})
+        self.main_pos_config.write({
+            'use_presets': True,
+            'default_preset_id': preset_eat_in.id,
+            'available_preset_ids': [(6, 0, preset_eat_in.ids)],
+        })
+        self.main_pos_config.open_ui()
+        self.start_pos_tour('test_guest_count_defaults_to_table_seats')
+        order = self.env['pos.order'].search([('table_id', '=', self.main_floor_table_5.id)], limit=1)
+        self.assertEqual(order.customer_count, self.main_floor_table_5.seats)
+
     def test_preset_future_timing_restaurant(self):
         """
         Test to set order preset future date inside a tour
@@ -675,6 +709,39 @@ class TestFrontend(TestFrontendCommon):
             'resource_calendar_id': resource_calendar
         })
         self.start_pos_tour('test_cancel_future_order')
+
+    def test_close_with_planned_order_later_today(self):
+        """
+        This test ensures that an order planned for later today is not cancelled when the PoS session is closed,
+        and that the session can be closed successfully.
+        """
+        self.main_pos_config.with_user(self.pos_user).open_ui()
+        session = self.main_pos_config.current_session_id
+        product = self.env['product.product'].search([('available_in_pos', '=', True)], limit=1)
+
+        planned_order = self.env['pos.order'].create({
+            'company_id': self.env.company.id,
+            'session_id': session.id,
+            'lines': [(0, 0, {
+                'name': "OL/0001",
+                'product_id': product.id,
+                'price_unit': 10.0,
+                'qty': 1.0,
+                'price_subtotal': 10.0,
+                'price_subtotal_incl': 10.0,
+            })],
+            'amount_tax': 0.0,
+            'amount_total': 10.0,
+            'amount_paid': 0.0,
+            'amount_return': 0.0,
+            'preset_time': fields.Datetime.now() + timedelta(hours=4),
+        })
+
+        session.close_session_from_ui()
+
+        self.assertEqual(session.state, 'closed')
+        self.assertEqual(planned_order.state, 'draft')
+        self.assertFalse(planned_order.session_id)
 
     def test_restaurant_preset_eatin_tour(self):
         self.pos_config.write({
@@ -718,6 +785,20 @@ class TestFrontend(TestFrontendCommon):
         self.pos_config.write({'default_screen': 'register'})
         self.pos_config.with_user(self.pos_user).open_ui()
         self.start_pos_tour('test_open_default_register_screen_config')
+
+    def test_show_default_with_register_screen(self):
+        """
+        Test that showDefault() correctly updates the selected order when
+        default_screen is 'register' (ProductScreen mode, not floor/tables).
+        Regression test: navigating via showDefault() must sync selectedOrderUuid
+        so that ProductScreen displays the correct order.
+        """
+        self.pos_config.write({
+            'default_screen': 'register',
+            'printer_ids': False,
+        })
+        self.pos_config.with_user(self.pos_user).open_ui()
+        self.start_pos_tour('test_show_default_with_register_screen')
 
     def test_fast_payment_validation_from_restaurant_product_screen_with_automatic_receipt_printing(self):
         self.env['pos.printer'].create({
@@ -795,6 +876,12 @@ class TestFrontend(TestFrontendCommon):
         order = self.pos_config.current_session_id.order_ids[0]
         self.assertEqual(order.lines[0].qty, 3)
 
+    def test_sync_lines_qty_update_ticket_screen(self):
+        self.pos_config.with_user(self.pos_user).open_ui()
+        self.start_pos_tour('test_sync_lines_qty_update_ticket_screen')
+        order = self.pos_config.current_session_id.order_ids[0]
+        self.assertEqual(order.lines[0].qty, 3, "Quantity should be updated to 3 in the backend")
+
     def test_sync_set_partner(self):
         self.pos_config.with_user(self.pos_user).open_ui()
         self.start_pos_tour('test_sync_set_partner')
@@ -827,8 +914,11 @@ class TestFrontend(TestFrontendCommon):
     def test_delete_line_release_table(self):
         self.pos_config.with_user(self.pos_user).open_ui()
         self.start_pos_tour('test_delete_line_release_table')
-        order = self.pos_config.current_session_id.order_ids[0]
+        order = self.pos_config.current_session_id.order_ids[1]
+        # opening a table at end of tour created a draft order
+        last_order = self.pos_config.current_session_id.order_ids[0]
         self.assertEqual(order.state, "cancel")
+        self.assertEqual(len(last_order.lines), 0)
 
     def test_combo_synchronisation(self):
         """This test checks that when a combo line is set as dirty, the parent combo line is also set as dirty.
@@ -925,3 +1015,31 @@ class TestFrontend(TestFrontendCommon):
         self.assertEqual(present_order.state, 'cancel')
         self.assertEqual(future_order.state, 'draft')
         self.assertEqual(future_order.session_id.id, False)
+
+    def test_floating_order_name_change_partner(self):
+        # Create partners
+        self.env['res.partner'].create([
+            {'name': 'Abigael', 'street': '123 Fake St'},
+            {'name': 'Deco Addict', 'street': '456 Real St'},
+        ])
+
+        # Create presets
+        self.preset_eat_in = self.env['pos.preset'].create({
+            'name': 'Eat in',
+        })
+        self.preset_delivery = self.env['pos.preset'].create({
+            'name': 'Delivery',
+            'identification': 'address',
+        })
+
+        self.main_pos_config.write({
+            'use_presets': True,
+            'default_preset_id': self.preset_eat_in.id,
+            'available_preset_ids': [(6, 0, [
+                self.preset_eat_in.id,
+                self.preset_delivery.id,
+            ])],
+        })
+
+        self.main_pos_config.with_user(self.pos_user).open_ui()
+        self.start_pos_tour('test_floating_order_name_change_partner', login="pos_user")

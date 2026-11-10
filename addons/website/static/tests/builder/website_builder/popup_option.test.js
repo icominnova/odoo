@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, test } from "@odoo/hoot";
-import { advanceTime, animationFrame, queryOne, waitFor } from "@odoo/hoot-dom";
-import { contains } from "@web/../tests/web_test_helpers";
+import { advanceTime, queryAll, queryOne, waitFor } from "@odoo/hoot-dom";
+import { contains, onRpc } from "@web/../tests/web_test_helpers";
 import {
     addPlugin,
     defineWebsiteModels,
@@ -43,6 +43,65 @@ describe("Popup options: empty page before edit", () => {
         // Check if the popup is visible.
         expect(":iframe .s_popup .modal").toHaveClass("show");
         expect(":iframe .s_popup .modal").toHaveStyle({ display: "block" });
+    });
+
+    test("dropping the popup snippet then previewing background colors keep it visible", async () => {
+        await insertCategorySnippet({ group: "content", snippet: "s_popup" });
+        expect(".o_add_snippet_dialog").toHaveCount(0);
+        expect(":iframe .s_popup .modal").toHaveStyle({ display: "block" });
+        await contains(":iframe .s_popup .modal").click();
+        await contains("[data-label=Backdrop] button.o_we_color_preview").click();
+        await contains("button.o_color_button[data-color='#FFFF00']").hover();
+        expect(":iframe .s_popup .modal").toHaveStyle({
+            display: "block",
+            "background-color": "rgb(255, 255, 0)",
+        });
+        await contains("button.o_color_button[data-color='#FF0000']").hover();
+        expect(":iframe .s_popup .modal").toHaveStyle({
+            display: "block",
+            "background-color": "rgb(255, 0, 0)",
+        });
+    });
+
+    test("selecting a theme backdrop color keeps the backdrop enabled", async () => {
+        await insertCategorySnippet({ group: "content", snippet: "s_popup" });
+        await contains(":iframe .s_popup .modal").click();
+        await contains("[data-label=Backdrop] button.o_we_color_preview").click();
+        await contains(".o-overlay-item [data-color='o-color-1']").click();
+
+        expect(":iframe .s_popup .modal").toHaveClass("bg-o-color-1");
+        expect("[data-action-id='setBackdrop'] .o-checkbox .form-check-input:checked").toHaveCount(
+            1
+        );
+    });
+
+    test("clearing the backdrop color keeps the backdrop enabled", async () => {
+        await insertCategorySnippet({ group: "content", snippet: "s_popup" });
+        await contains(":iframe .s_popup .modal").click();
+        await contains("[data-label=Backdrop] button.o_we_color_preview").click();
+        await contains("button[title='Reset']").click();
+
+        expect(queryOne(":iframe .s_popup .modal").style.backgroundColor).toBe("");
+        expect("[data-action-id='setBackdrop'] .o-checkbox .form-check-input:checked").toHaveCount(
+            1
+        );
+    });
+
+    test("closing a duplicated popup hides it", async () => {
+        await insertCategorySnippet({ group: "content", snippet: "s_popup" });
+        await contains(":iframe .s_popup .modal section").click();
+        await contains("[data-container-title='Popup'] .oe_snippet_clone").click();
+        await waitFor(":iframe .s_popup:nth-child(2)");
+        expect(":iframe .s_popup").toHaveCount(2);
+        const [originalPopupEl, clonedPopupEl] = queryAll(":iframe .s_popup");
+        await expectToTriggerEvent(clonedPopupEl.querySelector(".modal"), "hidden.bs.modal", () =>
+            contains(clonedPopupEl.querySelector(".js_close_popup")).click()
+        );
+        expect(clonedPopupEl.querySelector(".modal")).not.toBeVisible();
+        await expectToTriggerEvent(originalPopupEl.querySelector(".modal"), "hidden.bs.modal", () =>
+            contains(originalPopupEl.querySelector(".js_close_popup")).click()
+        );
+        expect(originalPopupEl.querySelector(".modal")).not.toBeVisible();
     });
 });
 describe("Popup options: popup in page before edit", () => {
@@ -92,6 +151,7 @@ describe("Popup options: popup in page before edit", () => {
         await advanceTime(5000);
         expect(":iframe .s_popup .modal").not.toBeVisible();
         expect(":iframe .s_popup").toHaveAttribute("data-invisible", "1");
+        expect(":iframe .s_popup").toHaveClass("d-none");
     });
 
     test("closing s_popup with the X button updates the invisible elements panel", async () => {
@@ -101,10 +161,12 @@ describe("Popup options: popup in page before edit", () => {
         await waitFor(":iframe .s_popup .modal", { visible: true });
         expect(".o_we_invisible_entry .fa").toHaveClass("fa-eye");
         expect(":iframe .s_popup .modal").toBeVisible();
+        expect(":iframe .s_popup").not.toHaveClass("d-none");
         await expectToTriggerEvent(":iframe .s_popup .modal", "hidden.bs.modal", () =>
             contains(":iframe .s_popup div.js_close_popup").click()
         );
         expect(":iframe .s_popup .modal").not.toBeVisible();
+        expect(":iframe .s_popup").toHaveClass("d-none");
         expect(".o_we_invisible_entry .fa").toHaveClass("fa-eye-slash");
         // Ensure that no mutations were registered in the history.
         // `addStep` return the created step, or false if there was no mutations
@@ -128,8 +190,39 @@ describe("Popup options: popup in page before edit", () => {
         expect(":iframe .s_popup .modal").not.toBeVisible();
         expect(editor.shared.history.canUndo()).toBe(true);
         await expectToTriggerEvent(":iframe .s_popup .modal", "shown.bs.modal", () => undo(editor));
+        await builder.waitSidebarUpdated();
         expect(".o_we_invisible_entry .fa").toHaveClass("fa-eye");
         expect(":iframe .s_popup .modal").toBeVisible();
+    });
+
+    test("changing background color of s_popup, then closing it, then undo, then redo keep it visible", async () => {
+        const editor = builder.getEditor();
+        await expectToTriggerEvent(":iframe .s_popup .modal", "shown.bs.modal", () =>
+            contains(".o_we_invisible_entry .fa-eye-slash").click()
+        );
+        await waitFor(":iframe .s_popup .modal", { visible: true });
+        expect(".o_we_invisible_entry .fa").toHaveClass("fa-eye");
+        expect(":iframe .s_popup .modal").toBeVisible();
+        await contains("[data-label=Backdrop] button.o_we_color_preview").click();
+        await contains("button.o_color_button[data-color='#FF0000']").click();
+        expect(":iframe .s_popup .modal").toHaveStyle({
+            display: "block",
+            "background-color": "rgb(255, 0, 0)",
+        });
+        await expectToTriggerEvent(":iframe .s_popup .modal", "hidden.bs.modal", () =>
+            contains(":iframe .s_popup div.js_close_popup").click()
+        );
+        expect(".o_we_invisible_entry .fa").toHaveClass("fa-eye-slash");
+        expect(":iframe .s_popup .modal").not.toBeVisible();
+        expect(editor.shared.history.canUndo()).toBe(true);
+        await expectToTriggerEvent(":iframe .s_popup .modal", "shown.bs.modal", () => undo(editor));
+        expect(".o_we_invisible_entry .fa").toHaveClass("fa-eye");
+        expect(":iframe .s_popup .modal").toBeVisible();
+        redo(editor);
+        expect(":iframe .s_popup .modal").toHaveStyle({
+            display: "block",
+            "background-color": "rgb(255, 0, 0)",
+        });
     });
 
     test("undoing something on a target outside s_popup closes it", async () => {
@@ -144,11 +237,11 @@ describe("Popup options: popup in page before edit", () => {
         await expectToTriggerEvent(":iframe .s_popup .modal", "hidden.bs.modal", () =>
             undo(builder.getEditor())
         );
+        await builder.waitSidebarUpdated();
         expect(".o_we_invisible_entry .fa").toHaveClass("fa-eye-slash");
     });
 
-    test("emptied s_popup are removed and the options are updated correctly", async () => {
-        const editor = builder.getEditor();
+    test("deleting the inner content of a popup does not delete the popup", async () => {
         await expectToTriggerEvent(":iframe .s_popup .modal", "shown.bs.modal", () =>
             contains(".o_we_invisible_entry .fa-eye-slash").click()
         );
@@ -158,44 +251,31 @@ describe("Popup options: popup in page before edit", () => {
 
         await contains(":iframe section p:contains('Popup content')").click();
         await contains("div[data-container-title='Block'] button.fa-trash").click();
-        expect(":iframe .s_popup").toHaveCount(0);
-        expect("div[data-container-title='Block']").toHaveCount(0);
-
-        expect(editor.shared.history.canUndo()).toBe(true);
-        undo(editor);
-        await animationFrame();
         expect(":iframe .s_popup").toHaveCount(1);
-        expect("div[data-container-title='Block']").toHaveCount(1);
+        expect(":iframe .s_popup .modal-content").toHaveClass("oe_structure_empty_message");
 
-        expect(editor.shared.history.canRedo()).toBe(true);
-        redo(editor);
-        await animationFrame();
-        expect(":iframe .s_popup").toHaveCount(0);
-        expect("div[data-container-title='Block']").toHaveCount(0);
+        // Expect the empty message to be removed if the popup is no longer empty
+        await contains(".o-snippets-tabs [data-name='blocks']").click();
+        await insertCategorySnippet({ group: "text", snippet: "s_title" });
+        expect(":iframe .s_popup .modal-content").not.toHaveClass("oe_structure_empty_message");
+    });
 
-        // Undo -> Hide popup -> Redo -> Undo -> Popup expected to be visible
-
-        expect(editor.shared.history.canUndo()).toBe(true);
-        undo(editor);
-        await animationFrame();
-        expect(":iframe .s_popup").toHaveCount(1);
-        expect("div[data-container-title='Block']").toHaveCount(1);
-
-        contains(".o_we_invisible_entry .fa-eye").click();
-        await animationFrame();
-        expect(".o_we_invisible_entry .fa").toHaveClass("fa-eye-slash");
-
-        expect(editor.shared.history.canRedo()).toBe(true);
-        redo(editor);
-        await animationFrame();
-        expect(":iframe .s_popup").toHaveCount(0);
-        expect("div[data-container-title='Block']").toHaveCount(0);
-
-        expect(editor.shared.history.canUndo()).toBe(true);
-        undo(editor);
-        await animationFrame();
-        expect(":iframe .s_popup").toHaveCount(1);
-        expect("div[data-container-title='Block']").toHaveCount(1);
+    test("saving an empty popup deletes the popup", async () => {
+        onRpc("ir.ui.view", "save", ({ args }) => {
+            expect.step("save");
+            expect(args[1]).not.toInclude("s_popup");
+            return true;
+        });
+        await expectToTriggerEvent(":iframe .s_popup .modal", "shown.bs.modal", () =>
+            contains(".o_we_invisible_entry .fa-eye-slash").click()
+        );
+        await waitFor(":iframe .s_popup .modal", { visible: true });
         expect(".o_we_invisible_entry .fa").toHaveClass("fa-eye");
+        expect(":iframe .s_popup .modal").toBeVisible();
+
+        await contains(":iframe section p:contains('Popup content')").click();
+        await contains(".overlay .oe_snippet_remove").click();
+        await contains(".o-snippets-top-actions button:contains(Save)").click();
+        expect.verifySteps(["save"]);
     });
 });

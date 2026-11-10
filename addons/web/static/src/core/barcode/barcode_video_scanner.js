@@ -6,6 +6,7 @@ import { loadJS } from "@web/core/assets";
 import { isVideoElementReady, buildZXingBarcodeDetector } from "./ZXingBarcodeDetector";
 import { CropOverlay } from "./crop_overlay";
 import { Component, onMounted, onWillStart, onWillUnmount, status, useRef, useState } from "@odoo/owl";
+import { isIOS } from "@web/core/browser/feature_detection";
 import { _t } from "@web/core/l10n/translation";
 import { pick } from "@web/core/utils/objects";
 
@@ -85,10 +86,22 @@ export class BarcodeVideoScanner extends Component {
                 this.props.onError(new Error(errorMessage));
                 return;
             }
+            if (isIOS()) {
+                // Since iOS 27, WebKit doesn't paint a MediaStream in a <video> created by
+                // cloning a <template> (which is how Owl renders blocks): re-import the node
+                // into the main document. See https://bugs.webkit.org/show_bug.cgi?id=320979
+                // TODO: remove once the WebKit fix is shipped.
+                const videoEl = document.importNode(this.videoPreviewRef.el);
+                this.videoPreviewRef.el.replaceWith(videoEl);
+                this.videoPreviewRef = { el: videoEl };
+            }
             this.videoPreviewRef.el.srcObject = this.stream;
             const ready = await this.isVideoReady();
             if (!ready) {
                 return;
+            }
+            if (this.videoPreviewRef.el.paused) {
+                await this.videoPreviewRef.el.play();
             }
             const { height, width } = getComputedStyle(this.videoPreviewRef.el);
             const divWidth = width.slice(0, -2);
@@ -98,6 +111,7 @@ export class BarcodeVideoScanner extends Component {
                 const [track] = tracks;
                 const settings = track.getSettings();
                 this.zoomRatio = Math.min(divWidth / settings.width, divHeight / settings.height);
+                this.addZoomSlider(track, settings);
             }
             this.detectorTimeout = setTimeout(this.detectCode.bind(this), 100);
         });
@@ -204,6 +218,23 @@ export class BarcodeVideoScanner extends Component {
             }
         }
         return newObject;
+    }
+
+    addZoomSlider(track, settings) {
+        const zoom = track.getCapabilities().zoom;
+        if (zoom?.min !== undefined && zoom?.max !== undefined) {
+            const inputElement = document.createElement("input");
+            inputElement.type = "range";
+            inputElement.min = zoom.min;
+            inputElement.max = zoom.max;
+            inputElement.step = zoom.step || 1;
+            inputElement.value = settings.zoom;
+            inputElement.classList.add("align-self-end", "m-5", "z-1");
+            inputElement.addEventListener("input", async (event) => {
+                await track?.applyConstraints({ advanced: [{ zoom: inputElement.value }] });
+            });
+            this.videoPreviewRef.el.parentElement.appendChild(inputElement);
+        }
     }
 }
 

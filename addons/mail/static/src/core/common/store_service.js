@@ -4,6 +4,7 @@ import {
     attClassObjectToString,
     cleanTerm,
     generateEmojisOnHtml,
+    getPartnerMentionName,
     prettifyMessageText,
 } from "@mail/utils/common/format";
 import { compareDatetime } from "@mail/utils/common/misc";
@@ -24,6 +25,7 @@ import { patch } from "@web/core/utils/patch";
 import { isMobileOS } from "@web/core/browser/feature_detection";
 import { getOrigin } from "@web/core/utils/urls";
 import { cookie } from "@web/core/browser/cookie";
+import { isMarkup, createDocumentFragmentFromContent } from "@web/core/utils/html";
 
 /**
  * @typedef {{isSpecial: boolean, channel_types: string[], label: string, displayName: string, description: string}} SpecialMention
@@ -459,7 +461,7 @@ export class Store extends BaseStore {
             this.env.services.ui.isSmall &&
             ev.target.closest(".o-mail-ChatWindow") &&
             link.href &&
-            !link.href.startsWith("#")
+            (model || !link.getAttribute("href").startsWith("#"))
         ) {
             let url;
             try {
@@ -492,7 +494,7 @@ export class Store extends BaseStore {
         navigator.serviceWorker?.addEventListener("message", ({ data = {} }) => {
             const { type, payload } = data;
             if (type === "notification-display-request") {
-                const { correlationId, model, res_id } = payload;
+                const { correlationId, model, res_id, message_id } = payload;
                 const thread = this.Thread.get({ model, id: res_id });
                 let isTabFocused;
                 try {
@@ -500,13 +502,16 @@ export class Store extends BaseStore {
                 } catch {
                     // assumes tab not focused: parent.document from iframe triggers CORS error
                 }
-                // Prevent duplicate inbox push notifications since they're already handled by
-                // `mail.message/inbox` bus notifications, and the `modelsHandleByPush` heuristic
-                // in `out_of_focus_service.js` isn't reliable enough to detect these cases.
-                const isInbox =
-                    this.store.self.main_user_id?.notification_type === "inbox" &&
-                    model !== "discuss.channel";
-                if ((isTabFocused && thread?.isDisplayed) || isInbox) {
+                const isMessageSeen =
+                    model === "discuss.channel"
+                        ? thread?.self_member_id?.seen_message_id?.id >= message_id
+                        : thread?.messages.some((m) => m.id === message_id) ||
+                          this["mail.message"].get(message_id)?.needaction === false;
+                if (
+                    this.self_partner?.im_status?.includes("busy") ||
+                    (isTabFocused && thread?.isDisplayed) ||
+                    isMessageSeen
+                ) {
                     navigator.serviceWorker.controller?.postMessage({
                         type: "notification-display-response",
                         payload: { correlationId },
@@ -588,20 +593,40 @@ export class Store extends BaseStore {
         { mentionedChannels = [], mentionedPartners = [], mentionedRoles = [], thread } = {}
     ) {
         const validMentions = {};
+        const segments = isMarkup(body)
+            ? Array.from(
+                  createDocumentFragmentFromContent(body).querySelectorAll("a"),
+                  (a) => a.textContent
+              )
+            : [body];
         validMentions.threads = mentionedChannels.filter((thread) => {
-            if (thread.parent_channel_id) {
-                return body.includes(
-                    `#${thread.parent_channel_id.displayName} > ${thread.displayName}`
-                );
-            }
-            return body.includes(`#${thread.displayName}`);
+            const mention = thread.parent_channel_id
+                ? `#${thread.parent_channel_id.displayName} > ${thread.displayName}`
+                : `#${thread.displayName}`;
+            return segments.some((segment) => segment.includes(mention));
         });
-        validMentions.partners = mentionedPartners.filter((partner) =>
-            body.includes(`@${thread?.getPersonaName(partner) ?? partner.name}`)
+        // Longest mention text first, so e.g. "@John" inside "@John Doe" isn't kept.
+        const mentionText = (partner) => `@${getPartnerMentionName(partner, thread)}`;
+        const remaining = [...segments];
+        const kept = new Set(
+            [...mentionedPartners]
+                .sort((p1, p2) => mentionText(p2).length - mentionText(p1).length)
+                .filter((partner) => {
+                    const text = mentionText(partner);
+                    const i = remaining.findIndex((s) => s.includes(text));
+                    if (i === -1) {
+                        return false;
+                    }
+                    remaining[i] = remaining[i].replace(text, " ".repeat(text.length));
+                    return true;
+                })
         );
-        validMentions.roles = mentionedRoles.filter((role) => body.includes(`@${role.name}`));
+        validMentions.partners = mentionedPartners.filter((partner) => kept.has(partner));
+        validMentions.roles = mentionedRoles.filter((role) =>
+            segments.some((segment) => segment.includes(`@${role.name}`))
+        );
         validMentions.specialMentions = this.specialMentions
-            .filter((special) => body.includes(`@${special.label}`))
+            .filter((special) => segments.some((segment) => segment.includes(`@${special.label}`)))
             .map((special) => special.label);
         return validMentions;
     }
@@ -678,6 +703,12 @@ export class Store extends BaseStore {
             params.canned_response_ids = cannedResponseIds;
         }
         return params;
+    }
+
+    notifySendFromMailbox(recordName) {
+        this.env.services.notification.add(_t('Message posted on "%s"', recordName), {
+            type: "info",
+        });
     }
 
     getNextTemporaryId() {
@@ -788,19 +819,20 @@ export class Store extends BaseStore {
      * @param {true|false|undefined} is_notification
      */
     async searchMessagesInThread(searchTerm, thread, before, is_notification) {
-        const { count, data, messages } = await rpc(thread.getFetchRoute(), {
+        const { data, messages } = await rpc(thread.getFetchRoute(), {
             ...thread.getFetchParams(),
             fetch_params: {
                 is_notification,
                 search_term: await prettifyMessageText(searchTerm), // formatted like message_post
                 before,
+                // one extra message to know whether there are more results
+                limit: this.FETCH_LIMIT + 1,
             },
         });
         this.insert(data);
         return {
-            count,
-            loadMore: messages.length === this.FETCH_LIMIT,
-            messages: this["mail.message"].insert(messages),
+            loadMore: messages.length > this.FETCH_LIMIT,
+            messages: this["mail.message"].insert(messages.slice(0, this.FETCH_LIMIT)),
         };
     }
 }

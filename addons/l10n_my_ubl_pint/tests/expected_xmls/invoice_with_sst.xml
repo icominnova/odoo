@@ -110,7 +110,7 @@
         <cbc:ID>T</cbc:ID>
         <cbc:Percent>10.0</cbc:Percent>
         <cac:TaxScheme>
-          <cbc:ID>VAT</cbc:ID>
+          <cbc:ID>GST</cbc:ID>
         </cac:TaxScheme>
       </cac:TaxCategory>
     </cac:TaxSubtotal>
@@ -130,13 +130,12 @@
     <cbc:InvoicedQuantity unitCode="C62">1.0</cbc:InvoicedQuantity>
     <cbc:LineExtensionAmount currencyID="EUR">2000.00</cbc:LineExtensionAmount>
     <cac:Item>
-      <cbc:Description>product_a</cbc:Description>
       <cbc:Name>product_a</cbc:Name>
       <cac:ClassifiedTaxCategory>
         <cbc:ID>T</cbc:ID>
         <cbc:Percent>10.0</cbc:Percent>
         <cac:TaxScheme>
-          <cbc:ID>VAT</cbc:ID>
+          <cbc:ID>GST</cbc:ID>
         </cac:TaxScheme>
       </cac:ClassifiedTaxCategory>
     </cac:Item>

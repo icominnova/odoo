@@ -5,6 +5,7 @@ import time
 from datetime import datetime
 
 from dateutil.relativedelta import relativedelta
+from werkzeug.exceptions import Forbidden
 from werkzeug.urls import url_encode
 
 from odoo import _, api, fields, models
@@ -63,7 +64,7 @@ class PaymentTransaction(models.Model):
         :rtype: dict
         """
         payload = {
-            'name': self.partner_name,
+            'name': self.partner_name.replace(',', ' ')[:50],
             'email': self.partner_email or '',
             'contact': self.partner_phone and self._validate_phone_number(self.partner_phone) or '',
             'fail_existing': '0',  # Don't throw an error if the customer already exists.
@@ -125,6 +126,7 @@ class PaymentTransaction(models.Model):
         payload = {
             'amount': converted_amount,
             'currency': self.currency_id.name,
+            'notes': {'reference': self.reference},
             **({'method': pm_code} if pm_code not in const.FALLBACK_PAYMENT_METHOD_CODES else {}),
         }
         if self.operation in ['online_direct', 'validation']:
@@ -216,6 +218,8 @@ class PaymentTransaction(models.Model):
 
         try:
             order_data = self._razorpay_create_order()
+            if not order_data:  # The order creation failed and the transaction was set in error.
+                return
             phone = self._validate_phone_number(self.partner_phone)
             customer_id, token_id = self.token_id.provider_ref.split(',')
             payload = {
@@ -253,7 +257,7 @@ class PaymentTransaction(models.Model):
             },
         }
         response_content = self._send_api_request(
-            'POST', f'payments/{self.provider_reference}/refund', json=payload
+            'POST', f'payments/{self.source_transaction_id.provider_reference}/refund', json=payload
         )
         response_content.update(entity_type='refund')
         self._process('razorpay', response_content)
@@ -266,7 +270,7 @@ class PaymentTransaction(models.Model):
         converted_amount = payment_utils.to_minor_currency_units(self.amount, self.currency_id)
         payload = {'amount': converted_amount, 'currency': self.currency_id.name}
         response_content = self._send_api_request(
-            'POST', f'payments/{self.provider_reference}/capture', json=payload
+            'POST', f'payments/{self.source_transaction_id.provider_reference}/capture', json=payload
         )
 
         # Process the capture request response.
@@ -375,6 +379,14 @@ class PaymentTransaction(models.Model):
             except ValidationError as e:
                 self._set_error(str(e))
                 return
+
+        notes = entity_data.get('notes')
+        reference = isinstance(notes, dict) and notes.get('reference')
+        tx_reference = self.source_transaction_id.reference or self.reference
+        # Skip refunds: only received from the API or the signed webhook
+        if entity_data.get('entity_type') != 'refund' and reference != tx_reference:
+            _logger.warning("Received payment data with incorrect reference")
+            raise Forbidden()
 
         # Update the provider reference.
         entity_id = entity_data.get('id')

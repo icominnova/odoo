@@ -12,6 +12,7 @@ from urllib.parse import urlparse
 from odoo import _, http, tools, SUPERUSER_ID
 from odoo.addons.html_editor.tools import get_video_url_data
 from odoo.exceptions import UserError, MissingError, AccessError
+from odoo.fields import Domain
 from odoo.http import request
 from odoo.tools.image import image_process, image_data_uri, binary_to_image, get_webp_size
 from odoo.tools.mimetypes import guess_mimetype
@@ -333,10 +334,22 @@ class HTML_Editor(http.Controller):
         if not attachment:
             # Find attachment by url. There can be multiple matches because of default
             # snippet images referencing the same image in /static/, so we limit to 1
-            attachment = request.env['ir.attachment'].search([
-                '|', ('url', '=like', src), ('url', '=like', '%s?%%' % src),
-                ('mimetype', 'in', list(SUPPORTED_IMAGE_MIMETYPES.keys())),
-            ], limit=1)
+            attachment = request.env['ir.attachment'].search(
+                Domain.AND([
+                    Domain.OR([
+                        Domain('url', '=like', src),
+                        Domain('url', '=like', '%s?%%' % src),
+                    ]),
+                    Domain.OR([
+                        Domain('mimetype', 'in', list(SUPPORTED_IMAGE_MIMETYPES.keys())),
+                        # Add mimetype with optional parameters:
+                        # e.g: `image/svg+xml; charset=utf-8`
+                        *[
+                            Domain('mimetype', '=like', image_mimetype + ';%')
+                            for image_mimetype in SUPPORTED_IMAGE_MIMETYPES
+                        ],
+                    ]),
+                ]), limit=1)
         if not attachment:
             return {
                 'attachment': False,
@@ -396,6 +409,9 @@ class HTML_Editor(http.Controller):
         Creates a modified copy of an attachment and returns its image_src to be
         inserted into the DOM.
         """
+        format_error_msg = _("Uploaded image's format is not supported. Try with: %s", ', '.join(SUPPORTED_IMAGE_MIMETYPES.values()))
+        if mimetype and mimetype not in SUPPORTED_IMAGE_MIMETYPES:
+            return {'error': format_error_msg}
         self._clean_context()
         attachment = request.env['ir.attachment'].browse(attachment.id)
         if not data and attachment.datas:
@@ -436,6 +452,11 @@ class HTML_Editor(http.Controller):
             attachment = attachment.sudo().copy(fields).sudo(False)
             # Override mimetype with SUPERUSER if it was forced to plain text
             if attachment.mimetype == 'text/plain' != fields['mimetype']:
+                mimetype_exempt = any(
+                    request.env.user.has_group(group) for group in attachment._get_mimetype_exempt_groups()
+                )
+                if not mimetype_exempt:
+                    request.env['ir.ui.view'].sudo(False).check_access_rights('write')
                 attachment.with_user(SUPERUSER_ID).mimetype = fields['mimetype']
 
         if alt_data:
@@ -553,6 +574,13 @@ class HTML_Editor(http.Controller):
                 ], limit=1)
                 if not attachment:
                     raise werkzeug.exceptions.NotFound()
+
+            if not re.match(r'^image\/svg\+xml(;.*)?$', attachment.mimetype):
+                return request.make_response(attachment.raw, [
+                    ('Content-type', attachment.mimetype),
+                    ('Cache-control', 'max-age=%s' % http.STATIC_CACHE_LONG),
+                ])
+
             svg = attachment.raw.decode('utf-8')
         else:
             # Used for compatibility
@@ -622,6 +650,8 @@ class HTML_Editor(http.Controller):
 
     @http.route(["/web_editor/generate_text", "/html_editor/generate_text"], type="jsonrpc", auth="user")
     def generate_text(self, prompt, conversation_history):
+        if not request.env.user._is_internal():
+            raise AccessError(_("Only internal users can use AI text generation."))
         try:
             IrConfigParameter = request.env['ir.config_parameter'].sudo()
             olg_api_endpoint = IrConfigParameter.get_param('html_editor.olg_api_endpoint', DEFAULT_OLG_ENDPOINT)
@@ -710,14 +740,16 @@ class HTML_Editor(http.Controller):
 
             record = model.browse(record_id)
 
-            result = {}
-            if 'description' in record:
-                result['description'] = html.fromstring(record.description).text_content() if record.description else ""
+            description_field = 'description' if 'description' in record else None
+            name_field = 'link_preview_name' if 'link_preview_name' in record else 'display_name'
 
-            if 'link_preview_name' in record:
-                result['link_preview_name'] = record.link_preview_name
-            elif 'display_name' in record:
-                result['display_name'] = record.display_name
+            record.read([field for field in (description_field, name_field) if field])
+
+            result = {name_field: record[name_field]}
+
+            if description_field:
+                description = record[description_field]
+                result[description_field] = html.fromstring(description).text_content() if description else ""
 
             return result
         except (MissingError) as e:

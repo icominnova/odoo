@@ -38,13 +38,15 @@ def after_commit(func):
         @self.env.cr.postcommit.add
         def called_after():
             db_registry = Registry(dbname)
-            with db_registry.cursor() as cr:
-                env = api.Environment(cr, uid, context)
-                try:
-                    func(self.with_env(env), *args, **kwargs)
-                except Exception as e:
-                    _logger.warning("Could not sync record now: %s" % self)
-                    _logger.exception(e)
+            try:
+                with db_registry.cursor() as cr:
+                    env = api.Environment(cr, uid, context)
+                    try:
+                        func(self.with_env(env), *args, **kwargs)
+                    except Exception:
+                        _logger.exception("Could not sync record now: %s", self)
+            except Exception:
+                _logger.exception("Could not commit sync of record: %s", self)
 
     return wrapped
 
@@ -200,6 +202,21 @@ class MicrosoftCalendarSync(models.AbstractModel):
             new_recurrence_odoo.base_event_id = new_recurrence_odoo.calendar_event_ids[0] if new_recurrence_odoo.calendar_event_ids else False
             new_recurrence |= new_recurrence_odoo
 
+        # Outlook can turn an existing single event into a recurring one in place:
+        # the seriesMaster then keeps the iCalUId of the former single event. Those
+        # single events are now represented by the recurrences, so remove them to
+        # avoid leaving duplicates next to the recurrences' first occurrences.
+        # UIDs may be missing for birthday events; empty UIDs would match unrelated, unsynchronized events.
+        recurrence_uids = [uid for uid in new_recurrence.mapped('ms_universal_event_id') if uid]
+        if recurrence_uids:
+            duplicate_singles = self.env['calendar.event'].search([
+                ('ms_universal_event_id', 'in', recurrence_uids),
+                ('recurrence_id', '=', False),
+            ])
+            duplicate_singles.microsoft_id = False
+            duplicate_singles.ms_universal_event_id = False
+            duplicate_singles.with_context(dont_notify=True).unlink()
+
         # --- update events in existing recurrences ---
         # Important note:
         # To map existing recurrences with events to update, we must use the universal id
@@ -293,9 +310,10 @@ class MicrosoftCalendarSync(models.AbstractModel):
         synced_events |= updated_events
 
         # remove cancelled events and recurrences
+        # Deleted events may be returned without an iCalUId.
         cancelled_recurrences = self.env['calendar.recurrence'].search([
             '|',
-            ('ms_universal_event_id', 'in', cancelled.uids),
+            ('ms_universal_event_id', 'in', [uid for uid in cancelled.uids if uid]),
             ('microsoft_id', 'in', cancelled.ids),
         ])
         cancelled_events = self.browse([

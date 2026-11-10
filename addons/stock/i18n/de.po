@@ -10,14 +10,15 @@
 # Niyas Raphy, 2023
 # Larissa Manderfeld, 2023
 # Stefan Reisich <nafex@gmx.net>, 2023
-# "Dylan Kiss (dyki)" <dyki@odoo.com>, 2025.
+# "Dylan Kiss (dyki)" <dyki@odoo.com>, 2025, 2026.
 # "Larissa Manderfeld (lman)" <lman@odoo.com>, 2025, 2026.
+# "Andreas Brandl (1st Group SE)" <a.brandl@1st.group>, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-02-06 18:35+0000\n"
-"PO-Revision-Date: 2026-02-13 09:18+0000\n"
+"POT-Creation-Date: 2026-07-24 17:38+0000\n"
+"PO-Revision-Date: 2026-09-09 08:11+0000\n"
 "Last-Translator: \"Larissa Manderfeld (lman)\" <lman@odoo.com>\n"
 "Language-Team: German <https://translate.odoo.com/projects/odoo-19/stock/de/>"
 "\n"
@@ -26,7 +27,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Weblate 5.14.3\n"
+"X-Generator: Weblate 2026.8.1\n"
 
 #. module: stock
 #. odoo-python
@@ -89,6 +90,16 @@ msgid ""
 msgstr ""
 "\n"
 "(%(serial_number)s) existiert in %(location)s"
+
+#. module: stock
+#. odoo-python
+#: code:addons/stock/models/stock_move.py:0
+msgid ""
+"\n"
+"Package: %s"
+msgstr ""
+"\n"
+"Paket: %s"
 
 #. module: stock
 #. odoo-python
@@ -218,8 +229,8 @@ msgid ""
 "%(operations)s have default source or destination locations within warehouse "
 "%(warehouse)s, therefore you cannot archive it."
 msgstr ""
-"%(operations)s haben Standardquell- oder -ziellagerorte im Lager %"
-"(warehouse)s, daher können Sie sie nicht archivieren."
+"%(operations)s haben Standardquell- oder -ziellagerorte im Lager %(warehouse)"
+"s, daher können Sie sie nicht archivieren."
 
 #. module: stock
 #. odoo-python
@@ -481,52 +492,9 @@ msgid "1 Week"
 msgstr "1 Woche"
 
 #. module: stock
-#: model_terms:ir.ui.view,arch_db:stock.report_delivery_document
-#: model_terms:ir.ui.view,arch_db:stock.stock_report_delivery_aggregated_move_lines
-msgid "1.00"
-msgstr "1,00"
-
-#. module: stock
-#: model_terms:ir.ui.view,arch_db:stock.report_package_barcode_content
-msgid "12.0"
-msgstr "12.0"
-
-#. module: stock
-#: model_terms:ir.ui.view,arch_db:stock.report_generic_barcode
-msgid "1234567890"
-msgstr "1234567890"
-
-#. module: stock
-#: model_terms:ir.ui.view,arch_db:stock.report_lot_label
-msgid "12345678901"
-msgstr "12345678901"
-
-#. module: stock
 #: model:ir.model.fields.selection,name:stock.selection__stock_picking_type__product_label_format__2x7xprice
 msgid "2 x 7 with price"
 msgstr "2 x 7 mit Preis"
-
-#. module: stock
-#: model_terms:ir.ui.view,arch_db:stock.report_package_barcode
-msgid "2021-09-01"
-msgstr "2021-09-01"
-
-#. module: stock
-#: model_terms:ir.ui.view,arch_db:stock.report_package_barcode_small
-msgid "2023-01-01"
-msgstr "2023-01-01"
-
-#. module: stock
-#: model_terms:ir.ui.view,arch_db:stock.report_picking
-msgid "2023-09-24"
-msgstr "2023-09-24"
-
-#. module: stock
-#: model_terms:ir.ui.view,arch_db:stock.report_delivery_document
-#: model_terms:ir.ui.view,arch_db:stock.report_package_barcode_content
-#: model_terms:ir.ui.view,arch_db:stock.report_picking
-msgid "3.00"
-msgstr "3,00"
 
 #. module: stock
 #: model:ir.model.fields.selection,name:stock.selection__lot_label_layout__print_format__4x12
@@ -553,11 +521,6 @@ msgstr "4 x 12 mit Preis"
 #: model:ir.model.fields.selection,name:stock.selection__stock_picking_type__product_label_format__4x7xprice
 msgid "4 x 7 with price"
 msgstr "4 x 7 mit Preis"
-
-#. module: stock
-#: model_terms:ir.ui.view,arch_db:stock.report_package_barcode_content
-msgid "54326786758"
-msgstr "54326786758"
 
 #. module: stock
 #: model_terms:ir.ui.view,arch_db:stock.stock_warn_insufficient_qty_form_view
@@ -655,8 +618,8 @@ msgid ""
 msgstr ""
 "<div style=\"margin: 0px; padding: 0px;\">\n"
 "    <p style=\"margin: 0px; padding: 0px; font-size: 13px;\">\n"
-"        Hallo <t t-out=\"object.partner_id.name or ''\">Brandon Freeman</t>,"
-"<br/><br/>\n"
+"        Guten Tag <t t-out=\"object.partner_id.name or ''\">Brandon Freeman</"
+"t>,<br/><br/>\n"
 "       wir freuen uns, Ihnen mitteilen zu können, dass Ihre Bestellung "
 "versandt wurde.\n"
 "        <t t-if=\"hasattr(object, 'carrier_tracking_ref') and "
@@ -667,8 +630,8 @@ msgstr ""
 "                <t t-set=\"multiple_carrier_tracking\" t-"
 "value=\"object.get_multiple_carrier_tracking()\"/>\n"
 "                <t t-if=\"multiple_carrier_tracking\">\n"
-"                    <t t-foreach=\"multiple_carrier_tracking\" t-"
-"as=\"line\">\n"
+"                    <t t-foreach=\"multiple_carrier_tracking\" t-as=\"line\">"
+"\n"
 "                        <br/><a t-att-href=\"line[1]\" target=\"_blank\" t-"
 "out=\"line[0] or ''\"/>\n"
 "                    </t>\n"
@@ -690,8 +653,8 @@ msgstr ""
 "        <t t-if=\"user.signature\" data-o-mail-quote-container=\"1\">\n"
 "            <br/>\n"
 "            <div data-o-mail-quote=\"1\">--<br data-o-mail-quote=\"1\"/><t t-"
-"out=\"user.signature or ''\" data-o-mail-quote=\"1\">Mitchell Admin</t></"
-"div>\n"
+"out=\"user.signature or ''\" data-o-mail-quote=\"1\">Mitchell Admin</t></div>"
+"\n"
 "        </t>\n"
 "    </p>\n"
 "</div>\n"
@@ -702,7 +665,8 @@ msgstr ""
 msgid ""
 "<i class=\"fa fa-clock-o\" role=\"img\" aria-label=\"Date\" title=\"Date\"/>"
 msgstr ""
-"<i class=\"fa fa-clock-o\" role=\"img\" aria-label=\"Date\" title=\"Date\"/>"
+"<i class=\"fa fa-clock-o\" role=\"img\" aria-label=\"Datum\" "
+"title=\"Datum\"/>"
 
 #. module: stock
 #: model_terms:ir.ui.view,arch_db:stock.report_picking
@@ -868,12 +832,6 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:stock.product_view_kanban_catalog
 msgid "<span class=\"text-muted small\"> On Hand</span>"
 msgstr "<span class=\"text-muted small\"> Vorrätig</span>"
-
-#. module: stock
-#: model_terms:ir.ui.view,arch_db:stock.product_form_view_procurement_button
-#: model_terms:ir.ui.view,arch_db:stock.product_template_form_view_procurement_button
-msgid "<span groups=\"!uom.group_uom\">On Hand</span>"
-msgstr "<span groups=\"!uom.group_uom\">Vorrätig</span>"
 
 #. module: stock
 #: model_terms:ir.ui.view,arch_db:stock.res_config_settings_view_form
@@ -2171,8 +2129,7 @@ msgstr "Leeren"
 #. odoo-javascript
 #: code:addons/stock/static/src/views/picking_form/stock_move_product_label.xml:0
 msgid "Click or press enter to add a description"
-msgstr ""
-"Auf Enter klicken oder Enter drücken, um eine Beschreibung hinzuzufügen"
+msgstr "Auf Enter klicken oder Enter drücken, um eine Beschreibung hinzuzufügen"
 
 #. module: stock
 #: model_terms:ir.ui.view,arch_db:stock.view_stock_replenishment_info
@@ -2558,7 +2515,7 @@ msgstr "Bestand erstellen"
 #. module: stock
 #: model:ir.model,website_form_label:stock.model_res_partner
 msgid "Create a Customer"
-msgstr "Kunden erstellen"
+msgstr "Kunde erstellen"
 
 #. module: stock
 #: model_terms:ir.ui.view,arch_db:stock.view_backorder_confirmation
@@ -2870,7 +2827,7 @@ msgstr "DHL-Express-Konnektor"
 #. odoo-javascript
 #: code:addons/stock/static/src/widgets/json_widget.xml:0
 msgid "Daily Demand:"
-msgstr "Tägliche Bedarf:"
+msgstr "Tagesbedarf:"
 
 #. module: stock
 #. odoo-javascript
@@ -3122,8 +3079,8 @@ msgstr ""
 "Geringste Anzahl an Paketen: Der Bedarf wird mit der geringsten Anzahl "
 "Paketen gedeckt.\n"
 "FEFO: Produkte/Lose mit dem nächstgelegenen Entnahmedatum werden zuerst "
-"entnommen (die Verfügbarkeit dieser Methode hängt von der Einstellung "
-"„Verfallsdaten“ ab)."
+"entnommen (die Verfügbarkeit dieser Methode hängt von der Einstellung „"
+"Verfallsdaten“ ab)."
 
 #. module: stock
 #: model:ir.model.fields,field_description:stock.field_stock_move__delay_alert_date
@@ -3790,8 +3747,8 @@ msgstr ""
 "Genießen Sie zügige Abläufe mit der Odoo-Barcode-App. Sie ist blitzschnell "
 "und funktioniert auch ohne stabile Internetverbindung. Sie unterstützt alle "
 "Abläufe: Bestandsaufnahme, Stapelkommissionierung, Verschieben von Losen "
-"oder Paletten, Überprüfung von niedrigem Bestand usw. Rufen Sie das Menü "
-"„Apps“ auf, um die Barcode-Schnittstelle zu aktivieren."
+"oder Paletten, Überprüfung von niedrigem Bestand usw. Rufen Sie das Menü „"
+"Apps“ auf, um die Barcode-Schnittstelle zu aktivieren."
 
 #. module: stock
 #: model:ir.model.fields,help:stock.field_product_product__tracking
@@ -3836,8 +3793,8 @@ msgid ""
 "            physical, partner or virtual locations."
 msgstr ""
 "Jeder Bestandsvorgang in Odoo bewegt die Produkte von einem \n"
-"            Lagerort zum anderen. Zum Beispiel, wenn Sie Produkte von "
-"einem \n"
+"            Lagerort zum anderen. Zum Beispiel, wenn Sie Produkte von einem "
+"\n"
 "            Lieferanten erhalten, wird Odoo Produkte aus dem \n"
 "            Lieferantenstandort an den Lagerort verschieben. Jeder Bericht "
 "kann an physischen,\n"
@@ -4143,6 +4100,7 @@ msgid "Full Package Name"
 msgstr "Vollständiger Paketname"
 
 #. module: stock
+#: model_terms:ir.ui.view,arch_db:stock.search_product_lot_filter
 #: model_terms:ir.ui.view,arch_db:stock.view_picking_internal_search
 msgid "Future Activities"
 msgstr "Anstehende Aktivitäten"
@@ -4327,8 +4285,7 @@ msgstr "Horizont"
 #. module: stock
 #: model:ir.model.fields,help:stock.field_stock_picking_type__reservation_method
 msgid "How products in transfers of this operation type should be reserved."
-msgstr ""
-"Wie Produkte in Bewegungen dieser Vorgangsart reserviert werden sollen."
+msgstr "Wie Produkte in Bewegungen dieser Vorgangsart reserviert werden sollen."
 
 #. module: stock
 #: model:ir.model.fields,field_description:stock.field_barcode_rule__id
@@ -5163,7 +5120,7 @@ msgstr "Schmuck (2,20\" x 0,50\")"
 #. module: stock
 #: model_terms:ir.ui.view,arch_db:stock.report_delivery_document
 msgid "John Doe"
-msgstr "John Doe"
+msgstr "Max Mustermann"
 
 #. module: stock
 #: model:ir.model.fields,field_description:stock.field_stock_replenishment_info__json_lead_days
@@ -5408,6 +5365,7 @@ msgid "Late"
 msgstr "Verspätet"
 
 #. module: stock
+#: model_terms:ir.ui.view,arch_db:stock.search_product_lot_filter
 #: model_terms:ir.ui.view,arch_db:stock.view_picking_internal_search
 msgid "Late Activities"
 msgstr "Verspätete Aktivitäten"
@@ -6053,6 +6011,7 @@ msgid "Multiple destinations"
 msgstr "Mehrere Ziele"
 
 #. module: stock
+#: model_terms:ir.ui.view,arch_db:stock.search_product_lot_filter
 #: model_terms:ir.ui.view,arch_db:stock.view_picking_internal_search
 msgid "My Activities"
 msgstr "Meine Aktivitäten"
@@ -6396,7 +6355,7 @@ msgstr "November"
 #: model:ir.model.fields,field_description:stock.field_stock_picking__message_needaction_counter
 #: model:ir.model.fields,field_description:stock.field_stock_scrap__message_needaction_counter
 msgid "Number of Actions"
-msgstr "Anzahl der Aktionen"
+msgstr "Anzahl Aktionen"
 
 #. module: stock
 #. odoo-javascript
@@ -6481,7 +6440,9 @@ msgstr "Bürostuhl"
 #: code:addons/stock/static/src/stock_forecasted/forecasted_header.xml:0
 #: model:ir.model.fields,field_description:stock.field_stock_quant__on_hand
 #: model:ir.model.fields,field_description:stock.field_stock_warehouse_orderpoint__qty_on_hand
+#: model_terms:ir.ui.view,arch_db:stock.product_form_view_procurement_button
 #: model_terms:ir.ui.view,arch_db:stock.product_product_stock_tree
+#: model_terms:ir.ui.view,arch_db:stock.product_template_form_view_procurement_button
 #: model_terms:ir.ui.view,arch_db:stock.search_product_lot_filter
 #: model_terms:ir.ui.view,arch_db:stock.view_stock_product_template_tree
 #: model_terms:ir.ui.view,arch_db:stock.view_stock_product_tree
@@ -6862,6 +6823,7 @@ msgstr "Verpackungstyp"
 #. module: stock
 #: model_terms:ir.ui.view,arch_db:stock.report_delivery_document
 #: model_terms:ir.ui.view,arch_db:stock.stock_report_delivery_aggregated_move_lines
+#: model_terms:ir.ui.view,arch_db:stock.stock_report_delivery_has_serial_move_line
 msgid "Pack of 6"
 msgstr "6er-Pack"
 
@@ -8794,7 +8756,7 @@ msgstr "Geplantes Datum"
 #. module: stock
 #: model:ir.model.fields,field_description:stock.field_stock_request_count__inventory_date
 msgid "Scheduled at"
-msgstr "Geplant um"
+msgstr "Geplant am"
 
 #. module: stock
 #: model:ir.model.fields,help:stock.field_stock_move__date
@@ -9117,8 +9079,8 @@ msgstr ""
 "Nächstgelegener Lagerort: Die Produkte/Lose, die dem Zielplatz am nächsten "
 "sind, werden zuerst entnommen.\n"
 "FEFO: Produkte/Lose mit dem nächstgelegenen Entnahmedatum werden zuerst "
-"entnommen (die Verfügbarkeit dieser Methode hängt von der Einstellung "
-"„Verfallsdaten“ ab).\n"
+"entnommen (die Verfügbarkeit dieser Methode hängt von der Einstellung „"
+"Verfallsdaten“ ab).\n"
 "Geringste Anzahl an Paketen: FIFO, aber mit der geringstmöglichen Anzahl von "
 "Paketen, wenn es mehrere Pakete mit demselben Produkt gibt."
 
@@ -9554,7 +9516,7 @@ msgstr "Lagerbuchungen"
 #: model_terms:ir.ui.view,arch_db:stock.view_move_graph
 #: model_terms:ir.ui.view,arch_db:stock.view_move_pivot
 msgid "Stock Moves Analysis"
-msgstr "Statistik zu Lagerbuchungen"
+msgstr "Analyse der Lagerbuchungen"
 
 #. module: stock
 #: model:ir.model.fields,field_description:stock.field_stock_move_line__move_id
@@ -9938,8 +9900,7 @@ msgstr "Der Lieferrückstand %s wurde erstellt."
 #. module: stock
 #: model:ir.model.constraint,message:stock.constraint_stock_location_barcode_company_uniq
 msgid "The barcode for a location must be unique per company!"
-msgstr ""
-"Der Barcode eines Unternehmen für einen Lagerort sollte eindeutig sein!"
+msgstr "Der Barcode eines Unternehmen für einen Lagerort sollte eindeutig sein!"
 
 #. module: stock
 #: model_terms:res.company,invoice_terms_html:stock.res_company_1
@@ -10097,8 +10058,8 @@ msgid ""
 "The parent location that includes this location. Example : The 'Dispatch "
 "Zone' is the 'Gate 1' parent location."
 msgstr ""
-"Der übergeordnete Lagerort, der diesen Lagerort enthält. Beispiel: Die "
-"„Versandzone“ ist der übergeordnete Ort von „Tor 1“."
+"Der übergeordnete Lagerort, der diesen Lagerort enthält. Beispiel: Die „"
+"Versandzone“ ist der übergeordnete Ort von „Tor 1“."
 
 #. module: stock
 #: model:ir.model.fields,help:stock.field_stock_warehouse_orderpoint__replenishment_uom_id
@@ -10466,7 +10427,7 @@ msgid ""
 "location for stock moves generated by manufacturing orders."
 msgstr ""
 "Dieser Lagerort wird anstelle des Standardlagerortes als Quellort für "
-"Lagerbuchungen verwendet, die durch Fertigungsaufträge erzeugt werden."
+"Lagerbuchungen verwendet, die durch Fertigungsaufträge generiert werden."
 
 #. module: stock
 #: model:ir.model.fields,help:stock.field_product_product__property_stock_inventory
@@ -10476,7 +10437,7 @@ msgid ""
 "location for stock moves generated when you do an inventory."
 msgstr ""
 "Dieser Lagerort wird anstelle des Standardlagerortes als Quellort für "
-"Lagerbuchungen verwendet, die bei einer Inventur erzeugt werden."
+"Lagerbuchungen verwendet, die bei einer Inventur generiert werden."
 
 #. module: stock
 #: model:ir.model.fields,help:stock.field_product_product__responsible_id
@@ -10614,6 +10575,7 @@ msgid "Today"
 msgstr "Heute"
 
 #. module: stock
+#: model_terms:ir.ui.view,arch_db:stock.search_product_lot_filter
 #: model_terms:ir.ui.view,arch_db:stock.view_picking_internal_search
 msgid "Today Activities"
 msgstr "Heutige Aktivitäten"
@@ -10941,8 +10903,8 @@ msgid ""
 "Unavailable Serial numbers. Please correct the serial numbers encoded: %"
 "(serial_numbers_to_locations)s"
 msgstr ""
-"Nichtverfügbare Seriennummern. Bitte korrigieren Sie die verschlüsselten "
-"Seriennummern: %(serial_numbers_to_locations)s"
+"Seriennummern nicht verfügbar. Korrigieren Sie die erfassten Seriennummern: %"
+"(serial_numbers_to_locations)s"
 
 #. module: stock
 #. odoo-javascript
@@ -11440,8 +11402,8 @@ msgid ""
 "When checked, the route will be selectable in the Inventory tab of the "
 "Product form."
 msgstr ""
-"Wenn diese Option aktiviert ist, kann die Route auf der Registerkarte "
-"„Lager“ des Produktformulars ausgewählt werden."
+"Wenn diese Option aktiviert ist, kann die Route auf der Registerkarte „Lager"
+"“ des Produktformulars ausgewählt werden."
 
 #. module: stock
 #: model:ir.model.fields,help:stock.field_stock_route__package_type_selectable
@@ -11630,7 +11592,7 @@ msgid ""
 "lead to inconsistencies in your stock."
 msgstr ""
 "Sie dürfen das mit einer Serien- oder Losnummer verknüpfte Produkt nicht "
-"ändern, wenn bereits einige Lagerbewegungen mit dieser Nummer angelegt "
+"ändern, wenn bereits einige Lagerbuchungen mit dieser Nummer angelegt "
 "wurden. Dies würde zu Inkonsistenzen in Ihrem Bestand führen."
 
 #. module: stock
@@ -11776,9 +11738,9 @@ msgid ""
 "You cannot cancel a stock move that has been set to 'Done'. Create a return "
 "in order to reverse the moves which took place."
 msgstr ""
-"Sie können keine Lagerbewegungen stornieren, die als „Erledigt“ markiert "
-"wurden. Erstellen Sie eine Retoure, um die erfolgten Buchungen rückgängig zu "
-"machen."
+"Sie können keine Lagerbuchungen stornieren, die als „Erledigt“ markiert "
+"wurden. Erstellen Sie eine Retoure, um die bereits getätigten Buchungen "
+"rückgängig zu machen."
 
 #. module: stock
 #. odoo-python
@@ -12420,11 +12382,46 @@ msgid "units"
 msgstr "Einheiten"
 
 #. module: stock
+#: model_terms:ir.ui.view,arch_db:stock.view_stock_replenishment_info
+msgid "x"
+msgstr "x"
+
+#. module: stock
 #: model:mail.template,subject:stock.mail_template_data_delivery_confirmation
 msgid ""
 "{{ object.company_id.name }} Delivery Order (Ref {{ object.name or 'n/a' }})"
 msgstr ""
 "{{ object.company_id.name }} Lieferauftrag (Ref {{ object.name or 'k. A.' }})"
+
+#~ msgid "1.00"
+#~ msgstr "1,00"
+
+#~ msgid "12.0"
+#~ msgstr "12.0"
+
+#~ msgid "1234567890"
+#~ msgstr "1234567890"
+
+#~ msgid "12345678901"
+#~ msgstr "12345678901"
+
+#~ msgid "2021-09-01"
+#~ msgstr "2021-09-01"
+
+#~ msgid "2023-01-01"
+#~ msgstr "2023-01-01"
+
+#~ msgid "2023-09-24"
+#~ msgstr "2023-09-24"
+
+#~ msgid "3.00"
+#~ msgstr "3,00"
+
+#~ msgid "54326786758"
+#~ msgstr "54326786758"
+
+#~ msgid "<span groups=\"!uom.group_uom\">On Hand</span>"
+#~ msgstr "<span groups=\"!uom.group_uom\">Vorrätig</span>"
 
 #~ msgid "<strong>Customer Address</strong>"
 #~ msgstr "<strong>Kundenadresse</strong>"

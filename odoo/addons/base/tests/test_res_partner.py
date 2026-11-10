@@ -9,7 +9,7 @@ from odoo.addons.base.models.res_partner import ResPartner
 from odoo.addons.base.tests.common import TransactionCaseWithUserDemo
 from odoo.exceptions import AccessError, RedirectWarning, UserError, ValidationError
 from odoo.tests import Form
-from odoo.tests.common import new_test_user, tagged, TransactionCase, users
+from odoo.tests.common import new_test_user, tagged, TransactionCase, users, warmup
 
 # samples use effective TLDs from the Mozilla public suffix
 # list at http://publicsuffix.org
@@ -238,6 +238,18 @@ class TestPartner(TransactionCaseWithUserDemo):
         self.assertEqual(first_child.lang, 'de_DE')
         self.assertEqual(second_child.lang, 'fr_FR')
 
+    def test_create_ignores_default_user_ids(self):
+        """ default_user_ids is meant for other models (e.g. the 'All Tasks'
+        action), creating a partner with it must not re-link the user. """
+        user = self.user_demo
+        user_partner = user.partner_id
+        partner_id, _name = self.env['res.partner'].with_context(
+            default_user_ids=[Command.link(user.id)],
+        ).name_create('Imported Customer')
+        partner = self.env['res.partner'].browse(partner_id)
+        self.assertFalse(partner.user_ids)
+        self.assertEqual(user.partner_id, user_partner)
+
     def test_name_create(self):
         res_partner = self.env['res.partner']
         for text, expected_name, expected_mail in SAMPLES:
@@ -263,6 +275,27 @@ class TestPartner(TransactionCaseWithUserDemo):
         )
         self.assertEqual(partner.name, 'Raoulette Vachette')
         self.assertEqual(partner.email, 'John.Wick@example.com')
+
+        # ensure default_lang and lang in context are properly handled
+        partner = self.env['res.partner'].browse(
+            self.env['res.partner'].with_context(
+                default_email='John.Wick@example.com',
+                default_lang='en_US',
+                lang=False
+            ).name_create('Raoulette Vachette')[0]
+        )
+        self.assertEqual(partner.name, 'Raoulette Vachette')
+        self.assertEqual(partner.lang, 'en_US')
+
+        partner = self.env['res.partner'].browse(
+            self.env['res.partner'].with_context(
+                default_email='John.Wick@example.com',
+                default_lang=False,
+                lang='en_US'
+            ).name_create('Raoulette Vachette')[0]
+        )
+        self.assertEqual(partner.name, 'Raoulette Vachette')
+        self.assertEqual(partner.lang, 'en_US')
 
     def test_name_search(self):
         res_partner = self.env['res.partner']
@@ -725,6 +758,28 @@ class TestPartnerAddressCompany(TransactionCase):
         self.assertEqual(leaf111.address_get([]),
                         {'contact': branch11.id}, 'Invalid address resolution, branch11 should now be contact')
 
+    @warmup
+    def test_address_get_fetch_optimization(self):
+        """Check that address_get prefetches required fields to reduce memory.
+
+        The fetch() call ensures type/child_ids/is_company/parent_id are loaded
+        in batch. If a new field is accessed without adding it to fetch(), this
+        test will fail due to extra queries.
+
+        Fix: update fetch() in res_partner.py address_get() around L1139.
+        """
+        res_partner = self.env['res.partner']
+        company = res_partner.create({'name': 'Company', 'is_company': True})
+        res_partner.create([
+            {'name': 'Invoice', 'parent_id': company.id, 'type': 'invoice'},
+            {'name': 'Delivery', 'parent_id': company.id, 'type': 'delivery'},
+            {'name': 'Contact 1', 'parent_id': company.id, 'type': 'contact'},
+            {'name': 'Contact 2', 'parent_id': company.id, 'type': 'contact'},
+        ])
+        self.env.invalidate_all()
+        with self.assertQueryCount(4):
+            company.address_get(['delivery', 'invoice', 'contact'])
+
     @users('employee')
     def test_address_parent_company_creation(self):
         """ When creating parent company, it should be populated with information
@@ -977,6 +1032,30 @@ class TestPartnerAddressCompany(TransactionCase):
         self.assertFalse(individual.industry_id)
         self.assertFalse(individual.vat)
 
+    @warmup
+    def test_fields_sync_fetch_optimization(self):
+        """Check that _fields_sync prefetches required fields to reduce memory.
+
+        The fetch() call ensures parent_id/type/commercial_partner_id are loaded
+        in batch. If a new field is accessed without adding it to fetch(), this
+        test will fail due to extra queries.
+
+        Fix: update fetch() in res_partner.py _fields_sync() around L773.
+        """
+        company = self.env['res.partner'].create({
+            'is_company': True,
+            'name': 'Test Company',
+            'vat': 'BE0123456789',
+            **self.test_address_values,
+        })
+        contacts = self.env['res.partner'].create([
+            {'name': f'Contact {i}', 'parent_id': company.id}
+            for i in range(5)
+        ])
+        self.env.invalidate_all()
+        with self.assertQueryCount(7):
+            contacts.write({'street': 'New Street'})
+
     def test_company_dependent_commercial_sync(self):
         ResPartner = self.env['res.partner']
 
@@ -1102,6 +1181,30 @@ class TestPartnerAddressCompany(TransactionCase):
         })
         record = self.env['res.partner'].with_user(user).search([('id', '=', partner.id)])
         self.assertEqual(record.id, partner.id)
+
+    def test_commercial_field_sync_move_contact(self):
+        company_a, company_b, company_c = self.env['res.partner'].create([
+            {'name': 'Company A', 'is_company': True, 'vat': 'BECOMPANYA'},
+            {'name': 'Company B', 'is_company': True},
+            {'name': 'Company C', 'is_company': True, 'vat': 'BECOMPANYC'},
+        ])
+        contact_b = self.env['res.partner'].create({'name': 'B Employee', 'parent_id': company_b.id})
+        contact_a, contact_c = self.env['res.partner'].create([
+            {'name': 'Contact A', 'parent_id': company_a.id},
+            {'name': 'Contact C', 'parent_id': company_c.id},
+        ])
+        self.assertEqual(contact_a.vat, 'BECOMPANYA')
+
+        contact_a.parent_id = company_b
+        self.assertEqual(company_a.vat, 'BECOMPANYA')
+        self.assertFalse(company_b.vat, 'Moving a contact should not push the VAT of its previous company')
+        self.assertFalse(contact_b.vat)
+        self.assertFalse(contact_a.vat)
+
+        contact_c.parent_id = company_a
+        self.assertEqual(company_a.vat, 'BECOMPANYA')
+        self.assertEqual(company_c.vat, 'BECOMPANYC')
+        self.assertEqual(contact_c.vat, 'BECOMPANYA')
 
 
 @tagged('res_partner', 'post_install', '-at_install')

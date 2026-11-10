@@ -1,14 +1,18 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
+import json
 import unittest
-from unittest.mock import patch
+from unittest.mock import MagicMock, patch
 
+import requests
+from werkzeug.exceptions import Forbidden
 from werkzeug.urls import url_encode
 
 from odoo.tests import tagged
 from odoo.tools import mute_logger
 from odoo.tools.urls import urljoin as url_join
 
+from odoo.addons.payment.const import SENSITIVE_KEYS as PAYMENT_SENSITIVE_KEYS
 from odoo.addons.payment.tests.http_common import PaymentHttpCommon
 from odoo.addons.payment_stripe import const
 from odoo.addons.payment_stripe.controllers.main import StripeController
@@ -167,6 +171,23 @@ class StripeTest(StripeCommon, PaymentHttpCommon):
             self.assertEqual(signature_check_mock.call_count, 1)
 
     @mute_logger('odoo.addons.payment_stripe.controllers.main')
+    def test_reject_notification_when_missing_secret(self):
+        self.stripe.stripe_webhook_secret = False
+        tx = self._create_transaction('redirect')
+        self.assertRaises(Forbidden, StripeController()._verify_signature, tx)
+
+    @mute_logger('odoo.addons.payment_stripe.controllers.main')
+    def test_reject_notification_with_missing_timestamp(self):
+        tx = self._create_transaction('redirect')
+        signature_header = 'v1=Test_Signature'
+        mock_request = MagicMock()
+        mock_request.httprequest.data = b''
+        mock_request.httprequest.headers = {'Stripe-Signature': signature_header}
+        controller = StripeController()
+        with patch('odoo.addons.payment_stripe.controllers.main.request', new=mock_request):
+            self.assertRaises(Forbidden, controller._verify_signature, tx)
+
+    @mute_logger('odoo.addons.payment_stripe.controllers.main')
     @mute_logger('odoo.addons.payment_stripe.models.payment_transaction')
     def test_webhook_notification_skips_signature_verification_for_missing_transactions(self):
         """ Test that the webhook ignores signature verification for unknown transactions (e.g. POS). """
@@ -241,6 +262,37 @@ class StripeTest(StripeCommon, PaymentHttpCommon):
             self.stripe.action_stripe_create_webhook()
             self.assertEqual(mock.call_count, 0)
 
+    def test_sensitive_values_are_redacted_from_logs(self):
+        """ Test that all Stripe sensitive values are redacted from the logged API requests and
+        responses. """
+        # Only rely on Stripe's sensitive keys, not on those added by other installed providers.
+        original_sensitive_keys = set(PAYMENT_SENSITIVE_KEYS)
+        PAYMENT_SENSITIVE_KEYS.clear()
+        PAYMENT_SENSITIVE_KEYS.update(const.SENSITIVE_KEYS)
+
+        def restore_sensitive_keys():
+            PAYMENT_SENSITIVE_KEYS.clear()
+            PAYMENT_SENSITIVE_KEYS.update(original_sensitive_keys)
+        self.addCleanup(restore_sensitive_keys)
+
+        sensitive_values = {key: f'dummy_{key}_KJtHgNwt2KS3' for key in ('client_secret', 'secret')}
+        response = requests.Response()
+        response.status_code = 200
+        response._content = json.dumps(sensitive_values).encode()
+
+        with self.assertLogs(
+            'odoo.addons.payment.models.payment_provider', level='INFO'
+        ) as log_catcher:
+            self.stripe._log_request('POST', 'https://dummy.url', sensitive_values)
+            self.stripe._log_response(response)
+
+        request_log, response_log = log_catcher.output
+        for key, value in sensitive_values.items():
+            self.assertNotIn(value, request_log)
+            self.assertIn(f"'{key}': '[REDACTED]'", request_log)
+            self.assertNotIn(value, response_log)
+            self.assertIn(f'"{key}": "[REDACTED]"', response_log)
+
     def test_create_account_link_pass_required_parameters(self):
         """ Test that the generation of an account link includes all the required parameters. """
         with patch.object(
@@ -252,18 +304,3 @@ class StripeTest(StripeCommon, PaymentHttpCommon):
             call_args = mock.call_args.kwargs['json']['params']['payload'].keys()
             for payload_param in ('account', 'return_url', 'refresh_url', 'type'):
                 self.assertIn(payload_param, call_args)
-
-    def test_stripe_validate_amount_uses_payment_minor_unit(self):
-        """
-        Test that the payment's minor unit precision is used to validate the amount, not the custom
-        currency rounding that customers may have configured.
-        """
-        self.amount = 20076
-        self.currency.rounding = 0.001
-        tx = self._create_transaction(
-            'dummy', operation='online_direct', tokenize=True, amount=200.769
-        )
-        data = self.payment_data['data']
-        data['payment_intent'] = self._mock_payment_intent_request()
-        tx._validate_amount(data)
-        self.assertNotEqual(tx.state, 'error')

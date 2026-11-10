@@ -2,15 +2,15 @@
 # This file contains the translation of the following modules:
 # * pos_self_order
 #
-# "Tiffany Chang (tic)" <tic@odoo.com>, 2025.
+# "Tiffany Chang (tic)" <tic@odoo.com>, 2025, 2026.
 # Saara Hakanen <sahak@odoo.com>, 2025, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 18.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-02-06 18:36+0000\n"
-"PO-Revision-Date: 2026-02-13 07:42+0000\n"
-"Last-Translator: Saara Hakanen <sahak@odoo.com>\n"
+"POT-Creation-Date: 2026-10-24 17:38+0000\n"
+"PO-Revision-Date: 2026-08-02 17:22+0000\n"
+"Last-Translator: Anonymous <noreply@weblate.org>\n"
 "Language-Team: Finnish <https://translate.odoo.com/projects/odoo-19/"
 "pos_self_order/fi/>\n"
 "Language: fi\n"
@@ -18,7 +18,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Weblate 5.14.3\n"
+"X-Generator: Weblate 2026.6.1\n"
 
 #. module: pos_self_order
 #: model:ir.actions.report,print_report_name:pos_self_order.report_self_order_qr_codes_page
@@ -54,7 +54,8 @@ msgid ""
 "''\"/>\n"
 "                    <t t-set=\"store_name\" t-"
 "value=\"object.config_id.name\"/>\n"
-"                    <t t-set=\"tz\" t-value=\"object.env.user.tz\"/>\n"
+"                    <t t-set=\"tz\" t-"
+"value=\"object.company_id.partner_id.tz\"/>\n"
 "                    <t t-set=\"lg\" t-value=\"object.partner_id.lang or "
 "user.lang\"/>\n"
 "                    <div>\n"
@@ -76,10 +77,6 @@ msgid ""
 "                    <br/>\n"
 "                    <div>Thank you,</div>\n"
 "                    <br/>\n"
-"                    <div t-if=\"object.state == 'paid'\">\n"
-"                        <div>Attached, you will find your receipt</div>\n"
-"                        <br/>\n"
-"                    </div>\n"
 "                    <t t-out=\"store_name\">Store name</t>\n"
 "                </div>\n"
 "            "
@@ -88,39 +85,35 @@ msgstr ""
 "                    <t t-set=\"client\" t-value=\"object.partner_id\"/>\n"
 "                    <t t-set=\"client_name\" t-value=\"client.name\"/>\n"
 "                    <t t-set=\"street\" t-value=\"client.street or ''\"/>\n"
-"                    <t t-set=\"state\" t-value=\"client.state_id.name or ''\""
-"/>\n"
+"                    <t t-set=\"state\" t-value=\"client.state_id.name or "
+"''\"/>\n"
 "                    <t t-set=\"city\" t-value=\"client.city or ''\"/>\n"
-"                    <t t-set=\"country\" t-value="
-"\"client.country_id.name or ''\"/>\n"
-"                    <t t-set=\"store_name\" t-value=\"object.config_id.name\""
-"/>\n"
-"                    <t t-set=\"tz\" t-value=\"object.env.user.tz\"/>\n"
-"                    <t t-set=\"lg\" t-value="
-"\"object.partner_id.lang or user.lang\"/>\n"
+"                    <t t-set=\"country\" t-value=\"client.country_id.name or "
+"''\"/>\n"
+"                    <t t-set=\"store_name\" t-"
+"value=\"object.config_id.name\"/>\n"
+"                    <t t-set=\"tz\" t-"
+"value=\"object.company_id.partner_id.tz\"/>\n"
+"                    <t t-set=\"lg\" t-value=\"object.partner_id.lang or "
+"user.lang\"/>\n"
 "                    <div>\n"
-"                        <t t-if=\"client_name\">Hei <t t-out=\"client_name\""
-">Asiakkaan Nimi</t>,</t>\n"
+"                        <t t-if=\"client_name\">Hei <t t-"
+"out=\"client_name\">Asiakkaan Nimi</t>,</t>\n"
 "                        <t t-else=\"\">Hei,</t>\n"
 "                    </div>\n"
 "                    <br/>\n"
-"                    <div>Tilauksesi <t t-out=\"object.tracking_number\">...</"
-"t> loppusummalla <t t-out="
-"\"format_amount(object.amount_total,object.currency_id)\">xx,xx €</t> on "
-"vahvistettu. <span t-if=\"object.preset_time or client.street\">Se on "
-"valmis</span> <span t-if=\"object.preset_time\">kello <t t-out=\"format_time"
-"(time=object.preset_time, tz=tz, time_format='short', lang_code=lg)"
-"\">12:00</t></span> <span t-if=\"client.street\">osoitteessa <t t-out="
-"\"street\">katu</t>, <t t-out=\"state\">osavaltio</t>, <t t-out="
-"\"client.zip or ''\">postinumero</t>, <t t-out=\"city\">kaupunki</t>, <t "
+"                    <div>Tilauksenne <t t-out=\"object.tracking_number\">..."
+"</t> hintaan <t t-out=\"format_amount(object.amount_total,object.currency_id)"
+"\">xx,xx€</t> on vahvistettu. <span t-if=\"object.preset_time or "
+"client.street\">Se on valmis</span> <span t-if=\"object.preset_time\">kello "
+"<t t-out=\"format_time(time=object.preset_time, tz=tz, time_format='short', "
+"lang_code=lg)\">12:00</t></span> <span t-if=\"client.street\">osoitteessa <t "
+"t-out=\"street\">katu</t>, <t t-out=\"state\">osavaltio</t>, <t t-"
+"out=\"client.zip or ''\">postinumero</t>, <t t-out=\"city\">kaupunki</t>, <t "
 "t-out=\"country\">maa</t></span></div>\n"
 "                    <br/>\n"
 "                    <div>Kiitos,</div>\n"
 "                    <br/>\n"
-"                    <div t-if=\"object.state == 'paid'\">\n"
-"                        <div>Löydät kuittisi liitteenä</div>\n"
-"                        <br/>\n"
-"                    </div>\n"
 "                    <t t-out=\"store_name\">Kaupan nimi</t>\n"
 "                </div>\n"
 "            "
@@ -131,7 +124,8 @@ msgid ""
 "<div style=\"margin: 0; padding: 0; font-size: 14px;\">\n"
 "                    <t t-set=\"store_name\" t-"
 "value=\"object.config_id.name\"/>\n"
-"                    <t t-set=\"tz\" t-value=\"object.env.user.tz\"/>\n"
+"                    <t t-set=\"tz\" t-"
+"value=\"object.company_id.partner_id.tz\"/>\n"
 "                    <t t-set=\"lg\" t-value=\"object.partner_id.lang or "
 "user.lang\"/>\n"
 "                    <div>\n"
@@ -149,40 +143,31 @@ msgid ""
 "                    <br/>\n"
 "                    <div>Thank you,</div>\n"
 "                    <br/>\n"
-"                    <div t-if=\"object.state == 'paid'\">\n"
-"                        <div>Attached, you will find your receipt</div>\n"
-"                        <br/>\n"
-"                    </div>\n"
 "                    <t t-out=\"store_name\">Store name</t>\n"
 "                </div>\n"
 "            "
 msgstr ""
 "<div style=\"margin: 0; padding: 0; font-size: 14px;\">\n"
-"                    <t t-set=\"store_name\" t-value=\"object.config_id.name\""
-"/>\n"
-"                    <t t-set=\"tz\" t-value=\"object.env.user.tz\"/>\n"
-"                    <t t-set=\"lg\" t-value="
-"\"object.partner_id.lang or user.lang\"/>\n"
+"                    <t t-set=\"store_name\" t-"
+"value=\"object.config_id.name\"/>\n"
+"                    <t t-set=\"tz\" t-"
+"value=\"object.company_id.partner_id.tz\"/>\n"
+"                    <t t-set=\"lg\" t-value=\"object.partner_id.lang or "
+"user.lang\"/>\n"
 "                    <div>\n"
-"                        <t t-if=\"client_name\">Hei <t t-out=\"client_name\""
-">Asiakkaan Nimi</t>,</t>\n"
+"                        <t t-if=\"client_name\">Hei <t t-"
+"out=\"client_name\">Asiakkaan Nimi</t>,</t>\n"
 "                        <t t-else=\"\">Hei,</t>\n"
 "                    </div>\n"
 "                    <br/>\n"
-"                    <div>Tilauksesi <t t-out=\"object.tracking_number\">...</"
-"t> loppusummalla <t t-out="
-"\"format_amount(object.amount_total,object.currency_id)\">xx.xx €</t> on "
-"vahvistettu. <span t-if=\"object.preset_time\">Se on valmis <t t-out="
-"\"format_time"
-"(time=object.preset_time, tz=tz, time_format='short', lang_code=lg)\">kello "
-"12:00</t></span></div>\n"
+"                    <div>Tilauksenne <t t-out=\"object.tracking_number\">..."
+"</t> hintaan <t t-out=\"format_amount(object.amount_total,object.currency_id)"
+"\">xx,xx€</t> on vahvistettu. <span t-if=\"object.preset_time\">Se on valmis "
+"kello <t t-out=\"format_time(time=object.preset_time, tz=tz, "
+"time_format='short', lang_code=lg)\">12:00</t></span></div>\n"
 "                    <br/>\n"
 "                    <div>Kiitos,</div>\n"
 "                    <br/>\n"
-"                    <div t-if=\"object.state == 'paid'\">\n"
-"                        <div>Löydät kuittisi liitteenä</div>\n"
-"                        <br/>\n"
-"                    </div>\n"
 "                    <t t-out=\"store_name\">Kaupan nimi</t>\n"
 "                </div>\n"
 "            "
@@ -285,6 +270,7 @@ msgstr "Käytettävissä olevat käyttöliittymän kielet"
 #: code:addons/pos_self_order/static/src/app/pages/eating_location_page/eating_location_page.xml:0
 #: code:addons/pos_self_order/static/src/app/pages/order_history_page/order_history_page.xml:0
 #: code:addons/pos_self_order/static/src/app/pages/payment_page/payment_page.xml:0
+#: code:addons/pos_self_order/static/src/app/pages/product_page/product_page.xml:0
 #: code:addons/pos_self_order/static/src/app/pages/stand_number_page/stand_number_page.xml:0
 msgid "Back"
 msgstr "Takaisin"
@@ -349,12 +335,6 @@ msgstr "Valitse itsepalvelun tilaustila"
 #: model:ir.model.fields,help:pos_self_order.field_res_config_settings__pos_self_ordering_pay_after
 msgid "Choose when the customer will pay"
 msgstr "Valitse, milloin asiakas maksaa"
-
-#. module: pos_self_order
-#. odoo-javascript
-#: code:addons/pos_self_order/static/src/app/pages/combo_page/combo_page.xml:0
-msgid "Choose your"
-msgstr "Valitse oma"
 
 #. module: pos_self_order
 #. odoo-javascript
@@ -584,9 +564,9 @@ msgid ""
 "                    both the point of sale and table names are encrypted in "
 "the generated URL, as shown in the example below:."
 msgstr ""
-"Jokaiselle pöytäkartassa olevalle pöydälle annetaan yksilöllinen QR-koodi, "
-"joka perustuu kokoonpanoosi. Turvallisuussyistä,\n"
-"                    sekä Kassajärjestelmän että pöytien nimet salataan "
+"Jokaiselle pöytäkartassa olevalle pöydälle annetaan yksilöllinen QR-koodi "
+"asetustesi perusteella. Turvallisuussyistä,\n"
+"                    sekä kassajärjestelmän että pöytien nimet salataan "
 "luodussa URL-osoitteessa, kuten alla olevassa esimerkissä näkyy:"
 
 #. module: pos_self_order
@@ -623,7 +603,7 @@ msgstr ""
 #. odoo-javascript
 #: code:addons/pos_self_order/static/src/app/components/preset_info_popup/preset_info_popup.xml:0
 msgid "Enter a valid phone number starting with the country code (e.g. +32)"
-msgstr ""
+msgstr "Syötä kelvollinen puhelinnumero, joka alkaa maakoodilla (esim. +32)"
 
 #. module: pos_self_order
 #. odoo-javascript
@@ -636,6 +616,12 @@ msgstr "Syötä mukautettu arvo"
 #: code:addons/pos_self_order/static/src/app/pages/stand_number_page/stand_number_page.xml:0
 msgid "Enter your tracker number"
 msgstr "Syötä seurantanumerosi"
+
+#. module: pos_self_order
+#. odoo-javascript
+#: code:addons/pos_self_order/static/src/app/pages/combo_page/combo_page.xml:0
+msgid "Extra:"
+msgstr "Ekstra:"
 
 #. module: pos_self_order
 #: model_terms:ir.ui.view,arch_db:pos_self_order.qr_codes_page
@@ -785,7 +771,7 @@ msgstr ""
 #. module: pos_self_order
 #: model:ir.model.fields.selection,name:pos_self_order.selection__pos_config__status__inactive
 msgid "Inactive"
-msgstr "Passiivinen"
+msgstr "Epäaktiivinen"
 
 #. module: pos_self_order
 #: model:ir.model.fields.selection,name:pos_self_order.selection__pos_self_order_custom_link__style__info
@@ -797,6 +783,37 @@ msgstr "Info"
 #: code:addons/pos_self_order/static/src/app/components/network_connectionLost_popup/network_connectionLost_popup.xml:0
 msgid "Internet Connection Lost"
 msgstr "Internet-yhteys katkesi"
+
+#. module: pos_self_order
+#. odoo-python
+#: code:addons/pos_self_order/models/pos_order.py:0
+msgid "Invalid combo line"
+msgstr ""
+
+#. module: pos_self_order
+#. odoo-python
+#: code:addons/pos_self_order/models/pos_order.py:0
+msgid "Invalid preset"
+msgstr "Virheellinen esiasetus"
+
+#. module: pos_self_order
+#. odoo-python
+#: code:addons/pos_self_order/models/pos_order.py:0
+msgid "Invalid product attribute"
+msgstr ""
+
+#. module: pos_self_order
+#. odoo-python
+#: code:addons/pos_self_order/controllers/orders.py:0
+#: code:addons/pos_self_order/models/pos_order.py:0
+msgid "Invalid product configuration"
+msgstr ""
+
+#. module: pos_self_order
+#. odoo-python
+#: code:addons/pos_self_order/models/pos_order.py:0
+msgid "Invalid quantity"
+msgstr ""
 
 #. module: pos_self_order
 #. odoo-javascript
@@ -1130,42 +1147,54 @@ msgstr "Kassan tietojen lataus mixin"
 #. module: pos_self_order
 #: model:ir.model,name:pos_self_order.model_pos_category
 msgid "Point of Sale Category"
-msgstr "Kassapäätteen kategoria"
+msgstr "Kassajärjestelmän kategoria"
 
 #. module: pos_self_order
 #: model:ir.model,name:pos_self_order.model_pos_config
 msgid "Point of Sale Configuration"
-msgstr "Kassan asetukset"
+msgstr "Kassajärjestelmän asetukset"
 
 #. module: pos_self_order
 #: model:ir.model,name:pos_self_order.model_pos_order_line
 msgid "Point of Sale Order Lines"
-msgstr "Kassan tilausrivit"
+msgstr "Kassajärjestelmän tilausrivit"
 
 #. module: pos_self_order
 #: model:ir.model,name:pos_self_order.model_pos_order
 msgid "Point of Sale Orders"
-msgstr "Kassan tilaukset"
+msgstr "Kassajärjestelmän tilaukset"
 
 #. module: pos_self_order
 #: model:ir.model,name:pos_self_order.model_pos_payment_method
 msgid "Point of Sale Payment Methods"
-msgstr "Kassan maksutavat"
+msgstr "Kassajärjestelmän maksutavat"
 
 #. module: pos_self_order
 #: model:ir.model,name:pos_self_order.model_pos_session
 msgid "Point of Sale Session"
-msgstr "Kassan istunto"
+msgstr "Kassajärjestelmän istunto"
 
 #. module: pos_self_order
 #: model_terms:ir.ui.view,arch_db:pos_self_order.qr_codes_page
 msgid "Point of sale:"
-msgstr "Kassa:"
+msgstr "Kassajärjestelmä:"
 
 #. module: pos_self_order
 #: model:ir.model.fields,field_description:pos_self_order.field_pos_self_order_custom_link__pos_config_ids
 msgid "Points of Sale"
-msgstr "Kassat"
+msgstr "Kassajärjestelmät"
+
+#. module: pos_self_order
+#. odoo-python
+#: code:addons/pos_self_order/models/pos_order.py:0
+msgid "Preset is not available in self-ordering"
+msgstr ""
+
+#. module: pos_self_order
+#. odoo-python
+#: code:addons/pos_self_order/models/pos_order.py:0
+msgid "Preset is not available in this configuration"
+msgstr ""
 
 #. module: pos_self_order
 #: model:ir.model.fields,field_description:pos_self_order.field_pos_self_order_custom_link__link_html
@@ -1206,7 +1235,7 @@ msgstr "Tuotteen tunniste"
 #. module: pos_self_order
 #: model:ir.model,name:pos_self_order.model_product_product
 msgid "Product Variant"
-msgstr "Tuotevariaatio"
+msgstr "Tuotevariantti"
 
 #. module: pos_self_order
 #. odoo-javascript
@@ -1327,12 +1356,6 @@ msgstr "Valitse maa"
 
 #. module: pos_self_order
 #. odoo-javascript
-#: code:addons/pos_self_order/static/src/app/components/slots_popup/slots_popup.xml:0
-msgid "Select a hour"
-msgstr "Valise aika"
-
-#. module: pos_self_order
-#. odoo-javascript
 #: code:addons/pos_self_order/static/src/app/components/preset_info_popup/preset_info_popup.xml:0
 msgid "Select a state"
 msgstr "Valitse osavaltio"
@@ -1344,6 +1367,12 @@ msgid "Select a table"
 msgstr "Valitse pöytä"
 
 #. module: pos_self_order
+#. odoo-javascript
+#: code:addons/pos_self_order/static/src/app/components/slots_popup/slots_popup.xml:0
+msgid "Select an hour"
+msgstr ""
+
+#. module: pos_self_order
 #: model:ir.model.fields,help:pos_self_order.field_pos_self_order_custom_link__pos_config_ids
 msgid ""
 "Select for which points of sale you want to display this link. Leave empty "
@@ -1353,12 +1382,6 @@ msgstr ""
 "Valitse, missä kassoissa haluat näyttää tämän linkin. Jätä tyhjäksi "
 "näyttääksesi sen kaikissa kassoissa. Voit valita kassoista, joissa QR-koodi "
 "-ruokalista on käytössä."
-
-#. module: pos_self_order
-#. odoo-javascript
-#: code:addons/pos_self_order/static/src/app/components/preset_info_popup/preset_info_popup.xml:0
-msgid "Select your address"
-msgstr "Valitse osoitteesi"
 
 #. module: pos_self_order
 #. odoo-javascript
@@ -1449,13 +1472,13 @@ msgstr "Itsepalvelutilaaminen:"
 #. module: pos_self_order
 #: model:mail.template,description:pos_self_order.delivery_email_template
 #: model:mail.template,description:pos_self_order.takeout_email_template
-msgid "Sent to customers with the receipt in attachment"
-msgstr "Lähetetty asiakkaille kuittiliitteen kanssa"
+msgid "Sent to customers"
+msgstr "Lähetetty asiakkaille"
 
 #. module: pos_self_order
 #: model:ir.model.fields,field_description:pos_self_order.field_pos_self_order_custom_link__sequence
 msgid "Sequence"
-msgstr "Järjestys"
+msgstr "Sekvenssi"
 
 #. module: pos_self_order
 #: model:ir.model.fields,field_description:pos_self_order.field_pos_preset__service_at
@@ -1580,6 +1603,14 @@ msgstr "Itsepalvelutilauksen oletuskäyttäjän on oltava kassakäyttäjä"
 #: code:addons/pos_self_order/models/pos_order.py:0
 msgid "The mail template with xmlid %s has been deleted."
 msgstr "Xmlid %s -sähköpostipohja on poistettu."
+
+#. module: pos_self_order
+#. odoo-python
+#: code:addons/pos_self_order/models/pos_order.py:0
+msgid ""
+"The order ID isn't linked to the order UUID. This is a sign of a tampered "
+"payload."
+msgstr ""
 
 #. module: pos_self_order
 #. odoo-python
@@ -1718,7 +1749,7 @@ msgstr "Sinulla ei ole valtuuksia poistaa tätä tilausta"
 #: code:addons/pos_self_order/models/pos_config.py:0
 #: code:addons/pos_self_order/models/res_config_settings.py:0
 msgid "You cannot add cash payment methods in kiosk mode."
-msgstr "Käteismaksutapoja ei voi lisätä itsepalvelupäätetilassa."
+msgstr "Et voi lisätä käteismaksutapoja itsepalvelupäätetilassa."
 
 #. module: pos_self_order
 #. odoo-javascript
@@ -1763,6 +1794,11 @@ msgid "Zip"
 msgstr "Postinumero"
 
 #. module: pos_self_order
+#: model_terms:ir.ui.view,arch_db:pos_self_order.res_config_settings_view_form_menu
+msgid "a"
+msgstr "a"
+
+#. module: pos_self_order
 #. odoo-javascript
 #: code:addons/pos_self_order/static/src/app/components/unavailable_product_dialog/unavailable_product_dialog.xml:0
 msgid "are"
@@ -1799,8 +1835,8 @@ msgstr "https://odoo.com"
 #. module: pos_self_order
 #. odoo-javascript
 #: code:addons/pos_self_order/static/src/app/pages/combo_page/combo_page.xml:0
-msgid "included"
-msgstr "sisältyy"
+msgid "included &"
+msgstr "sisältyy &"
 
 #. module: pos_self_order
 #. odoo-javascript
@@ -1818,6 +1854,182 @@ msgstr "loppu. Palaa muokkaamaan tilaustasi."
 #: model_terms:ir.ui.view,arch_db:pos_self_order.custom_link_tree
 msgid "odoo"
 msgstr "odoo"
+
+#. module: pos_self_order
+#. odoo-javascript
+#: code:addons/pos_self_order/static/src/app/pages/combo_page/combo_page.xml:0
+msgid "per extra unit"
+msgstr "lisäyksikköä kohti"
+
+#. module: pos_self_order
+#. odoo-javascript
+#: code:addons/pos_self_order/static/src/app/pages/cart_page/cart_page.xml:0
+#: code:addons/pos_self_order/static/src/app/pages/combo_page/combo_page.xml:0
+msgid "x"
+msgstr "x"
+
+#~ msgid "Select a hour"
+#~ msgstr "Valise aika"
+
+#~ msgid ""
+#~ "<div style=\"margin: 0; padding: 0; font-size: 14px;\">\n"
+#~ "                    <t t-set=\"client\" t-value=\"object.partner_id\"/>\n"
+#~ "                    <t t-set=\"client_name\" t-value=\"client.name\"/>\n"
+#~ "                    <t t-set=\"street\" t-value=\"client.street or ''\"/"
+#~ ">\n"
+#~ "                    <t t-set=\"state\" t-value=\"client.state_id.name or "
+#~ "''\"/>\n"
+#~ "                    <t t-set=\"city\" t-value=\"client.city or ''\"/>\n"
+#~ "                    <t t-set=\"country\" t-value=\"client.country_id.name "
+#~ "or ''\"/>\n"
+#~ "                    <t t-set=\"store_name\" t-"
+#~ "value=\"object.config_id.name\"/>\n"
+#~ "                    <t t-set=\"tz\" t-"
+#~ "value=\"object.company_id.partner_id.tz\"/>\n"
+#~ "                    <t t-set=\"lg\" t-value=\"object.partner_id.lang or "
+#~ "user.lang\"/>\n"
+#~ "                    <div>\n"
+#~ "                        <t t-if=\"client_name\">Hello <t t-"
+#~ "out=\"client_name\">Client name</t>,</t>\n"
+#~ "                        <t t-else=\"\">Hello,</t>\n"
+#~ "                    </div>\n"
+#~ "                    <br/>\n"
+#~ "                    <div>Your order <t t-"
+#~ "out=\"object.tracking_number\">...</t> amounting in <t t-"
+#~ "out=\"format_amount(object.amount_total,object.currency_id)\">$xx.xx</t> "
+#~ "has been confirmed. <span t-if=\"object.preset_time or client.street\">It "
+#~ "will be ready</span> <span t-if=\"object.preset_time\">at <t t-"
+#~ "out=\"format_time(time=object.preset_time, tz=tz, time_format='short', "
+#~ "lang_code=lg)\">12:00 pm</t></span> <span t-if=\"client.street\">at <t t-"
+#~ "out=\"street\">street</t>, <t t-out=\"state\">state</t>, <t t-"
+#~ "out=\"client.zip or ''\">zip</t>, <t t-out=\"city\">city</t>, <t t-"
+#~ "out=\"country\">country</t></span></div>\n"
+#~ "                    <br/>\n"
+#~ "                    <div>Thank you,</div>\n"
+#~ "                    <br/>\n"
+#~ "                    <div t-if=\"object.state == 'paid'\">\n"
+#~ "                        <div>Attached, you will find your receipt</div>\n"
+#~ "                        <br/>\n"
+#~ "                    </div>\n"
+#~ "                    <t t-out=\"store_name\">Store name</t>\n"
+#~ "                </div>\n"
+#~ "            "
+#~ msgstr ""
+#~ "<div style=\"margin: 0; padding: 0; font-size: 14px;\">\n"
+#~ "                    <t t-set=\"client\" t-value=\"object.partner_id\"/>\n"
+#~ "                    <t t-set=\"client_name\" t-value=\"client.name\"/>\n"
+#~ "                    <t t-set=\"street\" t-value=\"client.street or ''\"/"
+#~ ">\n"
+#~ "                    <t t-set=\"state\" t-value=\"client.state_id.name or "
+#~ "''\"/>\n"
+#~ "                    <t t-set=\"city\" t-value=\"client.city or ''\"/>\n"
+#~ "                    <t t-set=\"country\" t-value=\"client.country_id.name "
+#~ "or ''\"/>\n"
+#~ "                    <t t-set=\"store_name\" t-"
+#~ "value=\"object.config_id.name\"/>\n"
+#~ "                    <t t-set=\"tz\" t-"
+#~ "value=\"object.company_id.partner_id.tz\"/>\n"
+#~ "                    <t t-set=\"lg\" t-value=\"object.partner_id.lang or "
+#~ "user.lang\"/>\n"
+#~ "                    <div>\n"
+#~ "                        <t t-if=\"client_name\">Hei <t t-"
+#~ "out=\"client_name\">Asiakkaan nimi</t>,</t>\n"
+#~ "                        <t t-else=\"\">Hei,</t>\n"
+#~ "                    </div>\n"
+#~ "                    <br/>\n"
+#~ "                    <div>Tilauksesi <t t-"
+#~ "out=\"object.tracking_number\">...</t> hintaan <t t-"
+#~ "out=\"format_amount(object.amount_total,object.currency_id)\">xx,xx€</t> "
+#~ "on vahvistettu. <span t-if=\"object.preset_time or client.street\">Se on "
+#~ "valmis</span> <span t-if=\"object.preset_time\">kello <t t-"
+#~ "out=\"format_time(time=object.preset_time, tz=tz, time_format='short', "
+#~ "lang_code=lg)\">12:00</t></span> <span t-if=\"client.street\">osoitteessa "
+#~ "<t t-out=\"street\">katu</t>, <t t-out=\"state\">maakunta</t>, <t t-"
+#~ "out=\"client.zip or ''\">postinumero</t>, <t t-out=\"city\">kaupunki</t>, "
+#~ "<t t-out=\"country\">maa</t></span></div>\n"
+#~ "                    <br/>\n"
+#~ "                    <div>Kiitos,</div>\n"
+#~ "                    <br/>\n"
+#~ "                    <div t-if=\"object.state == 'paid'\">\n"
+#~ "                        <div>Löydät kuitin liitteenä</div>\n"
+#~ "                        <br/>\n"
+#~ "                    </div>\n"
+#~ "                    <t t-out=\"store_name\">Kaupan nimi</t>\n"
+#~ "                </div>\n"
+#~ "            "
+
+#~ msgid ""
+#~ "<div style=\"margin: 0; padding: 0; font-size: 14px;\">\n"
+#~ "                    <t t-set=\"store_name\" t-"
+#~ "value=\"object.config_id.name\"/>\n"
+#~ "                    <t t-set=\"tz\" t-"
+#~ "value=\"object.company_id.partner_id.tz\"/>\n"
+#~ "                    <t t-set=\"lg\" t-value=\"object.partner_id.lang or "
+#~ "user.lang\"/>\n"
+#~ "                    <div>\n"
+#~ "                        <t t-if=\"client_name\">Hello <t t-"
+#~ "out=\"client_name\">Client name</t>,</t>\n"
+#~ "                        <t t-else=\"\">Hello,</t>\n"
+#~ "                    </div>\n"
+#~ "                    <br/>\n"
+#~ "                    <div>Your order <t t-"
+#~ "out=\"object.tracking_number\">...</t> amounting in <t t-"
+#~ "out=\"format_amount(object.amount_total,object.currency_id)\">$xx.xx</t> "
+#~ "has been confirmed. <span t-if=\"object.preset_time\">It will be ready at "
+#~ "<t t-out=\"format_time(time=object.preset_time, tz=tz, "
+#~ "time_format='short', lang_code=lg)\">12:00 pm</t></span></div>\n"
+#~ "                    <br/>\n"
+#~ "                    <div>Thank you,</div>\n"
+#~ "                    <br/>\n"
+#~ "                    <div t-if=\"object.state == 'paid'\">\n"
+#~ "                        <div>Attached, you will find your receipt</div>\n"
+#~ "                        <br/>\n"
+#~ "                    </div>\n"
+#~ "                    <t t-out=\"store_name\">Store name</t>\n"
+#~ "                </div>\n"
+#~ "            "
+#~ msgstr ""
+#~ "<div style=\"margin: 0; padding: 0; font-size: 14px;\">\n"
+#~ "                    <t t-set=\"store_name\" t-"
+#~ "value=\"object.config_id.name\"/>\n"
+#~ "                    <t t-set=\"tz\" t-"
+#~ "value=\"object.company_id.partner_id.tz\"/>\n"
+#~ "                    <t t-set=\"lg\" t-value=\"object.partner_id.lang or "
+#~ "user.lang\"/>\n"
+#~ "                    <div>\n"
+#~ "                        <t t-if=\"client_name\">Hei <t t-"
+#~ "out=\"client_name\">Asiakkaan nimi</t>,</t>\n"
+#~ "                        <t t-else=\"\">Hei,</t>\n"
+#~ "                    </div>\n"
+#~ "                    <br/>\n"
+#~ "                    <div>Tilauksesi <t t-"
+#~ "out=\"object.tracking_number\">...</t> hintaan <t t-"
+#~ "out=\"format_amount(object.amount_total,object.currency_id)\">xx,xx€</t> "
+#~ "on vahvistettu. <span t-if=\"object.preset_time\">Se on valmis kello <t t-"
+#~ "out=\"format_time(time=object.preset_time, tz=tz, time_format='short', "
+#~ "lang_code=lg)\">12:00</t></span></div>\n"
+#~ "                    <br/>\n"
+#~ "                    <div>Kiitos,</div>\n"
+#~ "                    <br/>\n"
+#~ "                    <div t-if=\"object.state == 'paid'\">\n"
+#~ "                        <div>Löydät kuittisi liitteenä</div>\n"
+#~ "                        <br/>\n"
+#~ "                    </div>\n"
+#~ "                    <t t-out=\"store_name\">Kaupan nimi</t>\n"
+#~ "                </div>\n"
+#~ "            "
+
+#~ msgid "Sent to customers with the receipt in attachment"
+#~ msgstr "Lähetetty asiakkaille kuittiliitteen kanssa"
+
+#~ msgid "Choose your"
+#~ msgstr "Valitse oma"
+
+#~ msgid "included"
+#~ msgstr "sisältyy"
+
+#~ msgid "Select your address"
+#~ msgstr "Valitse osoitteesi"
 
 #~ msgid ""
 #~ "<div style=\"margin: 0; padding: 0; font-size: 14px;\">\n"

@@ -6,7 +6,7 @@ import { ProductNameWidget } from "@pos_self_order/app/components/product_name_w
 import { ComboStepper } from "@pos_self_order/app/components/combo_stepper/combo_stepper";
 import { computeTotalComboPrice } from "../../services/card_utils";
 import { useScrollShadow } from "../../utils/scroll_shadow_hook";
-import { formatProductName } from "../../utils";
+import { formatProductName, shouldShowMissingDetails } from "../../utils";
 
 export class ComboPage extends Component {
     static template = "pos_self_order.ComboPage";
@@ -93,13 +93,11 @@ export class ComboPage extends Component {
     }
 
     shouldShowMissingDetails() {
-        const el = this.scrollContainerRef?.el;
-        if (!el) {
-            return false;
-        }
-        return (
-            el.scrollHeight > el.clientHeight &&
-            this.currentChoiceState.displayAttributesOfItem.product_id.attribute_line_ids.length > 1
+        const product = this.currentChoiceState.displayAttributesOfItem?.product_id;
+        return shouldShowMissingDetails(
+            product,
+            this.state.selectedValues,
+            this.scrollContainerRef
         );
     }
 
@@ -111,11 +109,13 @@ export class ComboPage extends Component {
 
         if (!this.hasMultiItemSelection) {
             this.currentChoiceState.selectedItems = {};
+            this.currentChoiceState.selectedItemsOrder = [];
         } else if (!this.canAddMoreItems()) {
             return;
         }
 
         const selectedItems = (this.currentChoiceState.selectedItems ||= {});
+        const selectedItemsOrder = (this.currentChoiceState.selectedItemsOrder ||= []);
 
         if (selectedItems[item.id]) {
             this.changeItemQuantity(null, item, +1);
@@ -125,6 +125,7 @@ export class ComboPage extends Component {
         const selection = (selectedItems[item.id] ||= { item });
         selection.item = item;
         selection.qty = 1;
+        selectedItemsOrder.push(item.id);
         if (this.hasAttribute(product)) {
             this.currentChoiceState.displayAttributesOfItem = item;
         } else if (!this.hasMultiItemSelection) {
@@ -133,12 +134,13 @@ export class ComboPage extends Component {
     }
 
     hasAttribute(product) {
-        return (
-            product.attribute_line_ids.length > 0 &&
-            product.attribute_line_ids.some(
-                (line) => line.attribute_id?.create_variant === "no_variant"
-            )
-        );
+        const isKiosk = this.selfOrder.kioskMode;
+        return product.attribute_line_ids.some((line) => {
+            if (line.attribute_id?.create_variant !== "no_variant") {
+                return false;
+            }
+            return line.product_template_value_ids.some((a) => !(isKiosk && a.is_custom));
+        });
     }
 
     getSelectedItems(choiceState = undefined) {
@@ -172,6 +174,64 @@ export class ComboPage extends Component {
         return this.getSelectedItems().some((item) => item.qty > 0);
     }
 
+    getExtraQtyForItem(item, comboIndex = null, showZero = false) {
+        const choice = comboIndex !== null ? this.comboChoices[comboIndex] : this.selectedChoice;
+        const choiceState =
+            comboIndex !== null ? this.state.choices[comboIndex] : this.currentChoiceState;
+        if (choice.qty_free === 0) {
+            return showZero ? choiceState.selectedItems?.[item.id]?.qty || 0 : 0;
+        }
+        const selectedItemsOrder = choiceState.selectedItemsOrder;
+        if (!selectedItemsOrder || !selectedItemsOrder.includes(item.id)) {
+            return 0;
+        }
+        const remainingFree = choice.qty_free;
+        const extraPriceItems = selectedItemsOrder.slice(remainingFree);
+        let extraPriceQty = 0;
+        for (const selectedItem of extraPriceItems) {
+            if (selectedItem === item.id) {
+                extraPriceQty += 1;
+            }
+        }
+        return extraPriceQty;
+    }
+
+    getBasePriceForItem(item) {
+        const comboSelection = this.getComboSelection().find(
+            (comboChoice) => comboChoice.combo_item_id.id === item.id
+        );
+        if (!comboSelection || !comboSelection.configuration) {
+            return {
+                pricePerExtra: 0,
+                pricePerUnit: 0,
+            };
+        }
+        let attributeExtraPrice = item.extra_price || 0;
+        for (const attribute of comboSelection.configuration.attribute_value_ids) {
+            const attributeValuePriceExtra =
+                this.selfOrder.models["product.template.attribute.value"].get(
+                    attribute
+                ).price_extra;
+            attributeExtraPrice += attributeValuePriceExtra || 0;
+        }
+        return {
+            pricePerExtra: comboSelection.combo_item_id.combo_id.base_price,
+            pricePerUnit: attributeExtraPrice,
+        };
+    }
+
+    getExtraPriceForItem(item, comboIndex = null, showZero = false) {
+        const choiceState =
+            comboIndex !== null ? this.state.choices[comboIndex] : this.currentChoiceState;
+        const itemQty =
+            showZero || item.combo_id.qty_free > 0
+                ? choiceState.selectedItems?.[item.id]?.qty || 0
+                : 0;
+        const extraQty = this.getExtraQtyForItem(item, comboIndex, showZero);
+        const basePrice = this.getBasePriceForItem(item);
+        return extraQty * basePrice.pricePerExtra + itemQty * basePrice.pricePerUnit;
+    }
+
     changeItemQuantity(evt, item, value) {
         evt?.stopPropagation();
 
@@ -183,6 +243,14 @@ export class ComboPage extends Component {
             return;
         }
         itemState.qty = Math.max(0, itemState.qty + value);
+        if (value < 0) {
+            const lastIndex = this.currentChoiceState.selectedItemsOrder.lastIndexOf(item.id);
+            if (lastIndex !== -1) {
+                this.currentChoiceState.selectedItemsOrder.splice(lastIndex, 1);
+            }
+        } else if (value > 0) {
+            this.currentChoiceState.selectedItemsOrder.push(item.id);
+        }
         if (itemState.qty === 0) {
             delete this.currentChoiceState.selectedItems[item.id];
         }
@@ -261,6 +329,12 @@ export class ComboPage extends Component {
                 // Disable product selection if not all attributes are selected
                 const choiceState = this.currentChoiceState;
                 delete choiceState.selectedItems[choiceState.displayAttributesOfItem.id];
+                const index = choiceState.selectedItemsOrder.indexOf(
+                    choiceState.displayAttributesOfItem.id
+                );
+                if (index !== -1) {
+                    choiceState.selectedItemsOrder.splice(index, 1);
+                }
             }
             this.currentChoiceState.displayAttributesOfItem = false;
         } else {
@@ -436,15 +510,32 @@ export class ComboPage extends Component {
         );
     }
 
+    getFixedComboSelection() {
+        // Fixed choices (a single item without attributes) are not shown as a
+        // selection step, so they have to be added to the selection explicitly.
+        return this.props.productTemplate.combo_ids
+            .filter(
+                (c) =>
+                    c.qty_max <= 1 &&
+                    c.combo_item_ids.length === 1 &&
+                    c.combo_item_ids[0].product_id.attribute_line_ids.length === 0
+            )
+            .map((c) => ({
+                combo_item_id: c.combo_item_ids[0],
+                qty: 1,
+                configuration: {
+                    attribute_custom_values: [],
+                    attribute_value_ids: [],
+                    price_extra: 0,
+                },
+            }));
+    }
+
     addToCart() {
-        this.selfOrder.addToCart(
-            this.props.productTemplate,
-            this.state.qty,
-            "",
-            {},
-            {},
-            this.getComboSelection()
-        );
+        this.selfOrder.addToCart(this.props.productTemplate, this.state.qty, "", {}, {}, [
+            ...this.getComboSelection(),
+            ...this.getFixedComboSelection(),
+        ]);
 
         this.goBack();
     }
@@ -453,7 +544,7 @@ export class ComboPage extends Component {
         return computeTotalComboPrice(
             this.selfOrder,
             this.props.productTemplate,
-            this.getComboSelection(),
+            [...this.getComboSelection(), ...this.getFixedComboSelection()],
             this.state.qty
         );
     }

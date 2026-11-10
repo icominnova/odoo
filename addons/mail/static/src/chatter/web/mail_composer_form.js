@@ -5,6 +5,7 @@ import { useCustomDropzone } from "@web/core/dropzone/dropzone_hook";
 import { useService } from "@web/core/utils/hooks";
 import { useX2ManyCrud } from "@web/views/fields/relational_utils";
 import { MailAttachmentDropzone } from "@mail/core/common/mail_attachment_dropzone";
+import { useMailComposerAttachmentsUploader } from "@mail/core/web/mail_composer_attachment_hook";
 
 export class MailComposerFormController extends formView.Controller {
     static props = {
@@ -14,7 +15,7 @@ export class MailComposerFormController extends formView.Controller {
     static defaultProps = { fullComposerBus: new EventBus() };
     setup() {
         super.setup();
-        toRaw(this.env.dialogData).model = "mail.compose.message";
+        toRaw(this.env.dialogData).model = this.props.resModel;
         useSubEnv({
             fullComposerBus: this.props.fullComposerBus,
         });
@@ -44,32 +45,53 @@ export class MailComposerFormRenderer extends formView.Renderer {
             () => [this.props.record.isInEdition, this.root.el, this.props.record.resId]
         );
 
-        const getActiveMailThreads = () =>
-            JSON.parse(this.props.record.data.res_ids).map((resId) => {
+        const getActiveMailThreads = () => {
+            let resIds;
+            if (this.props.record.resModel === "mail.scheduled.message") {
+                resIds = [this.props.record.data.res_id.resId];
+            } else {
+                // composer does not store res_ids past a certain limit, assume active_ids is used
+                resIds = this.props.record.data.res_ids
+                    ? JSON.parse(this.props.record.data.res_ids)
+                    : this.props.record.context.active_ids;
+            }
+            return resIds.map((resId) => {
                 const thread = this.mailStore.Thread.insert({
                     model: this.props.record.data.model,
                     id: resId,
                 });
                 return thread;
             });
+        };
 
         // Add file dropzone on full mail composer:
         this.attachmentUploadService = useService("mail.attachment_upload");
         this.operations = useX2ManyCrud(() => this.props.record.data["attachment_ids"], true);
 
+        const doUpload = useMailComposerAttachmentsUploader();
         useCustomDropzone(this.root, MailAttachmentDropzone, {
             /** @param {Event} event */
             onDrop: async (event) => {
-                for (const thread of getActiveMailThreads()) {
-                    for (const file of event.dataTransfer.files) {
-                        const attachment = await this.attachmentUploadService.upload(
-                            thread,
-                            thread.composer,
-                            file
-                        );
-                        await this.operations.saveRecord([attachment.id]);
+                const uploadFiles = async () => {
+                    for (const thread of getActiveMailThreads()) {
+                        // Use an isolated composer object instead of thread.composer to
+                        // avoid pushing into the main thread's composer.attachments list,
+                        // which is observed by the chatter.
+                        const composer =
+                            this.props.record.resModel === "mail.scheduled.message"
+                                ? { attachments: [] }
+                                : thread.composer;
+                        for (const file of event.dataTransfer.files) {
+                            const attachment = await this.attachmentUploadService.upload(
+                                thread,
+                                composer,
+                                file
+                            );
+                            await this.operations.saveRecord([attachment.id]);
+                        }
                     }
-                }
+                };
+                await doUpload(uploadFiles());
             },
         });
 
@@ -79,6 +101,10 @@ export class MailComposerFormRenderer extends formView.Renderer {
         };
 
         onCloseWizardModal(async () => {
+            if (this.props.record.resModel === "mail.scheduled.message") {
+                return;
+            }
+
             const selectedPartnerIds = this.props.record.data.partner_ids.currentIds;
             const selectedPartners = await this.orm.searchRead(
                 "res.partner",

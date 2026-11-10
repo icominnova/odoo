@@ -63,7 +63,7 @@ class IrQweb(models.AbstractModel):
                 if len(el_children) == 1:
                     sub_call = el_children[0].get('t-call')
                     if sub_call:
-                        el_children[0].set('t-options', f"{{'snippet-key': '{snippet_key}', 'snippet-sub-call-key': '{sub_call}'}}")
+                        el_children[0].set('t-options', f"{{'snippet-key': {snippet_key!r}, 'snippet-sub-call-key': {sub_call!r}}}")
         # If it already has a data-snippet it is a saved or an
         # inherited snippet. Do not override it.
         if 'data-snippet' not in snippet_base_node.attrib:
@@ -86,7 +86,7 @@ class IrQweb(models.AbstractModel):
         el.set('t-call', key)
         snippet_lang = self.env.context.get('snippet_lang')
         if snippet_lang:
-            el.set('t-lang', f"'{snippet_lang}'")
+            el.set('t-lang', repr(snippet_lang))
 
         el.set('t-options', f"{{'snippet-key': {key!r}}}")
         view = self.env['ir.ui.view']._get_template_view(key)
@@ -193,11 +193,23 @@ class IrQwebField(models.AbstractModel):
             lang = record.env.lang or 'en_US'
             base_lang = record._get_base_lang()
             if lang == base_lang:
-                attrs['data-oe-translation-state'] = 'translated'
+                translation_state = 'translated'
             else:
                 base_value = record.with_context(lang=base_lang)[field_name]
                 value = record[field_name]
-                attrs['data-oe-translation-state'] = 'translated' if base_value != value else 'to_translate'
+                if base_value == value:
+                    translation_state = 'to_translate'
+                else:
+                    (curr_record, curr_field) = (record, field)
+                    while curr_record and curr_field.related and not curr_field.store:
+                        curr_record = curr_record.mapped(curr_field.related.rsplit('.', 1)[0])[:1]
+                        curr_field = curr_field.related_field
+                    if not curr_field.store:
+                        translation_state = 'translated'
+                    else:
+                        translations = curr_field._get_stored_translations(curr_record) if curr_record else {}
+                        translation_state = 'translated' if lang in translations else 'to_translate'
+            attrs['data-oe-translation-state'] = translation_state
 
         return attrs
 

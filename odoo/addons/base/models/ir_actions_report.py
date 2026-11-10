@@ -14,7 +14,7 @@ from ast import literal_eval
 from collections import OrderedDict
 from contextlib import closing, ExitStack
 from itertools import islice
-from urllib.parse import urlparse
+from urllib.parse import urlsplit
 
 import lxml.html
 from PIL import Image, ImageFile
@@ -25,10 +25,11 @@ from odoo import api, fields, models, modules, tools, _
 from odoo.exceptions import UserError, AccessError, RedirectWarning, ValidationError
 from odoo.fields import Domain
 from odoo.service import security
-from odoo.http import request, root
+from odoo.http import root
 from odoo.tools import config, is_html_empty, parse_version, split_every
 from odoo.tools.barcode import check_barcode_encoding, createBarcodeDrawing, get_barcode_font
-from odoo.tools.misc import find_in_path
+from odoo.tools.lru import LRU
+from odoo.tools.misc import find_in_path, frozendict
 from odoo.tools.pdf import PdfFileReader, PdfFileWriter, PdfReadError
 from odoo.tools.safe_eval import safe_eval, time
 
@@ -266,7 +267,7 @@ class IrActionsReport(models.Model):
         attachment_name = safe_eval(self.attachment, {'object': record, 'time': time}) if self.attachment else ''
         if not attachment_name:
             return None
-        return self.env['ir.attachment'].search([
+        return record.env['ir.attachment'].search([
                 ('name', '=', attachment_name),
                 ('res_model', '=', self.model),
                 ('res_id', '=', record.id)
@@ -451,14 +452,14 @@ class IrActionsReport(models.Model):
             'base_url': base_url,
             'report_xml_id': self.xml_id,
             'debug': self.env.context.get("debug"),
-        })
+        }) if len(header_node) else None
         footer = self.env['ir.qweb']._render(layout.id, {
             'subst': True,
             'body': Markup(lxml.html.tostring(footer_node, encoding='unicode')),
             'base_url': base_url,
             'report_xml_id': self.xml_id,
             'debug': self.env.context.get("debug"),
-        })
+        }) if len(footer_node) else None
 
         return bodies, res_ids, header, footer, specific_paperformat_args
 
@@ -553,39 +554,38 @@ class IrActionsReport(models.Model):
         with ExitStack() as stack:
 
             # Passing the cookie to wkhtmltopdf in order to resolve internal links.
-            if request and request.db:
-                # Create a temporary session which will not create device logs
-                temp_session = root.session_store.new()
-                temp_session.update({
-                    **request.session,
-                    'debug': '',
-                    '_trace_disable': True,
-                })
-                if temp_session.uid:
-                    temp_session.session_token = security.compute_session_token(temp_session, self.env)
-                root.session_store.save(temp_session)
-                stack.callback(root.session_store.delete, temp_session)
+            temp_session = root.session_store.new()
+            temp_session.update({
+                'db': self.env.registry.db_name,
+                'debug': '',
+                '_trace_disable': True,
+            })
+            if not self.env.user._is_public():
+                temp_session.uid = self.env.uid
+                temp_session.session_token = security.compute_session_token(temp_session, self.env)
+            root.session_store.save(temp_session)
+            stack.callback(root.session_store.delete, temp_session)
 
-                base_url = self._get_report_url()
-                domain = urlparse(base_url).hostname
-                cookie = f'session_id={temp_session.sid}; HttpOnly; domain={domain}; path=/;'
-                cookie_jar_file_fd, cookie_jar_file_path = tempfile.mkstemp(suffix='.txt', prefix='report.cookie_jar.tmp.')
-                stack.callback(delete_file, cookie_jar_file_path)
-                with closing(os.fdopen(cookie_jar_file_fd, 'wb')) as cookie_jar_file:
-                    cookie_jar_file.write(cookie.encode())
-                command_args.extend(['--cookie-jar', cookie_jar_file_path])
+            base_url = self._get_report_url()
+            domain = urlsplit(base_url).hostname
+            cookie = f'session_id={temp_session.sid}; HttpOnly; domain={domain}; path=/;'
+            cookie_jar_file_fd, cookie_jar_file_path = tempfile.mkstemp(suffix='.txt', prefix='report.cookie_jar.tmp.')
+            stack.callback(delete_file, cookie_jar_file_path)
+            with closing(os.fdopen(cookie_jar_file_fd, 'wb')) as cookie_jar_file:
+                cookie_jar_file.write(cookie.encode())
+            command_args.extend(['--cookie-jar', cookie_jar_file_path])
 
             if header:
                 head_file_fd, head_file_path = tempfile.mkstemp(suffix='.html', prefix='report.header.tmp.')
+                stack.callback(delete_file, head_file_path)
                 with closing(os.fdopen(head_file_fd, 'wb')) as head_file:
                     head_file.write(header.encode())
-                stack.callback(delete_file, head_file_path)
                 files_command_args.extend(['--header-html', head_file_path])
             if footer:
                 foot_file_fd, foot_file_path = tempfile.mkstemp(suffix='.html', prefix='report.footer.tmp.')
+                stack.callback(delete_file, foot_file_path)
                 with closing(os.fdopen(foot_file_fd, 'wb')) as foot_file:
                     foot_file.write(footer.encode())
-                stack.callback(delete_file, foot_file_path)
                 files_command_args.extend(['--footer-html', foot_file_path])
 
             paths = []
@@ -593,6 +593,7 @@ class IrActionsReport(models.Model):
             for body_idx, body in enumerate(bodies):
                 prefix = f'report.body.tmp.{body_idx}.'
                 body_file_fd, body_file_path = tempfile.mkstemp(suffix='.html', prefix=prefix)
+                stack.callback(delete_file, body_file_path)
                 with closing(os.fdopen(body_file_fd, 'wb')) as body_file:
                     # HACK: wkhtmltopdf doesn't like big table at all and the
                     #       processing time become exponential with the number
@@ -608,11 +609,10 @@ class IrActionsReport(models.Model):
                         _split_table(tree, 500)
                         body_file.write(lxml.html.tostring(tree))
                 paths.append(body_file_path)
-                stack.callback(delete_file, body_file_path)
 
             pdf_report_fd, pdf_report_path = tempfile.mkstemp(suffix='.pdf', prefix='report.tmp.')
-            os.close(pdf_report_fd)
             stack.callback(delete_file, pdf_report_path)
+            os.close(pdf_report_fd)
 
             process = _run_wkhtmltopdf(command_args + files_command_args + paths + [pdf_report_path])
             err = process.stderr
@@ -732,17 +732,19 @@ class IrActionsReport(models.Model):
             barcode_type = 'Code128'
 
         try:
-            barcode = createBarcodeDrawing(barcode_type, value=value, format='png', **kwargs)
-
-            # If a mask is asked and it is available, call its function to
-            # post-process the generated QR-code image
+            mask_to_apply = None
             if kwargs['mask']:
                 available_masks = self.get_available_barcode_masks()
                 mask_to_apply = available_masks.get(kwargs['mask'])
+            frozen_kwargs = frozendict(kwargs)
+            cache = self.env.cr.cache.setdefault('ir_actions_report_barcode', LRU(256))
+            cache_key = (barcode_type, value, frozen_kwargs, mask_to_apply)
+            if cache_key not in cache:
+                barcode = createBarcodeDrawing(barcode_type, value=value, format='png', **frozen_kwargs)
                 if mask_to_apply:
-                    mask_to_apply(kwargs['width'], kwargs['height'], barcode)
-
-            return barcode.asString('png')
+                    mask_to_apply(frozen_kwargs['width'], frozen_kwargs['height'], barcode)
+                cache[cache_key] = barcode.asString('png')
+            return cache[cache_key]
         except (ValueError, AttributeError):
             if barcode_type == 'Code128':
                 raise ValueError("Cannot convert into barcode.")
@@ -792,14 +794,17 @@ class IrActionsReport(models.Model):
         raise UserError(_("Odoo is unable to merge the generated PDFs."))
 
     @api.model
-    def _merge_pdfs(self, streams, handle_error=_handle_merge_pdfs_error):
+    def _merge_pdfs(self, streams, handle_error=None):
         writer = PdfFileWriter()
         for stream in streams:
             try:
                 reader = PdfFileReader(stream)
                 writer.appendPagesFromReader(reader)
             except (PdfReadError, TypeError, NotImplementedError, ValueError) as e:
-                handle_error(error=e, error_stream=stream)
+                if handle_error is None:
+                    self._handle_merge_pdfs_error(error=e, error_stream=stream)
+                else:
+                    handle_error(error=e, error_stream=stream)
         result_stream = io.BytesIO()
         streams.append(result_stream)
         try:
@@ -966,11 +971,11 @@ class IrActionsReport(models.Model):
                         stream = io.BytesIO()
                         attachment_writer.write(stream)
                         collected_streams[res_ids_wo_stream[i]]['stream'] = stream
-                    return collected_streams
                 else:
                     for res_id in res_ids_wo_stream:
                         individual_collected_stream = self._render_qweb_pdf_prepare_streams(report_ref=report_ref, data=data, res_ids=[res_id])
                         collected_streams[res_id]['stream'] = individual_collected_stream[res_id]['stream']
+                return collected_streams
             collected_streams[False] = {'stream': pdf_content_stream, 'attachment': None}
 
         return collected_streams

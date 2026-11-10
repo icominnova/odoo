@@ -51,3 +51,41 @@ test("should remove `style.color` from table and apply it to td without `style.c
         `),
     });
 });
+
+test("Should properly add feffs around icons", async () => {
+    await testEditor({
+        contentBefore: `<div><span class="fa fa-glass" contenteditable="false"></span></div>`,
+        contentBeforeEdit: `<div class="o-paragraph">\ufeff<span class="fa fa-glass" contenteditable="false">\u200b</span>\ufeff</div>`,
+    });
+});
+
+test("should not distribute table color to tds of a nested table", async () => {
+    await testEditor({
+        contentBefore: unformat(`
+                <table style="color: red;"><tbody>
+                    <tr><td>ab</td></tr>
+                    <tr><td>
+                        <table><tbody>
+                            <tr><td>cd</td></tr>
+                        </tbody></table>
+                    </td></tr>
+                </tbody></table>
+            `),
+        contentBeforeEdit: unformat(`
+            <p data-selection-placeholder=""><br></p>
+            <table style="">
+                <tbody>
+                    <tr><td style="color: red;">ab</td></tr>
+                    <tr><td style="color: red;">
+                        <table>
+                            <tbody>
+                                <tr><td>cd</td></tr>
+                            </tbody>
+                        </table>
+                    </td></tr>
+                </tbody>
+            </table>
+            <p data-selection-placeholder=""><br></p>
+        `),
+    });
+});

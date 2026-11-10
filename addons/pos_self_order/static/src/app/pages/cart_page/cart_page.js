@@ -100,7 +100,22 @@ export class CartPage extends Component {
             return;
         }
 
-        if (!this.selfOrder.currentOrder.presetRequirementsFilled && orderingMode !== "table") {
+        const order = this.selfOrder.currentOrder;
+        const partner = order.partner_id || {};
+        const time = order.preset_time ? order.preset_time.toSQL() : null;
+        const isValidRequiredInfo = this.selfOrder.isValidSelection(time, {
+            id: parseInt(partner.id),
+            name: partner.name || order.floating_order_name,
+            email: partner.email || order.email,
+            phone: partner.phone || order.mobile,
+            street: partner.street,
+            city: partner.city,
+            country_id: partner.country_id,
+            state_id: partner.state_id,
+            zip: partner.zip,
+        });
+
+        if (!isValidRequiredInfo && orderingMode !== "table") {
             this.state.fillInformations = true;
             return;
         }
@@ -125,12 +140,15 @@ export class CartPage extends Component {
     async proceedInfos(state) {
         this.state.fillInformations = false;
         if (state) {
+            this.selfOrder.currentOrder.mobile =
+                this.selfOrder.currentOrder.partner_id?.phone || state.phone;
             this.selfOrder.currentOrder.email =
                 this.selfOrder.currentOrder.partner_id?.email || state.email;
             await this.pay();
         }
     }
 
+    // TODO: remove in master
     generateTicketImage = async (basicReceipt = false) =>
         await this.renderer.toJpeg(
             OrderReceipt,
@@ -141,6 +159,7 @@ export class CartPage extends Component {
             { addClass: "pos-receipt-print p-3" }
         );
 
+    // TODO: remove in master
     async _sendReceiptToCustomer({ action, destination, mail_template_id }) {
         const order = this.selfOrder.currentOrder;
         const fullTicketImage = await this.generateTicketImage();

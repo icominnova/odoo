@@ -8,16 +8,16 @@
 # Martin Trigaux, 2022
 # Niyas Raphy, 2022
 # Malaz Abuidris <msea@odoo.com>, 2023
-# "Tiffany Chang (tic)" <tic@odoo.com>, 2025.
-# "Dylan Kiss (dyki)" <dyki@odoo.com>, 2025.
-# Weblate <noreply-mt-weblate@weblate.org>, 2025.
+# "Tiffany Chang (tic)" <tic@odoo.com>, 2025, 2026.
+# "Dylan Kiss (dyki)" <dyki@odoo.com>, 2025, 2026.
+# Weblate <noreply-mt-weblate@weblate.org>, 2025, 2026.
 # "Malaz Siddig Elsayed Abuidris (msea)" <msea@odoo.com>, 2025, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-01-25 18:35+0000\n"
-"PO-Revision-Date: 2026-01-05 11:11+0000\n"
+"POT-Creation-Date: 2026-11-06 17:37+0000\n"
+"PO-Revision-Date: 2026-09-09 12:36+0000\n"
 "Last-Translator: \"Malaz Siddig Elsayed Abuidris (msea)\" <msea@odoo.com>\n"
 "Language-Team: Arabic <https://translate.odoo.com/projects/odoo-19/"
 "hr_holidays/ar/>\n"
@@ -27,7 +27,7 @@ msgstr ""
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=6; plural=n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 "
 "&& n%100<=10 ? 3 : n%100>=11 ? 4 : 5;\n"
-"X-Generator: Weblate 5.14.3\n"
+"X-Generator: Weblate 2026.8.1\n"
 
 #. module: hr_holidays
 #. odoo-python
@@ -175,6 +175,16 @@ msgstr "%(name)s (%(time)g متبقية من أصل %(maximum)g ساعات)"
 #. module: hr_holidays
 #. odoo-python
 #: code:addons/hr_holidays/models/hr_leave.py:0
+msgid ""
+"%(name)s does not have a valid allocation for the leave type %(leave_type)s "
+"to cover that request."
+msgstr ""
+"لا يتوفر لدى الموظف %(name)s تخصيص رصيد كافٍ من نوع الإجازة %(leave_type)s "
+"لتغطية هذا الطلب."
+
+#. module: hr_holidays
+#. odoo-python
+#: code:addons/hr_holidays/models/hr_leave.py:0
 msgid "%(name)s: %(duration)s"
 msgstr "%(name)s: %(duration)s"
 
@@ -189,6 +199,12 @@ msgstr "%(person)s في %(leave_type)s: %(duration)s (%(start)s)"
 #: code:addons/hr_holidays/models/hr_leave.py:0
 msgid "%(person)s: %(duration)s (%(start)s)"
 msgstr "%(person)s: %(duration)s (%(start)s)"
+
+#. module: hr_holidays
+#. odoo-python
+#: code:addons/hr_holidays/wizard/hr_leave_generate_multi_wizard.py:0
+msgid "%(success_count)s time off request(s) created successfully."
+msgstr ""
 
 #. module: hr_holidays
 #. odoo-python
@@ -246,16 +262,6 @@ msgstr "ملخص ("
 #: code:addons/hr_holidays/static/src/leave_stats/leave_stats.xml:0
 msgid "'s summary in this period"
 msgstr ": ملخص هذه الفترة"
-
-#. module: hr_holidays
-#. odoo-javascript
-#: code:addons/hr_holidays/static/src/components/accrual_level/accrual_levels.xml:0
-msgid ""
-"(s)\n"
-"                                    and a balance cap is set to"
-msgstr ""
-"(s)\n"
-"                                    وتعيين الحد الأقصى للرصيد إلى"
 
 #. module: hr_holidays
 #. odoo-javascript
@@ -336,7 +342,7 @@ msgstr "<span class=\"mx-1\">-</span>"
 #. module: hr_holidays
 #: model_terms:ir.ui.view,arch_db:hr_holidays.hr_leave_view_kanban
 msgid "<span class=\"mx-1\">–</span>"
-msgstr ""
+msgstr "<span class=\"mx-1\">–</span>"
 
 #. module: hr_holidays
 #: model_terms:ir.ui.view,arch_db:hr_holidays.edit_holiday_status_form
@@ -345,6 +351,9 @@ msgid ""
 "                                        <span class=\"mx-2\" "
 "invisible=\"request_unit != 'hour'\">hours</span>"
 msgstr ""
+"<span class=\"mx-2\" invisible=\"request_unit == 'hour'\">أيام</span>\n"
+"                                        <span class=\"mx-2\" "
+"invisible=\"request_unit != 'hour'\">ساعات</span>"
 
 #. module: hr_holidays
 #: model_terms:ir.ui.view,arch_db:hr_holidays.edit_holiday_status_form
@@ -446,7 +455,7 @@ msgstr "<strong>الأقسام والموظفين</strong>"
 #. odoo-javascript
 #: code:addons/hr_holidays/static/src/components/accrual_level/accrual_levels.xml:0
 msgid "A balance cap is set to"
-msgstr ""
+msgstr "تم تعيين الحد الأقصى للرصيد كـ "
 
 #. module: hr_holidays
 #. odoo-python
@@ -503,6 +512,11 @@ msgstr ""
 "%(versions)s"
 
 #. module: hr_holidays
+#: model_terms:ir.ui.view,arch_db:hr_holidays.hr_leave_view_form
+msgid "A supporting document is required for this type of time off."
+msgstr ""
+
+#. module: hr_holidays
 #. odoo-python
 #: code:addons/hr_holidays/models/hr_leave.py:0
 msgid "A time off cannot be duplicated."
@@ -512,7 +526,7 @@ msgstr "لا يمكن استنساخ أيام الإجازة"
 #. odoo-javascript
 #: code:addons/hr_holidays/static/src/components/accrual_level/accrual_levels.xml:0
 msgid "A yearly cap is set to"
-msgstr ""
+msgstr "تم تعيين الحد الأقصى السنوي كـ "
 
 #. module: hr_holidays
 #: model:ir.model.fields,field_description:hr_holidays.field_hr_employee__show_leaves
@@ -752,7 +766,7 @@ msgstr "بعد"
 #. module: hr_holidays
 #: model_terms:ir.ui.view,arch_db:hr_holidays.hr_accrual_level_view_form
 msgid "After a year, unused time off will be :"
-msgstr ""
+msgstr "بعد مرور عام، سيتم التعامل مع الإجازات غير المستخدمة على النحو التالي:"
 
 #. module: hr_holidays
 #: model:ir.model.fields.selection,name:hr_holidays.selection__hr_leave_accrual_plan__transition_mode__end_of_accrual
@@ -932,7 +946,7 @@ msgstr "السماح بالحد الأقصى السلبي"
 #. module: hr_holidays
 #: model:ir.model.fields,field_description:hr_holidays.field_hr_leave_type__allow_request_on_top
 msgid "Allow Request on Top"
-msgstr ""
+msgstr "السماح بالطلب في الأعلى"
 
 #. module: hr_holidays
 #: model:ir.model.fields,help:hr_holidays.field_hr_leave_allocation_generate_multi_wizard__allocation_mode
@@ -1068,6 +1082,7 @@ msgstr "أيقونة السهم"
 msgid ""
 "As Time Off Responsible, you can only use the allocation mode 'By Employee'."
 msgstr ""
+"بصفتك المسؤول عن الإجازات، لا يمكنك استخدام سوى وضع التخصيص 'حسب الموظف'."
 
 #. module: hr_holidays
 #: model_terms:ir.ui.view,arch_db:hr_holidays.hr_leave_allocation_view_form_dashboard
@@ -1161,7 +1176,7 @@ msgstr "سيرجع في %(date)s"
 #. module: hr_holidays
 #: model_terms:ir.ui.view,arch_db:hr_holidays.hr_leave_view_form
 msgid "Back to Approval"
-msgstr ""
+msgstr "العودة إلى الموافقة"
 
 #. module: hr_holidays
 #. odoo-javascript
@@ -1343,12 +1358,16 @@ msgid ""
 "period they already took leaves. Changing this working schedule changes the "
 "duration of these leaves in such a way the employee no longer has the "
 "required allocation for them. Please review these leaves and/or allocations "
-"before changing the contract."
+"before changing the contract.\n"
+"\n"
+"This error has been triggered by:\n"
 msgstr ""
 "يؤدي تغيير العقد على هذا الموظف إلى تغيير جدول عمله في الفترة التي حصل فيها "
 "على إجازات بالفعل. يؤدي تغيير جدول العمل هذا إلى تغيير مدة هذه الإجازات بحيث "
 "لم يعد الموظف لديه التخصيص المطلوب لها. يرجى مراجعة هذه الإجازات و/أو "
-"التخصيصات قبل تغيير العقد."
+"التخصيصات قبل تغيير العقد. \n"
+"\n"
+"حدث هذا الخطأ بسبب\n"
 
 #. module: hr_holidays
 #. odoo-python
@@ -1414,6 +1433,11 @@ msgid "Color"
 msgstr "اللون"
 
 #. module: hr_holidays
+#: model:ir.model,name:hr_holidays.model_res_company
+msgid "Companies"
+msgstr "الشركات"
+
+#. module: hr_holidays
 #: model:ir.model.fields,field_description:hr_holidays.field_hr_leave__company_id
 #: model:ir.model.fields,field_description:hr_holidays.field_hr_leave_accrual_plan__company_id
 #: model:ir.model.fields,field_description:hr_holidays.field_hr_leave_allocation__employee_company_id
@@ -1476,7 +1500,7 @@ msgstr "جهة الاتصال"
 #. module: hr_holidays
 #: model_terms:ir.ui.view,arch_db:hr_holidays.edit_holiday_status_form
 msgid "Count as"
-msgstr ""
+msgstr "تُحسب على أنها"
 
 #. module: hr_holidays
 #: model_terms:ir.ui.view,arch_db:hr_holidays.edit_holiday_status_form
@@ -1618,7 +1642,7 @@ msgstr "التاريخ"
 #. module: hr_holidays
 #: model:ir.model.fields,field_description:hr_holidays.field_hr_leave__request_date_to_period
 msgid "Date Period End"
-msgstr ""
+msgstr "تاريخ نهاية الفترة"
 
 #. module: hr_holidays
 #: model:ir.model.fields,field_description:hr_holidays.field_hr_leave__request_date_from_period
@@ -1685,17 +1709,17 @@ msgstr "ديسمبر"
 #. module: hr_holidays
 #: model_terms:ir.ui.view,arch_db:hr_holidays.hr_accrual_level_view_form
 msgid "Define a balance cap?"
-msgstr ""
+msgstr "ما هو الحد الأقصى للرصيد؟"
 
 #. module: hr_holidays
 #: model_terms:ir.ui.view,arch_db:hr_holidays.hr_accrual_level_view_form
 msgid "Define a carry over validity?"
-msgstr ""
+msgstr "ما المقصود بـ \"صلاحية الترحيل\"؟"
 
 #. module: hr_holidays
 #: model_terms:ir.ui.view,arch_db:hr_holidays.hr_accrual_level_view_form
 msgid "Define a yearly cap?"
-msgstr ""
+msgstr "تحديد حد أقصى سنوياً؟"
 
 #. module: hr_holidays
 #: model:ir.model.fields,help:hr_holidays.field_hr_leave_type__max_allowed_negative
@@ -1800,6 +1824,7 @@ msgstr "إهمال"
 #: model:ir.model.fields,field_description:hr_holidays.field_mail_activity_type__display_name
 #: model:ir.model.fields,field_description:hr_holidays.field_mail_message_subtype__display_name
 #: model:ir.model.fields,field_description:hr_holidays.field_report_hr_holidays_report_holidayssummary__display_name
+#: model:ir.model.fields,field_description:hr_holidays.field_res_company__display_name
 #: model:ir.model.fields,field_description:hr_holidays.field_res_partner__display_name
 #: model:ir.model.fields,field_description:hr_holidays.field_res_users__display_name
 #: model:ir.model.fields,field_description:hr_holidays.field_resource_calendar__display_name
@@ -1905,7 +1930,7 @@ msgstr "المدة (بالساعات)"
 #: model:ir.model.fields,field_description:hr_holidays.field_hr_leave_allocation_generate_multi_wizard__request_unit
 #: model:ir.model.fields,field_description:hr_holidays.field_hr_leave_type__request_unit
 msgid "Duration Type"
-msgstr ""
+msgstr "نوع المدة"
 
 #. module: hr_holidays
 #: model:ir.model.fields,help:hr_holidays.field_hr_leave_allocation__number_of_days
@@ -1916,12 +1941,12 @@ msgstr "المدة بالأيام. حقل مرجعي يُستخدم عند ال�
 #: model:ir.model.fields,field_description:hr_holidays.field_hr_leave_type__elligible_for_accrual_rate
 #: model:ir.model.fields,field_description:hr_holidays.field_resource_calendar_leaves__elligible_for_accrual_rate
 msgid "Eligible for Accrual Rate"
-msgstr ""
+msgstr "مستحق لاحتساب معدل تراكم الإجازات / الرصيد"
 
 #. module: hr_holidays
 #: model:hr.leave.type,name:hr_holidays.l10n_sa_leave_type_emergency
 msgid "Emergency Leave"
-msgstr ""
+msgstr "إجازة طارئة"
 
 #. module: hr_holidays
 #: model:ir.model,name:hr_holidays.model_hr_employee
@@ -2094,7 +2119,7 @@ msgstr ""
 msgid ""
 "For your reference, the equivalent times in your timezone are displayed "
 "below."
-msgstr ""
+msgstr "للإشارة، تظهر أدناه الأوقات المقابلة في منطقتك الزمنية."
 
 #. module: hr_holidays
 #: model:ir.model.fields,field_description:hr_holidays.field_hr_leave_accrual_level__frequency
@@ -2212,7 +2237,7 @@ msgstr "HK Paternity Leaves"
 #. module: hr_holidays
 #: model:hr.leave.type,name:hr_holidays.l10n_hk_leave_type_paternity_leave_80
 msgid "HK Paternity Leaves 80%"
-msgstr ""
+msgstr "إجازات الأبوة في هونغ كونغ 80%"
 
 #. module: hr_holidays
 #: model:hr.leave.type,name:hr_holidays.l10n_hk_leave_type_sick_leave
@@ -2322,7 +2347,7 @@ msgstr "ساعات"
 #. module: hr_holidays
 #: model_terms:ir.ui.view,arch_db:hr_holidays.hr_accrual_level_view_form
 msgid "How much time can be carried over :"
-msgstr ""
+msgstr "كم من الوقت يمكن ترحيله :"
 
 #. module: hr_holidays
 #: model:ir.model.fields,field_description:hr_holidays.field_hr_employee__hr_icon_display
@@ -2352,6 +2377,7 @@ msgstr "عرض أيقونة الموارد البشرية"
 #: model:ir.model.fields,field_description:hr_holidays.field_mail_activity_type__id
 #: model:ir.model.fields,field_description:hr_holidays.field_mail_message_subtype__id
 #: model:ir.model.fields,field_description:hr_holidays.field_report_hr_holidays_report_holidayssummary__id
+#: model:ir.model.fields,field_description:hr_holidays.field_res_company__id
 #: model:ir.model.fields,field_description:hr_holidays.field_res_partner__id
 #: model:ir.model.fields,field_description:hr_holidays.field_res_users__id
 #: model:ir.model.fields,field_description:hr_holidays.field_resource_calendar__id
@@ -2410,7 +2436,7 @@ msgstr "الأيقونة للإشارة إلى النشاط المستثنى."
 #. module: hr_holidays
 #: model:hr.leave.type,name:hr_holidays.l10n_sa_leave_type_iddah
 msgid "Iddah Leave"
-msgstr ""
+msgstr "إجازة العدة"
 
 #. module: hr_holidays
 #. odoo-javascript
@@ -2439,12 +2465,16 @@ msgid ""
 "If checked, this time off type will be taken into account for accruals "
 "computation."
 msgstr ""
+"إذا تم تحديد هذا الخيار، فسيتم أخذ هذا النوع من الإجازات في الاعتبار عند "
+"حساب الاستحقاقات."
 
 #. module: hr_holidays
 #: model:ir.model.fields,help:hr_holidays.field_hr_leave_type__allow_request_on_top
 msgid ""
 "If checked, users can request another leave on top of the ones of this type."
 msgstr ""
+"إذا تم تحديد هذه الخانة، يمكن للمستخدمين طلب إجازة أخرى بالإضافة إلى "
+"الإجازات من هذا النوع."
 
 #. module: hr_holidays
 #: model:ir.model.fields,help:hr_holidays.field_hr_leave_type__allows_negative
@@ -2472,6 +2502,14 @@ msgid ""
 msgstr ""
 "إذا تم تعيين قيمة الحقل النشط كخطأ، سوف يتيح لك إخفاء نوع الإجازة دون "
 "إزالتها."
+
+#. module: hr_holidays
+#: model:ir.model.fields,help:hr_holidays.field_hr_leave_type__create_calendar_meeting
+msgid ""
+"If this field is checked, every leave request of this type will have a "
+"corresponding entry in the calendar application. There will be no entry if "
+"this stays unchecked."
+msgstr ""
 
 #. module: hr_holidays
 #: model:ir.model.constraint,message:hr_holidays.constraint_hr_leave_duration_check
@@ -2536,7 +2574,7 @@ msgstr "مستخدَم"
 #. module: hr_holidays
 #: model_terms:ir.ui.view,arch_db:hr_holidays.hr_accrual_plan_view_form
 msgid "It is based on worked time?"
-msgstr ""
+msgstr "هل يعتمد ذلك على وقت العمل؟"
 
 #. module: hr_holidays
 #: model:ir.model.fields.selection,name:hr_holidays.selection__hr_leave_accrual_level__first_month__1
@@ -3079,12 +3117,13 @@ msgstr "لا توجد مؤشرات تقدم في الخطة حتى الآن. د�
 #: model_terms:ir.ui.view,arch_db:hr_holidays.hr_accrual_plan_view_form
 msgid "No, always consider the entire accrual period (whole calendar days)."
 msgstr ""
+"لا، يجب دائمًا مراعاة فترة الاستحقاق بأكملها (الأيام التقويمية الكاملة)."
 
 #. module: hr_holidays
 #. odoo-javascript
 #: code:addons/hr_holidays/static/src/components/accrual_level/accrual_levels.js:0
 msgid "No, keep the old version"
-msgstr ""
+msgstr "لا، احتفظ بالنسخة القديمة"
 
 #. module: hr_holidays
 #: model_terms:ir.actions.act_window,help:hr_holidays.action_hr_holidays_dashboard
@@ -3119,6 +3158,8 @@ msgstr "لا توجد حاجة لأي منها"
 msgid ""
 "Not possible state. State Approve is only used for leave needed 2 approvals"
 msgstr ""
+"لا يمكن الانتقال لهذه الحالة. تُستخدم حالة \"موافق عليه\" فقط لطلبات الإجازة "
+"التي تتطلب موافقتين ثنائيتين"
 
 #. module: hr_holidays
 #: model:ir.model.fields,field_description:hr_holidays.field_hr_leave_type__responsible_ids
@@ -3323,12 +3364,12 @@ msgstr "نظرة عامة"
 #. module: hr_holidays
 #: model:hr.leave.type,name:hr_holidays.l10n_pl_leave_type_sick_leave
 msgid "PL Sick Leaves 80% "
-msgstr ""
+msgstr "PL إجازات مرضية 80% "
 
 #. module: hr_holidays
 #: model:hr.leave.type,name:hr_holidays.l10n_eg_leave_type_paid_sick_time_off
 msgid "Paid Sick time off"
-msgstr ""
+msgstr "إجازة مرضية مدفوعة الأجر"
 
 #. module: hr_holidays
 #: model:hr.leave.type,name:hr_holidays.leave_type_paid_time_off
@@ -3361,7 +3402,7 @@ msgstr "الفترة"
 #. module: hr_holidays
 #: model:hr.leave.type,name:hr_holidays.l10n_jo_leave_type_pilgrimage
 msgid "Pilgrimage Leave"
-msgstr ""
+msgstr "إجازة الحج"
 
 #. module: hr_holidays
 #: model:ir.model.fields.selection,name:hr_holidays.selection__hr_leave_employee_type_report__holiday_status__planned
@@ -3708,7 +3749,7 @@ msgstr "تحديد الحد الأقصى للاستحقاقات التي يحت�
 #. module: hr_holidays
 #: model_terms:ir.ui.view,arch_db:hr_holidays.hr_accrual_level_view_form
 msgid "Set the employee accrual frequency :"
-msgstr ""
+msgstr "تحديد وتيرة استحقاقات الموظف:"
 
 #. module: hr_holidays
 #: model_terms:ir.ui.view,arch_db:hr_holidays.view_hr_holidays_filter
@@ -3719,13 +3760,13 @@ msgstr "عرض كافة السجلات التي مضى تاريخ نشاطها �
 #. module: hr_holidays
 #: model:hr.leave.type,name:hr_holidays.l10n_sa_leave_type_sick_leave_100
 msgid "Sick Leave (100% Paid)"
-msgstr ""
+msgstr "إجازة مرضية (مدفوعة الأجر بالكامل)"
 
 #. module: hr_holidays
 #: model:hr.leave.type,name:hr_holidays.l10n_eg_leave_type_sick_leave_75
 #: model:hr.leave.type,name:hr_holidays.l10n_sa_leave_type_sick_leave_75
 msgid "Sick Leave (75% Paid)"
-msgstr ""
+msgstr "إجازة مرضية (مدفوعة بنسبة 75%)"
 
 #. module: hr_holidays
 #: model:hr.leave.type,name:hr_holidays.l10n_eg_leave_type_sick_leave_unpaid
@@ -3736,7 +3777,7 @@ msgstr "إجازة مرضية (غير مدفوعة الأجر)"
 #. module: hr_holidays
 #: model:hr.leave.type,name:hr_holidays.l10n_jo_leave_type_unpaid_sick
 msgid "Sick Leave (Unpaid)"
-msgstr ""
+msgstr "إجازة مرضية (غير مدفوعة الأجر)"
 
 #. module: hr_holidays
 #: model:hr.leave.type,name:hr_holidays.l10n_ae_leave_type_sick_leave_0
@@ -3881,7 +3922,7 @@ msgstr "Striked"
 #: model:hr.leave.type,name:hr_holidays.l10n_jo_leave_type_study
 #: model:hr.leave.type,name:hr_holidays.l10n_sa_leave_type_study
 msgid "Study Leave"
-msgstr ""
+msgstr "إجازة دراسة"
 
 #. module: hr_holidays
 #. odoo-javascript
@@ -3933,7 +3974,7 @@ msgstr "المستندات الداعمة"
 #. module: hr_holidays
 #: model_terms:ir.ui.view,arch_db:hr_holidays.hr_accrual_plan_view_form
 msgid "Switch employees to the new accrual level:"
-msgstr ""
+msgstr "حوّل الموظفين إلى مستوى الاستحقاق الجديد:"
 
 #. module: hr_holidays
 #. odoo-javascript
@@ -3985,9 +4026,19 @@ msgid ""
 msgstr "سيتم استخدام اللون المحدد هنا في كافة الشاشات التي بها نوع الإجازة."
 
 #. module: hr_holidays
+#. odoo-python
+#: code:addons/hr_holidays/models/res_company.py:0
+msgid ""
+"The company country cannot be changed while time off leaves or allocations "
+"with the country exist."
+msgstr ""
+"لا يمكن تغيير دولة الشركة طالما توجد إجازات أو تخصيصات أرصدة مرتبطة بهذه "
+"الدولة."
+
+#. module: hr_holidays
 #: model_terms:ir.ui.view,arch_db:hr_holidays.hr_accrual_level_view_form
 msgid "The days carried over will be effective for"
-msgstr ""
+msgstr "ستكون الأيام المرحّلة سارية المفعول لمدة "
 
 #. module: hr_holidays
 #: model:ir.model.fields,help:hr_holidays.field_hr_leave_type__time_type
@@ -4057,6 +4108,8 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:hr_holidays.hr_accrual_level_view_form
 msgid "The plan will be on hold if the balance reach"
 msgstr ""
+"سيتم إيقاف الخطة مؤقتاً إذا وصل الرصيد إلى سيتم إيقاف الخطة مؤقتاً إذا وصل "
+"الرصيد إلى "
 
 #. module: hr_holidays
 #: model:ir.model.constraint,message:hr_holidays.constraint_hr_leave_date_check3
@@ -4113,12 +4166,6 @@ msgid ""
 msgstr ""
 "لا يوجد موظف معين للإجازة. رجاءً تأكد من أنك قد قمت بتسجيل الدخول إلى الشركة "
 "الصحيحة."
-
-#. module: hr_holidays
-#. odoo-python
-#: code:addons/hr_holidays/models/hr_leave.py:0
-msgid "There is no valid allocation to cover that request."
-msgstr "لا يوجد تخصيص صالح لتغطية هذا الطلب."
 
 #. module: hr_holidays
 #. odoo-python
@@ -4180,7 +4227,7 @@ msgstr "يحدد هذا ما إن كان استخدام هذا النوع من �
 #. module: hr_holidays
 #: model_terms:ir.ui.view,arch_db:hr_holidays.hr_accrual_level_view_form
 msgid "This milestone will be reached :"
-msgstr ""
+msgstr "سيتم الوصول إلى هذه المرحلة في:"
 
 #. module: hr_holidays
 #. odoo-python
@@ -4276,6 +4323,12 @@ msgstr "لوحة بيانات الإجازات "
 #: model:ir.model.fields,field_description:hr_holidays.field_hr_leave__private_name
 msgid "Time Off Description"
 msgstr "وصف الإجازة"
+
+#. module: hr_holidays
+#. odoo-python
+#: code:addons/hr_holidays/wizard/hr_leave_generate_multi_wizard.py:0
+msgid "Time Off Generated"
+msgstr ""
 
 #. module: hr_holidays
 #: model:ir.model.fields,field_description:hr_holidays.field_hr_leave_type__leave_notif_subtype_id
@@ -4625,19 +4678,19 @@ msgstr "الرسائل غير المقروءة"
 #. odoo-javascript
 #: code:addons/hr_holidays/static/src/components/accrual_level/accrual_levels.xml:0
 msgid "Unused days will be lost."
-msgstr ""
+msgstr "ستفقد الأيام غير المستخدمة."
 
 #. module: hr_holidays
 #. odoo-javascript
 #: code:addons/hr_holidays/static/src/components/accrual_level/accrual_levels.xml:0
 msgid "Unused days will be transferred totally on each"
-msgstr ""
+msgstr "سيتم نقل الأيام غير المستخدمة بالكامل في كل"
 
 #. module: hr_holidays
 #. odoo-javascript
 #: code:addons/hr_holidays/static/src/components/accrual_level/accrual_levels.xml:0
 msgid "Unused days will be transferred with a max of"
-msgstr ""
+msgstr "سيتم ترحيل الأيام غير المستخدمة بحد أقصى"
 
 #. module: hr_holidays
 #: model:ir.model.fields.selection,name:hr_holidays.selection__hr_leave_accrual_level__carryover_options__limited
@@ -4680,7 +4733,7 @@ msgstr "المُستخدِم في إجازة"
 #. odoo-javascript
 #: code:addons/hr_holidays/static/src/im_status_patch.xml:0
 msgid "User is on leave and busy"
-msgstr ""
+msgstr "المستخدم في إجازة ومشغول"
 
 #. module: hr_holidays
 #. odoo-javascript
@@ -4853,7 +4906,7 @@ msgstr ""
 #. module: hr_holidays
 #: model_terms:ir.ui.view,arch_db:hr_holidays.hr_accrual_plan_view_form
 msgid "When the time is accrued?"
-msgstr ""
+msgstr "متى يتم احتساب الوقت؟"
 
 #. module: hr_holidays
 #: model:ir.model.fields,help:hr_holidays.field_hr_leave_report_calendar__member_of_department
@@ -5056,7 +5109,7 @@ msgstr "لا يمكنك تصديق هذه الإجازة."
 #. odoo-python
 #: code:addons/hr_holidays/models/hr_leave_type.py:0
 msgid "You cannot allow requests on top of leaves of type 'Absence'."
-msgstr ""
+msgstr "لا يمكنك السماح بطلبات تُضاف إلى إجازات من نوع \"غياب\"."
 
 #. module: hr_holidays
 #. odoo-python
@@ -5089,7 +5142,7 @@ msgstr "لا يمكنك الموافقة على إجازة لـ %s، لأنك ل
 #. odoo-python
 #: code:addons/hr_holidays/models/hr_leave_accrual_plan_level.py:0
 msgid "You cannot have a balance cap on accrued time set to 0."
-msgstr ""
+msgstr "لا يمكنك تعيين الحد الأقصى للرصيد المتراكم على 0."
 
 #. module: hr_holidays
 #: model:ir.model.constraint,message:hr_holidays.constraint_hr_leave_accrual_level_valid_yearly_cap_value
@@ -5106,7 +5159,7 @@ msgstr "لا يمكنك تعيين الحد الأقصى للكمية المرا
 #. module: hr_holidays
 #: model:ir.model.constraint,message:hr_holidays.constraint_hr_leave_accrual_level_valid_accrual_validity_value
 msgid "You cannot have an accrual validity time set to 0."
-msgstr ""
+msgstr "لا يمكنك تحديد مدة صلاحية استحقاق تساوي 0."
 
 #. module: hr_holidays
 #. odoo-python
@@ -5149,7 +5202,7 @@ msgstr "لا تملك صلاحيات تطبيق الموافقة الثانية 
 #. module: hr_holidays
 #: model_terms:ir.actions.act_window,help:hr_holidays.action_my_days_off_dashboard_calendar
 msgid "You have no time off yet!"
-msgstr ""
+msgstr "ليس لديك إجازات بعد!"
 
 #. module: hr_holidays
 #: model:ir.model.constraint,message:hr_holidays.constraint_hr_leave_accrual_level_added_value_greater_than_zero
@@ -5190,7 +5243,7 @@ msgstr "أيام إجازتك"
 #. module: hr_holidays
 #: model_terms:ir.ui.view,arch_db:hr_holidays.hr_leave_view_form
 msgid "Your Timezone"
-msgstr ""
+msgstr "منطقتك الزمنية"
 
 #. module: hr_holidays
 #. odoo-python
@@ -5214,6 +5267,12 @@ msgstr "لقد تم إلغاء إجازتك."
 #: code:addons/hr_holidays/static/src/components/accrual_level/accrual_levels.js:0
 msgid "allocation date"
 msgstr "تاريخ التخصيص"
+
+#. module: hr_holidays
+#. odoo-javascript
+#: code:addons/hr_holidays/static/src/components/accrual_level/accrual_levels.xml:0
+msgid "and a balance cap is set to"
+msgstr "وتم تعيين الحد الأقصى للرصيد كـ "
 
 #. module: hr_holidays
 #. odoo-javascript
@@ -5257,6 +5316,12 @@ msgstr "التواريخ"
 
 #. module: hr_holidays
 #. odoo-javascript
+#: code:addons/hr_holidays/static/src/components/accrual_level/accrual_levels.js:0
+msgid "day(s)"
+msgstr "يوم"
+
+#. module: hr_holidays
+#. odoo-javascript
 #. odoo-python
 #: code:addons/hr_holidays/models/hr_leave.py:0
 #: code:addons/hr_holidays/models/hr_leave_allocation.py:0
@@ -5290,6 +5355,8 @@ msgstr "مثال: رأس السنة"
 #: model_terms:ir.ui.view,arch_db:hr_holidays.hr_accrual_plan_view_form
 msgid "e.g. Seniority Plan, PTO, RTT, ..."
 msgstr ""
+"مثال: خطة الأقدمية، الإجازات المدفوعة (PTO)، إجازات تعويض ساعات العمل "
+"(RTT)، ..."
 
 #. module: hr_holidays
 #: model_terms:ir.ui.view,arch_db:hr_holidays.hr_leave_allocation_view_form
@@ -5318,7 +5385,7 @@ msgstr "كل ساعة."
 #. odoo-javascript
 #: code:addons/hr_holidays/static/src/components/accrual_level/accrual_levels.xml:0
 msgid "every month on the"
-msgstr ""
+msgstr "كل شهر في"
 
 #. module: hr_holidays
 #. odoo-javascript
@@ -5330,12 +5397,18 @@ msgstr "كل أسبوع يوم"
 #. odoo-javascript
 #: code:addons/hr_holidays/static/src/components/accrual_level/accrual_levels.xml:0
 msgid "every year on the"
-msgstr ""
+msgstr "كل عام في"
 
 #. module: hr_holidays
 #: model_terms:ir.ui.view,arch_db:hr_holidays.hr_accrual_level_view_form
 msgid "from the start of allocation"
-msgstr ""
+msgstr "من بداية التخصيص"
+
+#. module: hr_holidays
+#. odoo-javascript
+#: code:addons/hr_holidays/static/src/components/accrual_level/accrual_levels.js:0
+msgid "hour(s)"
+msgstr "ساعات "
 
 #. module: hr_holidays
 #. odoo-javascript
@@ -5359,6 +5432,14 @@ msgstr "المعرف"
 msgid ""
 "leaves of type 'Worked Time' should be always eligible for accrual rate."
 msgstr ""
+"يجب أن تكون الإجازات من نوع \"الوقت المقضي في العمل\" مؤهلة دائماً لمعدل "
+"الاستحقاق."
+
+#. module: hr_holidays
+#. odoo-javascript
+#: code:addons/hr_holidays/static/src/components/accrual_level/accrual_levels.js:0
+msgid "month(s)"
+msgstr "شهر"
 
 #. module: hr_holidays
 #. odoo-javascript
@@ -5438,7 +5519,7 @@ msgstr "تسلسل"
 #. odoo-javascript
 #: code:addons/hr_holidays/static/src/components/accrual_level/accrual_levels.js:0
 msgid "start of the year"
-msgstr ""
+msgstr "بداية العام"
 
 #. module: hr_holidays
 #. odoo-javascript
@@ -5461,13 +5542,13 @@ msgstr "إلى"
 #. odoo-javascript
 #: code:addons/hr_holidays/static/src/components/accrual_level/accrual_levels.xml:0
 msgid "twice a month on the"
-msgstr ""
+msgstr "مرتين شهريًا في"
 
 #. module: hr_holidays
 #. odoo-javascript
 #: code:addons/hr_holidays/static/src/components/accrual_level/accrual_levels.xml:0
 msgid "twice a year on the"
-msgstr ""
+msgstr "مرتين في السنة في"
 
 #. module: hr_holidays
 #. odoo-python
@@ -5485,6 +5566,34 @@ msgstr "صالحة حتى"
 #: model_terms:ir.ui.view,arch_db:hr_holidays.hr_leave_report_calendar_view_search
 msgid "validate"
 msgstr "تصديق"
+
+#. module: hr_holidays
+#. odoo-javascript
+#: code:addons/hr_holidays/static/src/components/accrual_level/accrual_levels.js:0
+msgid "year(s)"
+msgstr "سنة"
+
+#~ msgid ""
+#~ "(s)\n"
+#~ "                                    and a balance cap is set to"
+#~ msgstr ""
+#~ "(s)\n"
+#~ "                                    وتعيين الحد الأقصى للرصيد إلى"
+
+#~ msgid "There is no valid allocation to cover that request."
+#~ msgstr "لا يوجد تخصيص صالح لتغطية هذا الطلب."
+
+#~ msgid ""
+#~ "Changing the contract on this employee changes their working schedule in "
+#~ "a period they already took leaves. Changing this working schedule changes "
+#~ "the duration of these leaves in such a way the employee no longer has the "
+#~ "required allocation for them. Please review these leaves and/or "
+#~ "allocations before changing the contract."
+#~ msgstr ""
+#~ "يؤدي تغيير العقد على هذا الموظف إلى تغيير جدول عمله في الفترة التي حصل "
+#~ "فيها على إجازات بالفعل. يؤدي تغيير جدول العمل هذا إلى تغيير مدة هذه "
+#~ "الإجازات بحيث لم يعد الموظف لديه التخصيص المطلوب لها. يرجى مراجعة هذه "
+#~ "الإجازات و/أو التخصيصات قبل تغيير العقد."
 
 #~ msgid ""
 #~ "You cannot refuse this allocation request since the employee has already "
@@ -6491,9 +6600,6 @@ msgstr "تصديق"
 #~ msgid "day of the month"
 #~ msgstr "اليوم من الشهر "
 
-#~ msgid "day(s)"
-#~ msgstr "يوم"
-
 #~ msgid "days of the months"
 #~ msgstr "أيام من الشهر "
 
@@ -6506,9 +6612,6 @@ msgstr "تصديق"
 #~ msgid "lost"
 #~ msgstr "ضائع "
 
-#~ msgid "month(s)"
-#~ msgstr "شهر"
-
 #~ msgid "postponed"
 #~ msgstr "مؤجل "
 
@@ -6517,6 +6620,3 @@ msgstr "تصديق"
 
 #~ msgid "validated"
 #~ msgstr "تم التصديق "
-
-#~ msgid "year(s)"
-#~ msgstr "سنة"

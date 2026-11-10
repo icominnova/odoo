@@ -9,6 +9,7 @@ import * as ProductScreenResto from "@pos_restaurant/../tests/tours/utils/produc
 import * as Utils from "@point_of_sale/../tests/generic_helpers/utils";
 import * as PaymentScreen from "@point_of_sale/../tests/pos/tours/utils/payment_screen_util";
 import * as ReceiptScreen from "@point_of_sale/../tests/pos/tours/utils/receipt_screen_util";
+import * as TextInputPopup from "@point_of_sale/../tests/generic_helpers/text_input_popup_util";
 const ProductScreen = { ...ProductScreenPos, ...ProductScreenResto };
 import * as TicketScreen from "@point_of_sale/../tests/pos/tours/utils/ticket_screen_util";
 import { registry } from "@web/core/registry";
@@ -98,6 +99,13 @@ registry.category("web_tour.tours").add("FloorScreenTour", {
 
             //test delete multiple tables
             FloorScreen.clickEditButton("Delete"),
+            Dialog.confirm(),
+
+            // add new floor
+            FloorScreen.clickAddFloor(),
+            Dialog.is(),
+            Dialog.footerBtnIsDisabled("Apply"),
+            TextInputPopup.inputText("Test Floor"),
             Dialog.confirm(),
 
             FloorScreen.clickFloor("Main Floor"),
@@ -217,11 +225,8 @@ registry.category("web_tour.tours").add("TableMergeUnmergeTour", {
             // Check original orders for table 4
             FloorScreen.clickTable("4"),
             inLeftSide(ProductScreen.orderLineHas("Coca-Cola", "1")),
+            Chrome.fakePrintChange(),
             ProductScreen.clickOrderButton(),
-            {
-                ...Dialog.confirm(),
-                content: "Acknowledge printing error (test does not use a printer).",
-            },
             ProductScreen.orderlinesHaveNoChange(),
             Chrome.clickPlanButton(),
             FloorScreen.isShown(),
@@ -230,10 +235,6 @@ registry.category("web_tour.tours").add("TableMergeUnmergeTour", {
             FloorScreen.clickTable("5"),
             inLeftSide(ProductScreen.orderLineHas("Minute Maid", "1")),
             ProductScreen.clickOrderButton(),
-            {
-                ...Dialog.confirm(),
-                content: "Acknowledge printing error (test does not use a printer).",
-            },
             ProductScreen.orderlinesHaveNoChange(),
             Chrome.clickPlanButton(),
             FloorScreen.isShown(),
@@ -248,10 +249,6 @@ registry.category("web_tour.tours").add("TableMergeUnmergeTour", {
             ProductScreen.clickDisplayedProduct("Minute Maid"),
             ProductScreen.orderlineIsToOrder("Minute Maid"),
             ProductScreen.clickOrderButton(),
-            {
-                ...Dialog.confirm(),
-                content: "Acknowledge printing error (test does not use a printer).",
-            },
             ProductScreen.orderlinesHaveNoChange(),
 
             // Unlink tables again and verify restoration

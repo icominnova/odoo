@@ -31,13 +31,15 @@ export class PaymentStripe extends PaymentInterface {
             return data.secret;
         } catch (error) {
             const { message } = error.data || error;
-            this._showError(message, "Fetch Token");
+            this._showError(message, _t("Fetch Token"));
             this.terminal = false;
         }
     }
 
     async discoverReaders() {
-        const discoverResult = await this.terminal.discoverReaders({});
+        const discoverResult = await this.terminal.discoverReaders({
+            simulated: this.payment_method_id.stripe_serial_number === "SIMULATOR",
+        });
         if (discoverResult.error) {
             this._showError(_t("Failed to discover: %s", discoverResult.error));
         } else if (discoverResult.discoveredReaders.length === 0) {
@@ -88,6 +90,8 @@ export class PaymentStripe extends PaymentInterface {
 
     async connectReader() {
         const line = this.pos.getOrder().getSelectedPaymentline();
+        this.pos.discoveredReaders = "[]";
+        await this.discoverReaders();
         const discoveredReaders = JSON.parse(this.pos.discoveredReaders);
         for (const selectedReader of discoveredReaders) {
             if (selectedReader.serial_number == this.payment_method_id.stripe_serial_number) {
@@ -134,6 +138,7 @@ export class PaymentStripe extends PaymentInterface {
 
         const intentCharge = charges.data[0];
         const processPaymentDetails = intentCharge.payment_method_details;
+        const cardPresentNetwork = processPaymentDetails?.card_present?.network;
 
         if (processPaymentDetails.type === "interac_present") {
             // Canadian interac payments should not be captured:
@@ -141,7 +146,7 @@ export class PaymentStripe extends PaymentInterface {
             return ["interac", intentCharge.id];
         }
         const cardPresentBrand = this.getCardBrandFromPaymentMethodDetails(processPaymentDetails);
-        if (cardPresentBrand.includes("eftpos")) {
+        if (cardPresentNetwork === "eftpos_au") {
             // Australian eftpos should not be captured:
             // https://stripe.com/docs/terminal/payments/regional?integration-country=AU
             return [cardPresentBrand, intentCharge.id];
@@ -161,7 +166,15 @@ export class PaymentStripe extends PaymentInterface {
             return false;
         }
         line.setPaymentStatus("waitingCard");
-        const collectPaymentMethod = await this.terminal.collectPaymentMethod(clientSecret);
+        const config = this.pos.config;
+        const collectPaymentMethod = await this.terminal.collectPaymentMethod(clientSecret, {
+            config_override: {
+                enable_customer_cancellation: true,
+                skip_tipping:
+                    config.set_tip_after_payment ||
+                    !(config.iface_tipproduct && config.tip_product_id),
+            },
+        });
         if (collectPaymentMethod.error) {
             this._showError(collectPaymentMethod.error.message, collectPaymentMethod.error.code);
             line.setPaymentStatus("retry");
@@ -178,6 +191,12 @@ export class PaymentStripe extends PaymentInterface {
                 return false;
             } else if (processPayment.paymentIntent) {
                 line.setPaymentStatus("waitingCapture");
+                const paymentMethodDetails =
+                    processPayment.paymentIntent.charges?.data[0]?.payment_method_details;
+                line.uiState.stripeCardPresentNetwork = paymentMethodDetails?.card_present?.network;
+                line.uiState.stripeOvercaptureSupported =
+                    paymentMethodDetails?.card_present?.overcapture_supported;
+                await this.addTerminalTip(line, processPayment.paymentIntent);
 
                 const [captured_card_type, captured_transaction_id] =
                     this._getCapturedCardAndTransactionId(processPayment);
@@ -185,7 +204,10 @@ export class PaymentStripe extends PaymentInterface {
                     line.card_type = captured_card_type;
                     line.transaction_id = captured_transaction_id;
                 } else {
-                    await this.captureAfterPayment(processPayment, line);
+                    if ((await this.captureAfterPayment(processPayment, line)) === false) {
+                        line.setPaymentStatus("retry");
+                        return false;
+                    }
                 }
 
                 line.setPaymentStatus("done");
@@ -194,13 +216,47 @@ export class PaymentStripe extends PaymentInterface {
         }
     }
 
+    async addTerminalTip(line, paymentIntent) {
+        const tip = paymentIntent.amount_details?.tip?.amount;
+        if (tip > 0) {
+            const currency = line.pos_order_id.currency;
+            const tipProduct = this.pos.config.tip_product_id;
+            const existingTip = line.pos_order_id.lines.find(
+                (orderLine) => orderLine.product_id.id === tipProduct.id
+            );
+            await this.pos.setTip(
+                (existingTip?.price_unit ?? 0) + currency.round(tip * currency.rounding)
+            );
+            line.setAmount(paymentIntent.amount * currency.rounding);
+        }
+    }
+
+    async collectRefund(amount) {
+        const line = this.pos.getOrder().getSelectedPaymentline();
+        line.setPaymentStatus("waitingCard");
+
+        const paymentId = line.uiState.stripePaymentIdToRefund;
+        const refundResult = await this.pos.data.silentCall("pos.payment.method", "stripe_refund", [
+            [line.payment_method_id.id],
+            paymentId,
+            amount,
+        ]);
+
+        if (refundResult.error) {
+            throw new Error(refundResult.error);
+        }
+        line.transaction_id = refundResult.id;
+        line.setPaymentStatus("done");
+
+        return true;
+    }
+
     createStripeTerminal() {
         try {
             this.terminal = StripeTerminal.create({
                 onFetchConnectionToken: this.stripeFetchConnectionToken.bind(this),
                 onUnexpectedReaderDisconnect: this.stripeUnexpectedDisconnect.bind(this),
             });
-            this.discoverReaders();
             return true;
         } catch (error) {
             this._showError(_t("Failed to load resource: net::ERR_INTERNET_DISCONNECTED."), error);
@@ -223,12 +279,16 @@ export class PaymentStripe extends PaymentInterface {
 
     async captureAfterPayment(processPayment, line) {
         const capturePayment = await this.capturePayment(processPayment.paymentIntent.id);
+        if (!capturePayment) {
+            return false;
+        }
         if (capturePayment.charges) {
             line.card_type = this.getCardBrandFromPaymentMethodDetails(
                 capturePayment.charges.data[0].payment_method_details
             );
         }
         line.transaction_id = capturePayment.id;
+        return true;
     }
 
     async capturePayment(paymentIntentId) {
@@ -252,7 +312,7 @@ export class PaymentStripe extends PaymentInterface {
             return data;
         } catch (error) {
             const { message } = error.data || error;
-            this._showError(message, "Capture Payment");
+            this._showError(message, _t("Capture Payment"));
             return false;
         }
     }
@@ -269,7 +329,7 @@ export class PaymentStripe extends PaymentInterface {
             return data.client_secret;
         } catch (error) {
             const { message } = error.data || error;
-            this._showError(message, "Fetch Secret");
+            this._showError(message, _t("Fetch Secret"));
             return false;
         }
     }
@@ -280,10 +340,21 @@ export class PaymentStripe extends PaymentInterface {
          */
         await super.sendPaymentRequest(...arguments);
         const line = this.pos.getOrder().getSelectedPaymentline();
+        const isRefund = line.amount < 0;
+
+        if (isRefund && !line.uiState.stripePaymentIdToRefund) {
+            this._showError(_t("You cannot refund a non-Stripe payment via Stripe"));
+            return false;
+        }
+
         line.setPaymentStatus("waiting");
         try {
             if (await this.checkReader()) {
-                return await this.collectPayment(line.amount);
+                if (isRefund) {
+                    return await this.collectRefund(line.amount);
+                } else {
+                    return await this.collectPayment(line.amount);
+                }
             }
         } catch (error) {
             logPosMessage(

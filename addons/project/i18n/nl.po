@@ -8,16 +8,16 @@
 # Yenthe Van Ginneken <yenthespam@gmail.com>, 2022
 # Martin Trigaux, 2023
 # Jolien De Paepe, 2023
-# Erwin van der Ploeg <erwin@odooexperts.nl>, 2023, 2025.
-# "Dylan Kiss (dyki)" <dyki@odoo.com>, 2025.
+# Erwin van der Ploeg <erwin@odooexperts.nl>, 2023, 2025, 2026.
+# "Dylan Kiss (dyki)" <dyki@odoo.com>, 2025, 2026.
 # Bren Driesen <brdri@odoo.com>, 2025, 2026.
-# Weblate <noreply-mt-weblate@weblate.org>, 2025.
+# Weblate <noreply-mt-weblate@weblate.org>, 2025, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-01-25 18:35+0000\n"
-"PO-Revision-Date: 2026-01-27 08:09+0000\n"
+"POT-Creation-Date: 2026-10-24 17:37+0000\n"
+"PO-Revision-Date: 2026-08-27 10:02+0000\n"
 "Last-Translator: Bren Driesen <brdri@odoo.com>\n"
 "Language-Team: Dutch <https://translate.odoo.com/projects/odoo-19/project/nl/"
 ">\n"
@@ -26,12 +26,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Weblate 5.14.3\n"
-
-#. module: project
-#: model:ir.model.fields.selection,name:project.selection__project_project__privacy_visibility__portal
-msgid " All internal users and invited portal users"
-msgstr " Alle interne gebruikers en uitgenodigde portaalgebruikers"
+"X-Generator: Weblate 2026.8.1\n"
 
 #. module: project
 #: model:ir.model.fields,field_description:project.field_project_project__rating_count
@@ -433,7 +428,7 @@ msgstr ""
 "<br/><span style=\"margin: 0px 0px 0px 0px; font-size: 12px; opacity: 0.5; "
 "color: #454748;\" groups=\"project.group_project_stages\">Je ontvangt deze e-"
 "mail omdat je project is verplaatst naar de fase <b t-"
-"out=\"object.stage_id.name or ''\">Gereed</b></span>\n"
+"out=\"object.stage_id.name or ''\">Voltooid</b></span>\n"
 "            "
 
 #. module: project
@@ -562,7 +557,7 @@ msgstr ""
 #. module: project
 #: model_terms:ir.ui.view,arch_db:project.project_milestone_view_form
 msgid "<span class=\"fw-normal\"> Done</span>"
-msgstr "<span class=\"fw-normal\"> Gereed</span>"
+msgstr "<span class=\"fw-normal\"> Voltooid</span>"
 
 #. module: project
 #: model_terms:ir.ui.view,arch_db:project.project_milestone_view_form
@@ -802,13 +797,13 @@ msgstr "Activiteitsfase"
 #: model:ir.model.fields,field_description:project.field_project_task__activity_type_icon
 #: model:ir.model.fields,field_description:project.field_project_update__activity_type_icon
 msgid "Activity Type Icon"
-msgstr "Activiteitensoort icoon"
+msgstr "Activiteitstype icoon"
 
 #. module: project
 #: model:ir.actions.act_window,name:project.mail_activity_type_action_config_project_types
 #: model:ir.ui.menu,name:project.project_menu_config_activity_type
 msgid "Activity Types"
-msgstr "Activiteitensoorten"
+msgstr "Activiteitstypes"
 
 #. module: project
 #: model_terms:ir.actions.act_window,help:project.mail_activity_plan_action_config_project_task_plan
@@ -824,7 +819,7 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:project.view_project_project_filter
 #: model_terms:ir.ui.view,arch_db:project.view_task_search_form_project_base
 msgid "Activity type"
-msgstr "Soort activiteit"
+msgstr "Activiteitstype"
 
 #. module: project
 #. odoo-javascript
@@ -852,7 +847,7 @@ msgid ""
 "Progress - Done</i>."
 msgstr ""
 "Voeg kolommen toe om je taken in <b>fases</b> te ordenen, <i>bijv. Nieuw - "
-"In behandeling - Gereed</i>."
+"In behandeling - Voltooid</i>."
 
 #. module: project
 #: model_terms:ir.ui.view,arch_db:project.project_sharing_project_task_view_form
@@ -893,8 +888,12 @@ msgstr "Beheerder"
 
 #. module: project
 #: model:res.groups,comment:project.group_project_manager
-msgid "Administrator can manage the employees' schedule"
-msgstr "De beheerder kan het rooster van de werknemers beheren"
+msgid ""
+"Administrator: Can manage projects and stages, with access to reporting and "
+"configuration."
+msgstr ""
+"Beheerder: Kan projecten en fases beheren, met toegang tot rapportage en "
+"configuratie."
 
 #. module: project
 #. odoo-javascript
@@ -965,6 +964,11 @@ msgstr "Alle taken"
 #: model:ir.model.fields.selection,name:project.selection__project_project__privacy_visibility__employees
 msgid "All internal users"
 msgstr "Alle interne gebruikers"
+
+#. module: project
+#: model:ir.model.fields.selection,name:project.selection__project_project__privacy_visibility__portal
+msgid "All internal users and invited portal users"
+msgstr "Alle interne gebruikers en uitgenodigde portaalgebruikers"
 
 #. module: project
 #: model:ir.model.fields,field_description:project.field_project_task__allocated_hours
@@ -2033,7 +2037,7 @@ msgstr "Ontwikkeling"
 #. module: project
 #: model:ir.model,name:project.model_digest_digest
 msgid "Digest"
-msgstr "Overzicht"
+msgstr "Samenvatting"
 
 #. module: project
 #. odoo-javascript
@@ -2092,7 +2096,7 @@ msgstr "Negeren"
 #: model:ir.model.fields,field_description:project.field_res_users_settings__display_name
 #: model:ir.model.fields,field_description:project.field_task_share_wizard__display_name
 msgid "Display Name"
-msgstr "Weergavenaam"
+msgstr "Schermnaam"
 
 #. module: project
 #. odoo-python
@@ -2115,7 +2119,7 @@ msgstr ""
 #: model:project.task.type,name:project.project_personal_stage_demo_5
 #: model:project.task.type,name:project.project_stage_2
 msgid "Done"
-msgstr "Gereed"
+msgstr "Voltooid"
 
 #. module: project
 #. odoo-javascript
@@ -2362,6 +2366,7 @@ msgid "Future"
 msgstr "In de toekomst"
 
 #. module: project
+#: model_terms:ir.ui.view,arch_db:project.project_update_view_search
 #: model_terms:ir.ui.view,arch_db:project.view_project_project_filter
 #: model_terms:ir.ui.view,arch_db:project.view_task_search_form
 msgid "Future Activities"
@@ -2857,6 +2862,7 @@ msgid "Last Updated on"
 msgstr "Laatst bijgewerkt op"
 
 #. module: project
+#: model_terms:ir.ui.view,arch_db:project.project_update_view_search
 #: model_terms:ir.ui.view,arch_db:project.view_project_project_filter
 #: model_terms:ir.ui.view,arch_db:project.view_task_search_form
 msgid "Late Activities"
@@ -2989,7 +2995,7 @@ msgstr "Productie"
 #: code:addons/project/static/src/components/done_checkmark/task_done_checkmark.xml:0
 #: code:addons/project/static/src/components/project_task_state_selection/project_task_state_selection.xml:0
 msgid "Mark as done"
-msgstr "Markeren als gereed"
+msgstr "Markeren als voltooid"
 
 #. module: project
 #. odoo-javascript
@@ -3097,6 +3103,7 @@ msgid "Months"
 msgstr "Maanden"
 
 #. module: project
+#: model_terms:ir.ui.view,arch_db:project.project_update_view_search
 #: model_terms:ir.ui.view,arch_db:project.view_project_project_filter
 #: model_terms:ir.ui.view,arch_db:project.view_task_search_form
 msgid "My Activities"
@@ -3288,7 +3295,7 @@ msgstr "Geen onderwerp"
 #. module: project
 #: model_terms:ir.actions.act_window,help:project.mail_activity_type_action_config_project_types
 msgid "No activity types found. Let's create one!"
-msgstr "Geen activiteitensoorten gevonden. Laten we er een maken!"
+msgstr "Geen activiteitstypes gevonden. Laten we er een maken!"
 
 #. module: project
 #: model_terms:ir.actions.act_window,help:project.rating_rating_action_project_report
@@ -3643,7 +3650,7 @@ msgstr "Delen via portaal"
 msgid ""
 "Portal users will be removed from the followers of the project and its tasks."
 msgstr ""
-"Portalgebruikers worden verwijderd uit de volgers van het project en zijn "
+"Portaalgebruikers worden verwijderd uit de volgers van het project en zijn "
 "taken."
 
 #. module: project
@@ -4086,7 +4093,7 @@ msgstr "Beoordeling gem. tekst"
 #. module: project
 #: model:ir.model.fields,field_description:project.field_project_task_type__rating_template_id
 msgid "Rating Email Template"
-msgstr "Beoordeling e-mailsjabloon"
+msgstr "Sjabloon beoordelingsmail"
 
 #. module: project
 #: model:ir.model.fields,field_description:project.field_project_task_type__rating_status_period
@@ -4206,7 +4213,7 @@ msgstr "Terugkerende taken"
 #: model_terms:ir.ui.view,arch_db:project.project_sharing_project_task_view_form
 #: model_terms:ir.ui.view,arch_db:project.view_task_form2
 msgid "Recurring Tasks"
-msgstr "Herhalende taken"
+msgstr "Terugkerende taken"
 
 #. module: project
 #. odoo-javascript
@@ -4551,6 +4558,7 @@ msgid "Show Sub-Tasks"
 msgstr "Subtaken weergeven"
 
 #. module: project
+#: model_terms:ir.ui.view,arch_db:project.project_update_view_search
 #: model_terms:ir.ui.view,arch_db:project.view_project_project_filter
 #: model_terms:ir.ui.view,arch_db:project.view_task_search_form
 msgid "Show all records whose next activity date is past"
@@ -4861,7 +4869,7 @@ msgstr "Taakafhankelijkheden"
 #: model:mail.message.subtype,name:project.mt_project_task_done
 #: model:mail.message.subtype,name:project.mt_task_done
 msgid "Task Done"
-msgstr "Taak is gereed"
+msgstr "Taak voltooid"
 
 #. module: project
 #: model:mail.message.subtype,description:project.mt_task_in_progress
@@ -4971,7 +4979,7 @@ msgstr "Taak omgezet naar sjabloon"
 #. module: project
 #: model:mail.message.subtype,description:project.mt_task_done
 msgid "Task done"
-msgstr "Taak gereed"
+msgstr "Taak voltooid"
 
 #. module: project
 #: model_terms:ir.ui.view,arch_db:project.task_track_depending_tasks
@@ -5150,8 +5158,8 @@ msgid ""
 "The name of the email alias, e.g. 'jobs' if you want to catch emails for "
 "<jobs@example.odoo.com>"
 msgstr ""
-"De naam van de e-mailalias, bijvoorbeeld: 'vacature' als je alle e-mails van "
-"vacature@bedrijf.nl wilt afvangen"
+"De naam van de e-mailalias, bv. 'vacature' als je alle mails van "
+"<vacature@jouwbedrijf.com> wilt opvangen"
 
 #. module: project
 #. odoo-python
@@ -5495,6 +5503,7 @@ msgid "Today"
 msgstr "Vandaag"
 
 #. module: project
+#: model_terms:ir.ui.view,arch_db:project.project_update_view_search
 #: model_terms:ir.ui.view,arch_db:project.view_project_project_filter
 #: model_terms:ir.ui.view,arch_db:project.view_task_search_form
 msgid "Today Activities"
@@ -5672,7 +5681,7 @@ msgstr "Mijlpalen gebruiken"
 #. module: project
 #: model:res.groups,name:project.group_project_recurring_tasks
 msgid "Use Recurring Tasks"
-msgstr "Gebruik herhalende taken"
+msgstr "Gebruik terugkerende taken"
 
 #. module: project
 #: model:res.groups,name:project.group_project_stages
@@ -5769,8 +5778,9 @@ msgstr "Gebruikersinstellingen"
 
 #. module: project
 #: model:res.groups,comment:project.group_project_user
-msgid "User can user the your employees' schedule"
-msgstr "De gebruiker kan het rooster van je werknemers gebruiken"
+msgid "User: Can manage tasks in projects shared with them."
+msgstr ""
+"Gebruiker: Kan taken beheren in projecten die met hem of haar zijn gedeeld."
 
 #. module: project
 #: model_terms:ir.ui.view,arch_db:project.view_project_kanban
@@ -6064,6 +6074,13 @@ msgid "Your managers decide which feedback is accepted"
 msgstr "Je managers beslissen welke feedback aanvaard is"
 
 #. module: project
+#. odoo-javascript
+#: code:addons/project/static/src/views/analytic_account_form/analytic_account_form_controller.js:0
+#: code:addons/project/static/src/views/analytic_account_list/analytic_account_list_controller.js:0
+msgid "\\t- ${"
+msgstr "\\t- ${"
+
+#. module: project
 #: model_terms:ir.ui.view,arch_db:project.edit_project
 msgid "alias"
 msgstr "alias"
@@ -6310,6 +6327,15 @@ msgstr "👤 Niet toegewezen"
 #: code:addons/project/models/project_task.py:0
 msgid "🔒 Private"
 msgstr "🔒 Privé"
+
+#~ msgid " All internal users and invited portal users"
+#~ msgstr " Alle interne gebruikers en uitgenodigde portaalgebruikers"
+
+#~ msgid "Administrator can manage the employees' schedule"
+#~ msgstr "De beheerder kan het rooster van de werknemers beheren"
+
+#~ msgid "User can user the your employees' schedule"
+#~ msgstr "De gebruiker kan het rooster van je werknemers gebruiken"
 
 #~ msgid "Invalid fields: "
 #~ msgstr "Ongeldige velden: "

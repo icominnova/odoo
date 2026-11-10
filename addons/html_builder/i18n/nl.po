@@ -2,15 +2,15 @@
 # This file contains the translation of the following modules:
 # * html_builder
 #
-# "Dylan Kiss (dyki)" <dyki@odoo.com>, 2025.
+# "Dylan Kiss (dyki)" <dyki@odoo.com>, 2025, 2026.
 # Bren Driesen <brdri@odoo.com>, 2025, 2026.
-# Erwin van der Ploeg <erwin@odooexperts.nl>, 2025.
+# Erwin van der Ploeg <erwin@odooexperts.nl>, 2025, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-01-25 18:36+0000\n"
-"PO-Revision-Date: 2026-02-13 15:50+0000\n"
+"POT-Creation-Date: 2026-10-24 17:37+0000\n"
+"PO-Revision-Date: 2026-08-27 10:02+0000\n"
 "Last-Translator: Bren Driesen <brdri@odoo.com>\n"
 "Language-Team: Dutch <https://translate.odoo.com/projects/odoo-19/"
 "html_builder/nl/>\n"
@@ -19,7 +19,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Weblate 5.14.3\n"
+"X-Generator: Weblate 2026.8.1\n"
 
 #. module: html_builder
 #. odoo-javascript
@@ -60,6 +60,12 @@ msgstr ""
 
 #. module: html_builder
 #. odoo-javascript
+#: code:addons/html_builder/static/src/plugins/shape/shape_selector.xml:0
+msgid "A"
+msgstr "A"
+
+#. module: html_builder
+#. odoo-javascript
 #: code:addons/html_builder/static/src/core/operation_plugin.js:0
 msgid ""
 "A technical issue occurred in the builder, you should save or discard your "
@@ -77,7 +83,7 @@ msgstr "Toevoegen"
 
 #. module: html_builder
 #. odoo-javascript
-#: code:addons/html_builder/static/src/plugins/add_product_option.xml:0
+#: code:addons/html_builder/static/src/plugins/add_product_option.js:0
 msgid "Add Product"
 msgstr "Product toevoegen"
 
@@ -247,12 +253,8 @@ msgstr "Alt-tag"
 #. module: html_builder
 #. odoo-javascript
 #: code:addons/html_builder/static/src/core/anchor/anchor_plugin.js:0
-msgid ""
-"Anchor copied to clipboard%(br)s%(open_span)sLink: %(anchor_link)s%"
-"(close_span)s"
+msgid "Anchor copied to clipboard"
 msgstr ""
-"Anker gekopieerd naar klembord%(br)s%(open_span)sLink: %(anchor_link)s%"
-"(close_span)s"
 
 #. module: html_builder
 #. odoo-javascript
@@ -1170,6 +1172,12 @@ msgstr "Gestippeld"
 
 #. module: html_builder
 #. odoo-javascript
+#: code:addons/html_builder/static/src/plugins/date_time_field_option.xml:0
+msgid "Date"
+msgstr "Datum"
+
+#. module: html_builder
+#. odoo-javascript
 #: code:addons/html_builder/static/src/plugins/image/image_shapes_definition.js:0
 msgid "Decorative"
 msgstr "Decoratief"
@@ -1683,6 +1691,16 @@ msgstr "Onzichtbare elementen"
 
 #. module: html_builder
 #. odoo-javascript
+#: code:addons/html_builder/static/src/core/version_error_plugin.js:0
+msgid ""
+"It might have caused problem during the editing. Please drag the new version "
+"from the snippet panel to update it."
+msgstr ""
+"Dit kan problemen hebben veroorzaakt tijdens het bewerken. Sleep de nieuwe "
+"versie vanuit het snippet-paneel om bij te werken."
+
+#. module: html_builder
+#. odoo-javascript
 #: code:addons/html_builder/static/src/core/building_blocks/builder_list.js:0
 msgid "Item"
 msgstr "Item"
@@ -1702,6 +1720,7 @@ msgstr "Labyrint"
 #. module: html_builder
 #. odoo-javascript
 #: code:addons/html_builder/static/src/plugins/rating_option.xml:0
+#: code:addons/html_builder/static/src/plugins/size_option.xml:0
 msgid "Large"
 msgstr "Groot"
 
@@ -1804,6 +1823,7 @@ msgstr "Media"
 #. module: html_builder
 #. odoo-javascript
 #: code:addons/html_builder/static/src/plugins/rating_option.xml:0
+#: code:addons/html_builder/static/src/plugins/size_option.xml:0
 msgid "Medium"
 msgstr "Medium"
 
@@ -2260,7 +2280,7 @@ msgstr "Vervangen"
 #: code:addons/html_builder/static/src/plugins/image/replace_media_option.js:0
 #: code:addons/html_builder/static/src/plugins/rating_option.xml:0
 msgid "Replace Icon"
-msgstr "Pictogram vervangen"
+msgstr "Icoon vervangen"
 
 #. module: html_builder
 #. odoo-javascript
@@ -2292,6 +2312,12 @@ msgstr "Reset"
 #: code:addons/html_builder/static/src/plugins/image/image_tool_option.xml:0
 msgid "Reset crop"
 msgstr "Bijsnijden resetten"
+
+#. module: html_builder
+#. odoo-javascript
+#: code:addons/html_builder/static/src/plugins/image/image_shape_option.xml:0
+msgid "Reset shape transformation"
+msgstr "Vormtransformatie resetten"
 
 #. module: html_builder
 #. odoo-javascript
@@ -2498,6 +2524,7 @@ msgstr "Shuriken (R)"
 #: code:addons/html_builder/static/src/plugins/image/image_size.xml:0
 #: code:addons/html_builder/static/src/plugins/image/image_tool_option.xml:0
 #: code:addons/html_builder/static/src/plugins/rating_option.xml:0
+#: code:addons/html_builder/static/src/plugins/size_option.xml:0
 msgid "Size"
 msgstr "Grootte"
 
@@ -2511,6 +2538,7 @@ msgstr "Schuin"
 #. odoo-javascript
 #: code:addons/html_builder/static/src/plugins/font/font_plugin.js:0
 #: code:addons/html_builder/static/src/plugins/rating_option.xml:0
+#: code:addons/html_builder/static/src/plugins/size_option.xml:0
 msgid "Small"
 msgstr "Klein"
 
@@ -2804,6 +2832,12 @@ msgid "This font is hosted and served to your visitors by Google servers"
 msgstr ""
 "Dit lettertype wordt door Google-servers gehost en aan je bezoekers "
 "aangeboden"
+
+#. module: html_builder
+#. odoo-javascript
+#: code:addons/html_builder/static/src/core/version_error_plugin.js:0
+msgid "This snippet is outdated"
+msgstr "Deze snippet is verouderd"
 
 #. module: html_builder
 #. odoo-javascript
@@ -3247,6 +3281,13 @@ msgstr "⌙ Actief"
 #: code:addons/html_builder/static/src/plugins/rating_option.xml:0
 msgid "⌙ Inactive"
 msgstr "⌙ Inactief"
+
+#~ msgid ""
+#~ "Anchor copied to clipboard%(br)s%(open_span)sLink: %(anchor_link)s%"
+#~ "(close_span)s"
+#~ msgstr ""
+#~ "Anker gekopieerd naar klembord%(br)s%(open_span)sLink: %(anchor_link)s%"
+#~ "(close_span)s"
 
 #~ msgid "Anchor copied to clipboard%(br)sLink: %(anchorLink)s"
 #~ msgstr "Anker gekopieerd naar klembord%(br)sLink: %(anchorLink)s"

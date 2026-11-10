@@ -10,15 +10,15 @@
 # Friederike Fasterling-Nesselbosch, 2022
 # Martin Trigaux, 2023
 # Larissa Manderfeld, 2023
-# "Dylan Kiss (dyki)" <dyki@odoo.com>, 2025.
+# "Dylan Kiss (dyki)" <dyki@odoo.com>, 2025, 2026.
 # "Larissa Manderfeld (lman)" <lman@odoo.com>, 2025, 2026.
-# Weblate <noreply-mt-weblate@weblate.org>, 2025.
+# Weblate <noreply-mt-weblate@weblate.org>, 2025, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-01-25 18:35+0000\n"
-"PO-Revision-Date: 2026-02-13 09:16+0000\n"
+"POT-Creation-Date: 2026-10-24 17:37+0000\n"
+"PO-Revision-Date: 2026-08-11 10:44+0000\n"
 "Last-Translator: \"Larissa Manderfeld (lman)\" <lman@odoo.com>\n"
 "Language-Team: German <https://translate.odoo.com/projects/odoo-19/project/"
 "de/>\n"
@@ -27,12 +27,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Weblate 5.14.3\n"
-
-#. module: project
-#: model:ir.model.fields.selection,name:project.selection__project_project__privacy_visibility__portal
-msgid " All internal users and invited portal users"
-msgstr " Alle internen Benutzer und eingeladenen Portalbenutzer"
+"X-Generator: Weblate 2026.6.1\n"
 
 #. module: project
 #: model:ir.model.fields,field_description:project.field_project_project__rating_count
@@ -299,11 +294,11 @@ msgstr ""
 "    <tbody>\n"
 "        <tr><td valign=\"top\" style=\"font-size: 13px;\">\n"
 "            <t t-if=\"partner.name\">\n"
-"                Hallo <t t-out=\"partner.name or ''\">Brandon Freeman</t>,"
-"<br/><br/>\n"
+"                Guten Tag <t t-out=\"partner.name or ''\">Brandon Freeman</"
+"t>,<br/><br/>\n"
 "            </t>\n"
 "            <t t-else=\"\">\n"
-"                Hallo,<br/><br/>\n"
+"                Guten Tag,<br/><br/>\n"
 "            </t>\n"
 "            bitte nehmen Sie sich einen Moment Zeit, unsere Dienstleistungen "
 "im Zusammenhang mit der Aufgabe <strong t-out=\"object.name or ''\">Planung "
@@ -421,8 +416,8 @@ msgid ""
 "            "
 msgstr ""
 "<div>\n"
-"    Hallo <t t-out=\"object.partner_id.name or 'customer'\">Brandon Freeman</"
-"t>,<br/>\n"
+"    Guten Tag <t t-out=\"object.partner_id.name or 'customer'\">Brandon "
+"Freeman</t>,<br/>\n"
 "    es ist mir eine Freude, Ihnen mitzuteilen, dass wir das Projekt „<strong "
 "t-out=\"object.name or ''\">Renovierungen</strong>“ erfolgreich "
 "abgeschlossen haben.\n"
@@ -463,8 +458,8 @@ msgid ""
 "        "
 msgstr ""
 "<div>\n"
-"    Hallo <t t-out=\"object.partner_id.name or 'customer'\">Brandon Freeman</"
-"t>,<br/><br/>\n"
+"    Guten Tag <t t-out=\"object.partner_id.name or 'customer'\">Brandon "
+"Freeman</t>,<br/><br/>\n"
 "    vielen Dank, dass Sie mit uns Kontakt aufgenommen haben. Wir freuen uns "
 "über Ihr Interesse an unseren Produkten/Dienstleistungen.<br/>\n"
 "    Unser Team prüft derzeit Ihre Anfrage und wird Ihre E-Mail so schnell "
@@ -898,8 +893,12 @@ msgstr "Administrator"
 
 #. module: project
 #: model:res.groups,comment:project.group_project_manager
-msgid "Administrator can manage the employees' schedule"
-msgstr "Der Administrator kann den Plan der Mitarbeiter verwalten"
+msgid ""
+"Administrator: Can manage projects and stages, with access to reporting and "
+"configuration."
+msgstr ""
+"Administrator: Kann Projekte und Phasen verwalten und hat Zugriff auf "
+"Berichte und Konfigurationen."
 
 #. module: project
 #. odoo-javascript
@@ -971,6 +970,11 @@ msgstr "Alle Aufgaben"
 #: model:ir.model.fields.selection,name:project.selection__project_project__privacy_visibility__employees
 msgid "All internal users"
 msgstr "Alle internen Benutzer"
+
+#. module: project
+#: model:ir.model.fields.selection,name:project.selection__project_project__privacy_visibility__portal
+msgid "All internal users and invited portal users"
+msgstr "Alle internen Benutzer und eingeladenen Portalbenutzer"
 
 #. module: project
 #: model:ir.model.fields,field_description:project.field_project_task__allocated_hours
@@ -1616,7 +1620,7 @@ msgstr "Erstellt am"
 #. module: project
 #: model:ir.model,website_form_label:project.model_res_partner
 msgid "Create a Customer"
-msgstr "Kunden erstellen"
+msgstr "Kunde erstellen"
 
 #. module: project
 #: model:ir.actions.act_window,name:project.open_create_project
@@ -1928,7 +1932,7 @@ msgstr "Frist"
 #. module: project
 #: model_terms:ir.ui.view,arch_db:project.project_message_user_assigned
 msgid "Dear"
-msgstr "Hallo"
+msgstr "Guten Tag"
 
 #. module: project
 #: model:ir.model.fields,field_description:project.field_project_project__alias_defaults
@@ -2390,6 +2394,7 @@ msgid "Future"
 msgstr "Zukünftig"
 
 #. module: project
+#: model_terms:ir.ui.view,arch_db:project.project_update_view_search
 #: model_terms:ir.ui.view,arch_db:project.view_project_project_filter
 #: model_terms:ir.ui.view,arch_db:project.view_task_search_form
 msgid "Future Activities"
@@ -2482,7 +2487,7 @@ msgstr "Hat Vorlagenvorgänger"
 #. module: project
 #: model_terms:ir.ui.view,arch_db:project.task_invitation_follower
 msgid "Hello"
-msgstr "Hallo"
+msgstr "Guten Tag"
 
 #. module: project
 #. odoo-javascript
@@ -2576,8 +2581,8 @@ msgid ""
 "ID of the parent record holding the alias (example: project holding the task "
 "creation alias)"
 msgstr ""
-"ID des übergeordneten Alias-Datensatz (Beispiel: Projekt welches den Alias "
-"für die Erstellung von Aufgaben beinhaltet)."
+"ID des übergeordneten Alias-Datensatz (Beispiel: Projekt mit dem Alias für "
+"die Aufgabenerstellung)"
 
 #. module: project
 #: model:ir.model.fields,field_description:project.field_project_project__activity_exception_icon
@@ -2888,6 +2893,7 @@ msgid "Last Updated on"
 msgstr "Zuletzt aktualisiert am"
 
 #. module: project
+#: model_terms:ir.ui.view,arch_db:project.project_update_view_search
 #: model_terms:ir.ui.view,arch_db:project.view_project_project_filter
 #: model_terms:ir.ui.view,arch_db:project.view_task_search_form
 msgid "Late Activities"
@@ -3128,6 +3134,7 @@ msgid "Months"
 msgstr "Monate"
 
 #. module: project
+#: model_terms:ir.ui.view,arch_db:project.project_update_view_search
 #: model_terms:ir.ui.view,arch_db:project.view_project_project_filter
 #: model_terms:ir.ui.view,arch_db:project.view_task_search_form
 msgid "My Activities"
@@ -3399,7 +3406,7 @@ msgstr "Notiz"
 #: model:ir.model.fields,field_description:project.field_project_task__message_needaction_counter
 #: model:ir.model.fields,field_description:project.field_project_update__message_needaction_counter
 msgid "Number of Actions"
-msgstr "Anzahl der Aktionen"
+msgstr "Anzahl Aktionen"
 
 #. module: project
 #: model:ir.model.fields,field_description:project.field_project_milestone__message_has_error_counter
@@ -4488,7 +4495,7 @@ msgstr "%(left)s Aufgaben%(right)s suchen"
 #: model:ir.model.fields,field_description:project.field_project_project__access_token
 #: model:ir.model.fields,field_description:project.field_project_task__access_token
 msgid "Security Token"
-msgstr "Security-Token"
+msgstr "Sicherheitstoken"
 
 #. module: project
 #. odoo-javascript
@@ -4591,6 +4598,7 @@ msgid "Show Sub-Tasks"
 msgstr "Teilaufgaben anzeigen"
 
 #. module: project
+#: model_terms:ir.ui.view,arch_db:project.project_update_view_search
 #: model_terms:ir.ui.view,arch_db:project.view_project_project_filter
 #: model_terms:ir.ui.view,arch_db:project.view_task_search_form
 msgid "Show all records whose next activity date is past"
@@ -4880,7 +4888,7 @@ msgstr "Aufgabe abgebrochen"
 #. module: project
 #: model:mail.message.subtype,name:project.mt_task_canceled
 msgid "Task Cancelled"
-msgstr "Aufgabe abgerbrochen"
+msgstr "Aufgabe abgebrochen"
 
 #. module: project
 #. odoo-python
@@ -5549,6 +5557,7 @@ msgid "Today"
 msgstr "Heute"
 
 #. module: project
+#: model_terms:ir.ui.view,arch_db:project.project_update_view_search
 #: model_terms:ir.ui.view,arch_db:project.view_project_project_filter
 #: model_terms:ir.ui.view,arch_db:project.view_task_search_form
 msgid "Today Activities"
@@ -5558,7 +5567,7 @@ msgstr "Heutige Aktivitäten"
 #. odoo-javascript
 #: code:addons/project/static/src/views/project_task_control_panel/project_task_control_panel.xml:0
 msgid "Top Menu"
-msgstr "Oberes Men"
+msgstr "Oberes Menü"
 
 #. module: project
 #. odoo-javascript
@@ -5824,8 +5833,8 @@ msgstr "Benutzereinstellungen"
 
 #. module: project
 #: model:res.groups,comment:project.group_project_user
-msgid "User can user the your employees' schedule"
-msgstr "Der Benutzer kann den Plan Ihrer Mitarbeiter verwenden"
+msgid "User: Can manage tasks in projects shared with them."
+msgstr "Benutzer: Kann Aufgaben in geteilten Projekten verwalten."
 
 #. module: project
 #: model_terms:ir.ui.view,arch_db:project.view_project_kanban
@@ -5835,7 +5844,7 @@ msgstr "Ansicht"
 #. module: project
 #: model_terms:ir.ui.view,arch_db:project.project_sharing_project_task_view_form
 msgid "View Task"
-msgstr "Aufgaben ansehen"
+msgstr "Aufgabe anzeigen"
 
 #. module: project
 #. odoo-javascript
@@ -5843,7 +5852,7 @@ msgstr "Aufgaben ansehen"
 #: model_terms:ir.ui.view,arch_db:project.project_milestone_view_tree
 #: model_terms:ir.ui.view,arch_db:project.view_project
 msgid "View Tasks"
-msgstr "Aufgaben ansehen"
+msgstr "Aufgaben anzeigen"
 
 #. module: project
 #: model:ir.model.fields,field_description:project.field_project_project__privacy_visibility
@@ -6126,6 +6135,13 @@ msgid "Your managers decide which feedback is accepted"
 msgstr "Ihre Manager entscheiden, welches Feedback akzeptiert wird"
 
 #. module: project
+#. odoo-javascript
+#: code:addons/project/static/src/views/analytic_account_form/analytic_account_form_controller.js:0
+#: code:addons/project/static/src/views/analytic_account_list/analytic_account_list_controller.js:0
+msgid "\\t- ${"
+msgstr "\\t- ${"
+
+#. module: project
 #: model_terms:ir.ui.view,arch_db:project.edit_project
 msgid "alias"
 msgstr "Alias"
@@ -6211,7 +6227,7 @@ msgstr "z. B. To-do"
 #: model_terms:ir.ui.view,arch_db:project.project_project_view_form_simplified
 #: model_terms:ir.ui.view,arch_db:project.project_project_view_form_simplified_template
 msgid "e.g. mycompany.com"
-msgstr "z. B. meinunternehmen.com"
+msgstr "z. B. meinunternehmen.de"
 
 #. module: project
 #: model_terms:ir.ui.view,arch_db:project.project_project_view_form_simplified
@@ -6372,6 +6388,15 @@ msgstr "👤 Nicht zugewiesen"
 #: code:addons/project/models/project_task.py:0
 msgid "🔒 Private"
 msgstr "🔒 Privat"
+
+#~ msgid " All internal users and invited portal users"
+#~ msgstr " Alle internen Benutzer und eingeladenen Portalbenutzer"
+
+#~ msgid "Administrator can manage the employees' schedule"
+#~ msgstr "Der Administrator kann den Plan der Mitarbeiter verwalten"
+
+#~ msgid "User can user the your employees' schedule"
+#~ msgstr "Der Benutzer kann den Plan Ihrer Mitarbeiter verwenden"
 
 #~ msgid "Invalid fields: "
 #~ msgstr "Ungültige Felder: "

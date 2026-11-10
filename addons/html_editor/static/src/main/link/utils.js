@@ -24,14 +24,14 @@ const tldWhitelist = [
     "ug", "uk", "um", "us", "uy", "uz", "va", "vc", "ve", "vg", "vi", "vn",
     "vu", "wf", "ws", "ye", "yt", "yu", "za", "zm", "zr", "zw", "co\\.uk"];
 
-const urlRegexBase = `|(?:www.))[-a-zA-Z0-9@:%._\\+~#=]{2,256}\\.[a-zA-Z][a-zA-Z0-9]{1,62}|(?:[-a-zA-Z0-9@:%._\\+~#=]{2,256}\\.(?:${tldWhitelist.join(
+const urlRegexBase = `|(?:www.))[-a-zA-Z0-9@:%._\\+~#=]{1,256}\\.[a-zA-Z][a-zA-Z0-9]{1,62}|(?:[-a-zA-Z0-9@:%._\\+~#=]{1,256}\\.(?:${tldWhitelist.join(
     "|"
-)})\\b))(?:(?:[/?#])[^\\s]*[^!.,})\\]'"\\s]|(?:[^!(){}.,[\\]'"\\s]+))?`;
+)})\\b))(?:(?:[/?#])[^\\s]*[^!.,})\\]'"\`\\s]|(?:[^!(){}.,[\\]'"\`\\s]+))?`;
 const httpCapturedRegex = `(https?:\\/\\/)`;
 
 export const URL_REGEX = new RegExp(`((?:(?:${httpCapturedRegex}${urlRegexBase})`, "i");
 export const EMAIL_REGEX = /^(mailto:)?[\w-.]+@(?:[\w-]+\.)+[\w-]{2,4}$/i;
-export const PHONE_REGEX = /^(tel:(?:\/\/)?)?\+?[\d\s.\-()/]{3,25}$/;
+export const PHONE_REGEX = /^(?=.*\d)(tel:(?:\/\/)?)?\+? ?[\d(][\d .\-()/]{2,24}$/;
 
 export function cleanZWChars(text) {
     return text.replace(/\u200B|\uFEFF/g, "");
@@ -44,7 +44,7 @@ export function cleanZWChars(text) {
  * 'http' and 'https'.
  *
  * @param {String} text
- * @param {HTMLAnchorElement} [link]
+ * @param {HTMLAnchorElement|{href: string}} [link]
  * @returns {String|null}
  */
 export function deduceURLfromText(text, link) {
@@ -75,3 +75,57 @@ export function deduceURLfromText(text, link) {
     return null;
 }
 
+/**
+ * Completes and validates a URL value for use as a link href.
+ * Adds `https://` to plain web URLs while preserving special URL forms such as
+ * `tel:`, `mailto:`, relative paths, anchors, and dynamic expressions.
+ *
+ * @param {string} url
+ * @returns {string}
+ */
+function correctLinkUrl(url) {
+    if (
+        url &&
+        !url.startsWith("tel:") &&
+        !url.startsWith("mailto:") &&
+        !url.includes("://") &&
+        !url.startsWith("/") &&
+        !url.startsWith("#") &&
+        !url.startsWith("${")
+    ) {
+        url = "https://" + url;
+    }
+    if (url && (url.startsWith("http:") || url.startsWith("https:"))) {
+        url = URL.parse(url) ? url : "";
+    }
+    return url;
+}
+
+/**
+ * Deduces a link URL from user-entered text. Explicit `http:`, `https:`,
+ * `mailto:`, and `tel:` values are accepted as-is; other values are inferred
+ * through `deduceURLfromText`.
+ *
+ * @param {string} text
+ * @param {HTMLAnchorElement|{href: string}} [link]
+ * @returns {string}
+ */
+export function deduceLinkUrl(text, link) {
+    text = text.trim();
+    if (/^(https?:|mailto:|tel:)/.test(text)) {
+        return text;
+    }
+    return deduceURLfromText(text, link) || "";
+}
+
+/**
+ * Normalizes user-entered link input: first deduce a URL from the input, then
+ * complete and validate it.
+ *
+ * @param {string} text
+ * @param {HTMLAnchorElement|{href: string}} [link]
+ * @returns {string}
+ */
+export function normalizeLinkUrlInput(text, link) {
+    return correctLinkUrl(deduceLinkUrl(text, link) || text);
+}

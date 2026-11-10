@@ -2,17 +2,17 @@
 # This file contains the translation of the following modules:
 # * hr
 #
-# "Dylan Kiss (dyki)" <dyki@odoo.com>, 2025.
+# "Dylan Kiss (dyki)" <dyki@odoo.com>, 2025, 2026.
 # "Patricia Gutiérrez (pagc)" <pagc@odoo.com>, 2025, 2026.
 # "Fernanda Alvarez (mfar)" <mfar@odoo.com>, 2025, 2026.
-# Weblate <noreply-mt-weblate@weblate.org>, 2025.
+# Weblate <noreply-mt-weblate@weblate.org>, 2025, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server saas~18.4\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-01-25 18:35+0000\n"
-"PO-Revision-Date: 2026-01-24 00:17+0000\n"
-"Last-Translator: \"Patricia Gutiérrez (pagc)\" <pagc@odoo.com>\n"
+"POT-Creation-Date: 2026-11-06 17:37+0000\n"
+"PO-Revision-Date: 2026-09-09 18:11+0000\n"
+"Last-Translator: \"Fernanda Alvarez (mfar)\" <mfar@odoo.com>\n"
 "Language-Team: Spanish (Latin America) <https://translate.odoo.com/projects/"
 "odoo-19/hr/es_419/>\n"
 "Language: es_419\n"
@@ -20,7 +20,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Weblate 5.14.3\n"
+"X-Generator: Weblate 2026.8.1\n"
 
 #. module: hr
 #. odoo-python
@@ -1251,7 +1251,6 @@ msgid "Attachment Count"
 msgstr "Número de archivos adjuntos"
 
 #. module: hr
-#: model_terms:ir.ui.view,arch_db:hr.res_users_view_form
 #: model_terms:ir.ui.view,arch_db:hr.res_users_view_form_preferences
 msgid "Attendance PIN"
 msgstr "NIP de asistencia"
@@ -1428,8 +1427,8 @@ msgstr "Según el estado del usuario en el sistema"
 msgid ""
 "Before creating a new contract, close the current one by setting an end date."
 msgstr ""
-"Antes de crear un nuevo contrato define una fecha de finalización para "
-"cerrar el cotrato actual."
+"Antes de crear un nuevo contrato, define una fecha de finalización para "
+"cerrar el contrato actual."
 
 #. module: hr
 #. odoo-javascript
@@ -1440,7 +1439,7 @@ msgstr "Archivo binario"
 #. module: hr
 #: model:ir.model.fields,field_description:hr.field_hr_employee__birthday
 msgid "Birthday"
-msgstr "Cumpleaños"
+msgstr "Fecha de nacimiento"
 
 #. module: hr
 #. odoo-javascript
@@ -1481,7 +1480,7 @@ msgstr "No es posible desasignar todas las versiones activas de un empleado."
 #. module: hr
 #: model:ir.model.fields,field_description:hr.field_hr_employee__certificate
 msgid "Certificate Level"
-msgstr "Nivel de certificado"
+msgstr "Nivel de estudios"
 
 #. module: hr
 #: model_terms:hr.job,website_description:hr.job_developer
@@ -1726,7 +1725,7 @@ msgstr "Plantilla de contrato"
 #. module: hr
 #: model:ir.actions.act_window,name:hr.hr_version_wizard_action
 msgid "Contract Template Load"
-msgstr "Carga de plantilla de contrato"
+msgstr "Subir una plantilla de contrato"
 
 #. module: hr
 #: model:ir.model,name:hr.model_hr_version_wizard
@@ -2239,12 +2238,12 @@ msgid ""
 "drink, and much more."
 msgstr ""
 "Todos los empleados pueden ver lo importante que es su trabajo.\n"
-"                             Contribuya al éxito de la empresa.\n"
-"                            <br>\n"
-"                             Organizamos varias actividades a lo largo del "
-"año, como actividades deportivas\n"
-"                            semanales, eventos para fomentar el trabajo en "
-"equipo, convivencias mensuales y más."
+"                     Contribuye al éxito de la empresa.\n"
+"                    <br>\n"
+"                    Organizamos varias actividades a lo largo del año, como "
+"actividades deportivas\n"
+"                     semanales, eventos de integración de equipos, "
+"convivencias mensuales y más."
 
 #. module: hr
 #: model_terms:hr.job,website_description:hr.job_trainee
@@ -3255,7 +3254,7 @@ msgstr "Puestos de trabajo"
 #. module: hr
 #: model_terms:ir.ui.view,arch_db:hr.view_hr_job_form
 msgid "Job Posting"
-msgstr "Oferta de trabajo"
+msgstr "Publicación de la oferta de trabajo"
 
 #. module: hr
 #: model:ir.model.fields,field_description:hr.field_hr_employee__job_title
@@ -3871,6 +3870,18 @@ msgstr ""
 
 #. module: hr
 #. odoo-javascript
+#: code:addons/hr/static/src/components/avatar_card/avatar_card_popover_patch.xml:0
+msgid "Open Contact Profile"
+msgstr "Abrir perfil del contacto"
+
+#. module: hr
+#. odoo-javascript
+#: code:addons/hr/static/src/components/avatar_card/avatar_card_popover_patch.xml:0
+msgid "Open Employee Profile (activates company)"
+msgstr "Abrir perfil del empleado (activa la empresa)"
+
+#. module: hr
+#. odoo-javascript
 #: code:addons/hr/static/src/core/web/thread_actions.js:0
 msgid "Open Profile"
 msgstr "Abrir perfil"
@@ -4176,7 +4187,7 @@ msgstr "Cuenta bancaria principal"
 #: model:ir.actions.report,name:hr.hr_employee_print_badge
 #: model_terms:ir.ui.view,arch_db:hr.view_employee_form
 msgid "Print Badge"
-msgstr "Imprimir insignia"
+msgstr "Imprimir identificación"
 
 #. module: hr
 #: model_terms:ir.ui.view,arch_db:hr.res_users_view_form_preferences
@@ -4856,16 +4867,6 @@ msgid "Temporary"
 msgstr "Temporal"
 
 #. module: hr
-#. odoo-python
-#: code:addons/hr/models/hr_employee.py:0
-msgid ""
-"The Badge ID must be alphanumeric without any accents and no longer than 18 "
-"characters."
-msgstr ""
-"El ID de la credencial debe ser alfanumérico, no debe tener acentos y "
-"tampoco debe exceder los 18 caracteres."
-
-#. module: hr
 #: model:ir.model.constraint,message:hr.constraint_hr_employee_barcode_uniq
 msgid ""
 "The Badge ID must be unique, this one is already assigned to another "
@@ -4873,6 +4874,14 @@ msgid ""
 msgstr ""
 "El ID de la identificación debe ser único, este ya esta asignado a otro "
 "empleado."
+
+#. module: hr
+#. odoo-python
+#: code:addons/hr/models/hr_employee.py:0
+msgid ""
+"The Badge ID must contain only printable ASCII characters, without spaces, "
+"and be no longer than 18 characters."
+msgstr ""
 
 #. module: hr
 #: model:ir.model.fields,help:hr.field_hr_departure_reason__country_code
@@ -4971,6 +4980,12 @@ msgid ""
 msgstr ""
 "Los campos \"%s\" que está intentando leer, no están disponibles para los "
 "perfiles públicos de los empleados."
+
+#. module: hr
+#. odoo-python
+#: code:addons/hr/models/hr_employee.py:0
+msgid "The following employees have the same work email address: %s"
+msgstr "Los siguientes empleados tienen el mismo correo laboral: %s"
 
 #. module: hr
 #. odoo-python
@@ -5299,9 +5314,25 @@ msgid "Version"
 msgstr "Versión"
 
 #. module: hr
+#: model:ir.model.fields,field_description:hr.field_hr_employee__version_revision
+msgid "Version Revision"
+msgstr "Revisión de la versión"
+
+#. module: hr
 #: model:ir.model.fields,field_description:hr.field_hr_employee__versions_count
 msgid "Versions Count"
 msgstr "Número de versiones"
+
+#. module: hr
+#: model_terms:ir.ui.view,arch_db:hr.hr_version_list_view
+msgid "View"
+msgstr "Ver"
+
+#. module: hr
+#. odoo-javascript
+#: code:addons/hr/static/src/components/avatar_card/avatar_card_popover_patch.xml:0
+msgid "View Profile"
+msgstr "Ver perfil"
 
 #. module: hr
 #: model_terms:ir.ui.view,arch_db:hr.view_employee_form
@@ -5660,6 +5691,12 @@ msgstr "No tiene acceso a este documento."
 
 #. module: hr
 #. odoo-python
+#: code:addons/hr/wizard/hr_bank_account_allocation_wizard_line.py:0
+msgid "You do not have the rights to trust or un-trust accounts."
+msgstr ""
+
+#. module: hr
+#. odoo-python
 #: code:addons/hr/models/hr_employee.py:0
 msgid "You need to set a valid work email address for %s"
 msgstr "Debes definir una dirección de correo de trabajo válida para %s"
@@ -5901,6 +5938,13 @@ msgstr "trabajo"
 #: model:ir.model.fields,field_description:hr.field_hr_employee__work_permit_name
 msgid "work_permit_name"
 msgstr "work_permit_name"
+
+#~ msgid ""
+#~ "The Badge ID must be alphanumeric without any accents and no longer than "
+#~ "18 characters."
+#~ msgstr ""
+#~ "El ID de la credencial debe ser alfanumérico, no debe tener acentos y "
+#~ "tampoco debe exceder los 18 caracteres."
 
 #~ msgid "Cannot archive the only active record of an employee."
 #~ msgstr "No puedes archivar el único registro activo de un empleado."

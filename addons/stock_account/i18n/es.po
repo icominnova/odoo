@@ -6,15 +6,15 @@
 # Martin Trigaux, 2022
 # Braulio D. López Vázquez <bdl@odoo.com>, 2022
 # Leonardo J. Caballero G. <leonardocaballero@gmail.com>, 2022
-# "Dylan Kiss (dyki)" <dyki@odoo.com>, 2025.
+# "Dylan Kiss (dyki)" <dyki@odoo.com>, 2025, 2026.
 # "Noemi Pla Garcia (nopl)" <nopl@odoo.com>, 2025, 2026.
-# Weblate <noreply-mt-weblate@weblate.org>, 2025.
+# Weblate <noreply-mt-weblate@weblate.org>, 2025, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-01-25 18:36+0000\n"
-"PO-Revision-Date: 2026-01-15 14:42+0000\n"
+"POT-Creation-Date: 2026-10-30 17:38+0000\n"
+"PO-Revision-Date: 2026-11-03 11:30+0000\n"
 "Last-Translator: \"Noemi Pla Garcia (nopl)\" <nopl@odoo.com>\n"
 "Language-Team: Spanish <https://translate.odoo.com/projects/odoo-19/"
 "stock_account/es/>\n"
@@ -24,7 +24,7 @@ msgstr ""
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=3; plural=(n == 1) ? 0 : ((n != 0 && n % 1000000 == "
 "0) ? 1 : 2);\n"
-"X-Generator: Weblate 5.14.3\n"
+"X-Generator: Weblate 2026.8.1\n"
 
 #. module: stock_account
 #. odoo-python
@@ -48,11 +48,6 @@ msgstr "%(quantity)s %(uom)s al coste del producto"
 
 #. module: stock_account
 #: model_terms:ir.ui.view,arch_db:stock_account.stock_account_report_invoice_document
-msgid "6.00"
-msgstr "6,00"
-
-#. module: stock_account
-#: model_terms:ir.ui.view,arch_db:stock_account.stock_account_report_invoice_document
 msgid "<span>Product</span>"
 msgstr "<span>Producto</span>"
 
@@ -65,6 +60,16 @@ msgstr "<span>Cantidad</span>"
 #: model_terms:ir.ui.view,arch_db:stock_account.stock_account_report_invoice_document
 msgid "<span>SN/LN</span>"
 msgstr "<span>NS/NL</span>"
+
+#. module: stock_account
+#. odoo-python
+#: code:addons/stock_account/models/stock_move.py:0
+msgid ""
+"A lot/serial number is required for product '%s' as it has lot valuation "
+"enabled."
+msgstr ""
+"Se necesita un número de serie o de lote para el producto «%s », ya que "
+"tiene habilitada la valoración por lotes."
 
 #. module: stock_account
 #: model:ir.model.fields,field_description:stock_account.field_stock_avco_report__avco_value
@@ -249,7 +254,7 @@ msgstr "Compañía"
 #. module: stock_account
 #: model:ir.model.fields,field_description:stock_account.field_stock_move__company_currency_id
 msgid "Company Currency"
-msgstr "Moneda de la compañía"
+msgstr "Moneda de la empresa"
 
 #. module: stock_account
 #: model:ir.model.fields,field_description:stock_account.field_product_value__computed_value_description
@@ -734,7 +739,7 @@ msgstr ""
 #: model:ir.model.fields.selection,name:stock_account.selection__product_template__valuation__real_time
 #: model:ir.model.fields.selection,name:stock_account.selection__res_company__inventory_valuation__real_time
 msgid "Perpetual (at invoicing)"
-msgstr "Perpetuo (en la facturación)"
+msgstr "Perpetuo (al facturar)"
 
 #. module: stock_account
 #: model:ir.model,name:stock_account.model_stock_picking_type
@@ -938,8 +943,6 @@ msgid "Stock Replenishment Report"
 msgstr "Informe de reposición de stock"
 
 #. module: stock_account
-#. odoo-javascript
-#: code:addons/stock_account/static/src/stock_account_forecasted/forecasted_header.js:0
 #: model:ir.model,name:stock_account.model_stock_account_stock_valuation_report
 msgid "Stock Valuation"
 msgstr "Valoración de stock"
@@ -1132,19 +1135,6 @@ msgstr ""
 "        Se utiliza para calcular los márgenes de los pedidos de venta."
 
 #. module: stock_account
-#: model:ir.model.fields,help:stock_account.field_stock_move__standard_price
-msgid ""
-"Value of the product (automatically computed in AVCO).\n"
-"        Used to value the product when the purchase cost is not known (e.g. "
-"inventory adjustment).\n"
-"        Used to compute margins on sale orders."
-msgstr ""
-"El valor del producto (calculado automáticamente con AVCO).\n"
-"        Se utiliza para valorar el producto cuando se desconoce el coste de "
-"compra (por ejemplo, en un ajuste de inventario).\n"
-"        Se utiliza para calcular los márgenes de los pedidos de venta."
-
-#. module: stock_account
 #: model:ir.model.fields,field_description:stock_account.field_account_account__account_stock_variation_id
 msgid "Variation Account"
 msgstr "Cuenta de variación"
@@ -1204,12 +1194,24 @@ msgstr ""
 
 #. module: stock_account
 #. odoo-python
+#: code:addons/stock_account/models/product.py:0
+msgid ""
+"You cannot enable lot valuation because the following products have on-hand "
+"quantities without a lot/serial number:\n"
+"%s"
+msgstr ""
+"No puedes habilitar una valoración por lote porque los siguientes productos "
+"tienen cantidades disponibles sin número de lote/serie:\n"
+"%s"
+
+#. module: stock_account
+#. odoo-python
 #: code:addons/stock_account/models/stock_picking.py:0
 msgid ""
-"You cannot modify the scheduled date of this operation because it falls "
-"within a locked fiscal period."
+"You cannot modify the scheduled date of operation %s because it falls within "
+"a locked fiscal period."
 msgstr ""
-"No es posible modificar la fecha programada de esta operación porque está "
+"No es posible modificar la fecha programada de esta operación %s porque está "
 "dentro de un período fiscal bloqueado."
 
 #. module: stock_account
@@ -1221,6 +1223,27 @@ msgstr "movimiento_stock_id"
 #: model_terms:ir.ui.view,arch_db:stock_account.stock_account_report_invoice_document
 msgid "units"
 msgstr "unidades"
+
+#~ msgid "6.00"
+#~ msgstr "6,00"
+
+#~ msgid ""
+#~ "Value of the product (automatically computed in AVCO).\n"
+#~ "        Used to value the product when the purchase cost is not known "
+#~ "(e.g. inventory adjustment).\n"
+#~ "        Used to compute margins on sale orders."
+#~ msgstr ""
+#~ "El valor del producto (calculado automáticamente con AVCO).\n"
+#~ "        Se utiliza para valorar el producto cuando se desconoce el coste "
+#~ "de compra (por ejemplo, en un ajuste de inventario).\n"
+#~ "        Se utiliza para calcular los márgenes de los pedidos de venta."
+
+#~ msgid ""
+#~ "You cannot modify the scheduled date of this operation because it falls "
+#~ "within a locked fiscal period."
+#~ msgstr ""
+#~ "No es posible modificar la fecha programada de esta operación porque está "
+#~ "dentro de un período fiscal bloqueado."
 
 #~ msgid "%(quantity)s %(uom)s at product's standard price %(price)s"
 #~ msgstr "%(quantity)s %(uom)s al precio estándar del producto %(price)s"

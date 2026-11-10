@@ -60,7 +60,6 @@ class AccountBankStatementLine(models.Model):
     partner_id = fields.Many2one(
         comodel_name='res.partner',
         string='Partner', ondelete='restrict',
-        domain="['|', ('parent_id','=', False), ('is_company','=',True)]",
         check_company=True)
 
     # Technical field used to store the bank account number before its creation, upon the line's processing
@@ -409,7 +408,7 @@ class AccountBankStatementLine(models.Model):
                 )
             to_write = {'statement_line_id': st_line.id, 'narration': st_line.narration, 'name': False}
             with self.env.protecting(self.env['account.move']._get_protected_vals(vals, st_line)):
-                st_line.move_id.write(to_write)
+                st_line.move_id.with_context(clear_sequence_mixin_cache=False).write(to_write)
         self.env['account.move.line'].create(to_create_lines_vals)
         self.env.add_to_compute(self.env['account.move']._fields['name'], st_lines.move_id)
 
@@ -461,12 +460,16 @@ class AccountBankStatementLine(models.Model):
         """ Undo the reconciliation made on the statement line and reset their journal items
         to their original states.
         """
+        for st_line in self:
+            if st_line.checked and st_line.is_reconciled and not st_line.move_id._is_user_able_to_review():
+                raise ValidationError(self.env._("Validated entries can only be changed by your accountant."))
+
         self.line_ids.remove_move_reconcile()
         self.payment_ids.unlink()
 
         for st_line in self:
             st_line.with_context(force_delete=True, skip_readonly_check=True).write({
-                'checked': True,
+                'checked': st_line.move_id._is_user_able_to_review(),
                 'line_ids': [Command.clear()] + [
                     Command.create(line_vals) for line_vals in st_line._prepare_move_line_default_vals()],
             })
@@ -483,40 +486,19 @@ class AccountBankStatementLine(models.Model):
 
     def _find_or_create_bank_account(self):
         self.ensure_one()
-
-        # There is a sql constraint on res.partner.bank ensuring an unique pair <partner, account number>.
-        # Since it's not dependent of the company, we need to search on others company too to avoid the creation
-        # of an extra res.partner.bank raising an error coming from this constraint.
-        # However, at the end, we need to filter out the results to not trigger the check_company when trying to
-        # assign a res.partner.bank owned by another company.
-        bank_account = self.env['res.partner.bank'].sudo().with_context(active_test=False).search([
-            ('acc_number', '=', self.account_number),
-            ('partner_id', '=', self.partner_id.id),
-        ])
-
-        if bank_account:
-            return bank_account.filtered(lambda x: x.company_id.id in (False, self.company_id.id)).sudo(False)
-
-        # Avoid creating a bank account during reconciliation if it already exists on another active partner
-        bank_account_on_other_partner = self.env['res.partner.bank'].sudo().search([
-            ('acc_number', '=', self.account_number),
-            ('partner_id', '!=', self.partner_id.id),
-            ('partner_id.active', '=', True),
-        ], limit=1)
-
-        if bank_account_on_other_partner:
+        if not self.partner_id:
             return self.env['res.partner.bank']
-
-        if not str2bool(
-                self.env['ir.config_parameter'].sudo().get_param("account.skip_create_bank_account_on_reconcile")
-        ):
-            bank_account = self.env['res.partner.bank'].create({
-                'acc_number': self.account_number,
-                'partner_id': self.partner_id.id,
-                'journal_id': None,
-            })
-
-        return bank_account
+        if str2bool(self.env['ir.config_parameter'].sudo().get_param("account.skip_create_bank_account_on_reconcile")):
+            return self.env['res.partner.bank'].search([
+                ('acc_number', '=', self.account_number),
+                ('partner_id', '=', self.partner_id.id),
+                ('company_id', 'in', [False, self.company_id.id]),
+            ], limit=1)
+        return self.env['res.partner.bank']._find_or_create_bank_account(
+            account_number=self.account_number,
+            partner=self.partner_id,
+            company=self.company_id,
+        )
 
     def _get_default_amls_matching_domain(self, allow_draft=False):
         self.ensure_one()

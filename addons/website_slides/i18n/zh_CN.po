@@ -10,15 +10,15 @@
 # Raymond Yu <cl_yu@hotmail.com>, 2022
 # digitalliuzg8888, 2022
 # Jeffery CHEN <jeffery9@gmail.com>, 2022
-# "Tiffany Chang (tic)" <tic@odoo.com>, 2025.
-# Weblate <noreply-mt-weblate@weblate.org>, 2025.
+# "Tiffany Chang (tic)" <tic@odoo.com>, 2025, 2026.
+# Weblate <noreply-mt-weblate@weblate.org>, 2025, 2026.
 # "Chloe Wang (chwa)" <chwa@odoo.com>, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-01-25 18:35+0000\n"
-"PO-Revision-Date: 2026-01-09 08:17+0000\n"
+"POT-Creation-Date: 2026-10-30 17:37+0000\n"
+"PO-Revision-Date: 2026-08-06 08:59+0000\n"
 "Last-Translator: \"Chloe Wang (chwa)\" <chwa@odoo.com>\n"
 "Language-Team: Chinese (Simplified Han script) <https://translate.odoo.com/"
 "projects/odoo-19/website_slides/zh_Hans/>\n"
@@ -27,7 +27,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Generator: Weblate 5.14.3\n"
+"X-Generator: Weblate 2026.6.1\n"
 
 #. module: website_slides
 #: model:ir.model.fields,field_description:website_slides.field_slide_channel__members_engaged_count
@@ -195,15 +195,6 @@ msgid ""
 msgstr ""
 "<a href=\"/contactus\" class=\"btn btn-primary rounded-circle "
 "o_translate_inline\">联系我们</a>"
-
-#. module: website_slides
-#: model_terms:ir.ui.view,arch_db:website_slides.profile_access_denied
-msgid ""
-"<a t-attf-href=\"/slides/course-#{request.params.get('channel_id')}\" "
-"class=\"o_translate_inline\">Return to the course.</a>"
-msgstr ""
-"<a t-attf-href=\"/slides/course-#{request.params.get('channel_id')}\" "
-"class=\"o_translate_inline\">返回课程。</a>"
 
 #. module: website_slides
 #. odoo-python
@@ -435,9 +426,9 @@ msgid ""
 "align: center;\">\n"
 "                            <a t-att-href=\"(object.website_share_url + '?"
 "fullscreen=1') if ctx.get('fullscreen') else object.website_share_url\">\n"
-"                                <img t-att-alt=\"object.name\" t-attf-"
-"src=\"{{ ctx.get('base_url') }}/web/image/slide.slide/{{ object.id }}/"
-"image_1024\" style=\"height:auto; width:150px; margin: 16px;\"/>\n"
+"                                <img t-att-alt=\"object.name\" t-att-"
+"src=\"object.get_image_1024_src()\" style=\"height:auto; width:150px; "
+"margin: 16px;\"/>\n"
 "                            </a>\n"
 "                        </div>\n"
 "                        <div style=\"padding: 16px 8px 16px 8px; text-align: "
@@ -460,40 +451,6 @@ msgid ""
 "                </div>\n"
 "            "
 msgstr ""
-"<div style=\"margin: 0px; padding: 0px;\">\n"
-"                    <p style=\"margin: 0px; padding: 0px; font-size: 13px;"
-"\">\n"
-"                        您好<br/><br/>\n"
-"                        <t t-out=\"user.name or ''\">Mitchell Admin</t> 与您"
-"分享了 <t t-out=\"object.slide_category or ''\">文档</t> <strong t-"
-"out=\"object.name or ''\">树</strong> ！\n"
-"                        </p><div style=\"margin: 16px 8px 16px 8px; text-"
-"align: center;\">\n"
-"                            <a t-att-href=\"(object.website_share_url + '?"
-"fullscreen=1') if ctx.get('fullscreen') else object.website_share_url\">\n"
-"                                <img t-att-alt=\"object.name\" t-attf-"
-"src=\"{{ ctx.get('base_url') }}/web/image/slide.slide/{{ object.id }}/"
-"image_1024\" style=\"height:auto; width:150px; margin: 16px;\"/>\n"
-"                            </a>\n"
-"                        </div>\n"
-"                        <div style=\"padding: 16px 8px 16px 8px; text-align: "
-"center;\">\n"
-"                            <a t-att-href=\"(object.website_share_url + '?"
-"fullscreen=1') if ctx.get('fullscreen') else object.website_share_url\" t-"
-"attf-style=\"background-color: {{user.company_id.email_secondary_color or "
-"'#875A7B'}}; padding: 8px 16px 8px 16px; text-decoration: none; color: "
-"{{user.company_id.email_primary_color or '#FFFFFF'}}; border-radius: 5px;\">"
-"查看 <strong t-out=\"object.name or ''\">树</strong></a>\n"
-"                        </div>\n"
-"                        <t t-if=\"user.signature\" data-o-mail-quote-"
-"container=\"1\">\n"
-"                            <br/>\n"
-"                            <div data-o-mail-quote=\"1\">--<br data-o-mail-"
-"quote=\"1\"/></t>Mitchell Admin</t></div>\n"
-"                        </t>\n"
-"                    \n"
-"                </div>\n"
-"            "
 
 #. module: website_slides
 #: model:mail.template,body_html:website_slides.slide_template_published
@@ -511,9 +468,9 @@ msgid ""
 "                            <div style=\"padding: 16px 8px 16px 8px; text-"
 "align: center;\">\n"
 "                                <a t-att-href=\"object.website_share_url\">\n"
-"                                <img t-att-alt=\"object.name\" t-attf-"
-"src=\"{{ ctx.get('base_url') }}/web/image/slide.slide/{{ object.id }}/"
-"image_1024\" style=\"height:auto; width:150px; margin: 16px;\"/>\n"
+"                                <img t-att-alt=\"object.name\" t-att-"
+"src=\"object.get_image_1024_src()\" style=\"height:auto; width:150px; "
+"margin: 16px;\"/>\n"
 "                            </a>\n"
 "                        </div>\n"
 "                        </t>\n"
@@ -538,44 +495,6 @@ msgid ""
 "                </div>\n"
 "            "
 msgstr ""
-"<div style=\"margin: 0px; padding: 0px;\">\n"
-"                    <p style=\"margin: 0px; padding: 0px; font-size: 13px;"
-"\">\n"
-"                        您好<br/><br/>\n"
-"                        您正在学习的课程“<strong t-"
-"out=\"object.channel_id.name or ''\">树木、树林和花园</strong>” 有一些新内"
-"容：<br/><br/>\n"
-"                        </p><center><strong t-out=\"object.name or ''\">树</"
-"strong></center>\n"
-"                        <t t-if=\"object.image_1024\">\n"
-"                            <div style=\"padding: 16px 8px 16px 8px; text-"
-"align: center;\">\n"
-"                                <a t-att-href=\"object.website_share_url\">\n"
-"                                <img t-att-alt=\"object.name\" t-attf-"
-"src=\"{{ ctx.get('base_url') }}/web/image/slide.slide/{{ object.id }}/"
-"image_1024\" style=\"height:auto; width:150px; margin: 16px;\"/>\n"
-"                            </a>\n"
-"                        </div>\n"
-"                        </t>\n"
-"                        <div style=\"padding: 16px 8px 16px 8px; text-align: "
-"center;\">\n"
-"                            <a t-att-href=\"object.website_share_url\" t-"
-"attf-style=\"background-color: "
-"{{object.user_id.company_id.email_secondary_color or '#875A7B'}}; padding: "
-"8px 16px 8px 16px; text-decoration: none; color: "
-"{{object.user_id.company_id.email_primary_color or '#FFFFFF'}}; border-"
-"radius: 5px;\">查看内容</a>\n"
-"                        </div>\n"
-"                        享受独家内容！\n"
-"                        <t t-if=\"user.signature\" data-o-mail-quote-"
-"container=\"1\">\n"
-"                            <br/>\n"
-"                            <div data-o-mail-quote=\"1\">--<br data-o-mail-"
-"quote=\"1\"/></t>Mitchell Admin</t></div>\n"
-"                        </t>\n"
-"                    \n"
-"                </div>\n"
-"            "
 
 #. module: website_slides
 #: model_terms:ir.ui.view,arch_db:website_slides.user_profile_content
@@ -2873,9 +2792,11 @@ msgid "Display"
 msgstr "显示"
 
 #. module: website_slides
+#: model:ir.model.fields,field_description:website_slides.field_base_partner_merge_automatic_wizard__display_name
 #: model:ir.model.fields,field_description:website_slides.field_gamification_challenge__display_name
 #: model:ir.model.fields,field_description:website_slides.field_gamification_karma_tracking__display_name
 #: model:ir.model.fields,field_description:website_slides.field_mail_activity__display_name
+#: model:ir.model.fields,field_description:website_slides.field_mail_message__display_name
 #: model:ir.model.fields,field_description:website_slides.field_res_config_settings__display_name
 #: model:ir.model.fields,field_description:website_slides.field_res_groups__display_name
 #: model:ir.model.fields,field_description:website_slides.field_res_partner__display_name
@@ -3594,9 +3515,11 @@ msgid "HowTo"
 msgstr "如何做"
 
 #. module: website_slides
+#: model:ir.model.fields,field_description:website_slides.field_base_partner_merge_automatic_wizard__id
 #: model:ir.model.fields,field_description:website_slides.field_gamification_challenge__id
 #: model:ir.model.fields,field_description:website_slides.field_gamification_karma_tracking__id
 #: model:ir.model.fields,field_description:website_slides.field_mail_activity__id
+#: model:ir.model.fields,field_description:website_slides.field_mail_message__id
 #: model:ir.model.fields,field_description:website_slides.field_res_config_settings__id
 #: model:ir.model.fields,field_description:website_slides.field_res_groups__id
 #: model:ir.model.fields,field_description:website_slides.field_res_partner__id
@@ -4286,6 +4209,16 @@ msgid "Menu Entry"
 msgstr "菜单项"
 
 #. module: website_slides
+#: model:ir.model,name:website_slides.model_base_partner_merge_automatic_wizard
+msgid "Merge Partner Wizard"
+msgstr ""
+
+#. module: website_slides
+#: model:ir.model,name:website_slides.model_mail_message
+msgid "Message"
+msgstr ""
+
+#. module: website_slides
 #: model:ir.model.fields,field_description:website_slides.field_slide_channel__message_has_error
 #: model:ir.model.fields,field_description:website_slides.field_slide_slide__message_has_error
 msgid "Message Delivery error"
@@ -4761,6 +4694,7 @@ msgstr "透视表"
 #: code:addons/website_slides/static/src/xml/slide_course_join.xml:0
 #: code:addons/website_slides/static/src/xml/slide_quiz.xml:0
 #: model_terms:ir.ui.view,arch_db:website_slides.course_join
+#: model_terms:ir.ui.view,arch_db:website_slides.slide_social_email
 msgid "Please"
 msgstr "请"
 
@@ -4777,15 +4711,6 @@ msgstr ""
 #: code:addons/website_slides/static/src/interactions/slide_like.js:0
 msgid "Please %(a_login_open)slogin%(a_login_close)s to vote for this lesson"
 msgstr ""
-
-#. module: website_slides
-#: model_terms:ir.ui.view,arch_db:website_slides.slide_social_email
-msgid ""
-"Please <a t-attf-href=\"/odoo?redirect=#{request.httprequest.url}\" "
-"class=\"fw-bold o_translate_inline\"> login </a> to share this"
-msgstr ""
-"请<a t-attf-href=\"/odoo?redirect=#{request.httprequest.url}\" class=\"fw-"
-"bold o_translate_inline\">登入</a>以分享"
 
 #. module: website_slides
 #. odoo-python
@@ -5201,6 +5126,11 @@ msgstr "从谷歌云端硬盘检索"
 #: code:addons/website_slides/static/src/js/public/components/slide_upload_dialog/slide_install_module.xml:0
 msgid "Retry"
 msgstr "重试"
+
+#. module: website_slides
+#: model_terms:ir.ui.view,arch_db:website_slides.profile_access_denied
+msgid "Return to the course."
+msgstr "返回课程。"
 
 #. module: website_slides
 #: model_terms:ir.ui.view,arch_db:website_slides.view_slide_channel_form
@@ -6806,6 +6736,14 @@ msgstr ""
 
 #. module: website_slides
 #. odoo-python
+#: code:addons/website_slides/models/base_partner_merge.py:0
+msgid ""
+"You cannot merge these contacts because multiple contacts are enrolled in "
+"the same courses: %s"
+msgstr ""
+
+#. module: website_slides
+#. odoo-python
 #: code:addons/website_slides/controllers/main.py:0
 msgid "You cannot upload on this channel."
 msgstr "您无法在此频道上传。"
@@ -7162,6 +7100,7 @@ msgstr "参加"
 #. odoo-javascript
 #: code:addons/website_slides/static/src/js/public/components/slide_share_dialog/email_sharing_input.xml:0
 #: code:addons/website_slides/static/src/xml/slide_course_join.xml:0
+#: model_terms:ir.ui.view,arch_db:website_slides.slide_social_email
 msgid "login"
 msgstr "登录"
 
@@ -7246,6 +7185,7 @@ msgstr "请求访问"
 #. module: website_slides
 #. odoo-javascript
 #: code:addons/website_slides/static/src/js/public/components/slide_share_dialog/email_sharing_input.xml:0
+#: model_terms:ir.ui.view,arch_db:website_slides.slide_social_email
 msgid "to share this"
 msgstr "分享这个"
 
@@ -7280,6 +7220,174 @@ msgstr "{{ user.name }} 跟您分享 {{ object.slide_category }} ！"
 #: model_terms:ir.ui.view,arch_db:website_slides.course_nav
 msgid "└<span class=\"ms-1\">Uncategorized</span>"
 msgstr "└<span class=\"ms-1\">未分类的</span>"
+
+#~ msgid ""
+#~ "<div style=\"margin: 0px; padding: 0px;\">\n"
+#~ "                    <p style=\"margin: 0px; padding: 0px; font-size: 13px;"
+#~ "\">\n"
+#~ "                        Hello<br/><br/>\n"
+#~ "                        <t t-out=\"user.name or ''\">Mitchell Admin</t> "
+#~ "shared the <t t-out=\"object.slide_category or ''\">document</t> <strong "
+#~ "t-out=\"object.name or ''\">Trees</strong> with you!\n"
+#~ "                        </p><div style=\"margin: 16px 8px 16px 8px; text-"
+#~ "align: center;\">\n"
+#~ "                            <a t-att-href=\"(object.website_share_url + '?"
+#~ "fullscreen=1') if ctx.get('fullscreen') else object.website_share_url\">\n"
+#~ "                                <img t-att-alt=\"object.name\" t-attf-"
+#~ "src=\"{{ ctx.get('base_url') }}/web/image/slide.slide/{{ object.id }}/"
+#~ "image_1024\" style=\"height:auto; width:150px; margin: 16px;\"/>\n"
+#~ "                            </a>\n"
+#~ "                        </div>\n"
+#~ "                        <div style=\"padding: 16px 8px 16px 8px; text-"
+#~ "align: center;\">\n"
+#~ "                            <a t-att-href=\"(object.website_share_url + '?"
+#~ "fullscreen=1') if ctx.get('fullscreen') else object.website_share_url\" t-"
+#~ "attf-style=\"background-color: {{user.company_id.email_secondary_color or "
+#~ "'#875A7B'}}; padding: 8px 16px 8px 16px; text-decoration: none; color: "
+#~ "{{user.company_id.email_primary_color or '#FFFFFF'}}; border-radius: 5px;"
+#~ "\">View <strong t-out=\"object.name or ''\">Trees</strong></a>\n"
+#~ "                        </div>\n"
+#~ "                        <t t-if=\"user.signature\" data-o-mail-quote-"
+#~ "container=\"1\">\n"
+#~ "                            <br/>\n"
+#~ "                            <div data-o-mail-quote=\"1\">--<br data-o-"
+#~ "mail-quote=\"1\"/><t t-out=\"user.signature or ''\" data-o-mail-"
+#~ "quote=\"1\">Mitchell Admin</t></div>\n"
+#~ "                        </t>\n"
+#~ "                    \n"
+#~ "                </div>\n"
+#~ "            "
+#~ msgstr ""
+#~ "<div style=\"margin: 0px; padding: 0px;\">\n"
+#~ "                    <p style=\"margin: 0px; padding: 0px; font-size: 13px;"
+#~ "\">\n"
+#~ "                        您好<br/><br/>\n"
+#~ "                        <t t-out=\"user.name or ''\">Mitchell Admin</t> 与"
+#~ "您分享了 <t t-out=\"object.slide_category or ''\">文档</t> <strong t-"
+#~ "out=\"object.name or ''\">树</strong> ！\n"
+#~ "                        </p><div style=\"margin: 16px 8px 16px 8px; text-"
+#~ "align: center;\">\n"
+#~ "                            <a t-att-href=\"(object.website_share_url + '?"
+#~ "fullscreen=1') if ctx.get('fullscreen') else object.website_share_url\">\n"
+#~ "                                <img t-att-alt=\"object.name\" t-attf-"
+#~ "src=\"{{ ctx.get('base_url') }}/web/image/slide.slide/{{ object.id }}/"
+#~ "image_1024\" style=\"height:auto; width:150px; margin: 16px;\"/>\n"
+#~ "                            </a>\n"
+#~ "                        </div>\n"
+#~ "                        <div style=\"padding: 16px 8px 16px 8px; text-"
+#~ "align: center;\">\n"
+#~ "                            <a t-att-href=\"(object.website_share_url + '?"
+#~ "fullscreen=1') if ctx.get('fullscreen') else object.website_share_url\" t-"
+#~ "attf-style=\"background-color: {{user.company_id.email_secondary_color or "
+#~ "'#875A7B'}}; padding: 8px 16px 8px 16px; text-decoration: none; color: "
+#~ "{{user.company_id.email_primary_color or '#FFFFFF'}}; border-radius: 5px;"
+#~ "\">查看 <strong t-out=\"object.name or ''\">树</strong></a>\n"
+#~ "                        </div>\n"
+#~ "                        <t t-if=\"user.signature\" data-o-mail-quote-"
+#~ "container=\"1\">\n"
+#~ "                            <br/>\n"
+#~ "                            <div data-o-mail-quote=\"1\">--<br data-o-"
+#~ "mail-quote=\"1\"/></t>Mitchell Admin</t></div>\n"
+#~ "                        </t>\n"
+#~ "                    \n"
+#~ "                </div>\n"
+#~ "            "
+
+#~ msgid ""
+#~ "<div style=\"margin: 0px; padding: 0px;\">\n"
+#~ "                    <p style=\"margin: 0px; padding: 0px; font-size: 13px;"
+#~ "\">\n"
+#~ "                        Hello<br/><br/>\n"
+#~ "                        There is something new in the course <strong t-"
+#~ "out=\"object.channel_id.name or ''\">Trees, Wood and Gardens</strong> you "
+#~ "are following:<br/><br/>\n"
+#~ "                        </p><center><strong t-out=\"object.name or "
+#~ "''\">Trees</strong></center>\n"
+#~ "                        <t t-if=\"object.image_1024\">\n"
+#~ "                            <div style=\"padding: 16px 8px 16px 8px; text-"
+#~ "align: center;\">\n"
+#~ "                                <a t-att-"
+#~ "href=\"object.website_share_url\">\n"
+#~ "                                <img t-att-alt=\"object.name\" t-attf-"
+#~ "src=\"{{ ctx.get('base_url') }}/web/image/slide.slide/{{ object.id }}/"
+#~ "image_1024\" style=\"height:auto; width:150px; margin: 16px;\"/>\n"
+#~ "                            </a>\n"
+#~ "                        </div>\n"
+#~ "                        </t>\n"
+#~ "                        <div style=\"padding: 16px 8px 16px 8px; text-"
+#~ "align: center;\">\n"
+#~ "                            <a t-att-href=\"object.website_share_url\" t-"
+#~ "attf-style=\"background-color: "
+#~ "{{object.user_id.company_id.email_secondary_color or '#875A7B'}}; "
+#~ "padding: 8px 16px 8px 16px; text-decoration: none; color: "
+#~ "{{object.user_id.company_id.email_primary_color or '#FFFFFF'}}; border-"
+#~ "radius: 5px;\">View content</a>\n"
+#~ "                        </div>\n"
+#~ "                        Enjoy this exclusive content!\n"
+#~ "                        <t t-if=\"user.signature\" data-o-mail-quote-"
+#~ "container=\"1\">\n"
+#~ "                            <br/>\n"
+#~ "                            <div data-o-mail-quote=\"1\">--<br data-o-"
+#~ "mail-quote=\"1\"/><t t-out=\"user.signature or ''\" data-o-mail-"
+#~ "quote=\"1\">Mitchell Admin</t></div>\n"
+#~ "                        </t>\n"
+#~ "                    \n"
+#~ "                </div>\n"
+#~ "            "
+#~ msgstr ""
+#~ "<div style=\"margin: 0px; padding: 0px;\">\n"
+#~ "                    <p style=\"margin: 0px; padding: 0px; font-size: 13px;"
+#~ "\">\n"
+#~ "                        您好<br/><br/>\n"
+#~ "                        您正在学习的课程“<strong t-"
+#~ "out=\"object.channel_id.name or ''\">树木、树林和花园</strong>” 有一些新内"
+#~ "容：<br/><br/>\n"
+#~ "                        </p><center><strong t-out=\"object.name or ''\">树"
+#~ "</strong></center>\n"
+#~ "                        <t t-if=\"object.image_1024\">\n"
+#~ "                            <div style=\"padding: 16px 8px 16px 8px; text-"
+#~ "align: center;\">\n"
+#~ "                                <a t-att-"
+#~ "href=\"object.website_share_url\">\n"
+#~ "                                <img t-att-alt=\"object.name\" t-attf-"
+#~ "src=\"{{ ctx.get('base_url') }}/web/image/slide.slide/{{ object.id }}/"
+#~ "image_1024\" style=\"height:auto; width:150px; margin: 16px;\"/>\n"
+#~ "                            </a>\n"
+#~ "                        </div>\n"
+#~ "                        </t>\n"
+#~ "                        <div style=\"padding: 16px 8px 16px 8px; text-"
+#~ "align: center;\">\n"
+#~ "                            <a t-att-href=\"object.website_share_url\" t-"
+#~ "attf-style=\"background-color: "
+#~ "{{object.user_id.company_id.email_secondary_color or '#875A7B'}}; "
+#~ "padding: 8px 16px 8px 16px; text-decoration: none; color: "
+#~ "{{object.user_id.company_id.email_primary_color or '#FFFFFF'}}; border-"
+#~ "radius: 5px;\">查看内容</a>\n"
+#~ "                        </div>\n"
+#~ "                        享受独家内容！\n"
+#~ "                        <t t-if=\"user.signature\" data-o-mail-quote-"
+#~ "container=\"1\">\n"
+#~ "                            <br/>\n"
+#~ "                            <div data-o-mail-quote=\"1\">--<br data-o-"
+#~ "mail-quote=\"1\"/></t>Mitchell Admin</t></div>\n"
+#~ "                        </t>\n"
+#~ "                    \n"
+#~ "                </div>\n"
+#~ "            "
+
+#~ msgid ""
+#~ "<a t-attf-href=\"/slides/course-#{request.params.get('channel_id')}\" "
+#~ "class=\"o_translate_inline\">Return to the course.</a>"
+#~ msgstr ""
+#~ "<a t-attf-href=\"/slides/course-#{request.params.get('channel_id')}\" "
+#~ "class=\"o_translate_inline\">返回课程。</a>"
+
+#~ msgid ""
+#~ "Please <a t-attf-href=\"/odoo?redirect=#{request.httprequest.url}\" "
+#~ "class=\"fw-bold o_translate_inline\"> login </a> to share this"
+#~ msgstr ""
+#~ "请<a t-attf-href=\"/odoo?redirect=#{request.httprequest.url}\" class=\"fw-"
+#~ "bold o_translate_inline\">登入</a>以分享"
 
 #~ msgid "<i class=\"fa fa-comments\"/> Comments ("
 #~ msgstr "<i class=\"fa fa-comments\"/>评价("
@@ -7565,9 +7673,6 @@ msgstr "└<span class=\"ms-1\">未分类的</span>"
 
 #~ msgid "Restrict publishing to this website."
 #~ msgstr "限制发布到本网站。"
-
-#~ msgid "Return to the course."
-#~ msgstr "返回课程。"
 
 #~ msgid "Save & Publish"
 #~ msgstr "保存和发布"

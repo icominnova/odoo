@@ -3,6 +3,7 @@
 import pprint
 
 from odoo import _, models
+from odoo.exceptions import ValidationError
 
 from odoo.addons.payment import utils as payment_utils
 from odoo.addons.payment.logging import get_payment_logger
@@ -106,7 +107,7 @@ class PaymentTransaction(models.Model):
                 # The payment has been settled on Authorize.net side. We can refund it.
                 rounded_amount = round(self.amount, self.currency_id.decimal_places)
                 res_content = authorize_api.refund(
-                    self.provider_reference, rounded_amount, tx_details
+                    self.source_transaction_id.provider_reference, rounded_amount, tx_details
                 )
             _logger.info(
                 "refund request response for transaction %s:\n%s",
@@ -145,7 +146,7 @@ class PaymentTransaction(models.Model):
             return super()._send_void_request()
 
         authorize_API = AuthorizeAPI(self.provider_id)
-        res_content = authorize_API.void(self.provider_reference)
+        res_content = authorize_API.void(self.source_transaction_id.provider_reference)
         _logger.info(
             "void request response for transaction %s:\n%s",
             self.reference, pprint.pformat(res_content)
@@ -157,9 +158,12 @@ class PaymentTransaction(models.Model):
         if self.provider_code != 'authorize':
             return super()._extract_amount_data(payment_data)
 
-        tx_details = AuthorizeAPI(self.provider_id).get_transaction_details(
-            payment_data.get('response', {}).get('x_trans_id')
-        )
+        try:
+            tx_details = AuthorizeAPI(self.provider_id).get_transaction_details(
+                payment_data.get('response', {}).get('x_trans_id')
+            )
+        except ValidationError:
+            return None  # Skip the validation
         if 'err_code' in tx_details:  # Transaction details are missing when an API error occurs.
             return None  # Skip the validation
 
@@ -196,11 +200,19 @@ class PaymentTransaction(models.Model):
                 self._set_done()
             elif status_type == 'auth_only':
                 self._set_authorized()
+                if self.tokenize:
+                    self._tokenize(payment_data)  # Tokenize before voiding
                 if self.operation == 'validation':
                     self._void()  # In last step because it processes the response.
             elif status_type == 'void':
-                if self.operation == 'validation':  # Validation txs are authorized and then voided
-                    self._set_done()  # If the refund went through, the validation tx is confirmed
+                # - If operation is refund, we are in a child transaction created in _refund(),
+                #   and having the void status means the payment was voided instead of refunded,
+                #   because the payment was not settled yet. In this case, we should mark the
+                #   refund transaction as done, since we are in the child transaction.
+                # - For validation transactions, they are authorized and then voided:
+                #   If the void went through, the validation transaction is confirmed.
+                if self.operation in ['validation', 'refund']:
+                    self._set_done()
                 else:
                     self._set_canceled(extra_allowed_states=('done',))
             elif status_type == 'refund' and self.operation == 'refund':

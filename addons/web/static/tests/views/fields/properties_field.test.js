@@ -3,19 +3,23 @@ import { Many2XAutocomplete } from "@web/views/fields/relational_utils";
 import { SelectCreateDialog } from "@web/views/view_dialogs/select_create_dialog";
 import { WebClient } from "@web/webclient/webclient";
 
-import { expect, getFixture, test } from "@odoo/hoot";
 import {
+    animationFrame,
     click,
     edit,
+    expect,
+    getFixture,
+    mockDate,
     press,
     queryAll,
     queryAllTexts,
     queryAllValues,
     queryAttribute,
     queryFirst,
+    runAllTimers,
+    test,
     waitFor,
-} from "@odoo/hoot-dom";
-import { animationFrame, mockDate, runAllTimers } from "@odoo/hoot-mock";
+} from "@odoo/hoot";
 import { editTime, getPickerCell } from "@web/../tests/core/datetime/datetime_test_helpers";
 import {
     clickCancel,
@@ -24,6 +28,7 @@ import {
     defineModels,
     fields,
     getService,
+    makeServerError,
     models,
     mountView,
     mountWithCleanup,
@@ -56,7 +61,7 @@ async function changeType(propertyType) {
         "tags",
         "many2one",
         "many2many",
-        "separator"
+        "separator",
     ];
     const propertyTypeIndex = TYPES.indexOf(propertyType);
     await click(".o_field_property_definition_type input");
@@ -269,13 +274,11 @@ class ResCurrency extends models.Model {
     name = fields.Char();
     symbol = fields.Char();
 
-    _records = Object.entries(serverState.currencies).map(
-        ([id, { name, symbol }]) => ({
-            id: Number(id) + 1,
-            name,
-            symbol,
-        })
-    );
+    _records = Object.entries(serverState.currencies).map(([id, { name, symbol }]) => ({
+        id: Number(id) + 1,
+        name,
+        symbol,
+    }));
 }
 
 defineModels([Partner, ResCompany, User, ResCurrency]);
@@ -1010,6 +1013,63 @@ test("properties: many2one", async () => {
     );
 });
 
+test.tags("desktop");
+test("properties: a relational property with an unevaluable domain shows no record count", async () => {
+    onRpc(({ method, model }) => {
+        if (method === "has_access") {
+            return true;
+        } else if (method === "get_available_models" && model === "ir.model") {
+            return [{ model: "res.users", display_name: "User" }];
+        } else if (method === "fields_get" && model === "res.users") {
+            return { name: { searchable: true, string: "Name", type: "char" } };
+        } else if (method === "search_count" && model === "res.users") {
+            throw makeServerError({ message: "Wrong path" });
+        }
+    });
+
+    await mountView({
+        type: "form",
+        resModel: "partner",
+        resId: 2,
+        arch: /* xml */ `
+            <form>
+                <sheet>
+                    <group>
+                        <field name="company_id"/>
+                        <field name="properties"/>
+                    </group>
+                </sheet>
+            </form>`,
+        actionMenus: {},
+    });
+
+    await toggleActionMenu();
+    await toggleMenuItem("Edit Properties"); // Start the edition mode
+
+    for (const propertyType of ["many2one", "many2many"]) {
+        await click(".o_property_field:nth-child(2) .o_field_property_open_popover");
+        await waitFor(".o_property_field_popover");
+        const popover = queryFirst(".o_property_field_popover");
+        await changeType(propertyType);
+
+        // Selecting the model triggers the matching-records count, which fails here.
+        await click(".o_field_property_definition_model input", { root: popover });
+        await animationFrame();
+        await click(".o_field_property_definition_model .ui-menu-item:first-child", {
+            root: popover,
+        });
+        await animationFrame();
+
+        expect(".o_property_field_popover").toHaveCount(1, {
+            message: `the ${propertyType} property editor stays open`,
+        });
+        expect(queryFirst(".o_property_field_popover").textContent).not.toInclude("record(s)", {
+            message: "no matching record count is shown when the domain cannot be evaluated",
+        });
+        await closePopover();
+    }
+});
+
 /**
  * Test the properties many2many
  */
@@ -1493,9 +1553,7 @@ test("properties: kanban view", async () => {
     expect(".o_kanban_record:nth-child(2) .o_card_property_field:nth-child(1)").toHaveText(
         "char value\nsuffix"
     );
-    expect(".o_kanban_record:nth-child(2) .o_card_property_field:nth-child(2)").toHaveText(
-        "C"
-    );
+    expect(".o_kanban_record:nth-child(2) .o_card_property_field:nth-child(2)").toHaveText("C");
 
     // check first card
     expect(".o_kanban_record:nth-child(1) .o_card_property_field").toHaveCount(2);
@@ -2256,10 +2314,7 @@ test("properties: open section by default", async () => {
     await click("div[property-name='property_1'] .o_field_property_group_label");
     await animationFrame();
 
-    expect(getGroups()).toEqual([
-        [["SEPARATOR 1", "property_1"]],
-        [["SEPARATOR 3", "property_3"]],
-    ]);
+    expect(getGroups()).toEqual([[["SEPARATOR 1", "property_1"]], [["SEPARATOR 3", "property_3"]]]);
 });
 
 test.tags("desktop");
@@ -2301,12 +2356,14 @@ test("properties: save separator folded state", async () => {
     assertFolded([true, false, true, false]);
 
     await clickSave();
-    expect.verifySteps([[
-        ["property_1", true],
-        ["property_2", false],
-        ["property_3", true],
-        ["property_4", false],
-    ]]);
+    expect.verifySteps([
+        [
+            ["property_1", true],
+            ["property_2", false],
+            ["property_3", true],
+            ["property_4", false],
+        ],
+    ]);
 });
 
 /**
@@ -2966,7 +3023,12 @@ test("properties: monetary without currency_field", async () => {
 
     await click(".o_field_property_definition_type input");
     await animationFrame();
-    expect(`.o_field_property_definition_type_menu .o-dropdown-item:contains(Monetary) > div.text-muted`).toHaveAttribute("data-tooltip", "Not possible to create monetary field because there is no currency on current model.");
+    expect(
+        `.o_field_property_definition_type_menu .o-dropdown-item:contains(Monetary) > div.text-muted`
+    ).toHaveAttribute(
+        "data-tooltip",
+        "Not possible to create monetary field because there is no currency on current model."
+    );
 });
 
 test("properties: monetary with currency_id", async () => {
@@ -3000,16 +3062,22 @@ test("properties: monetary with currency_id", async () => {
 
     await click(".o_field_property_definition_type input");
     await animationFrame();
-    expect(`.o_field_property_definition_type_menu .o-dropdown-item:contains(Monetary) > div:not(.text-muted)`).toHaveCount(1);
+    expect(
+        `.o_field_property_definition_type_menu .o-dropdown-item:contains(Monetary) > div:not(.text-muted)`
+    ).toHaveCount(1);
 
-    await contains(`.o_field_property_definition_type_menu .o-dropdown-item:contains(Monetary)`).click();
+    await contains(
+        `.o_field_property_definition_type_menu .o-dropdown-item:contains(Monetary)`
+    ).click();
     expect(`.o_field_property_definition_currency_field select`).toHaveText("Currency");
     expect(`.o_field_property_definition_currency_field select`).toHaveValue("currency_id");
     expect(".o_field_property_definition_value .o_input > span:eq(0)").toHaveText("$");
     expect(`.o_field_property_definition_value input`).toHaveValue("0.00");
 
     await closePopover();
-    expect(".o_property_field:nth-child(2) .o_property_field_value .o_input > span:eq(0)").toHaveText("$");
+    expect(
+        ".o_property_field:nth-child(2) .o_property_field_value .o_input > span:eq(0)"
+    ).toHaveText("$");
     expect(`.o_property_field:nth-child(2) .o_property_field_value input`).toHaveValue("0.00");
 });
 
@@ -3046,18 +3114,120 @@ test("properties: monetary with multiple currency field", async () => {
 
     await click(".o_field_property_definition_type input");
     await animationFrame();
-    expect(`.o_field_property_definition_type_menu .o-dropdown-item:contains(Monetary) > div:not(.text-muted)`).toHaveCount(1);
+    expect(
+        `.o_field_property_definition_type_menu .o-dropdown-item:contains(Monetary) > div:not(.text-muted)`
+    ).toHaveCount(1);
 
-    await contains(`.o_field_property_definition_type_menu .o-dropdown-item:contains(Monetary)`).click();
-    expect(`.o_field_property_definition_currency_field select`).toHaveText("Currency\nAnother currency");
+    await contains(
+        `.o_field_property_definition_type_menu .o-dropdown-item:contains(Monetary)`
+    ).click();
+    expect(`.o_field_property_definition_currency_field select`).toHaveText(
+        "Currency\nAnother currency"
+    );
     expect(`.o_field_property_definition_currency_field select`).toHaveValue("currency_id");
 
-    await contains(".o_field_property_definition_currency_field select").select("another_currency_id");
+    await contains(".o_field_property_definition_currency_field select").select(
+        "another_currency_id"
+    );
     expect(`.o_field_property_definition_currency_field select`).toHaveValue("another_currency_id");
     expect(".o_field_property_definition_value .o_input > span:eq(1)").toHaveText("€");
     expect(`.o_field_property_definition_value input`).toHaveValue("0.00");
 
     await closePopover();
-    expect(".o_property_field:nth-child(2) .o_property_field_value .o_input > span:eq(1)").toHaveText("€");
+    expect(
+        ".o_property_field:nth-child(2) .o_property_field_value .o_input > span:eq(1)"
+    ).toHaveText("€");
     expect(`.o_property_field:nth-child(2) .o_property_field_value input`).toHaveValue("0.00");
+});
+
+test("properties: no parent document set", async () => {
+    onRpc("has_access", () => true);
+
+    const formView = await mountView({
+        type: "form",
+        resModel: "partner",
+        arch: /* xml */ `
+            <form>
+                <sheet>
+                    <group>
+                        <field name="company_id"/>
+                        <field name="properties"/>
+                    </group>
+                </sheet>
+            </form>`,
+        actionMenus: {},
+    });
+
+    patchWithCleanup(formView.env.services.notification, {
+        add: (message, options) => {
+            expect.step("notification");
+            expect(message).toBe(
+                "Oops! A Company is needed to add property fields."
+            );
+            expect(options.type).toBe("warning");
+        },
+    });
+
+    expect(".o_field_properties").toHaveCount(1, { message: "The field must be in the view" });
+
+    await toggleActionMenu();
+
+    expect(".o-dropdown--menu span:contains(Edit Properties)").toHaveCount(1, {
+        message: "Show Edit Properties btn in cog menu",
+    });
+
+    await toggleMenuItem("Edit Properties");
+
+    expect.verifySteps(["notification"]);
+
+    expect(".o_field_properties:first-child .o_field_property_open_popover").toHaveCount(0, {
+        message: "The edit definition button must not be in the view",
+    });
+});
+
+test.tags("desktop");
+test("properties: Create a property with an onchange methods", async () => {
+    expect.errors(0);
+    for (const record of Partner._records) {
+        record.properties = {};
+    }
+    ResCompany._records[0].definitions = [];
+    Partner._onChanges.properties = () => {};
+    onRpc("onchange", async () => {
+        expect.step("on_change_called");
+        await new Promise((resolve) => setTimeout(resolve, 100));
+    });
+
+    onRpc("has_access", () => true);
+    patchWithCleanup(PropertiesField.prototype, {
+        onPropertyCreate() {
+            expect.step("onPropertyCreate");
+            return super.onPropertyCreate(...arguments);
+        },
+        _openPropertyDefinition() {
+            expect.step("_openPropertyDefinition");
+            return super._openPropertyDefinition(...arguments);
+        },
+    });
+    await mountView({
+        type: "form",
+        resModel: "partner",
+        resId: 1,
+        arch: `
+            <form>
+                <field name="company_id"/>
+                <field name="properties"/>
+            </form>`,
+        actionMenus: {},
+    });
+    await toggleActionMenu();
+    await contains(".o_popover span .fa-cogs").click();
+    await runAllTimers();
+    await closePopover();
+    expect.verifySteps([
+        "onPropertyCreate",
+        "on_change_called",
+        "_openPropertyDefinition",
+        "on_change_called",
+    ]);
 });

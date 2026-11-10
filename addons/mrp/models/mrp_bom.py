@@ -1,12 +1,12 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
+from collections import defaultdict
+
 from odoo import api, fields, models, _
 from odoo.exceptions import UserError, ValidationError
 from odoo.fields import Command, Domain
 from odoo.tools import float_compare
 from odoo.tools.misc import clean_context, OrderedSet
-
-from collections import defaultdict
 
 
 class MrpBom(models.Model):
@@ -50,6 +50,9 @@ class MrpBom(models.Model):
     sequence = fields.Integer('Sequence')
     operation_ids = fields.One2many('mrp.routing.workcenter', 'bom_id', 'Operations', copy=True)
     operation_count = fields.Integer('Operations Count', compute='_compute_operation_count')
+    show_copy_operations_button = fields.Boolean(
+        compute="_compute_show_copy_operations_button",
+        help="Technical field used to control the visibility of the 'Copy Existing Operations' button.")
     ready_to_produce = fields.Selection([
         ('all_available', ' When all components are available'),
         ('asap', 'When components for 1st operation are available')], string='Manufacturing Readiness',
@@ -326,6 +329,10 @@ class MrpBom(models.Model):
         for bom in self:
             bom.operation_count = len(bom.operation_ids)
 
+    def _compute_show_copy_operations_button(self):
+        exist_operation = bool(self.env['mrp.routing.workcenter'].search_count([], limit=1))
+        self.show_copy_operations_button = exist_operation
+
     def action_compute_bom_days(self):
         company_id = self.env.context.get('default_company_id', self.env.company.id)
         warehouse = self.env['stock.warehouse'].search([('company_id', '=', company_id)], limit=1)
@@ -396,15 +403,47 @@ class MrpBom(models.Model):
             return bom_by_product
 
         boms = self.search(domain, order='sequence, product_id, id')
-
-        products_ids = set(products.ids)
+        bom_by_product_tmpl = defaultdict(lambda: self.env['mrp.bom'])
         for bom in boms:
-            products_implies = bom.product_id or bom.product_tmpl_id.product_variant_ids
-            for product in products_implies:
-                if product.id in products_ids and product not in bom_by_product:
-                    bom_by_product[product] = bom
+            if bom.product_id and (bom.product_id.product_tmpl_id not in bom_by_product_tmpl) and (bom.product_id not in bom_by_product):
+                bom_by_product[bom.product_id] = bom
+            elif not bom.product_id and bom.product_tmpl_id not in bom_by_product_tmpl:
+                bom_by_product_tmpl[bom.product_tmpl_id] = bom
+
+        for product in products:
+            if product.product_tmpl_id in bom_by_product_tmpl and product not in bom_by_product:
+                bom_by_product[product] = bom_by_product_tmpl[product.product_tmpl_id]
 
         return bom_by_product
+
+    def preload_phantom_boms(self, products, picking_type, company_id):
+        """
+        This is a performance helper for :meth:`explode`, which traverses BoM trees depth-first
+        and would otherwise issue one :meth:`_bom_find` call per component. By pre-loading the
+        full reachable set of phantom BoMs before explosion, all look-ups become O(1) dict accesses
+        against the shared cache. The method performs a BFS over the forest whose roots are ``products``.
+        """
+        if not products:
+            return {}
+
+        product_boms = {}
+        current_level = products.ids
+        next_level = list()
+        while current_level:
+            current_products = self.env['product.product'].browse(current_level)
+            level_boms = self._bom_find(current_products, picking_type=picking_type, company_id=company_id, bom_type='phantom')
+            product_boms.update(level_boms)
+            # Set missing keys to default value
+            for prod in current_products:
+                product_boms.setdefault(prod, self.env['mrp.bom'])
+            for bom in level_boms.values():
+                for bom_line in bom.bom_line_ids:
+                    if bom_line.product_id not in product_boms:  # Skip if already processed
+                        next_level.append(bom_line.product_id.id)
+            current_level = next_level
+            next_level = list()
+
+        return product_boms
 
     def explode(self, product, quantity, picking_type=False, never_attribute_values=False):
         """
@@ -412,26 +451,19 @@ class MrpBom(models.Model):
             Quantity describes the number of times you need the BoM: so the quantity divided by the number created by the BoM
             and converted into its UoM
         """
-        product_ids = set()
-        product_boms = {}
-        def update_product_boms():
-            products = self.env['product.product'].browse(product_ids)
-            product_boms.update(self._bom_find(products, picking_type=picking_type or self.picking_type_id,
-                company_id=self.company_id.id, bom_type='phantom'))
-            # Set missing keys to default value
-            for product in products:
-                product_boms.setdefault(product, self.env['mrp.bom'])
+        if 'bom_cost_share_cache' not in self.env.context:
+            self = self.with_context(bom_cost_share_cache={})  # noqa: PLW0642
+        product_boms = self.env.cr.cache.get('phantom_boms_cache', {})
+        product_boms.update(self.preload_phantom_boms(
+            self.bom_line_ids.product_id.filtered(lambda p: p not in product_boms),
+            picking_type=picking_type or self.picking_type_id,
+            company_id=self.company_id.id,
+        ))
 
         boms_done = [(self, self.env['mrp.bom.line']._prepare_bom_done_values(quantity, product, quantity, []))]
         lines_done = []
+        bom_lines = [(line, product, quantity, False) for line in self.bom_line_ids]
 
-        bom_lines = []
-        for bom_line in self.bom_line_ids:
-            product_id = bom_line.product_id
-            bom_lines.append((bom_line, product, quantity, False))
-            product_ids.add(product_id.id)
-        update_product_boms()
-        product_ids.clear()
         while bom_lines:
             current_line, current_product, current_qty, parent_line = bom_lines[0]
             bom_lines = bom_lines[1:]
@@ -440,18 +472,12 @@ class MrpBom(models.Model):
                 continue
 
             line_quantity = current_qty * current_line.product_qty
-            if current_line.product_id not in product_boms:
-                update_product_boms()
-                product_ids.clear()
             bom = product_boms.get(current_line.product_id)
             if bom:
                 converted_line_quantity = current_line.product_uom_id._compute_quantity(
                     line_quantity / bom.product_qty, bom.product_uom_id, round=False
                 )
                 bom_lines = [(line, current_line.product_id, converted_line_quantity, current_line) for line in bom.bom_line_ids] + bom_lines
-                for bom_line in bom.bom_line_ids:
-                    if bom_line.product_id not in product_boms:
-                        product_ids.add(bom_line.product_id.id)
                 boms_done.append((bom, current_line._prepare_bom_done_values(converted_line_quantity, current_product, quantity, boms_done)))
             else:
                 # We round up here because the user expects that if he has to consume a little more, the whole UOM unit
@@ -478,6 +504,7 @@ class MrpBom(models.Model):
             return
         # Searches for MOs using these BoMs to notify them that their BoM has been updated.
         list_of_domain_by_bom = []
+        list_of_domain_by_bom_to_unmark = []
         for bom in self:
             if bom.product_id:
                 domain_by_products = Domain('product_id', '=', bom.product_id.id)
@@ -490,6 +517,17 @@ class MrpBom(models.Model):
         productions = self.env['mrp.production'].search(Domain.OR(list_of_domain_by_bom))
         if productions:
             productions.is_outdated_bom = True
+        # Manually sets the MO's bom to not outdated if product or its variant is changed.
+        if not self.env.context.get('skip_bom_outdated_unmark'):
+            for bom in self:
+                template_domain = [('state', '=', 'confirmed'), ('is_outdated_bom', '=', True), ('bom_id', '=', bom.id)]
+                if bom.product_id:
+                    template_domain.append(('product_id', '!=', bom.product_id.id))
+                else:
+                    template_domain.append(('product_tmpl_id', '!=', bom.product_tmpl_id.id))
+                list_of_domain_by_bom_to_unmark.append(template_domain)
+            if list_of_domain_by_bom_to_unmark:
+                self.env['mrp.production'].search(Domain.OR(list_of_domain_by_bom_to_unmark)).write({'is_outdated_bom': False})
 
     # -------------------------------------------------------------------------
     # CATALOG
@@ -572,38 +610,29 @@ class MrpBom(models.Model):
             Cases:
                 - no_variant:
                     1. attribute present on the line
-                        => need to be at least one attribute value matching between the one passed as args and the ones one the line
+                        => Every attribute on the line must have at least one of its values match with a value passed as args.
                     2. attribute not present on the line
                         => valid if the line has no attribute value selected for that attribute
                 - always and dynamic: match_all_variant_values()
         """
-        no_variant_bom_attributes = bom_attribule_values.filtered(lambda av: av.attribute_id.create_variant == 'no_variant')
+        no_variant_bom_attribute_values = bom_attribule_values.filtered(lambda av: av.attribute_id.create_variant == 'no_variant')
 
         # Attributes create_variant 'always' and 'dynamic'
-        other_attribute_valid = product._match_all_variant_values(bom_attribule_values - no_variant_bom_attributes)
+        other_attribute_valid = product._match_all_variant_values(bom_attribule_values - no_variant_bom_attribute_values)
 
         # If there are no never attribute values on the line => 'always' and 'dynamic'
-        if not no_variant_bom_attributes:
+        if not no_variant_bom_attribute_values:
             return not other_attribute_valid
 
         # Or if there are never attribute on the line values but no value is passed => impossible to match
         if not never_attribute_values:
             return True
 
-        bom_values_by_attribute = no_variant_bom_attributes.grouped('attribute_id')
-        never_values_by_attribute = never_attribute_values.grouped('attribute_id')
+        # Check that every no-variant attribute on the bom line has a matching value.
+        never_attribute_valid = len((no_variant_bom_attribute_values & never_attribute_values._origin).attribute_id) == len(no_variant_bom_attribute_values.attribute_id)
 
-        # Or if there is no overlap between given line values attributes and the ones on on the bom
-        if not any(never_att_id in no_variant_bom_attributes.attribute_id.ids for never_att_id in never_attribute_values.attribute_id.ids):
-            return True
-
-        # Check that at least one variant attribute is correct
-        for attribute, values in bom_values_by_attribute.items():
-            if never_values_by_attribute.get(attribute) and any(val.id in never_values_by_attribute[attribute].ids for val in values):
-                return not other_attribute_valid
-
-        # None were found, so we skip the line
-        return True
+        # If all the attributes values on the line are accounted for, it should not be skipped.
+        return not (other_attribute_valid and never_attribute_valid)
 
     # -------------------------------------------------------------------------
     # REPLENISHMENT WIZARD
@@ -652,6 +681,10 @@ class MrpBom(models.Model):
             },
         }
 
+    def action_copy_existing_operations(self):
+        self.ensure_one()
+        return self.env['mrp.routing.workcenter'].with_context(bom_id=self.id).copy_existing_operations()
+
 
 class MrpBomLine(models.Model):
     _name = 'mrp.bom.line'
@@ -663,7 +696,7 @@ class MrpBomLine(models.Model):
     def _get_default_product_uom_id(self):
         return self.env['uom.uom'].search([], limit=1, order='id').id
 
-    product_id = fields.Many2one('product.product', 'Component', required=True, check_company=True, index=True)
+    product_id = fields.Many2one('product.product', 'Component', required=True, check_company=True, index=True, domain="[('type', 'in', ['consu', 'service'])]")
     product_tmpl_id = fields.Many2one('product.template', 'Product Template', related='product_id.product_tmpl_id', store=True, index=True)
     company_id = fields.Many2one(
         related='bom_id.company_id', store=True, index=True, readonly=True)

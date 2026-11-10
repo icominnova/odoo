@@ -591,11 +591,9 @@ class MailMessage(models.Model):
                     message.get('message_type') != 'user_notification'):
                 model_docid_msgids[message['model']][message['res_id']].append(mid)
         for model, docid_msgids in model_docid_msgids.items():
-            allowed = self._filter_records_for_message_operation(model, docid_msgids, operation)
-            for doc_id, msg_ids in docid_msgids.items():
-                if doc_id in allowed.ids:
-                    for mid in msg_ids:
-                        messages_to_check.pop(mid)
+            for doc_id in self._filter_records_for_message_operation(model, docid_msgids, operation).ids:
+                for mid in docid_msgids.get(doc_id, []):
+                    messages_to_check.pop(mid)
 
         if not messages_to_check:
             return forbidden
@@ -723,8 +721,10 @@ class MailMessage(models.Model):
                             attachment.generate_access_token()
                             attachments = values.setdefault('attachment_ids', [])
                             attachments.append((4, attachment.id))
-                            data_to_url[key] = ['/web/image/%s?access_token=%s' % (attachment.id, attachment.access_token), name]
-                    return '%s%s alt="%s"' % (data_to_url[key][0], match.group(3), data_to_url[key][1])
+                            data_to_url[key] = ['/web/image/%s?access_token=%s' % (attachment.id, attachment.access_token), name, attachment.id]
+                    # data-attachment-id helps identify image attachments that are already inserted in the body
+                    # this is notably used to avoid displaying them twice in the chatter
+                    return f'{data_to_url[key][0]}{match.group(3)} alt="{data_to_url[key][1]}" data-attachment-id="{data_to_url[key][2]}"'
                 values['body'] = _image_dataurl.sub(base64_to_boundary, values['body'] or '')
 
             # delegate creation of tracking after the create as sudo to avoid access rights issues
@@ -777,7 +777,7 @@ class MailMessage(models.Model):
                 if vals_lst:
                     self.env['mail.tracking.value'].sudo().create(vals_lst)
                 if other_cmd:
-                    message.sudo().write({'tracking_value_ids': tracking_values_cmd})
+                    message.write({'tracking_value_ids': other_cmd})
 
             if message._is_thread_message_visible(vals=values):
                 message._invalidate_documents(values.get('model'), values.get('res_id'))
@@ -958,9 +958,14 @@ class MailMessage(models.Model):
         if search_term:
             # we replace every space by a % to avoid hard spacing matching
             search_term = search_term.replace(" ", "%")
+            attachment_domain = Domain("name", "ilike", search_term)
+            if thread:
+                attachment_domain &= (
+                    Domain("res_model", "=", thread._name) & Domain("res_id", "=", thread.id)
+                ) | Domain("res_model", "=", "mail.message")
             message_domain = Domain.OR([
-                # sudo: access to attachment is allowed if you have access to the parent model
-                [("attachment_ids", "in", self.env["ir.attachment"].sudo()._search([("name", "ilike", search_term)]))],
+                # any!: access to attachment is allowed if you have access to the parent model
+                Domain("attachment_ids", "any!", attachment_domain),
                 [("body", "ilike", search_term)],
                 [("subject", "ilike", search_term)],
                 [("subtype_id.description", "ilike", search_term)],
@@ -976,7 +981,6 @@ class MailMessage(models.Model):
                 accessible_tracking_value_ids = tracking_values._filter_has_field_access(self.env)
                 message_domain |= Domain("id", "in", accessible_tracking_value_ids.mail_message_id.ids)
             domain &= message_domain
-            res["count"] = self.search_count(domain)
         if around is not None:
             messages_before = self.search(domain & Domain('id', '<=', around), limit=limit // 2, order="id DESC")
             messages_after = self.search(domain & Domain('id', '>', around), limit=limit // 2, order='id ASC')
@@ -1104,7 +1108,7 @@ class MailMessage(models.Model):
             # sudo: mail.message: access to author_id is allowed
             Store.One(
                 "author_id",
-                ["avatar_128", "is_company", Store.One("main_user_id", "share")],
+                ["avatar_128", "is_company", Store.One("main_user_id", ["partner_id", "share"])],
                 dynamic_fields=lambda m: m._get_store_partner_name_fields(),
                 sudo=True,
             ),
@@ -1206,6 +1210,7 @@ class MailMessage(models.Model):
         record_fields = [
             # sudo: mail.thread - if mentionned in a non accessible thread, name is allowed
             Store.Attr("display_name", sudo=True),
+            Store.Attr("has_mail_thread", lambda record: isinstance(record, self.env.registry["mail.thread"])),
             Store.Attr(
                 "module_icon",
                 lambda record: modules.module.get_module_icon(self.env[record._name]._original_module),

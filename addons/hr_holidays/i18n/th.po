@@ -8,15 +8,17 @@
 # Odoo Thaidev <odoothaidev@gmail.com>, 2022
 # Martin Trigaux, 2022
 # Wichanon Jamwutthipreecha, 2023
-# "Tiffany Chang (tic)" <tic@odoo.com>, 2025.
-# Weblate <noreply-mt-weblate@weblate.org>, 2025.
+# "Tiffany Chang (tic)" <tic@odoo.com>, 2025, 2026.
+# Weblate <noreply-mt-weblate@weblate.org>, 2025, 2026.
+# Odoo Translation Bot <c3p@odoo.com>, 2026.
+# Nusara Boonma <nuboo@odoo.com>, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-01-25 18:35+0000\n"
-"PO-Revision-Date: 2025-11-08 17:48+0000\n"
-"Last-Translator: Weblate <noreply-mt-weblate@weblate.org>\n"
+"POT-Creation-Date: 2026-11-06 17:37+0000\n"
+"PO-Revision-Date: 2026-08-06 18:08+0000\n"
+"Last-Translator: Nusara Boonma <nuboo@odoo.com>\n"
 "Language-Team: Thai <https://translate.odoo.com/projects/odoo-19/hr_holidays/"
 "th/>\n"
 "Language: th\n"
@@ -24,7 +26,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Generator: Weblate 5.12.2\n"
+"X-Generator: Weblate 2026.6.1\n"
 
 #. module: hr_holidays
 #. odoo-python
@@ -40,6 +42,15 @@ msgid ""
 "                </p>\n"
 "            "
 msgstr ""
+"\n"
+"                <p class=\"o_view_nocontent_empty_folder\">\n"
+"                    ไม่พบยอดคงเหลือ\n"
+"                </p>\n"
+"                <p>\n"
+"                    ลองเริ่มต้นด้วย<a type=\"action\" class=\"text-link\" "
+"name=\"%d\">การจัดสรรเวลาพักผ่อน</a> ?\n"
+"                </p>\n"
+"            "
 
 #. module: hr_holidays
 #. odoo-python
@@ -163,6 +174,14 @@ msgstr "%(name)s (เหลือเวลา %(time)g จาก %(maximum)g ช
 #. module: hr_holidays
 #. odoo-python
 #: code:addons/hr_holidays/models/hr_leave.py:0
+msgid ""
+"%(name)s does not have a valid allocation for the leave type %(leave_type)s "
+"to cover that request."
+msgstr ""
+
+#. module: hr_holidays
+#. odoo-python
+#: code:addons/hr_holidays/models/hr_leave.py:0
 msgid "%(name)s: %(duration)s"
 msgstr "%(name)s: %(duration)s"
 
@@ -177,6 +196,12 @@ msgstr "%(person)s เมื่อ %(leave_type)s: %(duration)s (%(start)s)"
 #: code:addons/hr_holidays/models/hr_leave.py:0
 msgid "%(person)s: %(duration)s (%(start)s)"
 msgstr "%(person)s: %(duration)s (%(start)s)"
+
+#. module: hr_holidays
+#. odoo-python
+#: code:addons/hr_holidays/wizard/hr_leave_generate_multi_wizard.py:0
+msgid "%(success_count)s time off request(s) created successfully."
+msgstr ""
 
 #. module: hr_holidays
 #. odoo-python
@@ -233,14 +258,6 @@ msgstr ""
 #. odoo-javascript
 #: code:addons/hr_holidays/static/src/leave_stats/leave_stats.xml:0
 msgid "'s summary in this period"
-msgstr ""
-
-#. module: hr_holidays
-#. odoo-javascript
-#: code:addons/hr_holidays/static/src/components/accrual_level/accrual_levels.xml:0
-msgid ""
-"(s)\n"
-"                                    and a balance cap is set to"
 msgstr ""
 
 #. module: hr_holidays
@@ -468,6 +485,11 @@ msgstr ""
 "\n"
 "เวอร์ชัน:\n"
 "%(versions)s"
+
+#. module: hr_holidays
+#: model_terms:ir.ui.view,arch_db:hr_holidays.hr_leave_view_form
+msgid "A supporting document is required for this type of time off."
+msgstr ""
 
 #. module: hr_holidays
 #. odoo-python
@@ -1305,11 +1327,10 @@ msgid ""
 "period they already took leaves. Changing this working schedule changes the "
 "duration of these leaves in such a way the employee no longer has the "
 "required allocation for them. Please review these leaves and/or allocations "
-"before changing the contract."
+"before changing the contract.\n"
+"\n"
+"This error has been triggered by:\n"
 msgstr ""
-"การเปลี่ยนสัญญากับพนักงานรายนี้จะเปลี่ยนตารางการทำงานในช่วงเวลาที่พวกเขาได้ทำการลาไปแล้ว "
-"การเปลี่ยนตารางการทำงานนี้จะเปลี่ยนระยะเวลาของการลาในลักษณะที่พนักงานไม่ได้รับการจัดสรรที่จำเป็นสำหรับพวกเขาอีกต่อไป "
-"โปรดตรวจสอบการลาและ/หรือการจัดสรรเหล่านี้ก่อนที่จะเปลี่ยนแปลงสัญญา"
 
 #. module: hr_holidays
 #. odoo-python
@@ -1372,6 +1393,11 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:hr_holidays.report_holidayssummary
 msgid "Color"
 msgstr "สี"
+
+#. module: hr_holidays
+#: model:ir.model,name:hr_holidays.model_res_company
+msgid "Companies"
+msgstr ""
 
 #. module: hr_holidays
 #: model:ir.model.fields,field_description:hr_holidays.field_hr_leave__company_id
@@ -1756,6 +1782,7 @@ msgstr "ละทิ้ง"
 #: model:ir.model.fields,field_description:hr_holidays.field_mail_activity_type__display_name
 #: model:ir.model.fields,field_description:hr_holidays.field_mail_message_subtype__display_name
 #: model:ir.model.fields,field_description:hr_holidays.field_report_hr_holidays_report_holidayssummary__display_name
+#: model:ir.model.fields,field_description:hr_holidays.field_res_company__display_name
 #: model:ir.model.fields,field_description:hr_holidays.field_res_partner__display_name
 #: model:ir.model.fields,field_description:hr_holidays.field_res_users__display_name
 #: model:ir.model.fields,field_description:hr_holidays.field_resource_calendar__display_name
@@ -2302,6 +2329,7 @@ msgstr "แสดงไอคอน Hr"
 #: model:ir.model.fields,field_description:hr_holidays.field_mail_activity_type__id
 #: model:ir.model.fields,field_description:hr_holidays.field_mail_message_subtype__id
 #: model:ir.model.fields,field_description:hr_holidays.field_report_hr_holidays_report_holidayssummary__id
+#: model:ir.model.fields,field_description:hr_holidays.field_res_company__id
 #: model:ir.model.fields,field_description:hr_holidays.field_res_partner__id
 #: model:ir.model.fields,field_description:hr_holidays.field_res_users__id
 #: model:ir.model.fields,field_description:hr_holidays.field_resource_calendar__id
@@ -2419,6 +2447,14 @@ msgid ""
 "type without removing it."
 msgstr ""
 "หากฟิลด์ที่ใช้งานอยู่ถูกตั้งค่าเป็นเท็จ จะช่วยให้คุณสามารถซ่อนประเภทเวลาหยุดโดยไม่ต้องลบออก"
+
+#. module: hr_holidays
+#: model:ir.model.fields,help:hr_holidays.field_hr_leave_type__create_calendar_meeting
+msgid ""
+"If this field is checked, every leave request of this type will have a "
+"corresponding entry in the calendar application. There will be no entry if "
+"this stays unchecked."
+msgstr ""
 
 #. module: hr_holidays
 #: model:ir.model.constraint,message:hr_holidays.constraint_hr_leave_duration_check
@@ -3915,6 +3951,14 @@ msgid ""
 msgstr "สีที่เลือกไว้นี้จะถูกใช้ในทุกหน้าจอที่มีประเภทการลา"
 
 #. module: hr_holidays
+#. odoo-python
+#: code:addons/hr_holidays/models/res_company.py:0
+msgid ""
+"The company country cannot be changed while time off leaves or allocations "
+"with the country exist."
+msgstr ""
+
+#. module: hr_holidays
 #: model_terms:ir.ui.view,arch_db:hr_holidays.hr_accrual_level_view_form
 msgid "The days carried over will be effective for"
 msgstr ""
@@ -4038,12 +4082,6 @@ msgid ""
 "There is no employee set on the time off. Please make sure you're logged in "
 "the correct company."
 msgstr "ไม่มีพนักงานตั้งเวลาการลา โปรดตรวจสอบให้แน่ใจว่าคุณได้เข้าสู่ระบบบริษัทที่ถูกต้อง"
-
-#. module: hr_holidays
-#. odoo-python
-#: code:addons/hr_holidays/models/hr_leave.py:0
-msgid "There is no valid allocation to cover that request."
-msgstr "ไม่มีการจัดสรรที่ถูกต้องเพื่อให้ครอบคลุมคำขอดังกล่าว"
 
 #. module: hr_holidays
 #. odoo-python
@@ -4199,6 +4237,12 @@ msgstr "แดชบอร์ดการลา"
 #: model:ir.model.fields,field_description:hr_holidays.field_hr_leave__private_name
 msgid "Time Off Description"
 msgstr "คำอธิบายการลา"
+
+#. module: hr_holidays
+#. odoo-python
+#: code:addons/hr_holidays/wizard/hr_leave_generate_multi_wizard.py:0
+msgid "Time Off Generated"
+msgstr ""
 
 #. module: hr_holidays
 #: model:ir.model.fields,field_description:hr_holidays.field_hr_leave_type__leave_notif_subtype_id
@@ -4638,7 +4682,7 @@ msgstr "ผู้ใช้ไม่อยู่ที่สำนักงาน
 #: model_terms:ir.ui.view,arch_db:hr_holidays.hr_leave_view_kanban
 #: model_terms:ir.ui.view,arch_db:hr_holidays.hr_leave_view_tree
 msgid "Validate"
-msgstr "ตรวจสอบ"
+msgstr "ยืนยัน"
 
 #. module: hr_holidays
 #. odoo-javascript
@@ -5135,6 +5179,12 @@ msgstr ""
 #. module: hr_holidays
 #. odoo-javascript
 #: code:addons/hr_holidays/static/src/components/accrual_level/accrual_levels.xml:0
+msgid "and a balance cap is set to"
+msgstr ""
+
+#. module: hr_holidays
+#. odoo-javascript
+#: code:addons/hr_holidays/static/src/components/accrual_level/accrual_levels.xml:0
 #: model_terms:ir.ui.view,arch_db:hr_holidays.hr_accrual_level_view_form
 msgid "and the"
 msgstr "และ"
@@ -5171,6 +5221,12 @@ msgstr "คลิกที่นี่"
 #: model_terms:ir.ui.view,arch_db:hr_holidays.hr_leave_report_calendar_view_form
 msgid "dates"
 msgstr ""
+
+#. module: hr_holidays
+#. odoo-javascript
+#: code:addons/hr_holidays/static/src/components/accrual_level/accrual_levels.js:0
+msgid "day(s)"
+msgstr "วัน"
 
 #. module: hr_holidays
 #. odoo-javascript
@@ -5256,6 +5312,12 @@ msgstr ""
 
 #. module: hr_holidays
 #. odoo-javascript
+#: code:addons/hr_holidays/static/src/components/accrual_level/accrual_levels.js:0
+msgid "hour(s)"
+msgstr ""
+
+#. module: hr_holidays
+#. odoo-javascript
 #. odoo-python
 #: code:addons/hr_holidays/models/hr_leave.py:0
 #: code:addons/hr_holidays/models/hr_leave_allocation.py:0
@@ -5276,6 +5338,12 @@ msgstr "ไอดี"
 msgid ""
 "leaves of type 'Worked Time' should be always eligible for accrual rate."
 msgstr ""
+
+#. module: hr_holidays
+#. odoo-javascript
+#: code:addons/hr_holidays/static/src/components/accrual_level/accrual_levels.js:0
+msgid "month(s)"
+msgstr "เดือน"
 
 #. module: hr_holidays
 #. odoo-javascript
@@ -5401,7 +5469,27 @@ msgstr "ใช้ได้ถึงวันที่"
 #. module: hr_holidays
 #: model_terms:ir.ui.view,arch_db:hr_holidays.hr_leave_report_calendar_view_search
 msgid "validate"
-msgstr "ตรวจสอบ"
+msgstr "ยืนยัน"
+
+#. module: hr_holidays
+#. odoo-javascript
+#: code:addons/hr_holidays/static/src/components/accrual_level/accrual_levels.js:0
+msgid "year(s)"
+msgstr "ปี"
+
+#~ msgid "There is no valid allocation to cover that request."
+#~ msgstr "ไม่มีการจัดสรรที่ถูกต้องเพื่อให้ครอบคลุมคำขอดังกล่าว"
+
+#~ msgid ""
+#~ "Changing the contract on this employee changes their working schedule in "
+#~ "a period they already took leaves. Changing this working schedule changes "
+#~ "the duration of these leaves in such a way the employee no longer has the "
+#~ "required allocation for them. Please review these leaves and/or "
+#~ "allocations before changing the contract."
+#~ msgstr ""
+#~ "การเปลี่ยนสัญญากับพนักงานรายนี้จะเปลี่ยนตารางการทำงานในช่วงเวลาที่พวกเขาได้ทำการลาไปแล้ว "
+#~ "การเปลี่ยนตารางการทำงานนี้จะเปลี่ยนระยะเวลาของการลาในลักษณะที่พนักงานไม่ได้รับการจัดสรรที่จำเป็นสำหรับพวกเขาอีกต่อไป "
+#~ "โปรดตรวจสอบการลาและ/หรือการจัดสรรเหล่านี้ก่อนที่จะเปลี่ยนแปลงสัญญา"
 
 #~ msgid ""
 #~ "You cannot refuse this allocation request since the employee has already "
@@ -6204,9 +6292,6 @@ msgstr "ตรวจสอบ"
 #~ msgid "day of the month"
 #~ msgstr "วันของเดือน"
 
-#~ msgid "day(s)"
-#~ msgstr "วัน"
-
 #~ msgid "days of the months"
 #~ msgstr "วันของเดือน"
 
@@ -6219,9 +6304,6 @@ msgstr "ตรวจสอบ"
 #~ msgid "lost"
 #~ msgstr "ไม่สำเร็จ"
 
-#~ msgid "month(s)"
-#~ msgstr "เดือน"
-
 #~ msgid "postponed"
 #~ msgstr "เลื่อนออกไป"
 
@@ -6230,6 +6312,3 @@ msgstr "ตรวจสอบ"
 
 #~ msgid "validated"
 #~ msgstr "ตรวจสอบแล้ว"
-
-#~ msgid "year(s)"
-#~ msgstr "ปี"

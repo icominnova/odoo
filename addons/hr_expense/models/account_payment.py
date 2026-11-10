@@ -24,8 +24,8 @@ class AccountPayment(models.Model):
     def write(self, vals):
         trigger_fields = {
             'date', 'amount', 'payment_type', 'partner_type', 'payment_reference',
-            'currency_id', 'partner_id', 'destination_account_id', 'partner_bank_id', 'journal_id'
-            'ref', 'payment_method_line_id'
+            'currency_id', 'partner_id', 'destination_account_id', 'partner_bank_id', 'journal_id',
+            'memo', 'payment_method_line_id'
         }
         if self.expense_ids and any(field_name in trigger_fields for field_name in vals):
             raise UserError(_("You cannot do this modification since the payment is linked to an expense."))
@@ -33,14 +33,7 @@ class AccountPayment(models.Model):
 
     def action_open_expense(self):
         self.ensure_one()
-        return {
-            'name': self.expense_ids.name,
-            'type': 'ir.actions.act_window',
-            'view_mode': 'form',
-            'views': [(False, 'form')],
-            'res_model': 'hr.expense',
-            'res_id': self.expense_ids.id,
-        }
+        return self.expense_ids._get_records_action(name=_("Expenses"))
 
     def _creation_message(self):
         # EXTENDS mail

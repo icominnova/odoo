@@ -14,7 +14,7 @@ class AccountMoveSend(models.AbstractModel):
         return (move.move_type == 'out_invoice'
                 and ('debit_origin_id' not in self.env['account.move']._fields or not move.debit_origin_id)
                 and move.state == 'posted'
-                and move.company_id.country_id.code == 'TW'
+                and move.company_id.account_fiscal_country_id.code == 'TW'
                 and not move.l10n_tw_edi_state
                 and move.company_id._is_ecpay_enabled())
 
@@ -22,7 +22,7 @@ class AccountMoveSend(models.AbstractModel):
     def _is_tw_edi_issue_allowance_applicable(self, move):
         return (move.move_type == 'out_refund'
                 and move.state == 'posted'
-                and move.company_id.country_id.code == 'TW'
+                and move.company_id.account_fiscal_country_id.code == 'TW'
                 and move.reversed_entry_id
                 and move.reversed_entry_id.l10n_tw_edi_ecpay_invoice_id
                 and not move.l10n_tw_edi_refund_invoice_number
@@ -110,7 +110,7 @@ class AccountMoveSend(models.AbstractModel):
                     }
             if 'tw_ecpay_send' in invoice_data['extra_edis'] or 'tw_ecpay_issue_allowance' in invoice_data['extra_edis']:
                 if self._can_commit():
-                    self._cr.commit()
+                    self.env.cr.commit()
 
     def _call_web_service_after_invoice_pdf_render(self, invoices_data):
         # EXTENDS 'account'
@@ -126,7 +126,7 @@ class AccountMoveSend(models.AbstractModel):
                 }
             # We commit again if possible, to ensure that the invoice status is set in the database in case of errors later.
             if self._can_commit():
-                self._cr.commit()
+                self.env.cr.commit()
 
     @api.model
     def _link_invoice_documents(self, invoices_data):

@@ -1,16 +1,22 @@
 import { EDITABLE_MEDIA_CLASS } from "@html_editor/utils/dom_info";
 import { describe, expect, test } from "@odoo/hoot";
-import { click, press, waitFor, waitForNone } from "@odoo/hoot-dom";
+import { click, dblclick, press, waitFor, waitForNone } from "@odoo/hoot-dom";
 import { animationFrame, tick } from "@odoo/hoot-mock";
-import { contains, makeMockEnv, onRpc, patchWithCleanup } from "@web/../tests/web_test_helpers";
+import {
+    makeMockEnv,
+    mountWithCleanup,
+    onRpc,
+    patchWithCleanup,
+} from "@web/../tests/web_test_helpers";
 import { cleanHints } from "./_helpers/dispatch";
 import { base64Img, setupEditor, testEditor } from "./_helpers/editor";
 import { getContent } from "./_helpers/selection";
 import { expectElementCount } from "./_helpers/ui_expectations";
 import { deleteBackward, deleteForward, insertText } from "./_helpers/user_actions";
-import { MAIN_PLUGINS, NO_EMBEDDED_COMPONENTS_FALLBACK_PLUGINS } from "@html_editor/plugin_sets";
 import { delay } from "@web/core/utils/concurrency";
 import { ImageCrop } from "@html_editor/main/media/image_crop";
+import { ImageSelector } from "@html_editor/main/media/media_dialog/image_selector";
+import { VideoSelector } from "@html_editor/main/media/media_dialog/video_selector";
 
 test("Can replace an image", async () => {
     onRpc("ir.attachment", "search_read", () => [
@@ -51,7 +57,7 @@ test("Replace an image with link by a document should remove the link", async ()
     const env = await makeMockEnv();
     await setupEditor(
         `<p><a href="http://test.com"><img class="img-fluid" src="/web/static/img/logo.png"></a></p>`,
-        { env, config: { Plugins: [...MAIN_PLUGINS, ...NO_EMBEDDED_COMPONENTS_FALLBACK_PLUGINS] } }
+        { env }
     );
     expect("img[src='/web/static/img/logo.png']").toHaveCount(1);
     await click("img");
@@ -137,6 +143,26 @@ test("should not preserve image styles when replacing an image with an icon", as
     await animationFrame();
     expect(getContent(el).replace(/<img.*?>/, "<img>")).toBe(
         `<p>\ufeff[<span class="fa fa-glass" style="" contenteditable="false">\u200b</span>]\ufeff</p>`
+    );
+});
+
+test("should not preserve image shape classes when replacing an image with an icon", async () => {
+    onRpc("ir.attachment", "search_read", () => []);
+    const { el } = await setupEditor(
+        `<p><img class="img-fluid rounded rounded-circle shadow img-thumbnail" src="/web/static/img/logo.png"></p>`
+    );
+    expect("img[src='/web/static/img/logo.png']").toHaveCount(1);
+    await click("img");
+    await tick(); // selectionchange
+    await expectElementCount(".o-we-toolbar button[name='replace_image']", 1);
+    await click("button[name='replace_image']");
+    await animationFrame();
+    await click(".nav-link:contains('Icons')");
+    await animationFrame();
+    await click(".fa-glass");
+    await animationFrame();
+    expect(getContent(el).replace(/<img.*?>/, "<img>")).toBe(
+        `<p>\ufeff[<span class="fa fa-glass" contenteditable="false">\u200b</span>]\ufeff</p>`
     );
 });
 
@@ -327,15 +353,32 @@ test("cropper should not open for external image", async () => {
     await setupEditor(
         `<p>[<img src="https://download.odoocdn.com/icons/website/static/description/icon.png">]</p>`
     );
-    await waitFor('button[name="image_transform"]');
+    const imageTransform = await waitFor('button[name="image_transform"]');
+    imageTransform.click();
 
-    await click('button[name="image_transform"]');
-    await animationFrame();
+    const imageCrop = await waitFor('.btn[name="image_crop"]');
+    imageCrop.click();
 
-    await click('.btn[name="image_crop"]');
-    await waitFor(".o_notification_manager .o_notification", { timeout: 1000 });
+    await waitFor(".o_notification_manager .o_notification", { timeout: 1500 });
     expect("img.o_we_cropper_img").toHaveCount(0);
 });
+
+/**
+ * Returns a promise resolved once `ImageCrop.show` has completed, i.e. once
+ * the cropper library bundle has been fetched and the cropper is ready.
+ *
+ * @returns {Promise<void>}
+ */
+function waitForCropperReady() {
+    return new Promise((resolve) => {
+        patchWithCleanup(ImageCrop.prototype, {
+            async show(...args) {
+                await super.show(...args);
+                resolve();
+            },
+        });
+    });
+}
 
 test("Image cropper disappear on backspace", async () => {
     const base64Image =
@@ -345,14 +388,7 @@ test("Image cropper disappear on backspace", async () => {
     // before destroying the cropper as it sets `isCropperActive` true
     // at the end. In `closeCropper` method `isCropperActive` must be true
     // to close the cropper.
-    const cropperReadyPromise = new Promise((resolve) => {
-        patchWithCleanup(ImageCrop.prototype, {
-            async show(...args) {
-                await super.show(...args);
-                resolve();
-            },
-        });
-    });
+    const cropperReadyPromise = waitForCropperReady();
     // Mock backend image RPCs
     onRpc("/html_editor/get_image_info", async () => {
         await delay(50);
@@ -361,13 +397,117 @@ test("Image cropper disappear on backspace", async () => {
         };
     });
     await setupEditor(`<p>[<img src="${base64Image}">]</p>`);
-    await waitFor(".o-we-toolbar");
-
-    await contains('.o-we-toolbar .btn[name="image_crop"]').click();
-    await waitFor(".o_we_crop_widget", { timeout: 1000 });
+    const cropButton = await waitFor(".o-we-toolbar .btn[name='image_crop']");
+    cropButton.click();
+    await waitFor(".o_we_crop_widget", { timeout: 1500 });
     expect("img.o_we_cropper_img").toHaveCount(1);
     await cropperReadyPromise;
     press("backspace");
-    await waitForNone(".o_we_crop_widget", { timeout: 1000 });
+    await waitForNone(".o_we_crop_widget", { timeout: 1500 });
     expect("img.o_we_cropper_img").toHaveCount(0);
+});
+
+test("shape remain present in cropper preview", async () => {
+    const base64Image =
+        "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAgAAAAIAQMAAAD+wSzIAAAABlBMVEX///+/v7+jQ3Y5AAAADklEQVQI12P4AIX8EAgALgAD/aNpbtEAAAAASUVORK5CYII=";
+    const cropperReadyPromise = waitForCropperReady();
+    // Mock backend image RPCs
+    onRpc("/html_editor/get_image_info", async () => ({
+        original: { image_src: base64Image },
+    }));
+
+    await setupEditor(`
+        <p>[<img src="${base64Image}">]</p>
+    `);
+    await waitFor(".o-we-toolbar");
+    await click(".o-we-toolbar button[name='shape_rounded']");
+    await expectElementCount(".o-we-toolbar button[name='shape_rounded'].active", 1);
+    expect("img").toHaveClass("rounded");
+
+    await click('.btn[name="image_crop"]');
+    await cropperReadyPromise;
+    expect(".cropper-face.cropper-move.rounded").toHaveCount(1);
+});
+
+test("double-click on image in Media Dialog executes onClickAttachment only once", async () => {
+    onRpc("ir.attachment", "search_read", () => [
+        {
+            id: 1,
+            name: "logo",
+            mimetype: "image/png",
+            image_src: "/web/static/img/logo2.png",
+            access_token: false,
+            public: true,
+        },
+    ]);
+
+    let executionCount = 0;
+    patchWithCleanup(ImageSelector.prototype, {
+        selectAttachment(attachment) {
+            executionCount++;
+            return super.selectAttachment(attachment);
+        },
+    });
+
+    const env = await makeMockEnv();
+    await setupEditor(`<p><img class="img-fluid" src="/web/static/img/logo.png"></p>`, { env });
+    await click("img");
+    await waitFor(".o-we-toolbar");
+    await click("button[name='replace_image']");
+    await animationFrame();
+    await dblclick(".o_existing_attachment_cell .o_button_area");
+    expect(executionCount).toBe(1);
+});
+
+describe("video options", () => {
+    const VIDEO_URL = "//www.youtube.com/embed/xyz?autoplay=1&mute=1";
+
+    const mountVideoSelector = async () => {
+        onRpc("/html_editor/video_url/data", () => ({
+            platform: "youtube",
+            embed_url: VIDEO_URL,
+            video_id: "xyz",
+            params: {},
+        }));
+        const media = document.createElement("div");
+        media.dataset.oeExpression = VIDEO_URL;
+        await mountWithCleanup(VideoSelector, {
+            props: {
+                media,
+                selectMedia: () => {},
+                errorMessages: () => {},
+            },
+        });
+    };
+
+    test("VideoOption supports boolean value prop (autoplay sync and toggle)", async () => {
+        await mountVideoSelector();
+        // `VideoOption` must accept it as `value` prop without a validation error.
+        expect(".o_video_dialog_options input[name='switch']:checked").toHaveCount(1);
+        // Toggling an enabled option off stores Boolean `false` in the state.
+        await click(".o_video_dialog_options input[name='switch']:checked");
+        expect(".o_video_dialog_options input[name='switch']:checked").toHaveCount(0);
+    });
+});
+
+test("documents tab domain excludes uploaded fonts and their css", async () => {
+    onRpc("ir.attachment", "search_read", ({ kwargs }) => {
+        const domain = JSON.stringify(kwargs.domain);
+        if (
+            domain.includes('"!",["mimetype","=like","font/%"]') &&
+            domain.includes('["description","not like","CSS font face for"]') &&
+            domain.includes('["name","!=","googleFontMetadata"]')
+        ) {
+            expect.step("fonts excluded from attachments domain");
+        }
+        return [];
+    });
+    const env = await makeMockEnv();
+    await setupEditor(`<p><img class="img-fluid" src="/web/static/img/logo.png"></p>`, { env });
+    await click("img");
+    await waitFor(".o-we-toolbar");
+    await click("button[name='replace_image']");
+    await animationFrame();
+    await click(".nav-link:contains('Documents')");
+    expect.verifySteps(["fonts excluded from attachments domain"]);
 });

@@ -7,7 +7,7 @@ class ProjectCollaborator(models.Model):
     _name = 'project.collaborator'
     _description = 'Collaborators in project shared'
 
-    project_id = fields.Many2one('project.project', 'Project Shared', domain=[('privacy_visibility', '=', 'portal'), ('is_template', '=', False)], required=True, readonly=True, export_string_translation=False)
+    project_id = fields.Many2one('project.project', 'Project Shared', domain=[('privacy_visibility', 'in', ['portal', 'invited_users']), ('is_template', '=', False)], required=True, readonly=True, export_string_translation=False)
     partner_id = fields.Many2one('res.partner', 'Collaborator', required=True, readonly=True, export_string_translation=False)
     partner_email = fields.Char(related='partner_id.email', export_string_translation=False)
     limited_access = fields.Boolean('Limited Access', default=False, export_string_translation=False)
@@ -55,4 +55,8 @@ class ProjectCollaborator(models.Model):
 
         task_portal_ir_rule = self.env.ref('project.project_task_rule_portal_project_sharing').sudo()
         if task_portal_ir_rule.active != active:
-            task_portal_ir_rule.write({'active': active})
+            rules_to_update = task_portal_ir_rule
+            task_portal_create_task_rule = self.env.ref('project.project_task_rule_portal_project_sharing_create_access', raise_if_not_found=False)
+            if task_portal_create_task_rule:
+                rules_to_update += task_portal_create_task_rule.sudo()
+            rules_to_update.write({'active': active})

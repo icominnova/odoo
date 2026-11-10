@@ -1,3 +1,6 @@
+import { htmlToTextContentInline } from "@mail/utils/common/format";
+
+import { isAndroid } from "@web/core/browser/feature_detection";
 import { browser } from "@web/core/browser/browser";
 import { _t } from "@web/core/l10n/translation";
 import { registry } from "@web/core/registry";
@@ -28,9 +31,18 @@ export class OutOfFocusService {
     }
 
     async notify(message, thread) {
-        const modelsHandleByPush = ["mail.thread", "discuss.channel"];
+        // Message types the server sends via web push, excluding the author.
+        // Keep in sync with mail.thread._notify_get_recipients_for_extra_notifications.
+        const messageTypesHandledByPush = [
+            "comment",
+            "email",
+            "notification",
+            "user_notification",
+            "whatsapp_message",
+        ];
         if (
-            modelsHandleByPush.includes(message.thread?.model) &&
+            messageTypesHandledByPush.includes(message.message_type) &&
+            !message.isSelfAuthored &&
             (await this.hasServiceWorkInstalledAndPushSubscriptionActive())
         ) {
             return;
@@ -51,9 +63,10 @@ export class OutOfFocusService {
                 notificationTitle = message.authorName;
             }
         }
-        const notificationContent = message.previewText
-            .toString()
-            .substring(0, PREVIEW_MSG_MAX_SIZE);
+        const notificationContent = htmlToTextContentInline(message.previewText).substring(
+            0,
+            PREVIEW_MSG_MAX_SIZE
+        );
         await this.sendNotification({
             message: notificationContent,
             sound: message.thread?.model === "discuss.channel",
@@ -145,6 +158,11 @@ export class OutOfFocusService {
     }
 
     async _playSound() {
+        // On Android with push notifications granted, suppress in-browser sound —
+        // push notifications handle alerts there and respect the device's silent mode.
+        if (isAndroid() && browser.Notification?.permission === "granted") {
+            return;
+        }
         if (
             this.canPlayAudio &&
             this.store.settings.messageSound &&

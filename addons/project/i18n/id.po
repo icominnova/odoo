@@ -8,16 +8,17 @@
 # Wahyu Setiawan <wahyusetiaaa@gmail.com>, 2022
 # Martin Trigaux, 2023
 # Abe Manyo, 2023
-# "Dylan Kiss (dyki)" <dyki@odoo.com>, 2025.
+# "Dylan Kiss (dyki)" <dyki@odoo.com>, 2025, 2026.
 # "Abe Manyo (abem)" <abem@odoo.com>, 2025, 2026.
-# Weblate <noreply-mt-weblate@weblate.org>, 2025.
+# Weblate <noreply-mt-weblate@weblate.org>, 2025, 2026.
+# "Nurul Aini Akrima Sabila (nuaas)" <nuaas@odoo.com>, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-01-25 18:35+0000\n"
-"PO-Revision-Date: 2026-01-06 10:37+0000\n"
-"Last-Translator: \"Abe Manyo (abem)\" <abem@odoo.com>\n"
+"POT-Creation-Date: 2026-10-24 17:37+0000\n"
+"PO-Revision-Date: 2026-10-06 09:37+0000\n"
+"Last-Translator: \"Nurul Aini Akrima Sabila (nuaas)\" <nuaas@odoo.com>\n"
 "Language-Team: Indonesian <https://translate.odoo.com/projects/odoo-19/"
 "project/id/>\n"
 "Language: id\n"
@@ -25,12 +26,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Generator: Weblate 5.14.3\n"
-
-#. module: project
-#: model:ir.model.fields.selection,name:project.selection__project_project__privacy_visibility__portal
-msgid " All internal users and invited portal users"
-msgstr " Semua user-user internal dan user-user portal yang diundang"
+"X-Generator: Weblate 2026.8.1\n"
 
 #. module: project
 #: model:ir.model.fields,field_description:project.field_project_project__rating_count
@@ -42,7 +38,7 @@ msgstr "# Rating"
 #: code:addons/project/static/src/views/burndown_chart/burndown_chart_model.js:0
 #: model:ir.model.fields,field_description:project.field_report_project_task_user__nbr
 msgid "# of Tasks"
-msgstr "# Kegiatans"
+msgstr "# Tugas"
 
 #. module: project
 #. odoo-javascript
@@ -667,7 +663,7 @@ msgstr "Dekorasi Pengecualian Aktivitas"
 #: model:ir.actions.act_window,name:project.mail_activity_plan_action_config_project_task_plan
 #: model:ir.ui.menu,name:project.mail_activity_plan_menu_config_project
 msgid "Activity Plans"
-msgstr "Rencana-Rencana Kegiatan"
+msgstr "Rencana Aktivitas"
 
 #. module: project
 #: model:ir.model.fields,field_description:project.field_project_project__activity_state
@@ -681,7 +677,7 @@ msgstr "Status Aktivitas"
 #: model:ir.model.fields,field_description:project.field_project_task__activity_type_icon
 #: model:ir.model.fields,field_description:project.field_project_update__activity_type_icon
 msgid "Activity Type Icon"
-msgstr "Ikon Jenis Aktifitas"
+msgstr "Ikon Jenis Aktivitas"
 
 #. module: project
 #: model:ir.actions.act_window,name:project.mail_activity_type_action_config_project_types
@@ -772,8 +768,10 @@ msgstr "Administrator"
 
 #. module: project
 #: model:res.groups,comment:project.group_project_manager
-msgid "Administrator can manage the employees' schedule"
-msgstr "Administrator dapat mengelola jadwal karyawan"
+msgid ""
+"Administrator: Can manage projects and stages, with access to reporting and "
+"configuration."
+msgstr ""
 
 #. module: project
 #. odoo-javascript
@@ -844,6 +842,11 @@ msgstr "Semua Task"
 #: model:ir.model.fields.selection,name:project.selection__project_project__privacy_visibility__employees
 msgid "All internal users"
 msgstr "Semua user internal"
+
+#. module: project
+#: model:ir.model.fields.selection,name:project.selection__project_project__privacy_visibility__portal
+msgid "All internal users and invited portal users"
+msgstr ""
 
 #. module: project
 #: model:ir.model.fields,field_description:project.field_project_task__allocated_hours
@@ -1068,9 +1071,9 @@ msgid ""
 msgstr ""
 "Secara otomatis modifikasi status saat pelanggan menjawab ke feedback untuk "
 "tahap ini.\n"
-" * Feedback bagus dari pelanggan akan mengupdate status ke 'Disetujui' "
+" * Masukan bagus dari pelanggan akan mengupdate status ke 'Disetujui' "
 "(lingkaran hijau).\n"
-" * Feedback netral atau jelek akan mengupdate status kanban ke 'Perubahan "
+" * Masukan netral atau jelek akan mengupdate status kanban ke 'Perubahan "
 "Diminta' (lingkaran oranye).\n"
 
 #. module: project
@@ -1341,7 +1344,7 @@ msgstr ""
 #. module: project
 #: model_terms:ir.ui.view,arch_db:project.portal_my_task
 msgid "Communication history"
-msgstr "Sejarah komunikasi"
+msgstr "Riwayat komunikasi"
 
 #. module: project
 #: model:ir.model.fields,field_description:project.field_project_project__company_id
@@ -1439,7 +1442,7 @@ msgstr "Konversikan menjadi Task/Sub-Task"
 #: model:ir.actions.server,name:project.action_server_convert_project_to_template
 #: model:ir.actions.server,name:project.action_server_convert_to_template
 msgid "Convert to Template"
-msgstr "Konversikan menjadi Templat"
+msgstr "Konversi Menjadi Template"
 
 #. module: project
 #. odoo-javascript
@@ -1497,7 +1500,7 @@ msgstr "Buat Tugas"
 #. module: project
 #: model_terms:ir.actions.act_window,help:project.mail_activity_plan_action_config_project_task_plan
 msgid "Create a Task Activity Plan"
-msgstr "Buat Task Rencana Kegiatan"
+msgstr "Buat Rencana Aktivitas Tugas"
 
 #. module: project
 #: model_terms:ir.actions.act_window,help:project.open_task_type_form_domain
@@ -1629,7 +1632,7 @@ msgstr "Pelanggan"
 #. odoo-javascript
 #: code:addons/project/static/src/views/project_task_kanban/project_task_kanban_examples.js:0
 msgid "Customer Feedback"
-msgstr "Feedback Pelanggan"
+msgstr "Masukan Pelanggan"
 
 #. module: project
 #: model:ir.model.fields,help:project.field_project_project__access_url
@@ -1754,7 +1757,7 @@ msgstr "Hari"
 #: model:ir.model.fields,field_description:project.field_project_project__rotting_days
 #: model:ir.model.fields,field_description:project.field_project_task__rotting_days
 msgid "Days Rotting"
-msgstr "Hari-Hari Membusuk"
+msgstr "Hari Membusuk"
 
 #. module: project
 #: model:ir.model.fields,field_description:project.field_report_project_task_user__delay_endings_days
@@ -1764,7 +1767,7 @@ msgstr "Hari menuju Deadline"
 #. module: project
 #: model:ir.model.fields,field_description:project.field_project_task_type__rotting_threshold_days
 msgid "Days to rot"
-msgstr "Hari-hari untuk membusuk"
+msgstr "Hari untuk membusuk"
 
 #. module: project
 #. odoo-python
@@ -1862,7 +1865,7 @@ msgstr "Dikirim"
 #. odoo-python
 #: code:addons/project/models/project_task.py:0
 msgid "Dependent Tasks"
-msgstr "Task yang Tergantung"
+msgstr "Tugas Dependen"
 
 #. module: project
 #: model:ir.model.fields,field_description:project.field_project_task__depend_on_count
@@ -2237,10 +2240,11 @@ msgid "Future"
 msgstr "Masa Depan"
 
 #. module: project
+#: model_terms:ir.ui.view,arch_db:project.project_update_view_search
 #: model_terms:ir.ui.view,arch_db:project.view_project_project_filter
 #: model_terms:ir.ui.view,arch_db:project.view_task_search_form
 msgid "Future Activities"
-msgstr "Kegiatan - Kegiatan Mendatang"
+msgstr "Aktivitas Mendatang"
 
 #. module: project
 #: model_terms:ir.actions.act_window,help:project.project_update_all_action
@@ -2287,9 +2291,9 @@ msgid ""
 "individual tasks. Internal users automatically gain access to tasks they are "
 "assigned to."
 msgstr ""
-"Berikan user-user akses dengan menambahkan mereka sebagai pengikut — baik ke "
-"project atau tugas individu. User-user internal secara otomatis mendapatkan "
-"akses ke tugas mereka."
+"Berikan user akses dengan menambahkan mereka sebagai pengikut — baik ke "
+"project atau tugas individu. User internal secara otomatis mendapatkan akses "
+"ke tugas mereka."
 
 #. module: project
 #. odoo-javascript
@@ -2351,12 +2355,12 @@ msgstr "Riwayat"
 #. module: project
 #: model:ir.model.fields,field_description:project.field_project_task__html_field_history
 msgid "History data"
-msgstr "Data sejarah"
+msgstr "Data riwayat"
 
 #. module: project
 #: model:ir.model.fields,field_description:project.field_project_task__html_field_history_metadata
 msgid "History metadata"
-msgstr "Metadata sejarah"
+msgstr "Metadata riwayat"
 
 #. module: project
 #: model:project.tags,name:project.project_tags_13
@@ -2732,10 +2736,11 @@ msgid "Last Updated on"
 msgstr "Terakhir Diperbarui pada"
 
 #. module: project
+#: model_terms:ir.ui.view,arch_db:project.project_update_view_search
 #: model_terms:ir.ui.view,arch_db:project.view_project_project_filter
 #: model_terms:ir.ui.view,arch_db:project.view_task_search_form
 msgid "Late Activities"
-msgstr "Aktifitas terakhir"
+msgstr "Aktivitas Terlambat"
 
 #. module: project
 #: model_terms:ir.ui.view,arch_db:project.view_project_project_filter
@@ -2972,6 +2977,7 @@ msgid "Months"
 msgstr "Bulan"
 
 #. module: project
+#: model_terms:ir.ui.view,arch_db:project.project_update_view_search
 #: model_terms:ir.ui.view,arch_db:project.view_project_project_filter
 #: model_terms:ir.ui.view,arch_db:project.view_task_search_form
 msgid "My Activities"
@@ -2982,7 +2988,7 @@ msgstr "Aktivitas Saya"
 #: model:ir.model.fields,field_description:project.field_project_task__my_activity_date_deadline
 #: model:ir.model.fields,field_description:project.field_project_update__my_activity_date_deadline
 msgid "My Activity Deadline"
-msgstr "Deadline Kegiatan Saya"
+msgstr "Tenggat Aktivitas Saya"
 
 #. module: project
 #: model_terms:ir.ui.view,arch_db:project.project_task_view_tree_base
@@ -3006,7 +3012,7 @@ msgstr "Project"
 #: model_terms:ir.ui.view,arch_db:project.project_task_burndown_chart_report_view_search
 #: model_terms:ir.ui.view,arch_db:project.view_task_search_form_project_fsm_base
 msgid "My Tasks"
-msgstr "Kegiatanku"
+msgstr "Tugas Saya"
 
 #. module: project
 #: model_terms:ir.ui.view,arch_db:project.project_update_view_search
@@ -3123,7 +3129,7 @@ msgstr "Kalender Acara Aktivitas Berikutnya"
 #: model:ir.model.fields,field_description:project.field_project_task__activity_date_deadline
 #: model:ir.model.fields,field_description:project.field_project_update__activity_date_deadline
 msgid "Next Activity Deadline"
-msgstr "Batas Waktu Aktivitas Berikutnya"
+msgstr "Tenggat Aktivitas Berikutnya"
 
 #. module: project
 #: model:ir.model.fields,field_description:project.field_project_project__activity_summary
@@ -3275,7 +3281,7 @@ msgstr "Jumlah pesan dengan kesalahan pengiriman"
 #: model:ir.model.fields.selection,name:project.selection__project_update__status__off_track
 #: model_terms:ir.ui.view,arch_db:project.project_update_view_search
 msgid "Off Track"
-msgstr "Keluar dari Jalur"
+msgstr "Terkendala"
 
 #. module: project
 #: model:project.tags,name:project.project_tags_10
@@ -3306,7 +3312,7 @@ msgstr "Tertahan"
 #: model:ir.model.fields.selection,name:project.selection__project_update__status__on_track
 #: model_terms:ir.ui.view,arch_db:project.project_update_view_search
 msgid "On Track"
-msgstr "Sesuai Jalur"
+msgstr "Sesuai Rencana"
 
 #. module: project
 #: model:ir.model.fields.selection,name:project.selection__project_task_type__rating_status_period__monthly
@@ -3639,7 +3645,7 @@ msgstr "Peran Project"
 #: model:ir.model.fields,field_description:project.field_project_task__role_ids
 #: model:ir.ui.menu,name:project.project_menu_config_project_roles
 msgid "Project Roles"
-msgstr "Peran-Peran Projec"
+msgstr "Peran Project"
 
 #. module: project
 #: model:ir.actions.act_window,name:project.project_sharing_project_task_action
@@ -3713,7 +3719,7 @@ msgstr "Wizard buat Templat Project"
 #. odoo-javascript
 #: code:addons/project/static/src/views/components/project_template_dropdown.xml:0
 msgid "Project Templates"
-msgstr "Templat-Templat Project"
+msgstr "Template Project"
 
 #. module: project
 #: model_terms:ir.ui.view,arch_db:project.quick_create_project_form
@@ -3962,7 +3968,7 @@ msgstr "Frekuensi Rating"
 #. module: project
 #: model:ir.model.fields,field_description:project.field_project_task__rating_last_feedback
 msgid "Rating Last Feedback"
-msgstr "Nilai Feedback Terakhir"
+msgstr "Nilai Masukan Terakhir"
 
 #. module: project
 #: model:ir.model.fields,field_description:project.field_project_task__rating_last_image
@@ -4418,6 +4424,7 @@ msgid "Show Sub-Tasks"
 msgstr "Tunjukkan Sub-Tugas"
 
 #. module: project
+#: model_terms:ir.ui.view,arch_db:project.project_update_view_search
 #: model_terms:ir.ui.view,arch_db:project.view_project_project_filter
 #: model_terms:ir.ui.view,arch_db:project.view_task_search_form
 msgid "Show all records whose next activity date is past"
@@ -4681,7 +4688,7 @@ msgstr "Label"
 #: model_terms:ir.ui.view,arch_db:project.rating_rating_view_tree_project
 #: model_terms:ir.ui.view,arch_db:project.view_task_form2
 msgid "Task"
-msgstr "Kegiatan"
+msgstr "Tugas"
 
 #. module: project
 #: model:ir.model.fields,field_description:project.field_project_project__tasks
@@ -4878,7 +4885,7 @@ msgstr "Task: Rating Permintaan"
 #: model_terms:ir.ui.view,arch_db:project.view_task_partner_info_form
 #: model_terms:ir.ui.view,arch_db:project.view_task_search_form_base
 msgid "Tasks"
-msgstr "Kegiatan"
+msgstr "Tugas"
 
 #. module: project
 #: model:ir.actions.act_window,name:project.action_project_task_user_tree
@@ -4889,7 +4896,7 @@ msgstr "Kegiatan"
 #: model_terms:ir.ui.view,arch_db:project.view_task_project_user_pivot
 #: model_terms:ir.ui.view,arch_db:project.view_task_project_user_search
 msgid "Tasks Analysis"
-msgstr "Kegiatan analisis"
+msgstr "Analisis Tugas"
 
 #. module: project
 #: model_terms:ir.ui.view,arch_db:project.edit_project
@@ -5363,6 +5370,7 @@ msgid "Today"
 msgstr "Hari Ini"
 
 #. module: project
+#: model_terms:ir.ui.view,arch_db:project.project_update_view_search
 #: model_terms:ir.ui.view,arch_db:project.view_project_project_filter
 #: model_terms:ir.ui.view,arch_db:project.view_task_search_form
 msgid "Today Activities"
@@ -5472,7 +5480,7 @@ msgstr "Batalkan Arsip Task"
 #: model_terms:ir.ui.view,arch_db:project.view_project_project_filter
 #: model_terms:ir.ui.view,arch_db:project.view_task_search_form_base
 msgid "Unassigned"
-msgstr "Tak diserah-tugaskan"
+msgstr "Belum Ditugaskan"
 
 #. module: project
 #. odoo-javascript
@@ -5633,8 +5641,8 @@ msgstr "Pengaturan User"
 
 #. module: project
 #: model:res.groups,comment:project.group_project_user
-msgid "User can user the your employees' schedule"
-msgstr "User dapat menggunakan jadwal karyawan Anda"
+msgid "User: Can manage tasks in projects shared with them."
+msgstr ""
 
 #. module: project
 #: model_terms:ir.ui.view,arch_db:project.view_project_kanban
@@ -5704,7 +5712,7 @@ msgstr "Desain Ulang Website"
 #: model:ir.model.fields,help:project.field_project_task__website_message_ids
 #: model:ir.model.fields,help:project.field_project_update__website_message_ids
 msgid "Website communication history"
-msgstr "Sejarah komunikasi situs"
+msgstr "Riwayat komunikasi situs"
 
 #. module: project
 #: model:ir.model.fields.selection,name:project.selection__project_task_type__rating_status_period__weekly
@@ -5932,6 +5940,13 @@ msgstr ""
 #: code:addons/project/static/src/xml/project_task_kanban_examples.xml:0
 msgid "Your managers decide which feedback is accepted"
 msgstr "Manajer Anda akan menentukan feedback apa yang diterima"
+
+#. module: project
+#. odoo-javascript
+#: code:addons/project/static/src/views/analytic_account_form/analytic_account_form_controller.js:0
+#: code:addons/project/static/src/views/analytic_account_list/analytic_account_list_controller.js:0
+msgid "\\t- ${"
+msgstr ""
 
 #. module: project
 #: model_terms:ir.ui.view,arch_db:project.edit_project
@@ -6179,6 +6194,15 @@ msgstr "👤 Belum Ditugaskan"
 #: code:addons/project/models/project_task.py:0
 msgid "🔒 Private"
 msgstr "🔒 Privat"
+
+#~ msgid " All internal users and invited portal users"
+#~ msgstr " Semua user internal dan user portal yang diundang"
+
+#~ msgid "Administrator can manage the employees' schedule"
+#~ msgstr "Administrator dapat mengelola jadwal karyawan"
+
+#~ msgid "User can user the your employees' schedule"
+#~ msgstr "User dapat menggunakan jadwal karyawan Anda"
 
 #~ msgid "Invalid fields: "
 #~ msgstr "Kolom-kolom invalid: "

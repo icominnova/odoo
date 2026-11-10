@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
-from odoo import fields, models, api
+from odoo import models, api
 from odoo.tools import float_compare, float_is_zero
 from odoo.tools.misc import unique
 
@@ -77,11 +77,12 @@ class AccountMove(models.Model):
                         'balance': line.currency_id._convert(
                             relevant_qty * price_unit_val_dif,
                             line.company_currency_id,
-                            line.company_id, fields.Date.today(),
+                            line.company_id, line.date,
                         ),
                         'account_id': debit_pdiff_account.id,
                         'analytic_distribution': line.analytic_distribution,
                         'display_type': 'cogs',
+                        'tax_ids': [],
                     }
                     lines_vals_list.append(vals)
 
@@ -96,11 +97,12 @@ class AccountMove(models.Model):
                         'balance': line.currency_id._convert(
                             relevant_qty * -price_unit_val_dif,
                             line.company_currency_id,
-                            line.company_id, fields.Date.today(),
+                            line.company_id, line.date,
                         ),
                         'account_id': line.account_id.id,
                         'analytic_distribution': line.analytic_distribution,
                         'display_type': 'cogs',
+                        'tax_ids': [],
                     }
                     lines_vals_list.append(vals)
         return lines_vals_list

@@ -19,7 +19,6 @@ from collections.abc import Sequence
 
 import chardet
 import psycopg2
-from PIL import Image
 
 from odoo import api, fields, models
 from odoo.exceptions import UserError
@@ -28,6 +27,7 @@ from odoo.tools import (
     DEFAULT_SERVER_DATETIME_FORMAT,
     config,
 )
+from odoo.tools.image import ImageProcess
 from odoo.tools.mimetypes import guess_mimetype
 from odoo.tools.translate import _
 
@@ -1379,14 +1379,7 @@ class Base_ImportImport(models.TransientModel):
             if not guess_mimetype(content).startswith('image/'):
                 return base64.b64encode(content)
 
-            image = Image.open(io.BytesIO(content))
-            w, h = image.size
-            if w * h > 42e6:  # Nokia Lumia 1020 photo resolution
-                raise ImportValidationError(
-                    _("Image size excessive, imported images must be smaller than 42 million pixel"),
-                    field=field
-                )
-
+            ImageProcess(bytes(content), verify_resolution=True)
             return base64.b64encode(content)
         except Exception as e:
             _logger.warning(e, exc_info=True)
@@ -1493,7 +1486,7 @@ class Base_ImportImport(models.TransientModel):
             import_skip_records=options.get('import_skip_records', []),
             _import_limit=import_limit)
         import_result = model.load(import_fields, merged_data)
-        _logger.info('done')
+        _logger.info('done importing data into model: %s', model._name)
 
         # If transaction aborted, RELEASE SAVEPOINT is going to raise
         # an InternalError (ROLLBACK should work, maybe). Ignore that.
@@ -1505,6 +1498,7 @@ class Base_ImportImport(models.TransientModel):
             self.pool.clear_all_caches()
             # don't propagate to other workers since it was rollbacked
             self.pool.reset_changes()
+            _logger.info('Previous import was a dry/test run, changes were reset')
 
         # Insert/Update mapping columns when import complete successfully
         if import_result['ids'] and options.get('has_headers'):
@@ -1771,6 +1765,7 @@ def check_patterns(patterns, values):
 def to_re(pattern):
     """ cut down version of TimeRE converting strptime patterns to regex
     """
+    pattern = re.sub(r"([\\.^$*+?\(\){}\[\]|])", r"\\\1", pattern)
     pattern = re.sub(r'\s+', r'\\s+', pattern)
     pattern = re.sub('%([a-z])', _replacer, pattern, flags=re.IGNORECASE)
     pattern = '^' + pattern + '$'

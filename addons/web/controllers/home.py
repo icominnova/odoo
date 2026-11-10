@@ -67,8 +67,8 @@ class Home(http.Controller):
                 request.env.user._on_webclient_bootstrap()
             context = request.env['ir.http'].webclient_rendering_context()
 
-            # Add the browser_cache_secret here and not in session_info() to ensure that it is only in
-            # the webclient page, which is cache-control: "no-store" (see below)
+            # Add the browser_cache_secret here and not in session_info() so it is only returned
+            # by pages with cache-control: "no-store" (see below)
             # Reuse session security related fields, to change the key when a security event
             # occurs for the user, like a password or 2FA change.
             hmac_payload = request.env.user._session_token_get_values()  # already ordered
@@ -93,14 +93,9 @@ class Home(http.Controller):
             request.update_context(lang=lang)
 
         menus = request.env["ir.ui.menu"].load_web_menus(request.session.debug)
-        body = json.dumps(menus)
-        response = request.make_response(body, [
-            # this method must specify a content-type application/json instead of using the default text/html set because
-            # the type of the route is set to HTTP, but the rpc is made with a get and expects JSON
-            ('Content-Type', 'application/json'),
-            ('Cache-Control', 'public, max-age=' + str(http.STATIC_CACHE_LONG)),
+        return request.make_json_response(menus, [
+            ('Cache-Control', 'no-store'),
         ])
-        return response
 
     def _login_redirect(self, uid, redirect=None):
         return _get_login_redirect_url(uid, redirect)

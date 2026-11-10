@@ -14,6 +14,8 @@ patch(PosOrder.prototype, {
         this.uiState.selected_course_uuid = undefined;
         if (this.config.module_pos_restaurant) {
             this.uiState.mappingOrderlinesUuid = {};
+            // uiState is device-local: an order from the server was asked on its own device
+            this.uiState.guestSetted = this.isSynced && Boolean(this.preset_id?.use_guest);
         }
     },
     getCustomerCount() {
@@ -62,21 +64,26 @@ patch(PosOrder.prototype, {
         }
         return super.getName(...arguments);
     },
-    get isDirectSale() {
+    get isDirectSaleCandidate() {
         return Boolean(
             this.config.module_pos_restaurant &&
                 !this.table_id &&
-                !this.floating_order_name &&
-                this.state == "draft" &&
+                this.state === "draft" &&
                 !this.isRefund
         );
+    },
+    get isDirectSale() {
+        return this.isDirectSaleCandidate && !this.floating_order_name;
     },
     get isFilledDirectSale() {
         return this.isDirectSale && !this.isEmpty();
     },
-    setPartner(partner) {
-        if (this.config.module_pos_restaurant && this.isDirectSale) {
-            this.floating_order_name = partner.name;
+    setPartner(newPartner) {
+        const partner = this.getPartner();
+        const isPreviouslyPartnerName = partner && this.floating_order_name === partner.name;
+
+        if (this.isDirectSaleCandidate && (this.isDirectSale || isPreviouslyPartnerName)) {
+            this.floating_order_name = newPartner ? newPartner.name : "";
         }
         return super.setPartner(...arguments);
     },

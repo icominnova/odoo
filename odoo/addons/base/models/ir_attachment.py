@@ -3,6 +3,7 @@
 import base64
 import binascii
 import contextlib
+import functools
 import hashlib
 import logging
 import mimetypes
@@ -160,10 +161,10 @@ class IrAttachment(models.Model):
         fname, full_path = self._get_path(bin_value, checksum)
         if not os.path.exists(full_path):
             try:
-                with open(full_path, 'wb') as fp:
-                    fp.write(bin_value)
                 # add fname to checklist, in case the transaction aborts
                 self._mark_for_gc(fname)
+                with open(full_path, 'wb') as fp:
+                    fp.write(bin_value)
             except OSError:
                 _logger.info("_file_write writing %s", full_path)
                 raise
@@ -269,6 +270,14 @@ class IrAttachment(models.Model):
                 attach.raw = attach._file_read(attach.store_fname)
             else:
                 attach.raw = attach.db_datas
+
+    def _get_pdf_raw(self):
+        self.ensure_one()
+        if self.type != 'binary':
+            return False
+        if not self.mimetype.startswith('application/pdf'):
+            return False
+        return self.raw
 
     def _inverse_raw(self):
         self._set_attachment_data(lambda a: a.raw or b'')
@@ -483,6 +492,15 @@ class IrAttachment(models.Model):
                 if not any(has_group(g) for g in attachment.get_serving_groups()):
                     raise ValidationError(_("Sorry, you are not allowed to write on this document"))
 
+    @api.constrains('res_model', 'res_id')
+    def _check_circular_attachment(self):
+        for record in self.sudo():
+            if record.res_model == 'ir.attachment' and record.id == record.res_id:
+                raise ValidationError(_(
+                    "You cannot attach an attachment to itself.\n"
+                    "Attachment %(record)s cannot have res_id: %(res_id)s",
+                    record=record, res_id=record))
+
     @api.model
     def check(self, mode, values=None):
         """ Restricts the access to an ir.attachment, according to referred mode """
@@ -529,24 +547,28 @@ class IrAttachment(models.Model):
         # DLE P173: `test_01_portal_attachment`
         remaining = remaining.sudo()
         remaining.fetch(SECURITY_FIELDS)  # fetch only these fields
+        # computed once per call and per field, not once per attachment
+        is_system = self.env.is_system()
+
+        @functools.cache
+        def has_field_access(res_model, res_field):
+            model = self.env.get(res_model)
+            field = model._fields.get(res_field) if model is not None else None
+            return field is not None and self._has_field_access(field, operation)
+
         for attachment in remaining:
             if attachment.public and operation == 'read':
                 continue
             att_id = attachment.id
             res_model, res_id = attachment.res_model, attachment.res_id
-            if not self.env.is_system():
+            if not is_system:
                 if not res_id and attachment.create_uid.id != self.env.uid:
                     forbidden_ids.add(att_id)
                     continue
-                if res_field := attachment.res_field:
-                    try:
-                        field = self.env[res_model]._fields[res_field]
-                    except KeyError:
-                        # field does not exist
-                        field = None
-                    if field is None or not self._has_field_access(field, operation):
-                        forbidden_ids.add(att_id)
-                        continue
+                res_field = attachment.res_field
+                if res_field and not has_field_access(res_model, res_field):
+                    forbidden_ids.add(att_id)
+                    continue
             if res_model and res_id:
                 model_ids[res_model].add(res_id)
                 att_model_ids.append((att_id, (res_model, res_id)))
@@ -665,10 +687,29 @@ class IrAttachment(models.Model):
         domain &= sec_domain | Domain('res_model', '!=', False)
         domain = domain.optimize_full(self)
         ordered = bool(order)
+        fields_to_fetch = [self._fields[name] for name in SECURITY_FIELDS]
         if limit is None:
-            records = self.sudo().with_context(active_test=False).search_fetch(
-                domain, SECURITY_FIELDS, order=order).sudo(False)
-            return records._filtered_access('read')[offset:]._as_query(ordered)
+            # The SQL conditions alone grant access to public attachments and
+            # to the ones linked to no record, for an administrator or for
+            # their creator. Only the other attachments go through the check in
+            # Python, and the result stays a query.
+            if self.env.is_system():
+                granted = Domain('public', '=', True) | Domain('res_id', '=', False)
+            else:
+                granted = Domain('public', '=', True) | (
+                    Domain('res_id', '=', False)
+                    & Domain('res_field', '=', False)
+                    & Domain('create_uid', '=', self.env.uid)
+                )
+            query = super()._search(
+                domain & ~granted,
+                order='id',
+                active_test=False,
+                bypass_access=True,
+            )
+            to_check = self._fetch_query(query, fields_to_fetch)
+            accessible = granted | Domain('id', 'in', to_check._filtered_access('read').ids)
+            return super()._search(domain & accessible, offset, limit, order, active_test=active_test)
         # Fetch by small batches
         sub_offset = 0
         limit += offset
@@ -677,13 +718,15 @@ class IrAttachment(models.Model):
             # By default, order by model to batch access checks.
             order = 'res_model nulls first, id'
         while len(result) < limit:
-            records = self.sudo().with_context(active_test=False).search_fetch(
+            query = super()._search(
                 domain,
-                SECURITY_FIELDS,
                 offset=sub_offset,
                 limit=PREFETCH_MAX,
                 order=order,
-            ).sudo(False)
+                active_test=False,
+                bypass_access=True,
+            )
+            records = self._fetch_query(query, fields_to_fetch)
             result.extend(records._filtered_access('read')._ids)
             if len(records) < PREFETCH_MAX:
                 # There are no more records
@@ -739,10 +782,10 @@ class IrAttachment(models.Model):
 
         # remove computed field depending of datas
         vals_list = [{
-            key: value
-            for key, value
-            in vals.items()
-            if key not in ('file_size', 'checksum', 'store_fname')
+            **vals,
+            'file_size': 0,
+            'checksum': False,
+            'store_fname': False,
         } for vals in vals_list]
         checksum_raw_map = {}
 
@@ -821,10 +864,11 @@ class IrAttachment(models.Model):
                 ['file_size', '=', len(bin_data)],
                 ['mimetype', '=', values['mimetype']],
             ]
-            existing = self.sudo().search(existing_domain)
-            if existing:
-                for attachment in existing:
-                    ids.append(attachment.id)
+            # Only reuse the attachments the current user can write, as callers may
+            # link new attachments to them (e.g. the resized variants of an image).
+            existing_ids = self.sudo().search(existing_domain).with_env(self.env)._filtered_access('write').ids
+            if existing_ids:
+                ids.extend(existing_ids)
             else:
                 attachment = self.create(values)
                 ids.append(attachment.id)

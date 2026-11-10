@@ -3,13 +3,15 @@
 # * l10n_ca
 #
 # Weblate <noreply-mt-weblate@weblate.org>, 2025.
+# "Manon Rondou (ronm)" <ronm@odoo.com>, 2026.
+# "Cécile Collart (cco)" <cco@odoo.com>, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.4alpha1+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-30 19:05+0000\n"
-"PO-Revision-Date: 2025-11-17 03:09+0000\n"
-"Last-Translator: Weblate <noreply-mt-weblate@weblate.org>\n"
+"POT-Creation-Date: 2026-10-24 18:07+0000\n"
+"PO-Revision-Date: 2026-07-13 14:11+0000\n"
+"Last-Translator: \"Cécile Collart (cco)\" <cco@odoo.com>\n"
 "Language-Team: French <https://translate.odoo.com/projects/odoo-19-l10n/"
 "l10n_ca/fr/>\n"
 "Language: fr\n"
@@ -17,12 +19,12 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=2; plural=n > 1;\n"
-"X-Generator: Weblate 5.12.2\n"
+"X-Generator: Weblate 2026.6.1\n"
 
 #. module: l10n_ca
 #: model:account.report.line,name:l10n_ca.l10n_ca_tr_pst_mb_2
 msgid "2 - Commission"
-msgstr ""
+msgstr "2 - Commission"
 
 #. module: l10n_ca
 #: model:account.report.line,name:l10n_ca.l10n_ca_tr_gsthst_90
@@ -30,11 +32,13 @@ msgid ""
 "90 - Taxable sales including zero-rated supplies (other than zero‑rated "
 "exports) made in Canada"
 msgstr ""
+"90 - Ventes taxables, y compris les fournitures détaxées (autres que les "
+"exportations détaxées), effectuées au Canada"
 
 #. module: l10n_ca
 #: model:account.report.line,name:l10n_ca.l10n_ca_tr_gsthst_91
 msgid "91 - Exempt supplies and zero-rated exports"
-msgstr ""
+msgstr "91 - Fournitures exonérées et exportations détaxées"
 
 #. module: l10n_ca
 #: model:ir.model,name:l10n_ca.model_account_chart_template
@@ -52,15 +56,18 @@ msgstr "Solde"
 #. module: l10n_ca
 #: model:account.report.line,name:l10n_ca.l10n_ca_tr_pst_bc_c
 msgid "C - Commission"
-msgstr ""
+msgstr "C - Commission"
 
 #. module: l10n_ca
 #: model:ir.model.fields,help:l10n_ca.field_base_document_layout__l10n_ca_pst
 #: model:ir.model.fields,help:l10n_ca.field_res_company__l10n_ca_pst
 #: model:ir.model.fields,help:l10n_ca.field_res_partner__l10n_ca_pst
 #: model:ir.model.fields,help:l10n_ca.field_res_users__l10n_ca_pst
-msgid "Canadian Provincial Tax Identification Number"
+msgid ""
+"Canadian Provincial Tax Identification Number (PST) or Québec Sales Tax (QST)"
 msgstr ""
+"Numéro d’identification fiscale provincial canadien (TVP) ou taxe de vente "
+"du Québec (TVQ)"
 
 #. module: l10n_ca
 #: model:ir.model,name:l10n_ca.model_res_company
@@ -75,7 +82,7 @@ msgstr "Mise en page des documents de votre société"
 #. module: l10n_ca
 #: model:ir.model,name:l10n_ca.model_res_partner
 msgid "Contact"
-msgstr "Contactes"
+msgstr "Contact"
 
 #. module: l10n_ca
 #: model:ir.model,website_form_label:l10n_ca.model_res_partner
@@ -123,6 +130,12 @@ msgid "PST:"
 msgstr "TVP:"
 
 #. module: l10n_ca
+#: model_terms:ir.ui.view,arch_db:l10n_ca.l10n_ca_report_invoice_document_inherit
+#: model_terms:ir.ui.view,arch_db:l10n_ca.pst_external_layout
+msgid "QST:"
+msgstr ""
+
+#. module: l10n_ca
 #: model:account.report.line,name:l10n_ca.l10n_ca_tr_pst_sk_step_1
 msgid "Step 1"
 msgstr "Étape 1"
@@ -145,4 +158,4 @@ msgstr "Le pays à utiliser pour les déclarations fiscales de cette entreprise.
 #. module: l10n_ca
 #: model:account.report.line,name:l10n_ca.l10n_ca_tr_pst_sk_total_sales
 msgid "Total Sales Before Taxes"
-msgstr ""
+msgstr "Total des ventes avant taxes"

@@ -69,6 +69,9 @@ export class PosOrderlineAccounting extends Base {
             ? this.unitPrices.total_included
             : this.unitPrices.total_excluded;
     }
+    get displayPriceUnitIncl() {
+        return this.unitPrices.total_included;
+    }
     get displayPriceUnitExcl() {
         return this.unitPrices.total_excluded;
     }
@@ -83,6 +86,11 @@ export class PosOrderlineAccounting extends Base {
     }
     get priceExcl() {
         return this.currency.round(this.prices.total_excluded * this.order_id.orderSign);
+    }
+    get priceUnitInclNoDiscount() {
+        return this.currency.round(
+            this.unitPrices.no_discount_total_included * this.order_id.orderSign
+        );
     }
     get priceInclNoDiscount() {
         return this.currency.round(
@@ -123,20 +131,30 @@ export class PosOrderlineAccounting extends Base {
     }
 
     get comboTotalPrice() {
-        const allLines = this.getAllLinesInCombo();
-        return allLines.reduce((total, line) => total + line.displayPrice, 0);
+        const childLines = this.getAllLinesInCombo().filter((line) => !line.combo_line_ids.length);
+        return childLines.reduce((total, line) => total + line.displayPrice, 0);
     }
 
     get comboTotalPriceWithoutTax() {
+        const childLines = this.getAllLinesInCombo().filter((line) => !line.combo_line_ids.length);
+        return childLines.reduce((total, line) => total + line.displayPriceUnitExcl, 0);
+    }
+
+    get comboTotalBasePrice() {
         const allLines = this.getAllLinesInCombo();
-        return allLines.reduce((total, line) => total + line.displayPriceUnitExcl, 0);
+        return allLines.reduce((total, line) => total + line.basePriceUnit, 0);
     }
 
     get taxGroupLabels() {
-        return this.tax_ids
-            ?.map((tax) => tax.tax_group_id?.pos_receipt_label)
-            .filter((label) => label)
-            .join(" ");
+        let taxes_id = this.tax_ids;
+        if (this.order_id?.fiscal_position_id) {
+            taxes_id = this.order_id.fiscal_position_id.getTaxesAfterFiscalPosition(this.tax_ids);
+        }
+        return [
+            ...new Set(
+                taxes_id?.map((tax) => tax.tax_group_id.pos_receipt_label).filter((label) => label)
+            ),
+        ].join(" ");
     }
 
     delete(record, opts = {}) {
@@ -147,7 +165,15 @@ export class PosOrderlineAccounting extends Base {
     }
 
     get basePrice() {
-        return this.qty * this.price_unit * (1 - this.getDiscount() / 100);
+        return this.qty * this.basePriceUnit;
+    }
+
+    get basePriceUnit() {
+        return this.price_unit * (1 - this.getDiscount() / 100);
+    }
+
+    isRefund() {
+        return this.qty * this.price_unit < 0;
     }
 
     /**
@@ -170,7 +196,7 @@ export class PosOrderlineAccounting extends Base {
             product_id: product,
             product_uom_id: productUom,
             rate: 1.0,
-            is_refund: this.qty * priceUnit < 0,
+            is_refund: this.isRefund(),
             ...customValues,
         };
         if (order?.fiscal_position_id && product !== this.config.discount_product_id) {

@@ -9,6 +9,10 @@ export function increaseQuantityOfTicket(ticket) {
     ];
 }
 
+export function increaseQuantityOfTicketBy(ticket, number) {
+    return Array.from({ length: number }, () => increaseQuantityOfTicket(ticket)).flat();
+}
+
 export function decreaseQuantityOfTicket(ticket) {
     return [
         {
@@ -35,6 +39,16 @@ export function answerGlobalSelectQuestion(question, answer) {
             content: `Answer question ${question} with ${answer} for global`,
             trigger: `.global_question:contains('${question}') select`,
             run: `selectByLabel ${answer}`,
+        },
+    ];
+}
+
+export function answerTicketQuestion(ticketNumber, question, answer) {
+    return [
+        {
+            content: `Answer question ${question} with ${answer} for ticket ${ticketNumber}`,
+            trigger: `.ticket_question:contains('Ticket #${ticketNumber}') .input-group:contains('${question}') input`,
+            run: `edit ${answer}`,
         },
     ];
 }

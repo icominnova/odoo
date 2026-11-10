@@ -17,8 +17,6 @@ import * as OfflineUtil from "@point_of_sale/../tests/generic_helpers/offline_ut
 import * as TicketScreen from "@point_of_sale/../tests/pos/tours/utils/ticket_screen_util";
 import * as combo from "@point_of_sale/../tests/pos/tours/utils/combo_popup_util";
 import { checkPreparationTicketData } from "@point_of_sale/../tests/pos/tours/utils/preparation_receipt_util";
-import * as Utils from "@point_of_sale/../tests/pos/tours/utils/common";
-import * as BackendUtils from "@point_of_sale/../tests/pos/tours/utils/backend_utils";
 import * as FeedbackScreen from "@point_of_sale/../tests/pos/tours/utils/feedback_screen_util";
 
 registry.category("web_tour.tours").add("ProductScreenTour", {
@@ -28,7 +26,15 @@ registry.category("web_tour.tours").add("ProductScreenTour", {
 
             Chrome.startPoS(),
             Dialog.confirm("Open Register"),
+            // Wait for the opening control modal to close to avoid warning if refreshing at wrong time
+            {
+                content: "Wait for the opening control modal to close",
+                trigger: "body:not(:has(.modal))",
+            },
             OfflineUtil.setOfflineMode(),
+            // ensure that even after refreshing the page while being offline all data is correctly reloaded
+            refresh(),
+            Dialog.confirm("Continue with limited functionality"),
             ProductScreen.firstProductIsFavorite("Whiteboard Pen"),
             // Make sure we don't have any scroll bar on the product list
             {
@@ -585,21 +591,25 @@ registry.category("web_tour.tours").add("PosCategoriesOrder", {
         [
             Chrome.startPoS(),
             Dialog.confirm("Open Register"),
+            {
+                content: "category selector keeps category-list styling",
+                trigger: ".category-list",
+            },
             ProductScreen.verifyCategorySequence(["AAA", "AAB", "AAC"]),
             {
-                trigger: '.category-button:eq(1) > span:contains("AAB")',
+                trigger: '.category-button:eq(1) > div span:contains("AAB")',
                 run: "click",
             },
             ProductScreen.productIsDisplayed("Product in AAB and AAX", 0),
             {
-                trigger: '.category-button:eq(-1) > span:contains("AAX")',
+                trigger: '.category-button:eq(-1) > div span:contains("AAX")',
             },
             {
-                trigger: '.category-button:eq(-1) > span:contains("AAX")',
+                trigger: '.category-button:eq(-1) > div span:contains("AAX")',
                 run: "click",
             },
             {
-                trigger: '.category-button:eq(-1) > span:contains("AAY")',
+                trigger: '.category-button:eq(-1) > div span:contains("AAY")',
             },
         ].flat(),
 });
@@ -891,21 +901,25 @@ registry.category("web_tour.tours").add("test_fiscal_position_tax_group_labels",
             Chrome.startPoS(),
             Dialog.confirm("Open Register"),
             ProductScreen.clickDisplayedProduct("Test Product"),
-            ProductScreen.totalAmountIs("100.00"),
-            ProductScreen.clickFiscalPosition("Fiscal Position Test"),
-            ProductScreen.totalAmountIs("100.00"),
+            ProductScreen.totalAmountIs("115.00"),
             ProductScreen.clickPayButton(),
             PaymentScreen.clickPaymentMethod("Bank", true, { remaining: "0.00" }),
             PaymentScreen.clickValidate(),
             ReceiptScreen.isShown(),
-            {
-                content: "Make sure orderline tax label is correct",
-                trigger: ".orderline:contains('Tax Group 2')",
-            },
-            {
-                content: "Make sure receipt tax label is correct and correspond to the orderline",
-                trigger: ".pos-receipt-taxes:contains('Tax Group 2')",
-            },
+            ReceiptScreen.checkOrderlineTaxGroupLabel("Tax Group 1"),
+            ReceiptScreen.checkTaxSummaryTaxGroupLabel("Tax Group 1"),
+            ReceiptScreen.clickNextOrder(),
+            ProductScreen.clickDisplayedProduct("Test Product"),
+            ProductScreen.totalAmountIs("115.00"),
+            ProductScreen.clickFiscalPosition("Fiscal Position Test"),
+            ProductScreen.totalAmountIs("105.00"),
+            ProductScreen.clickPayButton(),
+            PaymentScreen.clickPaymentMethod("Bank", true, { remaining: "0.00" }),
+            PaymentScreen.clickValidate(),
+            ReceiptScreen.isShown(),
+            ReceiptScreen.checkOrderlineTaxGroupLabel("Tax Group 2"),
+            ReceiptScreen.checkTaxSummaryTaxGroupLabel("Tax Group 2"),
+            ReceiptScreen.clickNextOrder(),
         ].flat(),
 });
 
@@ -934,11 +948,19 @@ registry.category("web_tour.tours").add("test_product_long_press", {
             Dialog.is(),
             {
                 content: "Check that VAT label is present in the product details popup",
-                trigger: ".section-financials .vat-label:contains('VAT')",
+                trigger: ".section-financials .vat-label:contains('Child Tax 1')",
+            },
+            {
+                content: "Check that VAT label is present in the product details popup",
+                trigger: ".section-financials .vat-label:contains('Child Tax 2')",
             },
             {
                 content: "Check that VAT value is correct in the product details popup",
-                trigger: ".section-financials .vat-value:contains('$ 15.00 (Parent Tax)')",
+                trigger: ".section-financials .vat-value:contains('$ 10.00')",
+            },
+            {
+                content: "Check that VAT value is correct in the product details popup",
+                trigger: ".section-financials .vat-value:contains('$ 5.00')",
             },
             Chrome.endTour(),
         ].flat(),
@@ -986,7 +1008,7 @@ registry.category("web_tour.tours").add("test_barcode_search_attributes_preset",
         ].flat(),
 });
 
-registry.category("web_tour.tours").add("test_archived_product_removed_and_order_is_refunded", {
+registry.category("web_tour.tours").add("test_archived_product_removed_and_order_is_refunded_1", {
     steps: () =>
         [
             Chrome.startPoS(),
@@ -996,39 +1018,21 @@ registry.category("web_tour.tours").add("test_archived_product_removed_and_order
             PaymentScreen.clickPaymentMethod("Bank"),
             PaymentScreen.clickValidate(),
             ReceiptScreen.isShown(),
-            Chrome.clickMenuOption("Close Register"),
-            {
-                trigger: ".modal .modal-footer .btn:contains(close register)",
-                run: "click",
-                expectUnloadPage: true,
-            },
-            {
-                content: `Select button backend`,
-                trigger: `button:contains(backend)`,
-                run: "click",
-                expectUnloadPage: true,
-            },
-            {
-                trigger: "body",
-                expectUnloadPage: true,
-            },
-            BackendUtils.openProductForm("A Test Product"),
-            {
-                trigger: `.fa-cog`,
-                run: "click",
-            },
-            {
-                trigger: ".dropdown-item:contains('Archive')",
-                run: "click",
-            },
-            Utils.selectButton("Archive"),
-            BackendUtils.openShopSession("Shop"),
+            Chrome.endTour(),
+        ].flat(),
+});
+
+registry.category("web_tour.tours").add("test_archived_product_removed_and_order_is_refunded_2", {
+    steps: () =>
+        [
+            Chrome.startPoS(),
             Dialog.confirm("Open Register"),
             ProductScreen.productIsDisplayed("A Test Product").map(negateStep),
             // Refund.
             Chrome.clickOrders(),
             TicketScreen.selectFilter("Paid"),
-            TicketScreen.selectOrder("0001"),
+            Chrome.waitRequest(),
+            TicketScreen.selectOrder("001"),
             TicketScreen.confirmRefund(),
             PaymentScreen.clickPaymentMethod("Bank"),
             PaymentScreen.clickValidate(),
@@ -1051,10 +1055,10 @@ registry.category("web_tour.tours").add("test_preset_timing_retail", {
             Chrome.createFloatingOrder(),
             ProductScreen.clickDisplayedProduct("Desk Organizer"),
             Chrome.clickOrders(),
-            TicketScreen.nthRowContains(1, "A simple PoS man!"),
-            TicketScreen.nthRowContains(1, "Delivery", false),
-            TicketScreen.nthRowContains(2, "002"),
-            TicketScreen.nthRowContains(2, "Dine in", false),
+            TicketScreen.nthRowContains(2, "A simple PoS man!"),
+            TicketScreen.nthRowContains(2, "Delivery", false),
+            TicketScreen.nthRowContains(1, "002"),
+            TicketScreen.nthRowContains(1, "Dine in", false),
         ].flat(),
 });
 
@@ -1093,33 +1097,37 @@ registry
                 ProductScreen.clickDisplayedProduct("Desk Organizer"),
                 ProductScreen.clickFastPaymentButton("Bank"),
                 FeedbackScreen.isShown(),
-                Dialog.confirm(),
-                FeedbackScreen.clickScreen(),
                 ProductScreen.isShown(),
+                Dialog.confirm(),
                 ProductScreen.clickDisplayedProduct("Desk Organizer"),
                 ProductScreen.clickPayButton(),
                 PaymentScreen.clickPaymentMethod("Bank"),
                 PaymentScreen.clickValidate(),
                 FeedbackScreen.isShown(),
-                Dialog.confirm(),
-                FeedbackScreen.clickScreen(),
                 ProductScreen.isShown(),
+                Dialog.confirm(),
             ].flat(),
     });
 
-registry.category("web_tour.tours").add("test_only_existing_lots", {
-    steps: () =>
-        [
-            Chrome.startPoS(),
-            Dialog.confirm("Open Register"),
-            ProductScreen.clickDisplayedProduct("Product with existing lots"),
-            ProductScreen.selectNthLotNumber(1),
-            ProductScreen.selectedOrderlineHas("Product with existing lots", "1.0"),
-            inLeftSide({
-                trigger: ".order-container .orderline .lot-number:contains('Lot Number 1001')",
-            }),
-            Chrome.endTour(),
-        ].flat(),
+function existingLotsTour(expectedLot) {
+    return [
+        Chrome.startPoS(),
+        Dialog.confirm("Open Register"),
+        ProductScreen.clickDisplayedProduct("Product with existing lots"),
+        ProductScreen.selectedOrderlineHas("Product with existing lots", "1.0"),
+        inLeftSide({
+            trigger: `.order-container .orderline .lot-number:contains('Lot Number ${expectedLot}')`,
+        }),
+        Chrome.endTour(),
+    ].flat();
+}
+
+registry.category("web_tour.tours").add("test_only_existing_lots_fifo", {
+    steps: () => existingLotsTour("1001"),
+});
+
+registry.category("web_tour.tours").add("test_only_existing_lots_lifo", {
+    steps: () => existingLotsTour("1002"),
 });
 
 registry.category("web_tour.tours").add("test_delete_line", {
@@ -1218,9 +1226,11 @@ registry.category("web_tour.tours").add("test_preset_customer_selection", {
         [
             Chrome.startPoS(),
             Dialog.confirm("Open Register"),
-            PartnerList.searchCustomerValue("Test Partner", true),
-            PartnerList.clickPartner("Test Partner"),
-            ProductScreen.customerIsSelected("Test Partner"),
+            PartnerList.searchCustomerValue("Partner Full", true),
+            PartnerList.clickPartner("Partner Full"),
+            ProductScreen.customerIsSelected("Partner Full"),
+            Chrome.clickOrders(),
+            TicketScreen.checkCustomerAddress("77 Santa Barbara Rd Pleasant Hill"),
             Chrome.endTour(),
         ].flat(),
 });
@@ -1260,6 +1270,49 @@ registry.category("web_tour.tours").add("test_orderline_merge_with_higher_price_
             ProductScreen.selectedOrderlineHas("High Precision Product", "1.0", "8.25"),
             ProductScreen.clickDisplayedProduct("High Precision Product"),
             ProductScreen.selectedOrderlineHas("High Precision Product", "2.0", "16.49"), // 8.245 * 2 = 16.49
+            Chrome.endTour(),
+        ].flat(),
+});
+
+registry.category("web_tour.tours").add("test_default_fiscal_position_allowed", {
+    steps: () =>
+        [
+            Chrome.startPoS(),
+            Dialog.confirm("Open Register"),
+            ProductScreen.clickPartnerButton(),
+            ProductScreen.clickCustomer("Partner Test 1"),
+            ProductScreen.checkFiscalPosition("Allowed"),
+            ProductScreen.clickControlButtonMore(),
+            Chrome.endTour(),
+        ].flat(),
+});
+
+registry.category("web_tour.tours").add("test_barcode_scan_preselect_always_variant", {
+    steps: () =>
+        [
+            Chrome.startPoS(),
+            Dialog.confirm("Open Register"),
+
+            scan_barcode("VAR_RED_001"),
+
+            ProductConfiguratorPopup.pickRadio("Large"),
+            Dialog.confirm("Add"),
+            ProductScreen.selectedOrderlineHas(
+                "Variant Barcode Product",
+                "1.0",
+                "10.0",
+                "Red, Large"
+            ),
+
+            scan_barcode("VAR_BLUE_001"),
+            Dialog.confirm("Add"),
+            ProductScreen.selectedOrderlineHas(
+                "Variant Barcode Product",
+                "1.0",
+                "10.0",
+                "Blue, Small"
+            ),
+
             Chrome.endTour(),
         ].flat(),
 });

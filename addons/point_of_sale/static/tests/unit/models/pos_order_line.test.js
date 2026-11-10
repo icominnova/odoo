@@ -263,6 +263,30 @@ test("[canBeMergedWith]: Base test", async () => {
     expect(line1.qty).toBe(5);
 });
 
+test("[setUnitPrice] preserves price precision when tax data is saved", async () => {
+    const store = await setupPosEnv();
+    const models = store.models;
+
+    const currency = store.config.currency_id;
+    currency.rounding = 0.001;
+    currency.decimal_places = 3;
+
+    const data = models.loadConnectedData(getAllPricesData());
+    const orderLine = data["pos.order.line"][0];
+
+    orderLine.setUnitPrice(-2.175);
+    expect(orderLine.price_unit).toBe(-2.18);
+
+    orderLine.extra_tax_data = { price_unit: -2.175 };
+    orderLine.setUnitPrice(-2.175);
+    expect(orderLine.price_unit).toBe(-2.175);
+
+    currency.rounding = 1.0;
+    currency.decimal_places = 0;
+    orderLine.setUnitPrice(-2.175);
+    expect(orderLine.price_unit).toBe(-2.18);
+});
+
 describe("Test taxes after fiscal position", () => {
     test("Orderline containing a taxed product", async () => {
         const store = await setupPosEnv();
@@ -307,4 +331,64 @@ describe("Test taxes after fiscal position", () => {
         const nonTaxedProductlineValues = orderLine.prepareBaseLineForTaxesComputationExtraValues();
         expect(nonTaxedProductlineValues.tax_ids.length).toBe(0);
     });
+});
+
+test("Test serial number requirements", async () => {
+    const store = await setupPosEnv();
+    const order = await getFilledOrder(store);
+    const serial_line = order.lines[0];
+    serial_line.product_id.tracking = "serial";
+    expect(serial_line.hasValidProductLot()).toBe(false); // No SN set
+    serial_line.setPackLotLines({
+        modifiedPackLotLines: {},
+        newPackLotLines: [
+            {
+                lot_name: "SN001",
+            },
+        ],
+    });
+    expect(serial_line.hasValidProductLot()).toBe(true);
+    serial_line.qty = 2;
+    expect(serial_line.hasValidProductLot()).toBe(false); // Only one SN set
+    serial_line.setPackLotLines({
+        modifiedPackLotLines: {},
+        newPackLotLines: [
+            {
+                lot_name: "SN002",
+            },
+        ],
+    });
+    expect(serial_line.hasValidProductLot()).toBe(true);
+
+    const lot_line = order.lines[1];
+    lot_line.product_id.tracking = "lot";
+    expect(lot_line.hasValidProductLot()).toBe(false);
+    lot_line.setPackLotLines({
+        modifiedPackLotLines: {},
+        newPackLotLines: [
+            {
+                lot_name: "LOT001",
+            },
+        ],
+    });
+    expect(lot_line.hasValidProductLot()).toBe(true);
+    lot_line.qty = 2;
+    expect(lot_line.hasValidProductLot()).toBe(true); // One lot is enough
+});
+
+test("[setQuantity, setPricelist]: lot tracked lines keep their manual price", async () => {
+    const store = await setupPosEnv();
+    const order = await getFilledOrder(store);
+    const [lotLine1, lotLine2] = order.lines;
+    lotLine2.product_id = lotLine1.product_id; // same product, different lots
+    lotLine1.product_id.tracking = "lot";
+    lotLine2.price_type = "manual";
+    lotLine2.setUnitPrice(123);
+
+    lotLine1.setQuantity(4);
+    expect(lotLine2.price_unit).toBe(123);
+
+    order.setPricelist(store.models["product.pricelist"].get(3)); // 90% discount
+    expect(lotLine1.price_unit).toBe(10);
+    expect(lotLine2.price_unit).toBe(123);
 });

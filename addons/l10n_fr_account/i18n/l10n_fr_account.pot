@@ -6,54 +6,14 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 19.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-30 19:06+0000\n"
-"PO-Revision-Date: 2025-12-30 19:06+0000\n"
+"POT-Creation-Date: 2026-10-24 18:08+0000\n"
+"PO-Revision-Date: 2026-10-24 18:08+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: \n"
-
-#. module: l10n_fr_account
-#: model_terms:ir.ui.view,arch_db:l10n_fr_account.fec_export_wizard_view
-msgid "# 10"
-msgstr ""
-
-#. module: l10n_fr_account
-#: model_terms:ir.ui.view,arch_db:l10n_fr_account.fec_export_wizard_view
-msgid "# 11"
-msgstr ""
-
-#. module: l10n_fr_account
-#: model_terms:ir.ui.view,arch_db:l10n_fr_account.fec_export_wizard_view
-msgid "# 12"
-msgstr ""
-
-#. module: l10n_fr_account
-#: model_terms:ir.ui.view,arch_db:l10n_fr_account.fec_export_wizard_view
-msgid "# 13"
-msgstr ""
-
-#. module: l10n_fr_account
-#: model_terms:ir.ui.view,arch_db:l10n_fr_account.fec_export_wizard_view
-msgid "# 14"
-msgstr ""
-
-#. module: l10n_fr_account
-#: model_terms:ir.ui.view,arch_db:l10n_fr_account.fec_export_wizard_view
-msgid "# 15"
-msgstr ""
-
-#. module: l10n_fr_account
-#: model_terms:ir.ui.view,arch_db:l10n_fr_account.fec_export_wizard_view
-msgid "# 16"
-msgstr ""
-
-#. module: l10n_fr_account
-#: model_terms:ir.ui.view,arch_db:l10n_fr_account.fec_export_wizard_view
-msgid "# 17"
-msgstr ""
 
 #. module: l10n_fr_account
 #: model_terms:ir.ui.view,arch_db:l10n_fr_account.report_invoice_document
@@ -190,6 +150,11 @@ msgid "End Date"
 msgstr ""
 
 #. module: l10n_fr_account
+#: model:res.country.group,name:l10n_fr_account.europe_vat_without_mc
+msgid "European Union VAT (Without Monaco)"
+msgstr ""
+
+#. module: l10n_fr_account
 #: model:ir.model.fields,field_description:l10n_fr_account.field_l10n_fr_fec_export_wizard__excluded_journal_ids
 msgid "Excluded Journals"
 msgstr ""
@@ -317,11 +282,6 @@ msgid "Official FEC report (posted entries only)"
 msgstr ""
 
 #. module: l10n_fr_account
-#: model_terms:ir.ui.view,arch_db:l10n_fr_account.report_invoice_document
-msgid "Option to pay tax on debits"
-msgstr ""
-
-#. module: l10n_fr_account
 #: model_terms:ir.ui.view,arch_db:l10n_fr_account.fec_export_wizard_view
 msgid "Options"
 msgstr ""
@@ -339,6 +299,11 @@ msgstr ""
 #. module: l10n_fr_account
 #: model:ir.model.fields,field_description:l10n_fr_account.field_base_document_layout__report_footer
 msgid "Report Footer"
+msgstr ""
+
+#. module: l10n_fr_account
+#: model_terms:ir.ui.view,arch_db:l10n_fr_account.report_invoice_document
+msgid "SIREN:"
 msgstr ""
 
 #. module: l10n_fr_account
@@ -366,6 +331,11 @@ msgstr ""
 #. module: l10n_fr_account
 #: model:ir.model.fields,field_description:l10n_fr_account.field_l10n_fr_fec_export_wizard__date_from
 msgid "Start Date"
+msgstr ""
+
+#. module: l10n_fr_account
+#: model_terms:ir.ui.view,arch_db:l10n_fr_account.report_invoice_document
+msgid "Tax exigibility on debits"
 msgstr ""
 
 #. module: l10n_fr_account

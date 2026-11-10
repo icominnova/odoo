@@ -54,6 +54,12 @@ class TestTimesheetHolidays(TestCommonTimesheet):
             'time_type': 'other',
         })
 
+        self.hr_leave_type_half_day = self.env['hr.leave.type'].sudo().create({
+            'name': 'Time Off Type (half day)',
+            'requires_allocation': False,
+            'request_unit': 'half_day',
+        })
+
         # HR Officer allocates some leaves to the employee 1
         self.Requests = self.env['hr.leave'].with_context(mail_create_nolog=True, mail_notrack=True)
         self.Allocations = self.env['hr.leave.allocation'].with_context(mail_create_nolog=True, mail_notrack=True)
@@ -88,6 +94,18 @@ class TestTimesheetHolidays(TestCommonTimesheet):
         holiday.with_user(SUPERUSER_ID).action_refuse()
         self.assertEqual(len(holiday.timesheet_ids), 0, 'Number of linked timesheets should be zero, since the leave is refused.')
 
+        # Ensure timesheets generated from a time off are deleted when the leave is removed
+        holiday.with_user(SUPERUSER_ID).action_approve()
+        timesheets = holiday.timesheet_ids
+        self.assertEqual(
+            len(timesheets),
+            holiday.number_of_days,
+            'Number of generated timesheets should be the same as the leave duration'
+        )
+
+        holiday.with_user(SUPERUSER_ID).unlink()
+        self.assertFalse(timesheets.exists(), 'Timesheet should be deleted')
+
         company = self.env['res.company'].create({"name": "new company"})
         self.empl_employee.write({
             "company_id": company.id,
@@ -110,6 +128,33 @@ class TestTimesheetHolidays(TestCommonTimesheet):
         # The leave type and timesheet are linked to the same project and task of the employee company as the company is not set
         self.assertEqual(holiday.timesheet_ids.project_id.id, company.internal_project_id.id)
         self.assertEqual(holiday.timesheet_ids.task_id.id, company.leave_timesheet_task_id.id)
+
+    def test_back_to_approval_removes_timesheets(self):
+        holiday = self.Requests.with_user(self.user_employee).create({
+            'name': 'Time Off 1',
+            'employee_id': self.empl_employee.id,
+            'holiday_status_id': self.hr_leave_type_with_ts.id,
+            'request_date_from': self.leave_start_datetime,
+            'request_date_to': self.leave_end_datetime,
+        })
+        holiday.with_user(SUPERUSER_ID).action_approve()
+        timesheets = holiday.timesheet_ids
+        self.assertEqual(len(timesheets), 3)
+
+        holiday.with_user(SUPERUSER_ID).action_back_to_approval()
+        self.assertEqual(holiday.state, 'confirm')
+        self.assertFalse(timesheets.exists(), 'Timesheets should be removed when the time off goes back to approval')
+
+        # the employee moves the time off by one day, only the new dates are timesheeted on validation
+        holiday.with_user(self.user_employee).write({
+            'request_date_from': self.leave_start_datetime + relativedelta(days=1),
+            'request_date_to': self.leave_end_datetime + relativedelta(days=1),
+        })
+        holiday.with_user(SUPERUSER_ID).action_approve()
+        self.assertEqual(
+            sorted(holiday.timesheet_ids.mapped('date')),
+            [(self.leave_start_datetime + relativedelta(days=d)).date() for d in (1, 2, 3)],
+        )
 
     def test_validate_worked_leave(self):
         # employee creates a leave request of worked time type
@@ -151,6 +196,10 @@ class TestTimesheetHolidays(TestCommonTimesheet):
             3) Check if there are five timesheets generated for time off and public
                holiday.4 timesheets should be linked to the time off and 1 for
                the public one.
+            4) Reconfigure the company's time off task and verify the old task
+               becomes writable while the new one becomes restricted.
+            5) Verify this still holds correctly in a multi-company environment,
+               including when the timeoff task has no company_id set.
         """
 
         leave_start_datetime = datetime(2022, 1, 24, 7, 0, 0, 0) # Monday
@@ -197,14 +246,53 @@ class TestTimesheetHolidays(TestCommonTimesheet):
         self.assertEqual(len(timesheets.filtered('holiday_id')), 4, "4 timesheet should be linked to employee's timeoff")
         self.assertEqual(len(timesheets.filtered('global_leave_id')), 1, '1 timesheet should be linked to global leave')
 
+        new_time_off_task = self.env['project.task'].create({
+            'name': 'New Time off task',
+            'project_id': self.internal_project.id
+        })
+        self.env.company.leave_timesheet_task_id = new_time_off_task
+        # Should be able to create a timesheet on the previous time off task
+        self.env['account.analytic.line'].with_user(self.user_employee).create({
+            'name': "my timesheet",
+            'project_id': self.internal_project.id,
+            'task_id': self.internal_task_leaves.id,
+            'date': '2026-08-10',
+            'unit_amount': 8.0,
+        })
+
+        # should not able to create a timesheet in newly configured timeoff task
+        with self.assertRaises(UserError):
+            self.env['account.analytic.line'].with_user(self.user_employee).create({
+                'name': "my timesheet",
+                'task_id': new_time_off_task.id,
+                'date': '2026-08-10',
+                'unit_amount': 8.0,
+            })
+
+        company_b = self.env['res.company'].create({'name': 'Company B'})
+        self.user_employee.write({'company_ids': [(4, company_b.id)]})
+
+        time_off_task_company_b = company_b.leave_timesheet_task_id
+        time_off_task_company_b.company_id = False
+
+        # should not able to create timesheet in company b timeoff task
+        with self.assertRaises(UserError):
+            self.env['account.analytic.line'].with_user(self.user_employee).create({
+                'name': "my timesheet",
+                'task_id': time_off_task_company_b.id,
+                'date': '2026-08-10',
+                'unit_amount': 8.0,
+            })
+
     def test_delete_timesheet_after_new_holiday_covers_whole_timeoff(self):
-        """ User should be able to delete a timesheet created after a new public holiday is added,
-            covering the *whole* period of a existing time off.
+        """ A timesheet created from a validated time off should be removed
+            when a new public holiday fully covers that time off period.
+
             Test Case:
             =========
             1) Create a Time off, approve and validate it.
             2) Create a new Public Holiday, covering the whole time off created in step 1.
-            3) Delete the new timesheet associated with the public holiday.
+            3) The associated timesheet should be deleted to avoid orphan records.
         """
 
         leave_start_datetime = datetime(2022, 1, 31, 7, 0, 0, 0)    # Monday
@@ -228,28 +316,30 @@ class TestTimesheetHolidays(TestCommonTimesheet):
             'date_to': datetime(2022, 1, 31, 23, 0, 0, 0),
         })
 
-        # The timeoff should have been force_cancelled and its associated timesheet unlinked.
+        # The timeoff should have been force_cancelled and its associated timesheet should be removed.
         self.assertFalse(time_off.timesheet_ids, '0 timesheet should remain for this time off.')
 
-        # (3) Delete the timesheet
+        # (3) Ensure no timesheet exists for that employee and date
         timesheets = self.env['account.analytic.line'].search([
             ('date', '>=', leave_start_datetime),
             ('date', '<=', leave_end_datetime),
             ('employee_id', '=', self.empl_employee.id),
         ])
 
-        # timesheet should be unlinked to the timeoff, and be able to delete it
-        timesheets.with_user(SUPERUSER_ID).unlink()
         self.assertFalse(timesheets.exists(), 'Timesheet should be deleted')
 
     def test_timeoff_task_creation_with_holiday_leave(self):
         """ Test the search method on is_timeoff_task"""
         company = self.env['res.company'].create({"name": "new company"})
-        self.empl_employee.write({
-            "company_id": company.id,
-        })
+        self.empl_employee.write({'company_id': company.id})
+
+        # New company already has an auto-configured timeoff task
+        self.assertTrue(company.leave_timesheet_task_id)
+        self.assertTrue(company.leave_timesheet_task_id.is_timeoff_task)
+
         task_count = self.env['project.task'].search_count([('is_timeoff_task', '!=', False)])
         timesheet_count = self.env['account.analytic.line'].search_count([('holiday_id', '!=', False)])
+
         leave = self.Requests.with_user(SUPERUSER_ID).create({
             'name': 'Test Leave',
             'employee_id': self.empl_employee.id,
@@ -258,8 +348,13 @@ class TestTimesheetHolidays(TestCommonTimesheet):
             'request_date_to': datetime(2024, 6, 24),
         })
         leave.with_user(SUPERUSER_ID).action_approve()
+
+        # Approving the leave adds a timesheet, but should NOT change the
+        # task_count, since the task was already counted via config, not
+        # via the historical-timesheet query
         new_task_count = self.env['project.task'].search_count([('is_timeoff_task', '!=', False)])
-        self.assertEqual(task_count + 1, new_task_count)
+        self.assertEqual(task_count, new_task_count)
+
         new_timesheet_count = self.env['account.analytic.line'].search_count([('holiday_id', '!=', False)])
         self.assertEqual(timesheet_count + 1, new_timesheet_count)
 
@@ -267,6 +362,7 @@ class TestTimesheetHolidays(TestCommonTimesheet):
         flex_40h_calendar = self.env['resource.calendar'].create({
             'name': 'Flexible 40h/week',
             'hours_per_day': 8.0,
+            'hours_per_week': 40.0,
             'full_time_required_hours': 40.0,
             'flexible_hours': True,
         })
@@ -343,6 +439,7 @@ class TestTimesheetHolidays(TestCommonTimesheet):
         flex_40h_calendar = self.env['resource.calendar'].create({
             'name': 'Flexible 10h/week',
             'hours_per_day': 10,
+            'hours_per_week': 10,
             'full_time_required_hours': 10,
             'flexible_hours': True,
         })
@@ -380,3 +477,139 @@ class TestTimesheetHolidays(TestCommonTimesheet):
         time_off.with_user(SUPERUSER_ID)._action_validate()
 
         self.assertEqual(time_off.state, 'validate', "The time off for a fully flexible employee should be validated")
+
+    def test_timesheet_generation_with_past_contract_timeoff(self):
+        """
+        Test that timesheets are correctly generated for time off requests that with past contracts.
+        """
+        # Define attendance lines for the standard 35h/week to prevent auto-generating the default 8h/day schedule.
+        attendance_lines = []
+        for i in range(5):
+            attendance_lines.extend([
+                (0, 0, {'name': 'Morning', 'dayofweek': str(i), 'hour_from': 8.0, 'hour_to': 12.0, 'day_period': 'morning'}),
+                (0, 0, {'name': 'Afternoon', 'dayofweek': str(i), 'hour_from': 13.0, 'hour_to': 16.0, 'day_period': 'afternoon'}),
+            ])
+        standard_35h_calendar = self.env['resource.calendar'].create({
+            'name': 'Standard 35h/week',
+            'hours_per_day': 7,
+            'attendance_ids': attendance_lines,
+            'flexible_hours': False,
+        })
+        self.env['hr.version'].create([
+            {
+                'name': 'Past Contract 40h',
+                'employee_id': self.empl_employee.id,
+                'resource_calendar_id': self.employee_working_calendar.id,
+                'contract_date_start': '2025-01-01',
+                'contract_date_end': '2025-12-31',
+                'date_version': '2025-01-01',
+            }, {
+                'name': 'Current Contract 35h',
+                'employee_id': self.empl_employee.id,
+                'resource_calendar_id': standard_35h_calendar.id,
+                'contract_date_start': '2026-01-01',
+                'date_version': '2026-01-01',
+            },
+        ])
+        self.empl_employee.resource_calendar_id = standard_35h_calendar.id
+        past_leave, current_leave = self.env['hr.leave'].sudo().create([
+            {
+                'name': "leave with past contract",
+                'holiday_status_id': self.hr_leave_type_with_ts.id,
+                'employee_id': self.empl_employee.id,
+                'request_date_from': datetime(2025, 12, 29, 8, 0),
+                'request_date_to': datetime(2025, 12, 29, 17, 0),
+            }, {
+                'name': "leave with current contract",
+                'holiday_status_id': self.hr_leave_type_with_ts.id,
+                'employee_id': self.empl_employee.id,
+                'request_date_from': datetime(2026, 2, 2, 8, 0),
+                'request_date_to': datetime(2026, 2, 2, 17, 0),
+            },
+        ])
+        (past_leave | current_leave).with_user(SUPERUSER_ID).action_approve()
+
+        self.assertTrue(len(past_leave.timesheet_ids), 1)
+        self.assertTrue(len(current_leave.timesheet_ids), 1)
+        self.assertEqual(past_leave.timesheet_ids.unit_amount, 8, "The timesheet for the past contract should have 8 hours")
+        self.assertEqual(current_leave.timesheet_ids.unit_amount, 7, "The timesheet for the Current contract should have 7 hours")
+
+    def test_timesheet_generation_for_flexible_employee_with_half_day_time_off_type(self):
+        """
+        Ensure timesheet entries are generated correctly for employees
+        with flexible schedules using a 'half-day' leave type:
+            - A full-day request creates an 8h entry.
+            - A half-day request creates a 4h entry.
+            - Multi-day requests aggregate correctly across days.
+        """
+        self.empl_employee.resource_calendar_id.flexible_hours = True
+
+        # Create 3 scenarios: Full Day, Single Half Day, and Multi-Day
+        time_off, time_off_half_day, time_off_multi_day = self.Requests.with_user(self.user_employee).create([
+            {
+                'name': 'Test Full Day',
+                'employee_id': self.empl_employee.id,
+                'holiday_status_id': self.hr_leave_type_half_day.id,
+                'request_date_from': datetime(2026, 2, 9),
+                'request_date_to': datetime(2026, 2, 9),
+            },
+            {
+                'name': 'Test Single Half Day',
+                'employee_id': self.empl_employee.id,
+                'holiday_status_id': self.hr_leave_type_half_day.id,
+                'request_date_from': datetime(2026, 2, 10),
+                'request_date_to': datetime(2026, 2, 10),
+                'request_date_from_period': 'am',
+                'request_date_to_period': 'am',
+            },
+            {
+                'name': 'Test Multi-Day',
+                'employee_id': self.empl_employee.id,
+                'holiday_status_id': self.hr_leave_type_half_day.id,
+                'request_date_from': datetime(2026, 2, 11),
+                'request_date_to': datetime(2026, 2, 12),
+            }]
+        )
+
+        (time_off | time_off_half_day | time_off_multi_day).with_user(SUPERUSER_ID).action_approve()
+        validation_data = [
+            (time_off, 1, 8.0),
+            (time_off_half_day, 1, 4.0),
+            (time_off_multi_day, 2, 16.0),
+        ]
+        for leave, expected_entries, expected_hours in validation_data:
+            self.assertEqual(len(leave.timesheet_ids), expected_entries, f"{leave.name}: incorrect number of timesheet entries.")
+            self.assertEqual(sum(leave.timesheet_ids.mapped('unit_amount')), expected_hours, f"{leave.name}: incorrect total timesheet hours.")
+
+    def test_holiday_with_calendar_timezone(self):
+        """
+        Tests that the timesheets for public holidays use the calendar's timezone
+        """
+        dubai_calendar = self.env['resource.calendar'].create({
+            'name': 'Dubai tz calendar',
+            'tz': 'Asia/Dubai',
+            'hours_per_day': 8.0,
+            'attendance_ids': [
+                (0, 0, {
+                    'name': str(day),
+                    'dayofweek': str(day),
+                    'hour_from': 8.0,
+                    'hour_to': 16.0,
+                    'day_period': 'morning',
+                }) for day in range(5)
+            ]
+        })
+
+        self.empl_employee.resource_calendar_id = dubai_calendar.id
+        self.env.user.tz = dubai_calendar.tz
+        christmas = self.env['resource.calendar.leaves'].create({
+            'name': 'Christmas',
+            'calendar_id': dubai_calendar.id,
+            'date_from': datetime(2026, 12, 24, 4, 0, 0),
+            'date_to': datetime(2026, 12, 24, 8, 0, 0),
+        })
+        timesheet = self.env['account.analytic.line'].search([
+            ('global_leave_id', '=', christmas.id),
+            ('employee_id', '=', self.empl_employee.id),
+        ])
+        self.assertEqual(timesheet.unit_amount, 4.0, "The amount of leaves should use the calendar's timezone and not blindly take UTC")

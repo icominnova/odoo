@@ -19,7 +19,7 @@ class HrDepartment(models.Model):
     name = fields.Char('Department Name', required=True, translate=True)
     complete_name = fields.Char('Complete Name', compute='_compute_complete_name', recursive=True, search='_search_complete_name')
     active = fields.Boolean('Active', default=True)
-    company_id = fields.Many2one('res.company', string='Company', index=True, default=lambda self: self.env.company)
+    company_id = fields.Many2one('res.company', string='Company', compute="_compute_company_id", store=True, recursive=True, index=True, readonly=False, tracking=True, default=lambda self: self.env.company)
     parent_id = fields.Many2one('hr.department', string='Parent Department', index=True, check_company=True)
     child_ids = fields.One2many('hr.department', 'parent_id', string='Child Departments')
     manager_id = fields.Many2one('hr.employee', string='Manager', tracking=True, domain="['|', ('company_id', '=', False), ('company_id', 'in', allowed_company_ids)]")
@@ -121,6 +121,11 @@ class HrDepartment(models.Model):
     def create(self, vals_list):
         return super(HrDepartment, self.with_context(mail_create_nosubscribe=True)).create(vals_list)
 
+    @api.depends('parent_id', 'parent_id.company_id')
+    def _compute_company_id(self):
+        if self.parent_id and self.parent_id.company_id:
+            self.company_id = self.parent_id.company_id
+
     def write(self, vals):
         """ If updating manager of a department, we need to update all the employees
             of department hierarchy, and subscribe the new manager.
@@ -170,7 +175,7 @@ class HrDepartment(models.Model):
             ])
         else:
             action['domain'] = domain
-        if self.plans_count == 0:
+        if self.plans_count == 0 and self.env['mail.activity.plan'].has_access('create'):
             action['views'] = [(False, 'form')]
         return action
 

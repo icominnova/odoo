@@ -66,6 +66,7 @@ class TestSaleMrpFlow(test_sale_mrp_flow.TestSaleMrpFlowCommon):
         sub_kit, kit = self._cls_create_product('Sub Kit', self.uom_unit), self._cls_create_product('Lovely Kit', self.uom_ten)
         kit.uom_ids = [Command.set([self.uom_unit.id, self.uom_ten.id])]
         self.product_category.property_cost_method = 'average'
+        self.product_category.property_valuation = 'real_time'
         (kit + sub_kit + self.component_a + self.component_b).categ_id = self.product_category
         self.env['mrp.bom'].create([
             {
@@ -122,3 +123,252 @@ class TestSaleMrpFlow(test_sale_mrp_flow.TestSaleMrpFlowCommon):
         self.assertEqual(so.picking_ids.state, 'done')
         self.assertRecordValues(so.order_line, [{'purchase_price': 600, 'qty_delivered': 3.0}])
         self.assertEqual(so.order_line.purchase_price, 600)
+        # create an invoice to check that the cost price on the invoice line is correct
+        inv_1 = so._create_invoices()
+        inv_1.action_post()
+        self.assertEqual(inv_1.state, 'posted', 'invoice should be in posted state')
+        # The cost price on the invoice line should be 600 * 3 = 1800
+        self.assertRecordValues(inv_1.line_ids, [
+            {'debit': 0.0, 'credit': 3.0},
+            {'debit': 0.0, 'credit': 0.45},
+            {'debit': 3.45, 'credit': 0.0},
+            {'debit': 0.0, 'credit': 1800},
+            {'debit': 1800, 'credit': 0.0},
+        ])
+
+    def test_kit_cost_calculation_3(self):
+        """ Check that the average cost price is correct with different UoM in BoM:
+            Product A UoM is pack of ten
+            Lovely KIT BOM for 1:
+                - 1 unit of Product A
+        """
+        kit = self._cls_create_product('Lovely Kit', self.uom_unit)
+        self.product_category.property_cost_method = 'average'
+        self.product_category.property_valuation = 'real_time'
+        self.component_a.uom_id = self.uom_ten
+        (kit + self.component_a).categ_id = self.product_category
+        self.env['mrp.bom'].create([
+            {
+                'product_tmpl_id': kit.product_tmpl_id.id,
+                'product_qty': 1.0,
+                'type': 'phantom',
+                'bom_line_ids': [
+                    Command.create({
+                        'product_id': self.component_a.id,
+                        'product_qty': 1.0,
+                        'product_uom_id': self.uom_unit.id,
+                    }),
+                ],
+            }
+        ])
+        self.component_a.standard_price = 10
+        so = self.env['sale.order'].create({
+            'partner_id': self.partner_a.id,
+            'order_line': [Command.create({
+                'product_id': kit.id,
+                'product_uom_qty': 1,
+            })]
+        })
+        so.action_confirm()
+        for move in so.picking_ids.move_ids:
+            move.quantity = move.product_uom_qty
+        so.picking_ids.button_validate()
+        # create an invoice to check that the cost price on the invoice line is correct
+        inv_1 = so._create_invoices()
+        inv_1.action_post()
+        self.assertEqual(inv_1.state, 'posted', 'invoice should be in posted state')
+        self.assertRecordValues(inv_1.line_ids, [
+            {'debit': 0.0, 'credit': 1.0},
+            {'debit': 0.0, 'credit': 0.15},
+            {'debit': 1.15, 'credit': 0.0},
+            {'debit': 0.0, 'credit': 1.0},
+            {'debit': 1.0, 'credit': 0.0}
+        ])
+
+    def test_kit_cost_calculation_multi_qty_bom(self):
+        """ Check that the average cost price is correctly normalized by bom.product_qty.
+
+            BOM: 12 units of "Kit X" = 12 x Comp A + 12 x Comp B
+            Comp A cost = $10, Comp B cost = $20
+            Per-unit cost of Kit X = (12*10 + 12*20) / 12 = $30
+
+            Without normalization the cost would incorrectly be 12*10 + 12*20 = $360.
+        """
+        kit_x = self._cls_create_product('Kit X', self.uom_unit)
+        (kit_x + self.component_a + self.component_b).categ_id.property_cost_method = 'average'
+        self.env['mrp.bom'].create({
+            'product_tmpl_id': kit_x.product_tmpl_id.id,
+            'product_qty': 12.0,
+            'type': 'phantom',
+            'bom_line_ids': [
+                (0, 0, {'product_id': self.component_a.id, 'product_qty': 12.0}),
+                (0, 0, {'product_id': self.component_b.id, 'product_qty': 12.0}),
+            ],
+        })
+        self.component_a.standard_price = 10
+        self.component_b.standard_price = 20
+        kit_x.button_bom_cost()
+
+        stock_location = self.env['stock.warehouse'].search(
+            [('company_id', '=', self.env.company.id)], limit=1,
+        ).lot_stock_id
+        self.env['stock.quant']._update_available_quantity(self.component_a, stock_location, 100)
+        self.env['stock.quant']._update_available_quantity(self.component_b, stock_location, 100)
+
+        so_form = Form(self.env['sale.order'])
+        so_form.partner_id = self.partner_a
+        with so_form.order_line.new() as line:
+            line.product_id = kit_x
+        so = so_form.save()
+        so.action_confirm()
+        self.assertEqual(so.order_line.purchase_price, 30)
+
+    def test_dropshipped_kit_margin(self):
+        """Test cost price computation for dropshipped kits after receipt validation.
+
+        Case 1: Dropshipped kits without BOM-line cost share.
+        Case 2: Dropshipped kits with BOM-line cost share.
+
+        In both cases, supplier purchase prices should be used since dropshipped
+        kit components are exploded into individual PO lines.
+        """
+        try:
+            dropship_route = self.env.ref('stock_dropshipping.route_drop_shipping')
+        except ValueError:
+            self.skipTest('This test requires the following module: stock_dropshipping')
+
+        categ_goods = self.env.ref('product.product_category_goods')
+        kit_1_components = self.kit_1.bom_ids.bom_line_ids.product_id  # components_{a,b,c}
+        kit_3_components = self.kit_3.bom_ids.bom_line_ids.product_id  # components_{f,g}
+        categ_goods.property_cost_method = 'fifo'
+        (self.kit_1 | self.kit_3 | kit_1_components | kit_3_components).write({
+            'categ_id': categ_goods.id,
+            'route_ids': [Command.link(dropship_route.id)],
+        })
+        (self.kit_1 | kit_1_components).write({
+            'seller_ids': [Command.create({'partner_id': self.partner_b.id, 'price': 30})],
+        })
+        kit_3_components.write({
+            'seller_ids': [Command.create({'partner_id': self.partner_b.id, 'price': 80})],
+        })
+        self.kit_3.bom_ids.bom_line_ids[0].cost_share = 80
+        self.kit_3.bom_ids.bom_line_ids[1].cost_share = 20
+        so = self.env['sale.order'].create({
+            'partner_id': self.partner_a.id,
+            'order_line': [
+                Command.create({'product_id': self.kit_1.id, 'product_uom_qty': 1.0}),
+                Command.create({'product_id': self.kit_3.id, 'product_uom_qty': 1.0}),
+            ],
+        })
+        so.action_confirm()
+        po = so.order_line.purchase_line_ids.order_id
+        po.button_confirm()
+        self.assertRecordValues(so.order_line, [
+            {'product_id': self.kit_1.id, 'purchase_price': self.kit_1.standard_price},
+            {'product_id': self.kit_3.id, 'purchase_price': self.kit_3.standard_price},
+        ])
+        so.picking_ids.button_validate()
+        self.assertRecordValues(po.order_line, [
+            {'product_id': self.component_a.id, 'product_uom_qty': 2, 'price_unit': 30.0},
+            {'product_id': self.component_b.id, 'product_uom_qty': 1, 'price_unit': 30.0},
+            {'product_id': self.component_c.id, 'product_uom_qty': 3, 'price_unit': 30.0},
+            {'product_id': self.component_f.id, 'product_uom_qty': 1, 'price_unit': 80.0},
+            {'product_id': self.component_g.id, 'product_uom_qty': 2, 'price_unit': 80.0},
+        ])
+        self.assertRecordValues(so.order_line, [
+            {'product_id': self.kit_1.id, 'purchase_price': 180},
+            {'product_id': self.kit_3.id, 'purchase_price': 240},
+        ])
+
+    def test_avco_mto_manufacture_delivery_keeps_cost_stable(self):
+        """ Ensures that manufacturing moves are ignored when computing the sales order cost,
+            and only the outgoing delivery move is taken into account
+
+            MO move: unit value $5
+            SO move: unit value $7.5
+
+            The cost should be $7.5 and not $(7.5 + 5)/2
+        """
+        warehouse = self.company_data['default_warehouse']
+        route_mto = warehouse.mto_pull_id.route_id
+
+        self.product_category.property_cost_method = 'average'
+        component = self.component_a
+        component.categ_id = self.product_category
+        component.standard_price = 5.0
+        self.env['stock.quant']._update_available_quantity(component, warehouse.lot_stock_id, 10.0)
+
+        product_a = self._cls_create_product('Product A', self.uom_unit, routes=[route_mto])
+        product_a.categ_id = self.product_category
+        product_a.standard_price = 10.0
+        self.env['stock.quant']._update_available_quantity(product_a, warehouse.lot_stock_id, 1.0)
+
+        self.env['mrp.bom'].create({
+            'product_tmpl_id': product_a.product_tmpl_id.id,
+            'product_qty': 1.0,
+            'bom_line_ids': [Command.create({'product_id': component.id, 'product_qty': 1.0})],
+        })
+
+        so = self.env['sale.order'].create({
+            'partner_id': self.partner_a.id,
+            'order_line': [Command.create({
+                'product_id': product_a.id,
+                'product_uom_qty': 1.0,
+                'price_unit': 100.0,
+            })],
+        })
+        so.action_confirm()
+
+        mo = so.mrp_production_ids
+        mo.button_mark_done()
+        self.assertEqual(mo.state, 'done')
+        self.assertEqual(product_a.standard_price, 7.5)
+        self.assertEqual(so.order_line.purchase_price, 7.5)
+
+        delivery = so.picking_ids
+        delivery.button_validate()
+        self.assertEqual(delivery.state, 'done')
+        self.assertEqual(product_a.standard_price, 7.5)
+        self.assertEqual(so.order_line.purchase_price, 7.5)
+
+    def test_fifo_kit_return_and_redelivery_purchase_price(self):
+        """ A FIFO kit of 2 components is delivered with components at 100, returned, then the return
+        is returned to the customer and consumes the components received at 1. The cost of the
+        delivered kit is the one of the second delivery: 2 x 1 = 2.
+        """
+        warehouse = self.company_data['default_warehouse']
+        kit = self._cls_create_product('Kit', self.uom_unit)
+        (kit + self.component_a).categ_id = self.stock_account_product_categ
+        self.env['mrp.bom'].create({
+            'product_tmpl_id': kit.product_tmpl_id.id,
+            'type': 'phantom',
+            'bom_line_ids': [Command.create({'product_id': self.component_a.id, 'product_qty': 2.0})],
+        })
+        for price_unit in (100.0, 1.0):
+            receipt_move = self.env['stock.move'].create({
+                'product_id': self.component_a.id,
+                'product_uom_qty': 2.0,
+                'location_id': self.env.ref('stock.stock_location_suppliers').id,
+                'location_dest_id': warehouse.lot_stock_id.id,
+                'picking_type_id': warehouse.in_type_id.id,
+                'price_unit': price_unit,
+                'value_manual': 2.0 * price_unit,
+            })
+            receipt_move._action_confirm()
+            receipt_move.picked = True
+            receipt_move._action_done()
+
+        so = self.env['sale.order'].create({
+            'partner_id': self.partner_a.id,
+            'order_line': [Command.create({'product_id': kit.id, 'product_uom_qty': 1.0})],
+        })
+        so.action_confirm()
+        picking = so.picking_ids
+        picking.button_validate()
+        for _ in range(2):
+            return_wizard = Form(self.env['stock.return.picking']
+                .with_context(active_ids=picking.ids, active_id=picking.id, active_model='stock.picking')).save()
+            return_wizard.product_return_moves.quantity = 2.0
+            picking = self.env['stock.picking'].browse(return_wizard.action_create_returns()['res_id'])
+            picking.button_validate()
+        self.assertRecordValues(so.order_line, [{'qty_delivered': 1.0, 'purchase_price': 2.0}])

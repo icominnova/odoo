@@ -215,6 +215,8 @@ export class EditMenuDialog extends Component {
             handle: "div",
             nest: true,
             maxLevels: 2,
+            onDragStart: () => this.menuEditor.el.classList.add("o_menu_editor_dragging"),
+            onDragEnd: () => this.menuEditor.el.classList.remove("o_menu_editor_dragging"),
             onDrop: this._moveMenu.bind(this),
             isAllowed: this._isAllowedMove.bind(this),
             useElementSize: true,
@@ -405,8 +407,11 @@ export class EditMenuDialog extends Component {
         let url = menu.fields["url"];
         url = url.startsWith("/") ? url : "/" + url;
         this.dialogs.add(AddPageDialog, {
-            onAddPage: () => {
-                this.onClickSave(false, url);
+            onAddPage: ({ createdUrl }) => {
+                if (createdUrl) {
+                    menu.fields["url"] = createdUrl;
+                }
+                this.onClickSave(false, createdUrl ?? url);
             },
             websiteId: this.website.currentWebsite.id,
             forcedURL: url,

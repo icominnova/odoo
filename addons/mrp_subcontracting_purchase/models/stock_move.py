@@ -15,11 +15,11 @@ class StockMove(models.Model):
         valuation_data = super()._get_value_from_account_move(quantity, at_date=at_date)
         last_subcontract_done_receipt = self.move_dest_ids.filtered(
             lambda m: m.state == 'done' and m.is_subcontract and m.purchase_line_id
-        )
+        ).sorted('create_date', reverse=True)[:1]
         if not self.production_id or not last_subcontract_done_receipt:
             return valuation_data
 
-        bill_data = last_subcontract_done_receipt._get_value_from_account_move(quantity)
+        bill_data = last_subcontract_done_receipt.with_context(valuation_without_extra=True)._get_value_from_account_move(quantity)
         po_data = last_subcontract_done_receipt._get_value_from_quotation(quantity - bill_data['quantity'])
         if not bill_data['value'] and not po_data['value']:
             return valuation_data

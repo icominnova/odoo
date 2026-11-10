@@ -13,10 +13,29 @@ class StockMove(models.Model):
 
     def _is_dropshipped(self):
         res = super()._is_dropshipped()
-        return res or (
+        return (
+            res
+            # subcontractor -> customer
+            or (
                 self.partner_id.property_stock_subcontractor.parent_path
-                and self.partner_id.property_stock_subcontractor.parent_path in self.location_id.parent_path
-                and self.location_dest_id.usage == 'customer'
+                and (
+                    (
+                        self.partner_id.property_stock_subcontractor.parent_path
+                        in self.location_id.parent_path
+                        and self.location_dest_id.usage == "customer"
+                    )
+                    # Vendor -> subcontractor location
+                    or self._is_resupply_dropship()
+                )
+            )
+        )
+
+    def _is_resupply_dropship(self):
+        subcontracting_path = self.partner_id.property_stock_subcontractor.parent_path
+        return bool(
+            subcontracting_path
+            and subcontracting_path in self.location_dest_id.parent_path
+            and self.location_id.usage == "supplier"
         )
 
     def _is_dropshipped_returned(self):
@@ -26,3 +45,17 @@ class StockMove(models.Model):
                 and self.partner_id.property_stock_subcontractor.parent_path
                 and self.partner_id.property_stock_subcontractor.parent_path in self.location_dest_id.parent_path
         )
+
+    def _get_value_from_account_move(self, quantity, at_date=None):
+        if not self.env.context.get('valuation_without_extra') and self.is_subcontract and self._is_dropshipped() and self.purchase_line_id:
+            last_subcontract_production_move = self.move_orig_ids.production_id.move_finished_ids[:1]
+            if last_subcontract_production_move:
+                return last_subcontract_production_move._get_value_from_account_move(quantity, at_date=at_date)
+        return super()._get_value_from_account_move(quantity, at_date=at_date)
+
+    def _get_partner_id(self):
+        if self.raw_material_production_id.subcontractor_id:
+            route = self.env.ref('stock_dropshipping.route_drop_shipping', raise_if_not_found=False)
+            if route and self.rule_id.route_id == route:
+                return self.raw_material_production_id.subcontractor_id.id
+        return super()._get_partner_id()

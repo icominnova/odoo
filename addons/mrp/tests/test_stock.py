@@ -284,6 +284,30 @@ class TestWarehouseMrp(common.TestMrpCommon):
         self.assertEqual(location_dest.id, self.depot_location.id)
         self.assertNotEqual(location_dest.id, self.stock_location.id)
 
+    def test_putaway_lot_after_increasing_qty_to_produce(self):
+        """Ensure a generated lot is assigned to all split finished move lines
+        after increasing a confirmed MO's quantity, avoiding missing lot errors.
+        """
+        self.laptop.tracking = 'lot'
+        mo_laptop = self.new_mo_laptop()
+        change_qty = self.env['change.production.qty'].create({
+            'mo_id': mo_laptop.id,
+            'product_qty': 3,
+        })
+        change_qty.change_prod_qty()
+        self.assertEqual(len(mo_laptop.move_finished_ids.move_line_ids), 2)
+        mo_laptop.action_generate_serial()
+        self.env['change.production.qty'].create({
+            'mo_id': mo_laptop.id,
+            'product_qty': 4,
+        }).change_prod_qty()
+        self.assertEqual(len(mo_laptop.move_finished_ids.move_line_ids), 3)
+        mo_laptop.button_mark_done()
+        self.assertEqual(mo_laptop.state, 'done')
+        move_lines = mo_laptop.move_finished_ids.move_line_ids
+        self.assertTrue(all(ml.lot_id == mo_laptop.lot_producing_ids for ml in move_lines))
+        self.assertEqual(sum(move_lines.mapped('quantity')), 4)
+
     def test_backorder_unpacking(self):
         """ Test that movement of pack in backorder is correctly handled. """
         self.warehouse_1.manufacture_steps = 'pbm'
@@ -354,6 +378,19 @@ class TestWarehouseMrp(common.TestMrpCommon):
         self.assertFalse(self.warehouse_1.pbm_mto_pull_id.active)
         self.assertFalse(self.warehouse_1.pbm_mto_pull_id.location_dest_id.active)
         self.assertNotIn(self.warehouse_1.pbm_mto_pull_id, self.route_mto.rule_ids)
+
+    def test_manufacturing_putaway_after_manual_reservation(self):
+        """Test the putaway of the produced product after manually reserving
+        the components following an unreservation."""
+        self.laptop.tracking = 'lot'
+        mo = self.new_mo_laptop()
+        mo.do_unreserve()
+        mo.move_raw_ids.move_line_ids = [Command.create({
+            'product_id': self.graphics_card.id,
+            'quantity': 1,
+        })]
+        mo.button_mark_done()
+        self.assertEqual(mo.move_finished_ids.move_line_ids.location_dest_id, self.depot_location)
 
 
 class TestKitPicking(common.TestMrpCommon):
@@ -759,3 +796,63 @@ class TestKitPicking(common.TestMrpCommon):
 
         # assert the scrap's bom_id is updated to False after updating the product
         self.assertFalse(scrap.bom_id)
+
+    def test_compute_scrap_qty_mixed_bom(self):
+        """Test that _compute_scrap_qty correctly handles a recordset with
+        scraps that have no bom_id (delegating to super)"""
+        # Products without kit
+        product_no_kit_1 = self.env['product.product'].create({
+            'name': 'No Kit 1',
+            'is_storable': True,
+        })
+        product_no_kit_2 = self.env['product.product'].create({
+            'name': 'No Kit 2',
+            'is_storable': True,
+        })
+
+        # Stock for all products
+        self.env['stock.quant'].create([
+            {
+                'location_id': self.stock_location.id,
+                'product_id': product_no_kit_1.id,
+                'inventory_quantity': 10,
+            },
+            {
+                'location_id': self.stock_location.id,
+                'product_id': product_no_kit_2.id,
+                'inventory_quantity': 10,
+            },
+        ]).action_apply_inventory()
+
+        # Create 2 scraps without bom
+        scrap_no_bom_1, scrap_no_bom_2 = self.env['stock.scrap'].create([
+            {
+                'product_id': product_no_kit_1.id,
+                'scrap_qty': 3.0,
+                'product_uom_id': product_no_kit_1.uom_id.id,
+                'location_id': self.stock_location.id,
+            },
+            {
+                'product_id': product_no_kit_2.id,
+                'scrap_qty': 5.0,
+                'product_uom_id': product_no_kit_2.uom_id.id,
+                'location_id': self.stock_location.id,
+            },
+        ])
+
+        # Verify bom_id assignment
+        self.assertFalse(scrap_no_bom_1.bom_id)
+        self.assertFalse(scrap_no_bom_2.bom_id)
+
+        # Before do_scrap: no move_ids, scrap_qty should be the written values
+        self.assertEqual(scrap_no_bom_1.scrap_qty, 3.0)
+        self.assertEqual(scrap_no_bom_2.scrap_qty, 5.0)
+
+        # Execute all scraps
+        all_scraps = scrap_no_bom_1 | scrap_no_bom_2
+        for scrap in all_scraps:
+            scrap.do_scrap()
+
+        # After do_scrap: move_ids exist
+        self.assertEqual(scrap_no_bom_1.scrap_qty, 3.0)
+        self.assertEqual(scrap_no_bom_2.scrap_qty, 5.0)

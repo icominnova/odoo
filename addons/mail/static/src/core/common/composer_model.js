@@ -1,11 +1,13 @@
 import { fields, OR, Record } from "@mail/core/common/record";
 import {
     convertBrToLineBreak,
+    generatePartnerMentionElement,
     getNonEditableMentions,
     prettifyMessageText,
 } from "@mail/utils/common/format";
 import { markup } from "@odoo/owl";
-import { isHtmlEmpty } from "@web/core/utils/html";
+import { createDocumentFragmentFromContent, isHtmlEmpty } from "@web/core/utils/html";
+import { nbsp } from "@web/core/utils/strings";
 
 export class Composer extends Record {
     static id = OR("thread", "message");
@@ -13,6 +15,7 @@ export class Composer extends Record {
     clear() {
         this.attachments.length = 0;
         this.replyToMessage = undefined;
+        this.restoredFromFullComposer = false;
         this.composerHtml = markup("<div class='o-paragraph'><br></div>");
         Object.assign(this.selection, {
             start: 0,
@@ -116,6 +119,8 @@ export class Composer extends Record {
         },
     });
     autofocus = 0;
+    /** When set, this means the composer content was restored from local storage, and content was saved from full composer */
+    restoredFromFullComposer = false;
     replyToMessage = fields.One("mail.message", { inverse: "composerAsReplyToMessage" });
     /** @type {"text" | "html" | undefined} */
     updateFrom = undefined;
@@ -126,6 +131,31 @@ export class Composer extends Record {
 
     get targetThread() {
         return this.replyToMessage?.thread ?? this.thread ?? this.message?.thread ?? null;
+    }
+
+    /** @param {import("models").Message} message */
+    insertReplyFromNote(message) {
+        this.mentionedPartners.add(message.author);
+        if (!this.store.env.services["mail.composer"].htmlEnabled) {
+            const mentionText = `@${message.authorName} `;
+            if (!this.composerText.includes(mentionText)) {
+                this.insertText(mentionText, 0, { moveCursorToEnd: true });
+            }
+            return;
+        }
+        const composerBody = createDocumentFragmentFromContent(this.composerHtml).body;
+        if (
+            composerBody.querySelector(
+                `a.o_mail_redirect[data-oe-model="res.partner"][data-oe-id="${message.author.id}"]`
+            )
+        ) {
+            return;
+        }
+        composerBody.firstElementChild.prepend(
+            generatePartnerMentionElement(message.author, this.thread),
+            nbsp
+        );
+        this.composerHtml = markup(composerBody.innerHTML);
     }
 }
 

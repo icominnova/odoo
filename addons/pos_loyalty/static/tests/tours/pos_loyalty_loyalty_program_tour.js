@@ -239,8 +239,8 @@ registry.category("web_tour.tours").add("PosComboCheapestRewardProgram", {
             combo.select("Combo Product 6"),
             Dialog.confirm(),
             Order.hasLine({ productName: "10% on the cheapest product" }),
-            PosLoyalty.orderTotalIs("61.03"),
-            PosLoyalty.finalizeOrder("Cash", "61.03"),
+            PosLoyalty.orderTotalIs("61.04"),
+            PosLoyalty.finalizeOrder("Cash", "61.04"),
         ].flat(),
 });
 
@@ -268,7 +268,7 @@ registry.category("web_tour.tours").add("PosCheapestProductTaxInclude", {
             ProductScreen.clickDisplayedProduct("Product"),
             ProductScreen.addOrderline("Desk Organizer", "1"),
             Order.hasLine({ productName: "10% on the cheapest product" }),
-            PosLoyalty.orderTotalIs("6.01"), // taxe of 9 cents (≈ 10% HT)
+            PosLoyalty.orderTotalIs("6.00"), // taxe of 9 cents (≈ 10% HT)
         ].flat(),
 });
 

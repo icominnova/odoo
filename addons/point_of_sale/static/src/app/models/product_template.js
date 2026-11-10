@@ -14,6 +14,12 @@ import { normalize } from "@web/core/l10n/utils";
 
 export class ProductTemplate extends ProductTemplateAccounting {
     static pythonModel = "product.template";
+    static enableLazyGetters = false;
+
+    setup(_vals) {
+        super.setup(_vals);
+        this.onUpdate();
+    }
 
     isAllowOnlyOneLot() {
         return this.tracking === "lot" || !this.uom_id || !this.uom_id.is_pos_groupable;
@@ -31,18 +37,19 @@ export class ProductTemplate extends ProductTemplateAccounting {
     async _onScaleNotAvailable() {}
 
     isConfigurable() {
-        return this.attribute_line_ids.find(
-            (l) =>
-                l.product_template_value_ids.length > 1 ||
-                l.product_template_value_ids.some((v) => v.is_custom)
+        return (
+            this.attribute_line_ids.map((a) => a.active !== false && a.product_template_value_ids)
+                .length >= 1
         );
     }
 
     needToConfigure() {
+        const activeLines = this.attribute_line_ids.filter((l) => l.active !== false);
         return (
-            this.isConfigurable() &&
-            this.attribute_line_ids.length > 0 &&
-            this.attribute_line_ids.some((l) => l.attribute_id.create_variant === "no_variant")
+            this.isCombo() ||
+            (this.isConfigurable() &&
+                activeLines.length > 0 &&
+                activeLines.some((l) => l.attribute_id.create_variant === "no_variant"))
         );
     }
 
@@ -55,38 +62,77 @@ export class ProductTemplate extends ProductTemplateAccounting {
     }
 
     get parentCategories() {
-        const categories = [];
-        let category = this.categ_id;
+        return this.cacheValues("parentCategories", () => {
+            const categories = [];
+            let category = this.categ_id;
 
-        while (category) {
-            categories.push(category.id);
-            category = category.parent_id;
-        }
+            while (category) {
+                categories.push(category.id);
+                category = category.parent_id;
+            }
 
-        return categories;
+            return categories;
+        });
     }
 
     get parentPosCategIds() {
-        const current = [];
-        const categories = this.pos_categ_ids;
+        return this.cacheValues("parentPosCategIds", () => {
+            const current = [];
+            const categories = this.pos_categ_ids;
 
-        const getParent = (categ) => {
-            if (categ.parent_id) {
-                current.push(categ.parent_id.id);
-                getParent(categ.parent_id);
+            const getParent = (categ) => {
+                const parentCat = categ.parent_id;
+                if (parentCat) {
+                    current.push(parentCat.id);
+                    getParent(parentCat);
+                }
+            };
+
+            for (const category of categories) {
+                current.push(category.id);
+                getParent(category);
             }
-        };
 
-        for (const category of categories) {
-            current.push(category.id);
-            getParent(category);
-        }
-
-        return current;
+            return current;
+        });
     }
 
     getImageUrl() {
         return `/web/image?model=product.template&field=image_128&id=${this.id}&unique=${this.write_date}`;
+    }
+
+    hasDynamicAttributes() {
+        return this.attribute_line_ids.some(
+            (line) => line.attribute_id.create_variant === "dynamic"
+        );
+    }
+
+    getVariantForCombination(attributeValues) {
+        const valueIds = attributeValues
+            .filter((value) => value.attribute_id.create_variant !== "no_variant")
+            .map(({ id }) => id);
+        if (!valueIds.length) {
+            return false;
+        }
+
+        return (
+            this.product_variant_ids.find((variant) => {
+                // Not product_template_variant_value_ids: its domain drops values from
+                // single-value attribute lines, which are part of the combination.
+                const variantValueIds = variant.product_template_attribute_value_ids.map(
+                    ({ id }) => id
+                );
+                return valueIds.every((id) => variantValueIds.includes(id));
+            }) || false
+        );
+    }
+
+    isDeletedCombination(attributeValues) {
+        return (
+            !this.hasDynamicAttributes() &&
+            attributeValues.some((value) => value.attribute_id.create_variant !== "no_variant") &&
+            !this.getVariantForCombination(attributeValues)
+        );
     }
 
     _isArchivedCombination(attributeValueIds) {
@@ -130,26 +176,39 @@ export class ProductTemplate extends ProductTemplateAccounting {
     }
 
     get searchString() {
-        const fields = ["name", "default_code", "barcode"];
-        const raw = fields
-            .map((field) => this[field] || "")
-            .filter(Boolean)
-            .join(" ");
+        return this.cacheValues("searchString", () => {
+            const fields = ["name", "default_code", "barcode"];
+            const raw = fields
+                .map((field) => this[field] || "")
+                .filter(Boolean)
+                .join(" ");
 
-        const templateContent = normalize(raw);
-        const variantContent = this.product_variant_ids.map((v) => v.searchString).join(" ");
+            const templateContent = normalize(raw);
+            const variantContent = this.product_variant_ids.map((v) => v.searchString).join(" ");
 
-        return variantContent ? templateContent + " " + variantContent : templateContent;
+            return variantContent ? templateContent + " " + variantContent : templateContent;
+        });
     }
 
     get normalizedName() {
-        return normalize(this.name || "");
+        return this.cacheValues("normalizedName", () => normalize(this.name || ""));
     }
 
     get displayName() {
         return this.default_code
             ? `[${this.default_code}] ${this.display_name}`
             : this.display_name;
+    }
+
+    cacheValues(key, computeFunc) {
+        if (!this.cachedValues[key]) {
+            this.cachedValues[key] = computeFunc();
+        }
+        return this.cachedValues[key];
+    }
+
+    onUpdate() {
+        this.cachedValues = {};
     }
 }
 registry.category("pos_available_models").add(ProductTemplate.pythonModel, ProductTemplate);

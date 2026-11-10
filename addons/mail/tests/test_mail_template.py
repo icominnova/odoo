@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
+from lxml.etree import LIBXML_VERSION
 from markupsafe import Markup
 from unittest.mock import patch
 
@@ -304,7 +305,11 @@ class TestMailTemplate(MailCommon):
         templates = (
             # here sanitizer adds an 'equals void' after object.name as properties
             # should have values
-            ('''<p ou="<p t-out="object.name">"</p>''', '<p ou="&lt;p t-out=" object.name="">"</p>'),
+            (
+                # Note: lxml build against libxml2 2.14.0+ interprets slightly differently malformed HTMl snippets
+                """<p ou="<p t-out="object.name">"</p>""",
+                '<p ou="&lt;p t-out=" object.name"="">"</p>' if LIBXML_VERSION >= (2, 14, 0) else '<p ou="&lt;p t-out=" object.name="">"</p>',
+            ),
             ('''<p title="'<p t-out='object.name'/>">''', '''<p title="'&lt;p t-out='object.name'/&gt;"></p>'''),
         )
         o_render = self.env['mail.render.mixin']._render_template_qweb_regex
@@ -561,6 +566,34 @@ class TestMailTemplateReset(MailCommon):
         self.assertEqual(mail_template.name, 'Mail: Test Mail Template')
         self.assertEqual(mail_template.with_context(lang='en_GB').name, 'Mail: Test Mail Template')
         self.assertEqual(mail_template.with_context(lang='fr_FR').name, 'Mail: Test Mail Template FR')
+
+    @mute_logger(
+        'odoo.addons.mail.models.mail_template',
+        'odoo.addons.mail.models.mail_render_mixin',
+    )
+    def test_mail_template_reset_invalid_translation(self):
+        """ Ensure wrong current translation doesn't prevent template reset """
+        self._load('mail', 'tests/test_mail_template.xml')
+
+        self.env['res.lang']._activate_lang('fr_BE')
+        mail_template = self.env.ref('mail.mail_template_test').with_context(lang='fr_BE')
+        # Validation will not be applied here,
+        # and it might also persist post-upgrade
+        with patch.object(self.env.registry['mail.template'], '_check_can_be_rendered', autospec=True):
+            mail_template.with_context(lang='en_US').write({
+                'body_html': '<div>Hello <t t-out="object.field_that_does_not_exist"/></div>',
+            })
+        mail_template.with_context(lang='fr_BE').write({
+            'body_html': '<div>Hello FR</div>',
+        })
+
+        context = {'default_template_ids': mail_template.ids, 'lang': 'fr_BE'}
+        mail_template_reset = self.env['mail.template.reset'].with_context(context).create({})
+        reset_action = mail_template_reset.reset_template()
+        self.assertTrue(reset_action)
+
+        self.assertEqual(mail_template.body_html.strip(), Markup('<div>Hello Odoo</div>'))
+        self.assertEqual(mail_template.with_context(lang='fr_BE').body_html.strip(), Markup('<div>Hello Odoo</div>'))
 
 
 @tagged("mail_template", "-at_install", "post_install")

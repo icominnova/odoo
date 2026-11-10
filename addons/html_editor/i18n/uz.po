@@ -14,15 +14,17 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 19.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-01-25 18:36+0000\n"
-"PO-Revision-Date: 2025-10-08 18:38+0000\n"
-"Last-Translator: \n"
-"Language-Team: \n"
+"POT-Creation-Date: 2026-10-30 17:38+0000\n"
+"PO-Revision-Date: 2026-08-04 03:53+0000\n"
+"Last-Translator: Anonymous <noreply@weblate.org>\n"
+"Language-Team: Uzbek <https://translate.odoo.com/projects/odoo-19/"
+"html_editor/uz/>\n"
 "Language: uz\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
+"X-Generator: Weblate 2026.6.1\n"
 
 #. module: html_editor
 #. odoo-javascript
@@ -332,13 +334,6 @@ msgstr "Avtomatik ijro"
 
 #. module: html_editor
 #. odoo-javascript
-#: code:addons/html_editor/static/src/main/column_plugin.js:0
-#, fuzzy
-msgid "Back to one column"
-msgstr "Bitta ustunga qaytish"
-
-#. module: html_editor
-#. odoo-javascript
 #: code:addons/html_editor/static/src/main/banner_plugin.js:0
 #, fuzzy
 msgid "Banner"
@@ -440,6 +435,12 @@ msgstr "Bekor qilish"
 
 #. module: html_editor
 #. odoo-javascript
+#: code:addons/html_editor/static/src/others/embedded_components/plugins/caption_plugin/caption_plugin.js:0
+msgid "Caption"
+msgstr ""
+
+#. module: html_editor
+#. odoo-javascript
 #: code:addons/html_editor/static/src/main/list/list_plugin.js:0
 #, fuzzy
 msgid "Checklist"
@@ -465,6 +466,12 @@ msgstr "Mazmunni tozalash"
 #, fuzzy
 msgid "Click again to reset transformation"
 msgstr "O‘zgartirishni bekor qilish uchun qayta bosing"
+
+#. module: html_editor
+#. odoo-javascript
+#: code:addons/html_editor/static/src/main/movenode_plugin.js:0
+msgid "Click to select"
+msgstr ""
 
 #. module: html_editor
 #. odoo-javascript
@@ -509,6 +516,12 @@ msgstr "Ustunlarga ajratish"
 #, fuzzy
 msgid "Content generated"
 msgstr "Yaratilgan mazmun"
+
+#. module: html_editor
+#. odoo-javascript
+#: code:addons/html_editor/static/src/main/column_plugin.js:0
+msgid "Convert columns to regular content"
+msgstr ""
 
 #. module: html_editor
 #. odoo-javascript
@@ -695,10 +708,22 @@ msgstr "Hujjatlar"
 
 #. module: html_editor
 #. odoo-javascript
+#: code:addons/html_editor/static/src/main/movenode_plugin.js:0
+msgid "Drag to move"
+msgstr ""
+
+#. module: html_editor
+#. odoo-javascript
 #: code:addons/html_editor/static/src/others/dynamic_placeholder_plugin.js:0
 #, fuzzy
 msgid "Dynamic Placeholder"
 msgstr "Dinamik to‘ldiruvchi"
+
+#. module: html_editor
+#. odoo-javascript
+#: code:addons/html_editor/static/src/components/history_dialog/history_dialog.js:0
+msgid "Dynamic element"
+msgstr ""
 
 #. module: html_editor
 #. odoo-python
@@ -1405,7 +1430,7 @@ msgstr ""
 
 #. module: html_editor
 #. odoo-javascript
-#: code:addons/html_editor/static/src/main/powerbox/powerbox_plugin.js:0
+#: code:addons/html_editor/static/src/main/powerbox/search_powerbox_plugin.js:0
 #: code:addons/html_editor/static/src/others/embedded_components/backend/video/video.xml:0
 #, fuzzy
 msgid "More options"
@@ -1515,6 +1540,12 @@ msgstr "Raqamlangan ro‘yxat"
 #, fuzzy
 msgid "Ok"
 msgstr "OK"
+
+#. module: html_editor
+#. odoo-python
+#: code:addons/html_editor/controllers/main.py:0
+msgid "Only internal users can use AI text generation."
+msgstr ""
 
 #. module: html_editor
 #. odoo-python
@@ -1776,9 +1807,8 @@ msgstr "Rasmni o‘chirish"
 #. module: html_editor
 #. odoo-javascript
 #: code:addons/html_editor/static/src/core/format_plugin.js:0
-#, fuzzy
-msgid "Remove Format"
-msgstr "Formatni olib tashlash"
+msgid "Remove Format (Ctrl + Space)"
+msgstr ""
 
 #. module: html_editor
 #. odoo-javascript
@@ -1791,9 +1821,8 @@ msgstr "Havolani olib tashlash"
 #. module: html_editor
 #. odoo-javascript
 #: code:addons/html_editor/static/src/main/column_plugin.js:0
-#, fuzzy
-msgid "Remove columns"
-msgstr "Ustunlarni olib tashlash"
+msgid "Remove column layout"
+msgstr ""
 
 #. module: html_editor
 #. odoo-javascript
@@ -2735,6 +2764,12 @@ msgstr "daraja"
 
 #. module: html_editor
 #. odoo-javascript
+#: code:addons/html_editor/static/src/main/separator_plugin.js:0
+msgid "divider"
+msgstr ""
+
+#. module: html_editor
+#. odoo-javascript
 #: code:addons/html_editor/static/src/main/media/file_plugin.js:0
 #, fuzzy
 msgid "document"
@@ -2753,6 +2788,12 @@ msgstr "masalan, https://www.odoo.com"
 #, fuzzy
 msgid "file"
 msgstr "fayl"
+
+#. module: html_editor
+#. odoo-javascript
+#: code:addons/html_editor/static/src/main/separator_plugin.js:0
+msgid "line"
+msgstr ""
 
 #. module: html_editor
 #. odoo-javascript
@@ -2800,3 +2841,22 @@ msgstr "videolar"
 #, fuzzy
 msgid "websocket message handling"
 msgstr "veb-soket xabarlarini boshqarish"
+
+#. module: html_editor
+#. odoo-javascript
+#: code:addons/html_editor/static/src/main/table/table_picker.xml:0
+#, fuzzy
+msgid "x"
+msgstr "piksel"
+
+#, fuzzy
+#~ msgid "Back to one column"
+#~ msgstr "Bitta ustunga qaytish"
+
+#, fuzzy
+#~ msgid "Remove columns"
+#~ msgstr "Ustunlarni olib tashlash"
+
+#, fuzzy
+#~ msgid "Remove Format"
+#~ msgstr "Formatni olib tashlash"

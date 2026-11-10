@@ -14,15 +14,17 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 19.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-02-13 18:35+0000\n"
-"PO-Revision-Date: 2025-10-18 14:56+0000\n"
-"Last-Translator: \n"
-"Language-Team: \n"
+"POT-Creation-Date: 2026-11-06 17:37+0000\n"
+"PO-Revision-Date: 2026-08-06 19:11+0000\n"
+"Last-Translator: Anonymous <noreply@weblate.org>\n"
+"Language-Team: Uzbek <https://translate.odoo.com/projects/odoo-19/account/uz/"
+">\n"
 "Language: uz\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
+"X-Generator: Weblate 2026.6.1\n"
 
 #. module: account
 #: model:ir.model.fields,help:account.field_account_journal__type
@@ -64,6 +66,14 @@ msgstr ""
 "= 100 (narx kiritilgan) - Foiz solig‘i kiritilgan: Soliq summasi narxning "
 "bo‘linmasi hisoblanadi: masalan, 180 / (1 - 10%) = 200 (narx kiritilmagan) "
 "masalan, 200 * (1 - 10%) = 180 (narx kiritilgan)"
+
+#. module: account
+#. odoo-python
+#: code:addons/account/models/account_move_send.py:0
+msgid ""
+"\n"
+"Please contact your administrator."
+msgstr ""
 
 #. module: account
 #. odoo-python
@@ -170,6 +180,18 @@ msgstr "%(exception)s %(user)s uchun %(end_datetime_string)s%(reason)s."
 
 #. module: account
 #. odoo-python
+#: code:addons/account/models/account_move.py:0
+msgid "%(label)s at %(currency_amount)s"
+msgstr ""
+
+#. module: account
+#. odoo-python
+#: code:addons/account/models/account_move.py:0
+msgid "%(label)s at %(currency_amount)s (Draft)"
+msgstr ""
+
+#. module: account
+#. odoo-python
 #: code:addons/account/models/account_bank_statement_line.py:0
 #, fuzzy
 msgid ""
@@ -183,12 +205,6 @@ msgstr ""
 
 #. module: account
 #. odoo-python
-#: code:addons/account/models/account_move.py:0
-msgid "%(name)s - Draft at (%(currency_amount)s)"
-msgstr ""
-
-#. module: account
-#. odoo-python
 #: code:addons/account/models/account_move_line.py:0
 #, fuzzy
 msgid "%(name)s installment #%(number)s"
@@ -198,6 +214,14 @@ msgstr "%(name)s to‘lov #%(number)s"
 #. odoo-python
 #: code:addons/account/models/account_move.py:0
 msgid "%(name)s%(ref)s at %(currency_amount)s"
+msgstr ""
+
+#. module: account
+#. odoo-python
+#: code:addons/account/wizard/accrued_orders.py:0
+msgid ""
+"%(order)s - %(order_line)s; %(qty_invoiced)s invoiced, %(qty_delivered)s "
+"delivered at %(unit_price)s"
 msgstr ""
 
 #. module: account
@@ -221,6 +245,12 @@ msgid ""
 msgstr ""
 "%(order)s - %(order_line)s; %(quantity_invoiced)s hisob-faktura qilingan, %"
 "(quantity_delivered)s har biri %(unit_price)s dan yetkazib berilgan"
+
+#. module: account
+#. odoo-python
+#: code:addons/account/wizard/accrued_orders.py:0
+msgid "%(order)s - %(order_line)s; price difference for %(product)s"
+msgstr ""
 
 #. module: account
 #. odoo-python
@@ -297,20 +327,6 @@ msgstr "%s soliqlar"
 
 #. module: account
 #. odoo-python
-#: code:addons/account/models/company.py:0
-#, fuzzy
-msgid "%s, or / if not applicable"
-msgstr "%s yoki / qo‘llanilmasa"
-
-#. module: account
-#. odoo-python
-#: code:addons/account/models/partner.py:0
-#, fuzzy
-msgid "%s, or not applicable"
-msgstr "%s yoki qo‘llanilmaydi"
-
-#. module: account
-#. odoo-python
 #: code:addons/account/models/account_document_import_mixin.py:0
 #, fuzzy
 msgid "'%(filename)s' (extracted from '%(root_filename)s', type=%(type)s)"
@@ -322,18 +338,6 @@ msgstr "'%(filename)s' ('%(root_filename)s'dan ajratib olingan, turi=%(type)s)"
 #, fuzzy
 msgid "'%(filename)s' (type=%(type)s)"
 msgstr "'%(filename)s' (turi=%(type)s)"
-
-#. module: account
-#. odoo-python
-#: code:addons/account/wizard/accrued_orders.py:0
-msgid "(*) Goods Delivered not Invoiced (perpetual valuation)"
-msgstr ""
-
-#. module: account
-#. odoo-python
-#: code:addons/account/wizard/accrued_orders.py:0
-msgid "(*) Goods Invoiced not Delivered (perpetual valuation)"
-msgstr ""
 
 #. module: account
 #: model:ir.actions.server,name:account.action_move_block_payment
@@ -452,13 +456,6 @@ msgid "... (View all)"
 msgstr "... (Hammasini ko‘rish)"
 
 #. module: account
-#. odoo-python
-#: code:addons/account/models/company.py:0
-#, fuzzy
-msgid "/ if not applicable"
-msgstr "/ qo‘llanilmasa"
-
-#. module: account
 #: model:account.tax,name:account.1_sale_export_tax_template
 #, fuzzy
 msgid "0% Exports"
@@ -471,25 +468,10 @@ msgid "0% Imports"
 msgstr "0% import"
 
 #. module: account
-#: model_terms:ir.ui.view,arch_db:account.report_invoice_document
-msgid "1.00"
-msgstr ""
-
-#. module: account
-#: model_terms:ir.ui.view,arch_db:account.document_tax_totals_template
-msgid "1.05"
-msgstr ""
-
-#. module: account
 #: model:account.payment.term,name:account.account_payment_term_30_days_end_month_the_10
 #, fuzzy
 msgid "10 Days after End of Next Month"
 msgstr "Keyingi oy tugaganidan 10 kun o‘tgach"
-
-#. module: account
-#: model_terms:ir.ui.view,arch_db:account.report_statement
-msgid "100.0"
-msgstr ""
 
 #. module: account
 #: model_terms:ir.ui.view,arch_db:account.report_payment_receipt_document
@@ -498,105 +480,16 @@ msgid "100.00 USD"
 msgstr "100,00 AQSH dollari"
 
 #. module: account
-#: model_terms:ir.ui.view,arch_db:account.report_statement
-msgid "1000.0"
-msgstr ""
-
-#. module: account
-#: model_terms:ir.ui.view,arch_db:account.report_invoice_document
-msgid "11.05"
-msgstr ""
-
-#. module: account
-#: model_terms:ir.ui.view,arch_db:account.report_statement
-msgid "12345"
-msgstr ""
-
-#. module: account
 #: model:account.payment.term,name:account.account_payment_term_15days
 #, fuzzy
 msgid "15 Days"
 msgstr "15 kun"
 
 #. module: account
-#: model:account.tax,name:account.1_purchase_tax_template
-#: model:account.tax,name:account.1_sale_tax_template
-msgid "15%"
-msgstr ""
-
-#. module: account
-#: model_terms:ir.ui.view,arch_db:account.report_statement
-msgid "1500.0"
-msgstr ""
-
-#. module: account
-#: model:account.tax,invoice_label:account.2_account_tax_us_purchase_2_9
-#: model:account.tax,invoice_label:account.2_account_tax_us_sale_2_9
-#: model:account.tax,name:account.2_account_tax_us_purchase_2_9
-#: model:account.tax,name:account.2_account_tax_us_sale_2_9
-msgid "2.9%"
-msgstr ""
-
-#. module: account
 #: model:account.payment.term,name:account.account_payment_term_30days_early_discount
 #, fuzzy
 msgid "2/7 Net 30"
 msgstr "2/7 Sof 30"
-
-#. module: account
-#: model_terms:ir.ui.view,arch_db:account.report_invoice_document
-msgid "20.00"
-msgstr ""
-
-#. module: account
-#: model_terms:ir.ui.view,arch_db:account.report_invoice_document
-msgid "2021-09-19"
-msgstr ""
-
-#. module: account
-#: model_terms:ir.ui.view,arch_db:account.report_payment_receipt_document
-msgid "2023-01-01"
-msgstr ""
-
-#. module: account
-#: model_terms:ir.ui.view,arch_db:account.report_payment_receipt_document
-msgid "2023-01-05"
-msgstr ""
-
-#. module: account
-#: model_terms:ir.ui.view,arch_db:account.report_statement
-msgid "2023-08-11"
-msgstr ""
-
-#. module: account
-#: model_terms:ir.ui.view,arch_db:account.report_statement
-msgid "2023-08-15"
-msgstr ""
-
-#. module: account
-#: model_terms:ir.ui.view,arch_db:account.report_statement
-msgid "2023-08-31"
-msgstr ""
-
-#. module: account
-#: model_terms:ir.ui.view,arch_db:account.report_invoice_document
-msgid "2023-09-12"
-msgstr ""
-
-#. module: account
-#: model_terms:ir.ui.view,arch_db:account.report_invoice_document
-msgid "2023-09-25"
-msgstr ""
-
-#. module: account
-#: model_terms:ir.ui.view,arch_db:account.report_invoice_document
-msgid "2023-10-31"
-msgstr ""
-
-#. module: account
-#: model_terms:ir.ui.view,arch_db:account.report_invoice_document
-msgid "2024-01-01"
-msgstr ""
 
 #. module: account
 #: model:account.payment.term,name:account.account_payment_term_21days
@@ -617,18 +510,6 @@ msgid "25.00 USD"
 msgstr "25,00 AQSH dollari"
 
 #. module: account
-#: model_terms:ir.ui.view,arch_db:account.document_tax_totals_company_currency_template
-#: model_terms:ir.ui.view,arch_db:account.document_tax_totals_template
-#: model_terms:ir.ui.view,arch_db:account.report_invoice_document
-msgid "27.00"
-msgstr ""
-
-#. module: account
-#: model_terms:ir.ui.view,arch_db:account.report_invoice_document
-msgid "3.00"
-msgstr ""
-
-#. module: account
 #: model:account.payment.term,name:account.account_payment_term_30days
 #, fuzzy
 msgid "30 Days"
@@ -647,100 +528,10 @@ msgid "30% Now, Balance 60 Days"
 msgstr "Hozir 30%, qolgan qismi 60 kun ichida"
 
 #. module: account
-#: model_terms:ir.ui.view,arch_db:account.report_invoice_document
-msgid "30.00"
-msgstr ""
-
-#. module: account
-#: model_terms:ir.ui.view,arch_db:account.document_tax_totals_company_currency_template
-#: model_terms:ir.ui.view,arch_db:account.document_tax_totals_template
-#: model_terms:ir.ui.view,arch_db:account.report_invoice_document
-msgid "31.05"
-msgstr ""
-
-#. module: account
-#: model_terms:ir.ui.view,arch_db:account.document_tax_totals_company_currency_template
-#: model_terms:ir.ui.view,arch_db:account.document_tax_totals_template
-msgid "4.05"
-msgstr ""
-
-#. module: account
-#: model:account.tax,invoice_label:account.2_account_tax_us_purchase_4_2
-#: model:account.tax,invoice_label:account.2_account_tax_us_sale_4_2
-#: model:account.tax,name:account.2_account_tax_us_purchase_4_2
-#: model:account.tax,name:account.2_account_tax_us_sale_4_2
-msgid "4.2%"
-msgstr ""
-
-#. module: account
-#: model:account.tax,invoice_label:account.2_account_tax_us_purchase_4_225
-#: model:account.tax,invoice_label:account.2_account_tax_us_sale_4_225
-#: model:account.tax,name:account.2_account_tax_us_purchase_4_225
-#: model:account.tax,name:account.2_account_tax_us_sale_4_225
-msgid "4.225%"
-msgstr ""
-
-#. module: account
-#: model:account.tax,invoice_label:account.2_account_tax_us_purchase_4_5
-#: model:account.tax,invoice_label:account.2_account_tax_us_sale_4_5
-#: model:account.tax,name:account.2_account_tax_us_purchase_4_5
-#: model:account.tax,name:account.2_account_tax_us_sale_4_5
-msgid "4.5%"
-msgstr ""
-
-#. module: account
-#: model:account.tax,invoice_label:account.2_account_tax_us_purchase_4_75
-#: model:account.tax,invoice_label:account.2_account_tax_us_sale_4_75
-#: model:account.tax,name:account.2_account_tax_us_purchase_4_75
-#: model:account.tax,name:account.2_account_tax_us_sale_4_75
-msgid "4.75%"
-msgstr ""
-
-#. module: account
-#: model:account.tax,invoice_label:account.2_account_tax_us_purchase_4_875
-#: model:account.tax,invoice_label:account.2_account_tax_us_sale_4_875
-#: model:account.tax,name:account.2_account_tax_us_purchase_4_875
-#: model:account.tax,name:account.2_account_tax_us_sale_4_875
-msgid "4.875%"
-msgstr ""
-
-#. module: account
 #: model:account.payment.term,name:account.account_payment_term_45days
 #, fuzzy
 msgid "45 Days"
 msgstr "45 kun"
-
-#. module: account
-#: model:account.tax,invoice_label:account.2_account_tax_us_purchase_5_3
-#: model:account.tax,invoice_label:account.2_account_tax_us_sale_5_3
-#: model:account.tax,name:account.2_account_tax_us_purchase_5_3
-#: model:account.tax,name:account.2_account_tax_us_sale_5_3
-msgid "5.3%"
-msgstr ""
-
-#. module: account
-#: model:account.tax,invoice_label:account.2_account_tax_us_purchase_5_5
-#: model:account.tax,invoice_label:account.2_account_tax_us_sale_5_5
-#: model:account.tax,name:account.2_account_tax_us_purchase_5_5
-#: model:account.tax,name:account.2_account_tax_us_sale_5_5
-msgid "5.5%"
-msgstr ""
-
-#. module: account
-#: model:account.tax,invoice_label:account.2_account_tax_us_purchase_5_6
-#: model:account.tax,invoice_label:account.2_account_tax_us_sale_5_6
-#: model:account.tax,name:account.2_account_tax_us_purchase_5_6
-#: model:account.tax,name:account.2_account_tax_us_sale_5_6
-msgid "5.6%"
-msgstr ""
-
-#. module: account
-#: model:account.tax,invoice_label:account.2_account_tax_us_purchase_5_75
-#: model:account.tax,invoice_label:account.2_account_tax_us_sale_5_75
-#: model:account.tax,name:account.2_account_tax_us_purchase_5_75
-#: model:account.tax,name:account.2_account_tax_us_sale_5_75
-msgid "5.75%"
-msgstr ""
 
 #. module: account
 #: model_terms:ir.ui.view,arch_db:account.report_payment_receipt_document
@@ -753,80 +544,6 @@ msgstr "50 AQSH dollari"
 #, fuzzy
 msgid "50.00 EUR"
 msgstr "50,00 yevro"
-
-#. module: account
-#: model_terms:ir.ui.view,arch_db:account.report_statement
-msgid "534677881234"
-msgstr ""
-
-#. module: account
-#: model:account.tax,invoice_label:account.2_account_tax_us_purchase_6_1
-#: model:account.tax,invoice_label:account.2_account_tax_us_sale_6_1
-#: model:account.tax,name:account.2_account_tax_us_purchase_6_1
-#: model:account.tax,name:account.2_account_tax_us_sale_6_1
-msgid "6.1%"
-msgstr ""
-
-#. module: account
-#: model:account.tax,invoice_label:account.2_account_tax_us_purchase_6_25
-#: model:account.tax,invoice_label:account.2_account_tax_us_sale_6_25
-#: model:account.tax,name:account.2_account_tax_us_purchase_6_25
-#: model:account.tax,name:account.2_account_tax_us_sale_6_25
-msgid "6.25%"
-msgstr ""
-
-#. module: account
-#: model:account.tax,invoice_label:account.2_account_tax_us_purchase_6_35
-#: model:account.tax,invoice_label:account.2_account_tax_us_sale_6_35
-#: model:account.tax,name:account.2_account_tax_us_purchase_6_35
-#: model:account.tax,name:account.2_account_tax_us_sale_6_35
-msgid "6.35%"
-msgstr ""
-
-#. module: account
-#: model:account.tax,invoice_label:account.2_account_tax_us_purchase_6_5
-#: model:account.tax,invoice_label:account.2_account_tax_us_sale_6_5
-#: model:account.tax,name:account.2_account_tax_us_purchase_6_5
-#: model:account.tax,name:account.2_account_tax_us_sale_6_5
-msgid "6.5%"
-msgstr ""
-
-#. module: account
-#: model:account.tax,invoice_label:account.2_account_tax_us_purchase_6_625
-#: model:account.tax,invoice_label:account.2_account_tax_us_sale_6_625
-#: model:account.tax,name:account.2_account_tax_us_purchase_6_625
-#: model:account.tax,name:account.2_account_tax_us_sale_6_625
-msgid "6.625%"
-msgstr ""
-
-#. module: account
-#: model:account.tax,invoice_label:account.2_account_tax_us_purchase_6_85
-#: model:account.tax,invoice_label:account.2_account_tax_us_sale_6_85
-#: model:account.tax,name:account.2_account_tax_us_purchase_6_85
-#: model:account.tax,name:account.2_account_tax_us_sale_6_85
-msgid "6.85%"
-msgstr ""
-
-#. module: account
-#: model:account.tax,invoice_label:account.2_account_tax_us_purchase_6_875
-#: model:account.tax,invoice_label:account.2_account_tax_us_sale_6_875
-#: model:account.tax,name:account.2_account_tax_us_purchase_6_875
-#: model:account.tax,name:account.2_account_tax_us_sale_6_875
-msgid "6.875%"
-msgstr ""
-
-#. module: account
-#: model:account.tax,invoice_label:account.2_account_tax_us_purchase_7_25
-#: model:account.tax,invoice_label:account.2_account_tax_us_sale_7_25
-#: model:account.tax,name:account.2_account_tax_us_purchase_7_25
-#: model:account.tax,name:account.2_account_tax_us_sale_7_25
-msgid "7.25%"
-msgstr ""
-
-#. module: account
-#: model_terms:ir.ui.view,arch_db:account.report_invoice_document
-msgid "9.00"
-msgstr ""
 
 #. module: account
 #: model:account.payment.term,name:account.account_payment_term_90days_on_the_10th
@@ -1512,16 +1229,16 @@ msgid "<span class=\"o_stat_text\">Invoiced</span>"
 msgstr "<span class=\"o_stat_text\">Hisob-faktura qilingan</span>"
 
 #. module: account
-#: model_terms:ir.ui.view,arch_db:account.view_account_journal_form
-#, fuzzy
-msgid "<span class=\"o_stat_text\">Journal Entries</span>"
-msgstr "<span class=\"o_stat_text\">Buxgalteriya yozuvlari</span>"
-
-#. module: account
 #: model_terms:ir.ui.view,arch_db:account.view_account_payment_form
 #, fuzzy
 msgid "<span class=\"o_stat_text\">Journal Entry</span>"
 msgstr "<span class=\"o_stat_text\">Buxgalteriya yozuvi</span>"
+
+#. module: account
+#: model_terms:ir.ui.view,arch_db:account.view_account_journal_form
+#: model_terms:ir.ui.view,arch_db:account.view_move_form
+msgid "<span class=\"o_stat_text\">Journal Items</span>"
+msgstr ""
 
 #. module: account
 #: model_terms:ir.ui.view,arch_db:account.view_move_form
@@ -1730,12 +1447,8 @@ msgstr "<span>$ <span class=\"oe_currency_value\">19 250,00</span></span>"
 
 #. module: account
 #: model_terms:ir.ui.view,arch_db:account.report_invoice_document
-#, fuzzy
-msgid ""
-"<span>1.00</span>\n"
-"                                                        <span "
-"groups=\"uom.group_uom\">Units</span>"
-msgstr "<span>1,00</span> <span groups=\"uom.group_uom\">Dona</span>"
+msgid "<span>1.00</span>"
+msgstr ""
 
 #. module: account
 #: model_terms:ir.ui.view,arch_db:account.view_move_form
@@ -3014,6 +2727,11 @@ msgid "Account Move Count"
 msgstr "Hisob harakatlari soni"
 
 #. module: account
+#: model:ir.model.fields,field_description:account.field_account_tax__account_move_line_ids
+msgid "Account Move Line"
+msgstr ""
+
+#. module: account
 #: model:ir.model,name:account.model_account_move_reversal
 #, fuzzy
 msgid "Account Move Reversal"
@@ -3096,6 +2814,11 @@ msgid "Account Reconcile"
 msgstr "Hisobni solishtirish"
 
 #. module: account
+#: model:ir.model.fields,field_description:account.field_account_tax__account_reconcile_model_line_ids
+msgid "Account Reconcile Model Line"
+msgstr ""
+
+#. module: account
 #: model:ir.model.fields,field_description:account.field_account_move_line__account_root_id
 #, fuzzy
 msgid "Account Root"
@@ -3164,6 +2887,7 @@ msgstr ""
 "shakllantirish qoidalarini o‘rnatish uchun qo‘llaniladi."
 
 #. module: account
+#: model:ir.model.fields,field_description:account.field_account_accrued_orders_wizard__account_types
 #: model:ir.model.fields,field_description:account.field_account_report__filter_account_type
 #, fuzzy
 msgid "Account Types"
@@ -3525,6 +3249,12 @@ msgstr "Hisobga olingan umumiy summa"
 #, fuzzy
 msgid "Accumulated Depreciation"
 msgstr "To‘plangan amortizatsiya"
+
+#. module: account
+#: model:account.account,name:account.1_retained_earnings
+#: model:account.account,name:account.2_account_account_us_retained_earnings
+msgid "Accumulated Retained Earnings"
+msgstr ""
 
 #. module: account
 #: model:ir.model.fields,field_description:account.field_account_automatic_entry_wizard__action
@@ -4610,6 +4340,11 @@ msgstr ""
 "hisob xaritalarini avtomatik qo‘llash."
 
 #. module: account
+#: model:account.account,description:account.2_account_account_us_profit_or_loss_appropriation
+msgid "Appropriation of the profit or loss"
+msgstr ""
+
+#. module: account
 #: model:ir.model.fields.selection,name:account.selection__res_company__fiscalyear_last_month__4
 #, fuzzy
 msgid "April"
@@ -4984,9 +4719,21 @@ msgstr "Hisobga qaytish"
 #. module: account
 #. odoo-javascript
 #: code:addons/account/static/src/components/product_catalog/kanban_controller.js:0
+msgid "Back to Credit Note"
+msgstr ""
+
+#. module: account
+#. odoo-javascript
+#: code:addons/account/static/src/components/product_catalog/kanban_controller.js:0
 #, fuzzy
 msgid "Back to Invoice"
 msgstr "Hisob-fakturaga qaytish"
+
+#. module: account
+#. odoo-javascript
+#: code:addons/account/static/src/components/product_catalog/kanban_controller.js:0
+msgid "Back to Refund"
+msgstr ""
 
 #. module: account
 #: model_terms:ir.ui.view,arch_db:account.report_invoice_document
@@ -5030,8 +4777,8 @@ msgstr "Qoldiq foizi 0 bo‘lishi mumkin emas"
 #. odoo-python
 #: code:addons/account/models/account_journal.py:0
 #: code:addons/account/models/chart_template.py:0
-#: model:account.account,name:account.1_bank_journal_default_account_45
-#: model:account.account,name:account.2_bank_journal_default_account_150
+#: model:account.account,name:account.1_bank_journal_default_account_47
+#: model:account.account,name:account.2_bank_journal_default_account_153
 #: model:account.journal,name:account.1_bank
 #: model:account.journal,name:account.2_bank
 #: model:ir.model.fields,field_description:account.field_account_journal__bank_id
@@ -5274,6 +5021,12 @@ msgstr "Bank va naqd pul"
 #, fuzzy
 msgid "Bank of odoo"
 msgstr "Odoo banki"
+
+#. module: account
+#. odoo-python
+#: code:addons/account/models/account_move.py:0
+msgid "Bank settings"
+msgstr ""
 
 #. module: account
 #: model:ir.model,name:account.model_account_setup_bank_manual_config
@@ -5659,6 +5412,12 @@ msgstr ""
 
 #. module: account
 #. odoo-python
+#: code:addons/account/wizard/account_automatic_entry_wizard.py:0
+msgid "C"
+msgstr ""
+
+#. module: account
+#. odoo-python
 #: code:addons/account/models/chart_template.py:0
 #, fuzzy
 msgid "CABA"
@@ -5900,7 +5659,7 @@ msgstr "Keyingi davrga o‘tkazish"
 #. module: account
 #. odoo-python
 #: code:addons/account/models/account_journal.py:0
-#: model:account.account,name:account.1_cash_journal_default_account_161
+#: model:account.account,name:account.1_cash_journal_default_account_163
 #: model:ir.model.fields.selection,name:account.selection__account_journal__type__cash
 #: model_terms:ir.ui.view,arch_db:account.view_account_move_filter
 #: model_terms:ir.ui.view,arch_db:account.view_account_move_line_filter
@@ -5915,12 +5674,12 @@ msgid "Cash Account"
 msgstr "Naqd pul hisobi"
 
 #. module: account
-#: model:account.account,name:account.1_cash_journal_default_account_158
+#: model:account.account,name:account.1_cash_journal_default_account_160
 msgid "Cash Bakery"
 msgstr ""
 
 #. module: account
-#: model:account.account,name:account.1_cash_journal_default_account_160
+#: model:account.account,name:account.1_cash_journal_default_account_162
 msgid "Cash Bar"
 msgstr ""
 
@@ -5968,7 +5727,7 @@ msgid "Cash Basis Transition Account"
 msgstr "Kassaviy usulga o‘tish hisobi"
 
 #. module: account
-#: model:account.account,name:account.1_cash_journal_default_account_157
+#: model:account.account,name:account.1_cash_journal_default_account_159
 msgid "Cash Clothes Shop"
 msgstr ""
 
@@ -6039,7 +5798,7 @@ msgid "Cash Discount Write-Off Loss Account"
 msgstr "Naqd chegirmani hisobdan chiqarish zarar hisobi"
 
 #. module: account
-#: model:account.account,name:account.1_cash_journal_default_account_156
+#: model:account.account,name:account.1_cash_journal_default_account_158
 msgid "Cash Furn. Shop"
 msgstr ""
 
@@ -6051,7 +5810,7 @@ msgid "Cash Registers"
 msgstr "Kassa apparatlari"
 
 #. module: account
-#: model:account.account,name:account.1_cash_journal_default_account_159
+#: model:account.account,name:account.1_cash_journal_default_account_161
 msgid "Cash Restaurant"
 msgstr ""
 
@@ -6195,6 +5954,8 @@ msgid "Chart of accounts set!"
 msgstr "Buxgalteriya hisobi rejasi o‘rnatildi!"
 
 #. module: account
+#. odoo-python
+#: code:addons/account/models/account_move_send.py:0
 #: model_terms:ir.ui.view,arch_db:account.report_hash_integrity
 #, fuzzy
 msgid "Check"
@@ -6840,6 +6601,11 @@ msgid "Cost of office furniture, fixtures, and business equipment"
 msgstr "Ofis mebellari, jihozlari va biznes uskunalari qiymati"
 
 #. module: account
+#: model_terms:ir.ui.view,arch_db:account.view_account_search
+msgid "Cost of revenue"
+msgstr ""
+
+#. module: account
 #: model:account.account,description:account.2_account_account_us_postage
 #, fuzzy
 msgid ""
@@ -6890,6 +6656,16 @@ msgstr "%s ifodasi uchun o‘tkazma maqsadi avtomatik aniqlanmadi."
 #, fuzzy
 msgid "Could not upload files"
 msgstr "Fayllarni yuklab bo‘lmadi"
+
+#. module: account
+#: model:ir.model.fields,field_description:account.field_account_move_line__count_reconciled_lines
+msgid "Count Reconciled Lines"
+msgstr ""
+
+#. module: account
+#: model:ir.model.fields,field_description:account.field_account_move_line__count_reconciled_lines_excluding_exchange_diff
+msgid "Count Reconciled Lines Excluding Exchange Diff"
+msgstr ""
 
 #. module: account
 #: model_terms:ir.ui.view,arch_db:account.view_account_reconcile_model_form
@@ -7457,6 +7233,11 @@ msgid ""
 msgstr "Tanlangan domen va tartibga ko‘ra yig‘ilgan qoldiq."
 
 #. module: account
+#: model:account.account,description:account.2_account_account_us_retained_earnings
+msgid "Cumulative undistributed profits and losses"
+msgstr ""
+
+#. module: account
 #: model:ir.ui.menu,name:account.menu_action_currency_form
 #: model_terms:ir.ui.view,arch_db:account.res_config_settings_view_form
 #, fuzzy
@@ -7778,6 +7559,12 @@ msgstr "{label} chegaralash"
 #, fuzzy
 msgid "Cut-off {label} {percent}%"
 msgstr "{label} {percent}% chegaralash"
+
+#. module: account
+#. odoo-python
+#: code:addons/account/wizard/account_automatic_entry_wizard.py:0
+msgid "D"
+msgstr ""
 
 #. module: account
 #: model:account.incoterms,name:account.incoterm_DAP
@@ -9320,6 +9107,11 @@ msgid "Electronic Data Interchange"
 msgstr "Elektron ma'lumotlar almashinuvi"
 
 #. module: account
+#: model_terms:ir.ui.view,arch_db:account.res_config_settings_view_form
+msgid "Electronic Invoicing"
+msgstr ""
+
+#. module: account
 #: model_terms:ir.ui.view,arch_db:account.portal_my_details
 #, fuzzy
 msgid "Electronic format"
@@ -9347,8 +9139,8 @@ msgstr "Elektron pochta shablonlari"
 #. module: account
 #: model:ir.model.fields,help:account.field_account_journal__incoming_einvoice_notification_email
 msgid ""
-"Email addresses that will receive copy for sent and received invoices. "
-"Separate entries with ';'."
+"Email addresses that should receive invoices copy/return reminders. Separate "
+"entries with ';'."
 msgstr ""
 
 #. module: account
@@ -9607,15 +9399,6 @@ msgstr "%(filename)s ilovasini import qilishda xatolik:"
 
 #. module: account
 #. odoo-python
-#: code:addons/account/controllers/download_docs.py:0
-#, fuzzy
-msgid ""
-"Error while creating XML:\n"
-"- %s"
-msgstr "XML yaratishda xatolik yuz berdi: - %s"
-
-#. module: account
-#. odoo-python
 #: code:addons/account/models/chart_template.py:0
 #, fuzzy
 msgid ""
@@ -9708,6 +9491,7 @@ msgid "Exchange Gain or Loss Journal"
 msgstr "Valyuta kursi farqi jurnali"
 
 #. module: account
+#: model:ir.model.fields,field_description:account.field_account_move_line__exchange_move_ids
 #: model:ir.model.fields,field_description:account.field_account_partial_reconcile__exchange_move_id
 #, fuzzy
 msgid "Exchange Move"
@@ -10072,6 +9856,16 @@ msgid "First New Sequence"
 msgstr "Birinchi yangi ketma-ketlik"
 
 #. module: account
+#: model:ir.model.fields,field_description:account.field_account_move_line__first_reconciled_lines_id
+msgid "First Reconciled Lines"
+msgstr ""
+
+#. module: account
+#: model:ir.model.fields,field_description:account.field_account_move_line__first_reconciled_lines_excluding_exchange_diff_id
+msgid "First Reconciled Lines Excluding Exchange Diff"
+msgstr ""
+
+#. module: account
 #: model:ir.model.fields,field_description:account.field_account_bank_statement_line__auto_post_origin_id
 #: model:ir.model.fields,field_description:account.field_account_move__auto_post_origin_id
 #, fuzzy
@@ -10090,6 +9884,11 @@ msgstr "Soliq mamlakati"
 #, fuzzy
 msgid "Fiscal Country Code"
 msgstr "Soliq mamlakati kodi"
+
+#. module: account
+#: model:ir.model.fields,field_description:account.field_account_tax__company_country_code
+msgid "Fiscal Country Code of the Company"
+msgstr ""
 
 #. module: account
 #: model:ir.model.fields,field_description:account.field_account_payment_term__fiscal_country_codes
@@ -10736,6 +10535,18 @@ msgstr "Yaxshi to‘lovchi"
 #, fuzzy
 msgid "Goods"
 msgstr "Tovarlar"
+
+#. module: account
+#. odoo-python
+#: code:addons/account/wizard/accrued_orders.py:0
+msgid "Goods Delivered not Invoiced (perpetual valuation)"
+msgstr ""
+
+#. module: account
+#. odoo-python
+#: code:addons/account/wizard/accrued_orders.py:0
+msgid "Goods Invoiced not Delivered (perpetual valuation)"
+msgstr ""
 
 #. module: account
 #: model:account.account,name:account.2_account_account_us_ground_transportation
@@ -12320,6 +12131,12 @@ msgstr ""
 "taqsimot chizig‘iga ega bo‘lishi kerak"
 
 #. module: account
+#. odoo-python
+#: code:addons/account/models/account_move_send.py:0
+msgid "Invoice generated but not sent."
+msgstr ""
+
+#. module: account
 #: model_terms:ir.ui.view,arch_db:account.res_config_settings_view_form
 #, fuzzy
 msgid "Invoice line discounts:"
@@ -12582,6 +12399,12 @@ msgstr "Muharrir"
 #, fuzzy
 msgid "Is Entries"
 msgstr "Yozuvlar"
+
+#. module: account
+#: model:ir.model.fields,field_description:account.field_account_bank_statement_line__is_exact_move_duplicate
+#: model:ir.model.fields,field_description:account.field_account_move__is_exact_move_duplicate
+msgid "Is Exact Move Duplicate"
+msgstr ""
 
 #. module: account
 #: model:ir.model.fields,field_description:account.field_account_account__message_is_follower
@@ -12890,6 +12713,7 @@ msgstr "Jurnal elementi nomi"
 #. module: account
 #. odoo-python
 #: code:addons/account/models/account_lock_exception.py:0
+#: code:addons/account/models/account_move.py:0
 #: model:ir.actions.act_window,name:account.action_account_moves_all
 #: model:ir.actions.act_window,name:account.action_account_moves_all_a
 #: model:ir.actions.act_window,name:account.action_account_moves_all_grouped_matching
@@ -12997,6 +12821,7 @@ msgstr "Jurnal:"
 #: model:ir.model.fields,field_description:account.field_account_reconcile_model__match_journal_ids
 #: model:ir.model.fields,field_description:account.field_account_report__filter_journals
 #: model:ir.ui.menu,name:account.menu_action_account_journal_form
+#: model_terms:ir.ui.view,arch_db:account.view_account_move_line_filter
 #, fuzzy
 msgid "Journals"
 msgstr "Jurnallar"
@@ -13116,6 +12941,12 @@ msgstr "Hisob-fakturalardagi nom"
 #, fuzzy
 msgid "Label on PoS Receipts"
 msgstr "POS cheklaridagi nom"
+
+#. module: account
+#: model:ir.model.fields,field_description:account.field_account_bank_statement_line__sanitize_payment_reference
+#: model:ir.model.fields,field_description:account.field_account_move__sanitize_payment_reference
+msgid "Label sanitize"
+msgstr ""
 
 #. module: account
 #: model:account.account,name:account.2_account_account_us_land
@@ -13585,6 +13416,7 @@ msgid "Looks great!"
 msgstr "Ajoyib ko‘rinadi!"
 
 #. module: account
+#: model:ir.model.fields.selection,name:account.selection__account_analytic_line__analytic_profitability__loss
 #: model_terms:ir.ui.view,arch_db:account.res_config_settings_view_form
 #, fuzzy
 msgid "Loss"
@@ -14374,6 +14206,12 @@ msgid "Need Cancel Request"
 msgstr "Bekor qilish so‘rovi kerak"
 
 #. module: account
+#. odoo-python
+#: code:addons/account/models/chart_template.py:0
+msgid "Need to update"
+msgstr ""
+
+#. module: account
 #: model:ir.model.fields,field_description:account.field_account_bank_statement_line__needed_terms
 #: model:ir.model.fields,field_description:account.field_account_move__needed_terms
 #, fuzzy
@@ -14629,6 +14467,14 @@ msgstr "To‘lov jurnali yozuvlari yo‘q"
 #, fuzzy
 msgid "No possible action found with the selected lines."
 msgstr "Tanlangan satrlar bilan hech qanday amal topilmadi."
+
+#. module: account
+#. odoo-python
+#: code:addons/account/models/account_move_send.py:0
+msgid ""
+"No valid sending method could be applied, so this invoice was not sent "
+"automatically. Please configure a sending method and send it manually."
+msgstr ""
 
 #. module: account
 #: model:ir.model.fields.selection,name:account.selection__account_move_line__display_type__non_deductible_product
@@ -15111,6 +14957,12 @@ msgid "Online Payments"
 msgstr "Onlayn to‘lovlar"
 
 #. module: account
+#. odoo-python
+#: code:addons/account/models/partner.py:0
+msgid "Only Accounting managers can create foreign taxes."
+msgstr ""
+
+#. module: account
 #: model:ir.model.fields,field_description:account.field_account_report__only_tax_exigible
 #, fuzzy
 msgid "Only Tax Exigible Lines"
@@ -15583,6 +15435,7 @@ msgid "Owner's Current Account"
 msgstr "Egasining joriy hisobi"
 
 #. module: account
+#: model_terms:ir.ui.view,arch_db:account.view_account_analytic_line_filter_inherit_account
 #: model_terms:ir.ui.view,arch_db:account.view_account_move_line_filter
 #, fuzzy
 msgid "P&L Accounts"
@@ -15619,12 +15472,6 @@ msgstr "PDF fayl"
 #, fuzzy
 msgid "PDF without Payment"
 msgstr "To‘lovsiz PDF"
-
-#. module: account
-#: model_terms:ir.ui.view,arch_db:account.res_config_settings_view_form
-#, fuzzy
-msgid "PEPPOL Electronic Invoicing"
-msgstr "PEPPOL elektron hisob-fakturalash"
 
 #. module: account
 #: model:ir.model.fields,field_description:account.field_res_config_settings__module_account_peppol
@@ -16692,6 +16539,7 @@ msgstr "Mahsulot toifalari"
 #: model:ir.model,name:account.model_product_category
 #: model:ir.model.fields,field_description:account.field_account_analytic_applicability__product_categ_id
 #: model:ir.model.fields,field_description:account.field_account_analytic_distribution_model__product_categ_id
+#: model:ir.model.fields,field_description:account.field_account_analytic_line__product_category
 #: model:ir.model.fields,field_description:account.field_account_invoice_report__product_categ_id
 #: model:ir.model.fields,field_description:account.field_account_move_line__product_category_id
 #: model_terms:ir.ui.view,arch_db:account.view_account_invoice_report_search
@@ -16790,6 +16638,19 @@ msgid "Profit Account"
 msgstr "Foyda hisobi"
 
 #. module: account
+#. odoo-python
+#: code:addons/account/models/company.py:0
+#: model:account.account,name:account.1_profit_or_loss
+#: model:account.account,name:account.2_account_account_us_profit_or_loss_appropriation
+msgid "Profit or Loss Appropriation"
+msgstr ""
+
+#. module: account
+#: model:ir.model.fields,field_description:account.field_account_analytic_line__analytic_profitability
+msgid "Profitability"
+msgstr ""
+
+#. module: account
 #: model_terms:ir.ui.view,arch_db:account.report_invoice_document
 #, fuzzy
 msgid "Proforma Credit Note"
@@ -16877,6 +16738,7 @@ msgid "Purchase Lock date"
 msgstr "Xarid qulflash sanasi"
 
 #. module: account
+#: model:ir.model.fields.selection,name:account.selection__account_invoice_report__move_type__in_receipt
 #: model:ir.model.fields.selection,name:account.selection__account_move__move_type__in_receipt
 #, fuzzy
 msgid "Purchase Receipt"
@@ -17014,13 +16876,6 @@ msgstr "Tezkor kodlash qiymatlari"
 #, fuzzy
 msgid "Quick encoding"
 msgstr "Tezkor kodlash"
-
-#. module: account
-#. odoo-javascript
-#: code:addons/account/static/src/components/many2x_tax_tags/many2x_tax_tags.js:0
-#, fuzzy
-msgid "Quick search: %s"
-msgstr "Tezkor qidiruv: %s"
 
 #. module: account
 #: model:account.account,name:account.1_expense_rd
@@ -17589,12 +17444,6 @@ msgid "Responsible User"
 msgstr "Mas'ul foydalanuvchi"
 
 #. module: account
-#: model:ir.model.fields,help:account.field_account_tax__tax_scope
-#, fuzzy
-msgid "Restrict the use of taxes to a type of product."
-msgstr "Soliqlardan foydalanishni mahsulot turiga qarab cheklash"
-
-#. module: account
 #: model_terms:ir.ui.view,arch_db:account.report_hash_integrity
 #: model_terms:ir.ui.view,arch_db:account.view_message_tree_audit_log_search
 #, fuzzy
@@ -17625,6 +17474,7 @@ msgstr "Nafaqa rejasi xarajatlari (401K muvofiqlashtirish)"
 #: code:addons/account/wizard/accrued_orders.py:0
 #: model:account.group,name:account.2_us_group_4
 #: model:ir.model.fields,field_description:account.field_digest_digest__kpi_account_total_revenue
+#: model:ir.model.fields.selection,name:account.selection__account_analytic_line__analytic_profitability__revenue
 #: model:ir.model.fields.selection,name:account.selection__account_automatic_entry_wizard__account_type__income
 #, fuzzy
 msgid "Revenue"
@@ -17986,6 +17836,7 @@ msgid "Sales Lock Date"
 msgstr "Sotuvlarni qulflash sanasi"
 
 #. module: account
+#: model:ir.model.fields.selection,name:account.selection__account_invoice_report__move_type__out_receipt
 #: model:ir.model.fields.selection,name:account.selection__account_move__move_type__out_receipt
 #, fuzzy
 msgid "Sales Receipt"
@@ -18170,6 +18021,7 @@ msgstr "Ism yoki soliq ID'sini qidirish..."
 
 #. module: account
 #. odoo-javascript
+#: code:addons/account/static/src/components/many2one_account_account/many2one_account_account.js:0
 #: code:addons/account/static/src/components/many2x_tax_tags/many2x_tax_tags.js:0
 #, fuzzy
 msgid "Search: %s"
@@ -20305,6 +20157,7 @@ msgstr "Qat'iy qulflanish sanasini olib tashlash mumkin emas."
 #: model:ir.model.fields,help:account.field_account_payment_register__country_code
 #: model:ir.model.fields,help:account.field_account_secure_entries_wizard__country_code
 #: model:ir.model.fields,help:account.field_account_setup_bank_manual_config__country_code
+#: model:ir.model.fields,help:account.field_account_tax__company_country_code
 #: model:ir.model.fields,help:account.field_account_tax__country_code
 #: model:ir.model.fields,help:account.field_account_tax_group__country_code
 #: model:ir.model.fields,help:account.field_res_config_settings__country_code
@@ -20339,18 +20192,6 @@ msgstr ""
 "ni tashkil etishi kerak."
 
 #. module: account
-#: model:ir.model.fields,help:account.field_base_document_layout__vat
-#, fuzzy
-msgid ""
-"The Tax Identification Number. Values here will be validated based on the "
-"country format. You can use '/' to indicate that the partner is not subject "
-"to tax."
-msgstr ""
-"Soliq identifikatsiya raqami. Bu yerdagi qiymatlar mamlakat formatiga asosan "
-"tekshiriladi. Hamkor soliqqa tortilmasligini ko‘rsatish uchun '/' belgisidan "
-"foydalanishingiz mumkin."
-
-#. module: account
 #. odoo-python
 #: code:addons/account/models/account_move_line.py:0
 #, fuzzy
@@ -20360,10 +20201,10 @@ msgstr "%(name)s (%(code)s) hisobi arxivlangan."
 #. module: account
 #. odoo-python
 #: code:addons/account/models/account_account.py:0
-#, fuzzy
-msgid "The account code can only contain alphanumeric characters and dots."
+msgid ""
+"The account code can only contain alphanumeric characters and dots. (account "
+"code: %s)"
 msgstr ""
-"Hisob kodi faqat harflar, raqamlar va nuqtalardan iborat bo‘lishi mumkin."
 
 #. module: account
 #. odoo-python
@@ -20469,6 +20310,14 @@ msgstr ""
 "(%s)."
 
 #. module: account
+#. odoo-python
+#: code:addons/account/models/account_move.py:0
+msgid ""
+"The bank account of your company is not trusted. Please ask an admin or "
+"someone with approval rights to check it."
+msgstr ""
+
+#. module: account
 #: model:ir.model.fields,help:account.field_account_move_line__statement_id
 #, fuzzy
 msgid "The bank statement used for bank reconciliation"
@@ -20502,6 +20351,7 @@ msgstr ""
 
 #. module: account
 #. odoo-python
+#: code:addons/account/models/account_account.py:0
 #: code:addons/account/models/account_tax.py:0
 #, fuzzy
 msgid "The cash basis transition account needs to allow reconciliation."
@@ -20554,6 +20404,15 @@ msgid ""
 "The commercial partner has been updated for all related accounting entries."
 msgstr ""
 "Tijorat hamkori barcha tegishli buxgalteriya yozuvlari bo‘yicha yangilandi."
+
+#. module: account
+#. odoo-python
+#: code:addons/account/models/account_move.py:0
+msgid ""
+"The company bank account (%(account_number)s) linked to this invoice is not "
+"trusted. Go to the Bank Settings, double-check that it is yours or correct "
+"the number, and click on Send Money to trust it."
+msgstr ""
 
 #. module: account
 #: model:ir.model.fields,help:account.field_account_tax_repartition_line__company_id
@@ -20746,6 +20605,12 @@ msgstr "Yozuv o‘zgartirib bo‘lmaydigan xesh bilan himoyalangan."
 msgid ""
 "The entry is using accounts (%(accounts_codes_names)s) from a different "
 "company."
+msgstr ""
+
+#. module: account
+#. odoo-python
+#: code:addons/account/models/account_move.py:0
+msgid "The entry is using taxes (%(tax_names)s) from a different company."
 msgstr ""
 
 #. module: account
@@ -21144,6 +21009,14 @@ msgstr "Joriy balans (%s) belgilangan yakuniy balansga mos kelmaydi."
 
 #. module: account
 #. odoo-python
+#: code:addons/account/models/account_move_send.py:0
+msgid ""
+"The scheduled action 'Send Invoices automatically' is archived. You won't be "
+"able to send invoices in batch."
+msgstr ""
+
+#. module: account
+#. odoo-python
 #: code:addons/account/models/account_report.py:0
 #, fuzzy
 msgid "The sections defined on a report cannot have sections themselves."
@@ -21514,6 +21387,14 @@ msgid ""
 msgstr ""
 "Bannerni asl PDF fayliga qo‘shishda xatolik yuz berdi. Iltimos, manba "
 "faylning to‘g‘ri ekanligiga ishonch hosil qiling."
+
+#. module: account
+#. odoo-python
+#: code:addons/account/models/account_document_import_mixin.py:0
+msgid ""
+"There was an error while importing the bill, you can find attached the "
+"incoming XML"
+msgstr ""
 
 #. module: account
 #. odoo-python
@@ -22340,6 +22221,11 @@ msgid "Transfer to %s"
 msgstr "%sga o‘tkazish"
 
 #. module: account
+#: model:ir.model.fields,field_description:account.field_account_move_line__translated_product_name
+msgid "Translated Product Name"
+msgstr ""
+
+#. module: account
 #: model:account.group,name:account.2_us_group_661
 #, fuzzy
 msgid "Travel Expenses"
@@ -22455,20 +22341,16 @@ msgstr ""
 "etishdan oldin tranzaksiyalarni qayta tartiblashingiz mumkin."
 
 #. module: account
+#: model:ir.model.fields.selection,name:account.selection__account_analytic_line__analytic_profitability__uncategorized
+msgid "Uncategorized"
+msgstr ""
+
+#. module: account
 #. odoo-python
 #: code:addons/account/models/account_journal.py:0
 #, fuzzy
 msgid "Undefined Yet"
 msgstr "Hali aniqlanmagan"
-
-#. module: account
-#. odoo-python
-#: code:addons/account/models/company.py:0
-#: model:account.account,name:account.1_unaffected_earnings_account
-#: model:account.account,name:account.2_unaffected_earnings_account
-#, fuzzy
-msgid "Undistributed Profits/Losses"
-msgstr "Taqsimlanmagan foyda/zarar"
 
 #. module: account
 #: model:account.account,name:account.2_account_account_us_unemployment_insurance
@@ -22519,6 +22401,11 @@ msgstr "Birlik narxi"
 #, fuzzy
 msgid "Unit Price:"
 msgstr "Birlik narxi:"
+
+#. module: account
+#: model_terms:ir.ui.view,arch_db:account.report_invoice_document
+msgid "Units"
+msgstr ""
 
 #. module: account
 #: model_terms:ir.ui.view,arch_db:account.res_config_settings_view_form
@@ -22700,6 +22587,12 @@ msgstr "Shartlarni yangilash"
 #, fuzzy
 msgid "Update Terms & Conditions"
 msgstr "Shartlar va qoidalarni yangilash"
+
+#. module: account
+#. odoo-python
+#: code:addons/account/models/chart_template.py:0
+msgid "Update app"
+msgstr ""
 
 #. module: account
 #: model_terms:ir.ui.view,arch_db:account.res_config_settings_view_form
@@ -23019,6 +22912,7 @@ msgstr "Tasdiqlangan"
 
 #. module: account
 #. odoo-python
+#: code:addons/account/models/account_bank_statement_line.py:0
 #: code:addons/account/models/account_move.py:0
 #, fuzzy
 msgid "Validated entries can only be changed by your accountant."
@@ -23032,7 +22926,6 @@ msgstr "Qiymat"
 
 #. module: account
 #: model:ir.model.fields,help:account.field_account_reconcile_model_line__amount_string
-#, fuzzy
 msgid ""
 "Value for the amount of the writeoff line\n"
 "    * Percentage: Percentage of the balance, between 0 and 100.\n"
@@ -23042,14 +22935,17 @@ msgid ""
 "needed. For instance if you want to extract the amount from\n"
 "R:9672938 10/07 AX 9415126318 T:5L:NA BRT: 3358,07 C:\n"
 "You could enter\n"
-"BRT: ([\\d,]+)"
+"BRT: ([\\d,]+)\n"
+"    If the label is \"01870912 0009065 00115\" and you need the amount in "
+"decimal\n"
+"    format (e.g. 90.65), you can use a regex with capturing groups, for "
+"example:\n"
+"        \\s+0*(\\d+?)(\\d{2})(?=\\s)\n"
+"    In this case:\n"
+"    • the first group captures the integer part\n"
+"    • the second group captures the decimal part (last two digits)\n"
+"    "
 msgstr ""
-"Hisobdan chiqarish qatori summasi uchun qiymat * Foiz: Qoldiqning 0 dan 100 "
-"gacha bo‘lgan foizi.     * Qat'iy: Hisobdan chiqarishning belgilangan "
-"qiymati. Agar summa manfiy bo‘lsa, debet sifatida, musbat bo‘lsa, kredit "
-"sifatida hisoblanadi.     * Belgidan: Regex chegaralovchisi kerak emas, "
-"faqat regex o‘zi kifoya. Masalan, R:9672938 10/07 AX 9415126318 T:5L:NA BRT: "
-"3358,07 C: dan summani olish uchun BRT: ([\\d,]+) kiritishingiz mumkin"
 
 #. module: account
 #: model:ir.model.fields,field_description:account.field_account_partial_reconcile__draft_caba_move_vals
@@ -23516,20 +23412,14 @@ msgstr ""
 #. module: account
 #. odoo-python
 #: code:addons/account/models/account_journal.py:0
-#, fuzzy
 msgid ""
 "You can not archive a journal containing draft journal entries.\n"
 "\n"
 "To proceed:\n"
-"1/ click on the top-right button 'Journal Entries' from this journal form\n"
-"2/ then filter on 'Draft' entries\n"
+"1/ go to Accounting > Accounting > Journal Entries\n"
+"2/ filter on this journal and on 'Unposted' entries\n"
 "3/ select them all and post or delete them through the action menu"
 msgstr ""
-"Qoralama jurnal yozuvlari mavjud jurnalni arxivlay olmaysiz.  Davom etish "
-"uchun: 1/ ushbu jurnal shaklidan yuqori o‘ng burchakdagi \"Jurnal "
-"yozuvlari\" tugmasini bosing 2/ keyin \"Qoralama\" yozuvlarini filtrlang 3/ "
-"ularning barchasini tanlang va amallar menyusi orqali joylashtiring yoki "
-"o‘chiring"
 
 #. module: account
 #. odoo-python
@@ -23610,6 +23500,11 @@ msgstr ""
 msgid ""
 "You can unsubscribe from emails received upon invoice sending and reception "
 "here."
+msgstr ""
+
+#. module: account
+#: model:ir.model.fields,help:account.field_base_document_layout__vat
+msgid "You can use '/' to indicate that the customer has no Tax ID."
 msgstr ""
 
 #. module: account
@@ -23891,6 +23786,17 @@ msgstr ""
 
 #. module: account
 #. odoo-python
+#: code:addons/account/models/account_tax.py:0
+#, fuzzy
+msgid ""
+"You cannot delete taxes that are currently in use. Consider archiving them "
+"instead."
+msgstr ""
+"Bu xat andozasini o‘chira olmaysiz, u hisob-faktura yuborish jarayonida "
+"ishlatiladi."
+
+#. module: account
+#. odoo-python
 #: code:addons/account/models/account_account_tag.py:0
 #, fuzzy
 msgid ""
@@ -24064,11 +23970,10 @@ msgstr ""
 #. module: account
 #. odoo-python
 #: code:addons/account/models/account_move.py:0
-#, fuzzy
-msgid "You cannot modify the following readonly fields on a posted move: %s"
+msgid ""
+"You cannot modify the following readonly fields on the posted move %(move)s: "
+"%(fields)s"
 msgstr ""
-"Joylashtirilgan harakatda quyidagi faqat o‘qish uchun mo‘ljallangan "
-"maydonlarni tahrirlash mumkin emas: %s"
 
 #. module: account
 #. odoo-python
@@ -24099,6 +24004,12 @@ msgstr "Arxivlangan jurnalga yozuv joylashtirish mumkin emas (%(journal)s)"
 
 #. module: account
 #. odoo-python
+#: code:addons/account/models/account_move.py:0
+msgid "You cannot post an entry with an archived analytic account: %s"
+msgstr ""
+
+#. module: account
+#. odoo-python
 #: code:addons/account/models/res_currency.py:0
 #, fuzzy
 msgid ""
@@ -24107,6 +24018,13 @@ msgid ""
 msgstr ""
 "Buxgalteriya yozuvlarini amalga oshirish uchun allaqachon ishlatilgan "
 "valyutaning o‘nlik kasrlar sonini kamaytirish mumkin emas."
+
+#. module: account
+#. odoo-python
+#: code:addons/account/models/account_move.py:0
+#: code:addons/account/wizard/account_payment_register.py:0
+msgid "You cannot register payments for blocked invoices."
+msgstr ""
 
 #. module: account
 #. odoo-python
@@ -24878,13 +24796,6 @@ msgstr ""
 "qanday da'vo haqida xabardor qilinishi shart."
 
 #. module: account
-#. odoo-python
-#: code:addons/account/models/partner.py:0
-#, fuzzy
-msgid "not applicable"
-msgstr "qo‘llanilmaydi"
-
-#. module: account
 #: model:ir.model.fields.selection,name:account.selection__account_tax_repartition_line__repartition_type__tax
 #, fuzzy
 msgid "of tax"
@@ -25173,6 +25084,112 @@ msgid ""
 msgstr ""
 "{{ object.company_id.name }} o‘z-o‘zini hisoblash hisob-fakturasi (Havola "
 "{{ object.name or 'mavjud emas' }})"
+
+#, fuzzy
+#~ msgid "<span class=\"o_stat_text\">Journal Entries</span>"
+#~ msgstr "<span class=\"o_stat_text\">Buxgalteriya yozuvlari</span>"
+
+#, fuzzy
+#~ msgid ""
+#~ "Error while creating XML:\n"
+#~ "- %s"
+#~ msgstr "XML yaratishda xatolik yuz berdi: - %s"
+
+#, fuzzy
+#~ msgid "The account code can only contain alphanumeric characters and dots."
+#~ msgstr ""
+#~ "Hisob kodi faqat harflar, raqamlar va nuqtalardan iborat bo‘lishi mumkin."
+
+#, fuzzy
+#~ msgid ""
+#~ "You can not archive a journal containing draft journal entries.\n"
+#~ "\n"
+#~ "To proceed:\n"
+#~ "1/ click on the top-right button 'Journal Entries' from this journal "
+#~ "form\n"
+#~ "2/ then filter on 'Draft' entries\n"
+#~ "3/ select them all and post or delete them through the action menu"
+#~ msgstr ""
+#~ "Qoralama jurnal yozuvlari mavjud jurnalni arxivlay olmaysiz.  Davom etish "
+#~ "uchun: 1/ ushbu jurnal shaklidan yuqori o‘ng burchakdagi \"Jurnal "
+#~ "yozuvlari\" tugmasini bosing 2/ keyin \"Qoralama\" yozuvlarini filtrlang "
+#~ "3/ ularning barchasini tanlang va amallar menyusi orqali joylashtiring "
+#~ "yoki o‘chiring"
+
+#, fuzzy
+#~ msgid "You cannot modify the following readonly fields on a posted move: %s"
+#~ msgstr ""
+#~ "Joylashtirilgan harakatda quyidagi faqat o‘qish uchun mo‘ljallangan "
+#~ "maydonlarni tahrirlash mumkin emas: %s"
+
+#, fuzzy
+#~ msgid "PEPPOL Electronic Invoicing"
+#~ msgstr "PEPPOL elektron hisob-fakturalash"
+
+#, fuzzy
+#~ msgid "%s, or / if not applicable"
+#~ msgstr "%s yoki / qo‘llanilmasa"
+
+#, fuzzy
+#~ msgid "%s, or not applicable"
+#~ msgstr "%s yoki qo‘llanilmaydi"
+
+#, fuzzy
+#~ msgid "/ if not applicable"
+#~ msgstr "/ qo‘llanilmasa"
+
+#, fuzzy
+#~ msgid ""
+#~ "The Tax Identification Number. Values here will be validated based on the "
+#~ "country format. You can use '/' to indicate that the partner is not "
+#~ "subject to tax."
+#~ msgstr ""
+#~ "Soliq identifikatsiya raqami. Bu yerdagi qiymatlar mamlakat formatiga "
+#~ "asosan tekshiriladi. Hamkor soliqqa tortilmasligini ko‘rsatish uchun '/' "
+#~ "belgisidan foydalanishingiz mumkin."
+
+#, fuzzy
+#~ msgid "not applicable"
+#~ msgstr "qo‘llanilmaydi"
+
+#, fuzzy
+#~ msgid "Quick search: %s"
+#~ msgstr "Tezkor qidiruv: %s"
+
+#, fuzzy
+#~ msgid "Undistributed Profits/Losses"
+#~ msgstr "Taqsimlanmagan foyda/zarar"
+
+#, fuzzy
+#~ msgid "Restrict the use of taxes to a type of product."
+#~ msgstr "Soliqlardan foydalanishni mahsulot turiga qarab cheklash"
+
+#, fuzzy
+#~ msgid ""
+#~ "Value for the amount of the writeoff line\n"
+#~ "    * Percentage: Percentage of the balance, between 0 and 100.\n"
+#~ "    * Fixed: The fixed value of the writeoff. The amount will count as a "
+#~ "debit if it is negative, as a credit if it is positive.\n"
+#~ "    * From Label: There is no need for regex delimiter, only the regex is "
+#~ "needed. For instance if you want to extract the amount from\n"
+#~ "R:9672938 10/07 AX 9415126318 T:5L:NA BRT: 3358,07 C:\n"
+#~ "You could enter\n"
+#~ "BRT: ([\\d,]+)"
+#~ msgstr ""
+#~ "Hisobdan chiqarish qatori summasi uchun qiymat * Foiz: Qoldiqning 0 dan "
+#~ "100 gacha bo‘lgan foizi.     * Qat'iy: Hisobdan chiqarishning belgilangan "
+#~ "qiymati. Agar summa manfiy bo‘lsa, debet sifatida, musbat bo‘lsa, kredit "
+#~ "sifatida hisoblanadi.     * Belgidan: Regex chegaralovchisi kerak emas, "
+#~ "faqat regex o‘zi kifoya. Masalan, R:9672938 10/07 AX 9415126318 T:5L:NA "
+#~ "BRT: 3358,07 C: dan summani olish uchun BRT: ([\\d,]+) kiritishingiz "
+#~ "mumkin"
+
+#, fuzzy
+#~ msgid ""
+#~ "<span>1.00</span>\n"
+#~ "                                                        <span "
+#~ "groups=\"uom.group_uom\">Units</span>"
+#~ msgstr "<span>1,00</span> <span groups=\"uom.group_uom\">Dona</span>"
 
 #, fuzzy
 #~ msgid ""

@@ -11,11 +11,15 @@ import {
 } from "@odoo/owl";
 import { getBundle } from "@web/core/assets";
 import { memoize } from "@web/core/utils/functions";
-import { fillHtmlTransferData } from "@html_editor/utils/clipboard";
+import { fillClipboardWithSelection } from "@html_editor/utils/clipboard";
 import { fixInvalidHTML, instanceofMarkup } from "@html_editor/utils/sanitize";
 import { HtmlUpgradeManager } from "@html_editor/html_migrations/html_upgrade_manager";
 import { TableOfContentManager } from "@html_editor/others/embedded_components/core/table_of_content/table_of_content_manager";
-import { scrollAndHighlightHeading } from "@html_editor/utils/url";
+import {
+    getLinksToRetarget,
+    retargetLinkToNewTab,
+    scrollAndHighlightHeading,
+} from "@html_editor/utils/url";
 
 export class HtmlViewer extends Component {
     static template = "html_editor.HtmlViewer";
@@ -142,19 +146,7 @@ export class HtmlViewer extends Component {
     processReadonlyContent(container) {
         this.retargetLinks(container);
         this.applyAccessibilityAttributes(container);
-        this.addDomListener(container, "copy", this.onCopy);
-    }
-
-    /**
-     * @param {ClipboardEvent} ev
-     */
-    onCopy(ev) {
-        ev.preventDefault();
-        const selection = ev.target.ownerDocument.defaultView.getSelection();
-        const clonedContents = selection.getRangeAt(0).cloneContents();
-        fillHtmlTransferData(ev, "clipboardData", clonedContents, {
-            textContent: selection.toString(),
-        });
+        this.addDomListener(container, "copy", fillClipboardWithSelection);
     }
 
     /**
@@ -171,17 +163,18 @@ export class HtmlViewer extends Component {
     }
 
     /**
-     * Ensure all links are opened in a new tab.
+     * Retarget links to open in a new tab.
+     *
+     * @param {HTMLElement} container
      */
     retargetLinks(container) {
-        for (const link of container.querySelectorAll("a")) {
+        for (const link of getLinksToRetarget(container)) {
             this.retargetLink(link);
         }
     }
 
     retargetLink(link) {
-        link.setAttribute("target", "_blank");
-        link.setAttribute("rel", "noreferrer");
+        retargetLinkToNewTab(link);
     }
 
     updateIframeContent(content) {

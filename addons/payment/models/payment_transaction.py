@@ -14,7 +14,7 @@ from odoo.fields import Domain
 from odoo.tools import email_normalize_all, float_round
 
 from odoo.addons.payment import utils as payment_utils
-from odoo.addons.payment.const import SENSITIVE_KEYS
+from odoo.addons.payment.const import CURRENCY_MINOR_UNITS, SENSITIVE_KEYS
 from odoo.addons.payment.logging import get_payment_logger
 
 
@@ -126,7 +126,7 @@ class PaymentTransaction(models.Model):
     partner_lang = fields.Selection(string="Language", selection=_lang_get)
     partner_email = fields.Char(string="Email")
     partner_address = fields.Char(string="Address")
-    partner_zip = fields.Char(string="Zip")
+    partner_zip = fields.Char(string="Zip Code")
     partner_city = fields.Char(string="City")
     partner_state_id = fields.Many2one(string="State", comodel_name='res.country.state')
     partner_country_id = fields.Many2one(string="Country", comodel_name='res.country')
@@ -822,7 +822,11 @@ class PaymentTransaction(models.Model):
         # providers send a positive one.
         if self.operation == 'refund':
             amount = -amount
-        tx_amount = self.amount if precision_digits is None else float_round(
+        if precision_digits is None:
+            precision_digits = CURRENCY_MINOR_UNITS.get(
+                self.currency_id.name, self.currency_id.decimal_places
+            )
+        tx_amount = float_round(
             self.amount, precision_digits=precision_digits, rounding_method='DOWN'
         )
         if self.currency_id.compare_amounts(amount, tx_amount) != 0:
@@ -1091,9 +1095,11 @@ class PaymentTransaction(models.Model):
                 [('is_post_processed', '=', False), ('last_state_change', '>=', retry_limit_date)]
             )
         for tx in txs_to_post_process:
+            tx = tx.with_prefetch()  # Restrict pre-fetching before cache invalidation
             try:
-                tx._post_process()
-                self.env.cr.commit()
+                if not tx.is_post_processed:  # No other flow post-processed the tx since the search
+                    tx._post_process()
+                    self.env.cr.commit()
             except psycopg2.OperationalError:
                 self.env.cr.rollback()  # Rollback and try later.
             except Exception as e:

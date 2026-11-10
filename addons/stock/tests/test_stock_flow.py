@@ -2,7 +2,8 @@
 
 from odoo.addons.stock.tests.common import TestStockCommon
 from odoo.exceptions import ValidationError
-from odoo.tests import Form, tagged
+from odoo.tests import Form, HttpCase, tagged
+from odoo.tests.common import users
 from odoo.tools import mute_logger, float_round
 from odoo import Command, fields
 
@@ -2642,6 +2643,126 @@ class TestStockFlow(TestStockCommon):
         bo = self.env['stock.picking'].search([('backorder_id', '=', picking.id)])
         self.assertEqual(bo.state, 'assigned')
 
+    def test_two_steps_delivery_partner_customer_location(self):
+        """
+        Check that manual multi-step deliveries use the partner's customer
+        location rather than the generic one.
+        """
+        self.warehouse_1.delivery_steps = 'pick_ship'
+        partner_location = self.env['stock.location'].create({
+            'name': 'Acme Customer Location',
+            'usage': 'customer',
+            'location_id': self.customer_location.id,
+        })
+        self.partner.property_stock_customer = partner_location
+        pick = self.env['stock.picking'].create({
+            'partner_id': self.partner.id,
+            'picking_type_id': self.warehouse_1.pick_type_id.id,
+            'location_id': self.warehouse_1.lot_stock_id.id,
+            'location_dest_id': self.warehouse_1.wh_output_stock_loc_id.id,
+            'move_ids': [Command.create({
+                'product_id': self.product.id,
+                'product_uom_qty': 1,
+                'location_id': self.warehouse_1.lot_stock_id.id,
+                'location_dest_id': self.warehouse_1.wh_output_stock_loc_id.id,
+            })],
+        })
+        pick.action_confirm()
+        pick.button_validate()
+        ship = pick.move_ids.move_dest_ids
+        self.assertEqual(ship.picking_id.picking_type_id, self.warehouse_1.out_type_id)
+        self.assertEqual(ship.location_dest_id, partner_location)
+
+    def test_multiple_moves_with_different_destinations_putaway_strategy(self):
+        '''
+        Ensure that, when assigning a batch of moves with different destinations,
+        putaway strategy correctly defaults to child locations.
+        '''
+        view_a, view_b = self.env['stock.location'].create([{
+            'name': 'View A',
+            'usage': 'view',
+            'location_id': self.stock_location.id,
+        }, {
+            'name': 'View B',
+            'usage': 'view',
+            'location_id': self.stock_location.id,
+        }])
+        child_a, child_b = self.env['stock.location'].create([{
+            'name': 'Child A',
+            'usage': 'internal',
+            'location_id': view_a.id,
+        }, {
+            'name': 'Child B',
+            'usage': 'internal',
+            'location_id': view_b.id,
+        }])
+        picking_1, picking_2 = self.env['stock.picking'].create([{
+            'location_id': self.supplier_location.id,
+            'location_dest_id': view_a.id,
+            'picking_type_id': self.picking_type_in.id,
+            'move_ids': [Command.create({
+                'location_id': self.supplier_location.id,
+                'location_dest_id': view_a.id,
+                'product_id': self.productA.id,
+                'product_uom_qty': 1.0,
+            })],
+        }, {
+            'location_id': self.supplier_location.id,
+            'location_dest_id': view_b.id,
+            'picking_type_id': self.picking_type_in.id,
+            'state': 'draft',
+            'move_ids': [Command.create({
+                'location_id': self.supplier_location.id,
+                'location_dest_id': view_b.id,
+                'product_id': self.productB.id,
+                'product_uom_qty': 1.0,
+            })],
+        }])
+        (picking_1 | picking_2).action_confirm()
+        self.assertEqual(picking_1.move_ids.move_line_ids.location_dest_id, child_a)
+        self.assertEqual(picking_2.move_ids.move_line_ids.location_dest_id, child_b)
+
+
+@tagged('-at_install', 'post_install')
+class TestStockFlowTourPostInstall(TestStockCommon, HttpCase):
+
+    @users('pauline')  # pauline is the login of the basic stock_user
+    def test_basic_stock_flow_with_minimal_access_rights(self):
+        """
+        Test that a stock user with minimal access rights can open both the
+        list and form picking view, create and process a receipt and a delivery.
+        """
+        receipt, delivery = self.env['stock.picking'].create([
+            {
+                'picking_type_id': self.picking_type_in.id,
+                'location_id': self.supplier_location.id,
+                'location_dest_id': self.stock_location.id,
+                'move_ids': [Command.create({
+                    'product_id': self.product.id,
+                    'product_uom': self.product.uom_id.id,
+                    'product_uom_qty': 1.0,
+                    'location_id': self.supplier_location.id,
+                    'location_dest_id': self.stock_location.id,
+                })],
+            },
+            {
+                'partner_id': self.partner.id,
+                'picking_type_id': self.picking_type_out.id,
+                'location_id': self.stock_location.id,
+                'location_dest_id': self.customer_location.id,
+                'move_ids': [Command.create({
+                    'product_id': self.product.id,
+                    'product_uom': self.product.uom_id.id,
+                    'product_uom_qty': 1.0,
+                    'location_id': self.stock_location.id,
+                    'location_dest_id': self.customer_location.id,
+                })],
+            },
+        ])
+        (receipt | delivery).action_confirm()
+        self.start_tour('/odoo', 'test_basic_stock_flow_with_minimal_access_rights', login='pauline')
+
+
 @tagged('-at_install', 'post_install')
 class TestStockFlowPostInstall(TestStockCommon):
 
@@ -2773,3 +2894,29 @@ class TestStockFlowPostInstall(TestStockCommon):
 
         new_location_complete_name = self.env['stock.location'].name_create('NoPrefixLocation')[1]
         self.assertEqual(new_location_complete_name, 'NoPrefixLocation')
+
+    def test_past_qty_available(self):
+        """
+        Test that available quantity at a date (not datetime) is computed at the end of
+        that date.
+        """
+        TEST_DATE = fields.Datetime.to_datetime('2026-01-01 11:11:11')
+
+        # .date() simulates behavior of "As of" in the Stock Valuation report
+        # (Specifies date but no time)
+        self.assertEqual(0, self.productA.with_context(to_date=TEST_DATE.date()).qty_available)
+
+        receipt = self.env['stock.picking'].create({
+            'picking_type_id': self.picking_type_in.id,
+            'move_ids': [Command.create({
+                'product_id': self.productA.id,
+                'product_uom_qty': 10,
+            })]
+        })
+
+        receipt.action_confirm()
+        receipt.button_validate()
+
+        receipt.write({'date_done': TEST_DATE})
+
+        self.assertEqual(10, self.productA.with_context(to_date=TEST_DATE.date()).qty_available)

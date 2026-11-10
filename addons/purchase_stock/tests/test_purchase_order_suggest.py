@@ -84,6 +84,21 @@ class TestPurchaseOrderSuggest(PurchaseTestCommon, HttpCase):
                 delivery.button_validate()
             return delivery
 
+    def test_purchase_order_suggest_access_error_non_admin(self):
+        """ Test that non-admin users can use the suggest feature without access errors """
+        self.env = self.env(user=self.purchase_user)
+        po = self.env['purchase.order'].create({
+            'partner_id': self.vendor.id,
+        })
+        po.with_context(
+            suggest_days=12,
+            suggest_based_on='last_year_m_plus_1',
+            suggest_percent=42,
+        ).action_purchase_order_suggest()
+        self.assertRecordValues(self.vendor, [
+            {'suggest_days': 12, 'suggest_based_on': 'last_year_m_plus_1', 'suggest_percent': 42}
+        ])
+
     def test_purchase_order_suggest_quantities(self):
         """ Checks the suggest wizard adds right products with right quantities.
         Also checks some values, like the products' quantity demand or the
@@ -646,3 +661,64 @@ class TestPurchaseOrderSuggest(PurchaseTestCommon, HttpCase):
             [(test_product, 1)], date=today - relativedelta(days=1), warehouse=other_warehouse
         )
         self.start_tour('/odoo/purchase', "test_purchase_order_suggest_search_panel_ux", login='admin')
+
+    def test_monthly_demand_vendor_return(self):
+        "Test Returning receipt must not increase the warehouse's demand."
+        product = self.product_1
+        po = self._create_purchase(product, quantity=10)
+        self._receive(po, quantity=15)
+        return_wizard = self.env['stock.return.picking'].create({'picking_id': po.picking_ids.id})
+        return_wizard.product_return_moves.quantity = 5
+        return_picking = return_wizard._create_return()
+        return_picking.button_validate()
+        self.assertEqual(product.monthly_demand, 0)
+        self.assertEqual(product.with_context(warehouse_id=self.warehouse.id).monthly_demand, 0)
+        self._create_and_process_delivery_at_date([(product, 4)])
+        product.invalidate_recordset(['monthly_demand'])
+        self.assertEqual(product.monthly_demand, 4)
+        self.assertEqual(product.with_context(warehouse_id=self.warehouse.id).monthly_demand, 4)
+
+    def test_monthly_demand_interwarehouse_two_step_delivery(self):
+        """Ensure that monthly demand is correctly counted for waiting outgoing
+        moves in inter-warehouse transfers using two-step delivery routes.
+        """
+        warehouse = self.warehouse
+        warehouse.delivery_steps = 'pick_ship'
+        product = self.product_1
+        other_warehouse = self.other_warehouse
+        other_warehouse.resupply_wh_ids = [Command.set([warehouse.id])]
+
+        orderpoint = self.env['stock.warehouse.orderpoint'].create({
+            'product_id': product.id,
+            'location_id': other_warehouse.lot_stock_id.id,
+            'qty_to_order': 20,
+            'route_id': other_warehouse.resupply_route_ids.id,
+        })
+        orderpoint.action_replenish()
+
+        # Monthly demand should be 20.0 as only the outgoing move is counted with two-step delivery.
+        self.assertEqual(product.with_context(warehouse_id=warehouse.id).monthly_demand, 20.0)
+        self.assertEqual(product.monthly_demand, 20.0)
+
+    def test_purchase_order_suggestion_respects_vendor_uom(self):
+        '''
+        Ensure action_purchase_order_suggest uses the uom specified on the supplier info.
+        '''
+        today = fields.Datetime.now()
+        # Update supplier info.
+        self.product_1.seller_ids.product_uom_id = self.uom_pack_of_6
+        self.env['stock.quant']._update_available_quantity(self.product_1, self.stock_location, 18)
+        self._create_and_process_delivery_at_date(
+            [(self.product_1, 18)], today - relativedelta(days=3)
+        )
+        self.assertEqual(self.product_1.monthly_demand, 18)
+        po = self.env['purchase.order'].create({'partner_id': self.vendor.id})
+        self.actionAddAll(po, based_on='30_days', days=30, factor=100)
+        self.assertRecordValues(po.order_line, [
+            {
+                'product_id': self.product_1.id,
+                'product_qty': 3,
+                'product_uom_qty': 18,
+                'product_uom_id': self.uom_pack_of_6.id,
+            },
+        ])

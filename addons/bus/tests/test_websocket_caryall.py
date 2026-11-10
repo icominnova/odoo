@@ -22,6 +22,7 @@ from ..websocket import (
     CloseCode,
     Frame,
     Opcode,
+    PING_PONG_MESSAGE,
     TimeoutManager,
     Websocket,
     WebsocketConnectionHandler,
@@ -270,9 +271,10 @@ class TestWebsocketCaryall(WebsocketCase):
                 cookie=f'session_id={user_session.sid};',
                 origin="http://example.com"
             )
-            self.assertTrue(
-                ws.getheaders().get('set-cookie').startswith(f'session_id={user_session.sid}'),
-                'The set-cookie response header must be the origin request session rather than the websocket session'
+            self.assertNotIn(
+                "set-cookie",
+                ws.getheaders(),
+                "The browser must be left on the origin request session rather than the websocket one",
             )
             serve_forever_called_event.wait(timeout=5)
             self.assertTrue(mock.called)
@@ -283,6 +285,17 @@ class TestWebsocketCaryall(WebsocketCase):
             ws.close(CloseCode.CLEAN)
             self.wait_remaining_websocket_connections()
             self.assertTrue(mock.called)
+
+    def test_handshake_does_not_resend_the_session_cookie(self):
+        websocket = self.websocket_connect()
+        self.assertNotIn("set-cookie", websocket.getheaders())
+
+    def test_connection_check_is_answered(self):
+        websocket = self.websocket_connect()
+        websocket.send_binary(PING_PONG_MESSAGE)
+        opcode, frame = websocket.recv_data_frame()
+        self.assertEqual(opcode, Opcode.BINARY)
+        self.assertEqual(frame.data, PING_PONG_MESSAGE)
 
     def test_disconnect_when_version_outdated(self):
         # Outdated version, connection should be closed immediately

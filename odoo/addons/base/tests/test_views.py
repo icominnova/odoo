@@ -7,12 +7,14 @@ from contextlib import contextmanager
 
 from functools import partial
 from collections import defaultdict
+from unittest.mock import patch
 
 from lxml import etree
 from lxml.builder import E
 from psycopg2 import IntegrityError
 from psycopg2.extras import Json
 
+from odoo import fields
 from odoo.exceptions import AccessError, UserError, ValidationError
 from odoo.tests import common, tagged
 from odoo.addons.base.tests.common import TransactionCaseWithUserDemo
@@ -3806,6 +3808,114 @@ Forbidden use of `__comp__` in arch."""
             })
         self.assertIn("Element '<e4>' cannot be located in parent view", str(catcher.exception.args[0]))
 
+    def test_check_primary_skip_unloaded_siblings_during_base_update(self):
+        """ During `-u base`, a sibling primary view of a module that is not
+        loaded yet must not be checked when a base view of its tree is updated.
+        """
+        # P: primary, E: extension
+        #
+        #       P1
+        #      /  \
+        #    E1    E2
+        #            \
+        #             P2
+        #
+        # P1 belongs to base, E1, E2 and P2 to a module that is not loaded yet.
+        # P2 targets <e1/>, added by E1, which is left out while base loads.
+        p1 = self.View.create({
+            'name': 'test_view_p1',
+            'type': 'qweb',
+            'arch_db': '<div><p1/></div>',
+        })
+        e1 = self.View.create({
+            'name': 'test_view_e1',
+            'mode': 'extension',
+            'inherit_id': p1.id,
+            'arch_db': '<div position="inside"><e1/></div>',
+        })
+        e2 = self.View.create({
+            'name': 'test_view_e2',
+            'mode': 'extension',
+            'inherit_id': p1.id,
+            'arch_db': '<div position="inside"><e2/></div>',
+        })
+        p2 = self.View.create({
+            'name': 'test_view_p2',
+            'mode': 'primary',
+            'inherit_id': e2.id,
+            'arch_db': '<e1 position="replace"><p2/></e1>',
+        })
+        self.env['ir.model.data'].create([{
+            'module': module,
+            'name': view.name,
+            'model': 'ir.ui.view',
+            'res_id': view.id,
+        } for module, view in [
+            ('base', p1),
+            ('test_not_loaded_yet', e1),
+            ('test_not_loaded_yet', e2),
+            ('test_not_loaded_yet', p2),
+        ]])
+
+        # simulate the registry state while base is being updated: no module is fully loaded yet
+        with (
+            patch.object(self.registry, '_init', True),
+            patch.object(self.registry, '_init_modules', set()),
+            patch.object(self.registry, 'loaded_xmlids', set()),
+        ):
+            # base rewrites its own view from the XML file, which triggers the check of P2
+            p1.with_context(install_module='base').arch_db = '<div><p1/></div>'
+
+        # once all modules are loaded, P2 is valid
+        self.assertEqual(p2.get_combined_arch(), '<div><p1/><p2/><e2/></div>')
+
+    def test_check_primary_skip_not_yet_updated_siblings_of_installing_module(self):
+        """ During the update of a module, a sibling primary view of that same
+        module which has not been reloaded yet must not be checked when a view
+        of its tree is updated: its arch is still the old one.
+        """
+        # P: primary
+        #
+        #       P1
+        #        \
+        #         P2
+        #
+        # P1 and P2 belong to the module being updated. The new version of P1
+        # removes <old/>, the new version of P2 (loaded after P1) targets <new/>.
+        p1 = self.View.create({
+            'name': 'test_view_p1',
+            'type': 'qweb',
+            'arch_db': '<div><old/></div>',
+        })
+        p2 = self.View.create({
+            'name': 'test_view_p2',
+            'mode': 'primary',
+            'inherit_id': p1.id,
+            'arch_db': '<old position="replace"><p2/></old>',
+        })
+        self.env['ir.model.data'].create([{
+            'module': 'test_being_updated',
+            'name': view.name,
+            'model': 'ir.ui.view',
+            'res_id': view.id,
+        } for view in (p1, p2)])
+
+        # simulate the registry state while test_being_updated is being updated
+        with (
+            patch.object(self.registry, '_init', True),
+            patch.object(self.registry, '_init_modules', {'base'}),
+            patch.object(self.registry, 'loaded_xmlids', set()),
+        ):
+            # P1 is reloaded first, P2 still has its old arch and must be skipped
+            p1.with_context(install_module='test_being_updated').arch_db = '<div><new/></div>'
+            self.registry.loaded_xmlids.add('test_being_updated.test_view_p1')
+
+            # P2 is reloaded afterwards with an arch matching the new P1
+            p2.with_context(install_module='test_being_updated').arch_db = '<new position="replace"><p2/></new>'
+            self.registry.loaded_xmlids.add('test_being_updated.test_view_p2')
+
+        self.assertEqual(p2.get_combined_arch(), '<div><p2/></div>')
+
 
 @tagged('post_install', '-at_install')
 class TestDebugger(common.TransactionCase):
@@ -4842,13 +4952,11 @@ class TestInvisibleField(TransactionCaseWithUserDemo):
             'account',
             'account_3way_match',
             'account_accountant',
-            'account_accountant_batch_payment',
             'account_asset',
             'account_asset_fleet',
             'account_auto_transfer',
             'account_avatax',
             'account_avatax_geolocalize',
-            'account_avatax_sale',
             'account_base_import',
             'account_batch_payment',
             'account_budget',
@@ -4877,7 +4985,6 @@ class TestInvisibleField(TransactionCaseWithUserDemo):
             'appointment',
             'approvals',
             'approvals_purchase_stock',
-            'auth_signup',
             'auth_totp',
             'barcodes_gs1_nomenclature',
             'base_address_extended',
@@ -4912,9 +5019,6 @@ class TestInvisibleField(TransactionCaseWithUserDemo):
             'documents_account',
             'documents_approvals',
             'documents_fleet',
-            'documents_l10n_be_hr_payroll',
-            'documents_project',
-            'documents_project_sale',
             'documents_spreadsheet',
             'event',
             'event_booth',
@@ -4942,7 +5046,6 @@ class TestInvisibleField(TransactionCaseWithUserDemo):
             'hr_attendance',
             'hr_contract',
             'hr_contract_salary',
-            'hr_contract_salary_holidays',
             'hr_expense',
             'hr_expense_extract',
             'hr_fleet',
@@ -4963,11 +5066,9 @@ class TestInvisibleField(TransactionCaseWithUserDemo):
             'hr_sign',
             'hr_skills',
             'hr_skills_slides',
-            'hr_skills_survey',
             'hr_timesheet',
             'hr_work_entry',
             'hr_work_entry_holidays_enterprise',
-            'iap',
             'im_livechat',
             'industry_fsm',
             'industry_fsm_report',
@@ -4987,7 +5088,6 @@ class TestInvisibleField(TransactionCaseWithUserDemo):
             'l10n_be_hr_payroll',
             'l10n_be_hr_payroll_dimona',
             'l10n_be_hr_payroll_fleet',
-            'l10n_be_hr_payroll_sd_worx',
             'l10n_be_reports',
             'l10n_be_soda',
             'l10n_br',
@@ -5010,7 +5110,6 @@ class TestInvisibleField(TransactionCaseWithUserDemo):
             'l10n_ec_edi_stock',
             'l10n_ec_sale',
             'l10n_eg_edi_eta',
-            'l10n_eg_hr_payroll',
             'l10n_employment_hero',
             'l10n_es_edi_facturae',
             'l10n_es_edi_sii',
@@ -5049,12 +5148,12 @@ class TestInvisibleField(TransactionCaseWithUserDemo):
             'l10n_lu_reports',
             'l10n_ma_hr_payroll',
             'l10n_mx',
-            'l10n_mx_edi',
-            'l10n_mx_edi_extended',
-            'l10n_mx_edi_landing',
-            'l10n_mx_edi_pos',
-            'l10n_mx_edi_stock',
             'l10n_mx_hr_payroll',
+            'l10n_mx_edi',
+            'l10n_mx_edi_pos',
+            'l10n_mx_edi_extended',
+            'l10n_mx_edi_stock',
+            'l10n_mx_edi_landing',
             'l10n_mx_reports',
             'l10n_mx_xml_polizas',
             'l10n_my_edi',
@@ -5086,12 +5185,10 @@ class TestInvisibleField(TransactionCaseWithUserDemo):
             'loyalty',
             'lunch',
             'mail',
-            'mail_bot_hr',
             'mail_group',
             'maintenance',
             'maintenance_worksheet',
             'marketing_automation',
-            'marketing_automation_sms',
             'mass_mailing',
             'mass_mailing_crm',
             'mass_mailing_event',
@@ -5109,11 +5206,8 @@ class TestInvisibleField(TransactionCaseWithUserDemo):
             'mrp_subcontracting',
             'mrp_subcontracting_dropshipping',
             'mrp_workorder',
-            'mrp_workorder_expiry',
-            'mrp_workorder_iot',
             'onboarding',
             'partner_autocomplete',
-            'partner_commission',
             'payment',
             'payment_adyen',
             'payment_authorize',
@@ -5127,8 +5221,6 @@ class TestInvisibleField(TransactionCaseWithUserDemo):
             'pos_iot',
             'pos_online_payment',
             'pos_restaurant',
-            'pos_restaurant_appointment',
-            'pos_self_order',
             'privacy_lookup',
             'product',
             'product_email_template',
@@ -5159,7 +5251,6 @@ class TestInvisibleField(TransactionCaseWithUserDemo):
             'sale_amazon',
             'sale_crm',
             'sale_expense',
-            'sale_external_tax',
             'sale_loyalty',
             'sale_management',
             'sale_margin',
@@ -5167,10 +5258,8 @@ class TestInvisibleField(TransactionCaseWithUserDemo):
             'sale_planning',
             'sale_product_matrix',
             'sale_project',
-            'sale_purchase',
             'sale_renting',
             'sale_renting_crm',
-            'sale_stock',
             'sale_stock_renting',
             'sale_subscription',
             'sale_timesheet',
@@ -5179,7 +5268,6 @@ class TestInvisibleField(TransactionCaseWithUserDemo):
             'sign',
             'sms',
             'snailmail',
-            'snailmail_account',
             'social',
             'social_crm',
             'social_facebook',
@@ -5204,7 +5292,6 @@ class TestInvisibleField(TransactionCaseWithUserDemo):
             'survey',
             'test_testing_utilities',
             'timesheet_grid',
-            'uom',
             'utm',
             'voip',
             'web',
@@ -5229,8 +5316,6 @@ class TestInvisibleField(TransactionCaseWithUserDemo):
             'website_helpdesk_forum',
             'website_hr_recruitment',
             'website_knowledge',
-            'website_livechat',
-            'website_payment',
             'website_sale',
             'website_sale_loyalty',
             'website_sale_slides',
@@ -5245,7 +5330,7 @@ class TestInvisibleField(TransactionCaseWithUserDemo):
             'worksheet',
         )
 
-        modules_without_error = set(self.env['ir.module.module'].search([('state', '=', 'intalled'), ('name', 'in', only_log_modules)]).mapped('name'))
+        modules_without_error = set(self.env['ir.module.module'].search([('state', '=', 'installed'), ('name', 'in', only_log_modules)]).mapped('name'))
         module_log_views = defaultdict(list)
         module_error_views = defaultdict(lambda: defaultdict(list))
         uncommented_regexp = r'''(<field [^>]*invisible=['"](True|1)['"][^>]*>)[\s\t\n ]*(.*)'''
@@ -6149,3 +6234,23 @@ class ViewModifiers(ViewCase):
                 'inherit_id': parent_view.id,
                 'arch': inherit_arch,
             })
+
+
+class TestPropertiesFieldViewValidation(ViewCase):
+
+    def test_properties_field_without_definition_record(self):
+        """A ``properties`` field whose ``definition_record`` is not set
+        (e.g. the module declaring ``definition=`` is absent, as happens
+        during upgrade with custom module fields) must not crash view validation."""
+
+        model_name = 'ir.ui.view.custom'
+        model_class = self.env.registry[model_name]
+        dummy_field = fields.Properties(string="Dummy Properties", name='x_dummy_properties')
+        dummy_field.model_name = model_name
+
+        self.patch(model_class, '_fields', dict(model_class._fields, x_dummy_properties=dummy_field))
+
+        self.assertValid(
+            '<form><field name="x_dummy_properties"/></form>',
+            model=model_name,
+        )

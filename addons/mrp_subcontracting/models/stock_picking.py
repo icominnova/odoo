@@ -46,7 +46,7 @@ class StockPicking(models.Model):
         res = super(StockPicking, self)._action_done()
         for picking in self:
             productions_to_done = picking._get_subcontract_production().sudo()
-            productions_to_done.button_mark_done()
+            productions_to_done.with_context(skip_expired=True).button_mark_done()
             # For concistency, set the date on production move before the date
             # on picking. (Traceability report + Product Moves menu item)
             production_moves = productions_to_done.move_raw_ids | productions_to_done.move_finished_ids
@@ -104,10 +104,14 @@ class StockPicking(models.Model):
 
     def _prepare_subcontract_mo_vals(self, subcontract_move, bom):
         subcontract_move.ensure_one()
-        reference = self.env['stock.reference'].create({
-            'name': self.name,
-            'move_ids': [Command.link(subcontract_move.id)],
-        })
+        if not self.reference_ids:
+            references = self.env['stock.reference'].create({
+                'name': self.name,
+                'move_ids': [Command.link(subcontract_move.id)],
+            })
+        else:
+            references = self.reference_ids
+
         product = subcontract_move.product_id
         warehouse = self._get_warehouse(subcontract_move)
         subcontracting_location = \
@@ -126,7 +130,7 @@ class StockPicking(models.Model):
             'picking_type_id': warehouse.subcontracting_type_id.id,
             'date_start': subcontract_move.date - relativedelta(days=bom.produce_delay),
             'origin': self.name,
-            'reference_ids': [Command.link(reference.id)],
+            'reference_ids': [Command.link(ref.id) for ref in references],
         }
         return vals
 
@@ -174,5 +178,5 @@ class StockPicking(models.Model):
             for mo, move in zip(grouped_mo, moves):
                 mo.date_finished = move.date
                 finished_move = mo.move_finished_ids.filtered(lambda m: m.product_id == move.product_id)
-                finished_move.move_dest_ids = [Command.link(move.id)]
+                finished_move.move_dest_ids = [Command.set(move.ids)]
             grouped_mo.action_assign()

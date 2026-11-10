@@ -22,16 +22,18 @@
 # Linas Versada <linaskrisiukenas@gmail.com>, 2022
 # Arunas V. <arunas@devoro.com>, 2023
 # Jonas Zinkevicius <jozi@odoo.com>, 2023
-# "Tiffany Chang (tic)" <tic@odoo.com>, 2025.
-# Vytenis Viruišis <vytenis@users.noreply.translate.odoo.com>, 2025.
-# Weblate <noreply-mt-weblate@weblate.org>, 2025.
+# "Tiffany Chang (tic)" <tic@odoo.com>, 2025, 2026.
+# Vytenis Viruišis <vytenis@users.noreply.translate.odoo.com>, 2025, 2026.
+# Weblate <noreply-mt-weblate@weblate.org>, 2025, 2026.
+# Odoo Translation Bot <c3p@odoo.com>, 2026.
+# Ulevičienė <vilma.uleviciene@mededu.lt>, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-01-25 18:36+0000\n"
-"PO-Revision-Date: 2025-11-08 19:12+0000\n"
-"Last-Translator: Weblate <noreply-mt-weblate@weblate.org>\n"
+"POT-Creation-Date: 2026-10-24 17:38+0000\n"
+"PO-Revision-Date: 2026-10-13 12:33+0000\n"
+"Last-Translator: Ulevičienė <vilma.uleviciene@mededu.lt>\n"
 "Language-Team: Lithuanian <https://translate.odoo.com/projects/odoo-19/"
 "product/lt/>\n"
 "Language: lt\n"
@@ -41,7 +43,7 @@ msgstr ""
 "Plural-Forms: nplurals=4; plural=(n % 10 == 1 && (n % 100 > 19 || n % 100 < "
 "11) ? 0 : (n % 10 >= 2 && n % 10 <=9) && (n % 100 > 19 || n % 100 < 11) ? "
 "1 : n % 1 != 0 ? 2: 3);\n"
-"X-Generator: Weblate 5.12.2\n"
+"X-Generator: Weblate 2026.8.1\n"
 
 #. module: product
 #. odoo-python
@@ -65,16 +67,6 @@ msgid "# Products"
 msgstr "# Produktai"
 
 #. module: product
-#: model_terms:ir.ui.view,arch_db:product.report_pricelist_page
-msgid "$14.00"
-msgstr ""
-
-#. module: product
-#: model_terms:ir.ui.view,arch_db:product.report_pricelist_page
-msgid "$15.00"
-msgstr ""
-
-#. module: product
 #. odoo-python
 #: code:addons/product/models/product_pricelist_item.py:0
 msgid ""
@@ -96,19 +88,19 @@ msgstr ""
 #. odoo-python
 #: code:addons/product/models/product_pricelist_item.py:0
 msgid "%(percentage)s %% %(discount_type)s on %(base)s %(extra)s"
-msgstr ""
+msgstr "%(percentage)s %% %(discount_type)s į %(base)s %(extra)s"
 
 #. module: product
 #. odoo-python
 #: code:addons/product/models/product_pricelist_item.py:0
 msgid "%(percentage)s %% discount on %(pricelist)s"
-msgstr ""
+msgstr "%(percentage)s %% nuolaida %(pricelist)s"
 
 #. module: product
 #. odoo-python
 #: code:addons/product/models/product_pricelist_item.py:0
 msgid "%(percentage)s %% discount on sales price"
-msgstr ""
+msgstr "%(percentage)s %% nuolaida nuo pardavimo kainos"
 
 #. module: product
 #. odoo-python
@@ -180,38 +172,8 @@ msgid "1 year"
 msgstr "1 metai"
 
 #. module: product
-#: model_terms:ir.ui.view,arch_db:product.report_packagingbarcode
-msgid "10"
-msgstr "10"
-
-#. module: product
 #: model_terms:ir.ui.view,arch_db:product.report_pricelist_page
 msgid "10 Units"
-msgstr ""
-
-#. module: product
-#: model:product.attribute.value,name:product.pav_height_100
-msgid "100"
-msgstr "100"
-
-#. module: product
-#: model:product.attribute.value,name:product.pav_length_120
-msgid "120"
-msgstr ""
-
-#. module: product
-#: model_terms:ir.ui.view,arch_db:product.report_packagingbarcode
-msgid "123456789012"
-msgstr ""
-
-#. module: product
-#: model:product.attribute.value,name:product.pav_length_140
-msgid "140"
-msgstr ""
-
-#. module: product
-#: model:product.attribute.value,name:product.pav_length_160
-msgid "160"
 msgstr ""
 
 #. module: product
@@ -240,11 +202,6 @@ msgid "3 years"
 msgstr ""
 
 #. module: product
-#: model:product.attribute.value,name:product.pav_shoe_size_39
-msgid "39"
-msgstr ""
-
-#. module: product
 #: model:product.attribute.value,name:product.pav_size_3xl
 msgid "3XL"
 msgstr ""
@@ -265,31 +222,6 @@ msgid "4 x 7 with price"
 msgstr ""
 
 #. module: product
-#: model:product.attribute.value,name:product.pav_shoe_size_40
-msgid "40"
-msgstr "40"
-
-#. module: product
-#: model:product.attribute.value,name:product.pav_shoe_size_41
-msgid "41"
-msgstr "41"
-
-#. module: product
-#: model:product.attribute.value,name:product.pav_shoe_size_42
-msgid "42"
-msgstr "42"
-
-#. module: product
-#: model:product.attribute.value,name:product.pav_shoe_size_43
-msgid "43"
-msgstr ""
-
-#. module: product
-#: model:product.attribute.value,name:product.pav_height_45
-msgid "45"
-msgstr ""
-
-#. module: product
 #: model:product.attribute.value,name:product.pav_size_4xl
 msgid "4XL"
 msgstr ""
@@ -303,11 +235,6 @@ msgstr ""
 #: model:product.attribute.value,name:product.pav_duration_month_6
 msgid "6 months"
 msgstr ""
-
-#. module: product
-#: model:product.attribute.value,name:product.pav_height_85
-msgid "85"
-msgstr "85"
 
 #. module: product
 #: model_terms:product.template,website_description:product.product_product_4_product_template
@@ -437,6 +364,11 @@ msgid ""
 "            This is the perfect tool to handle several pricings, seasonal "
 "discounts, etc."
 msgstr ""
+"Kaina – tai pardavimo kainų rinkinys arba taisyklės, skirtos apskaičiuoti "
+"pardavimų užsakymo eilutės kainą, remiantis produktais, produktų "
+"kategorijomis, datomis ir užsakytomis kiekiais.\n"
+"            Tai puikus įrankis, leidžiantis tvarkyti įvairias kainodaros "
+"sistemas, sezonines nuolaidas ir pan."
 
 #. module: product
 #. odoo-python
@@ -796,13 +728,13 @@ msgstr "Atributai ir variantai"
 #. odoo-javascript
 #: code:addons/product/static/src/product_catalog/kanban_controller.js:0
 msgid "Back to Order"
-msgstr ""
+msgstr "Grįžti į užsakymą"
 
 #. module: product
 #. odoo-javascript
 #: code:addons/product/static/src/product_catalog/kanban_controller.js:0
 msgid "Back to Quotation"
-msgstr ""
+msgstr "Grįžti į citatą"
 
 #. module: product
 #: model:ir.model.fields,field_description:product.field_product_product__barcode
@@ -960,7 +892,7 @@ msgstr "Dukterinės kategorijos"
 #. module: product
 #: model:ir.model,name:product.model_product_label_layout
 msgid "Choose the sheet layout to print the labels"
-msgstr ""
+msgstr "Pasirinkite lapo išdėstymą, kad galėtumėte atsispausdinti etiketes"
 
 #. module: product
 #: model:product.attribute.value,name:product.pav_brand_cocacola
@@ -1046,6 +978,8 @@ msgid ""
 "Combos allow to choose one product amongst a selection of choices per "
 "category."
 msgstr ""
+"Kombinacijos leidžia pasirinkti vieną produktą iš kiekvienos kategorijos "
+"pasirinkimų."
 
 #. module: product
 #: model:product.template,description_sale:product.product_delivery_01_product_template
@@ -1523,6 +1457,12 @@ msgid "Drawers"
 msgstr "Stalčiai"
 
 #. module: product
+#. odoo-python
+#: code:addons/product/models/product_product.py:0
+msgid "Duplicate values in attribute values are not allowed: %s"
+msgstr ""
+
+#. module: product
 #: model:product.attribute,name:product.pa_duration
 msgid "Duration"
 msgstr "Trukmė"
@@ -1844,7 +1784,7 @@ msgstr ""
 #. module: product
 #: model:product.template,description_sale:product.product_product_12_product_template
 msgid "High-back office chair with great support"
-msgstr ""
+msgstr "Biuro kėdė su aukštu atlošu ir puikiu atramu"
 
 #. module: product
 #: model_terms:ir.ui.view,arch_db:product.product_document_form
@@ -2090,7 +2030,7 @@ msgstr "Yra sekėjas"
 #. module: product
 #: model:ir.model.fields,field_description:product.field_product_product__is_in_selected_section_of_order
 msgid "Is In Selected Section Of Order"
-msgstr ""
+msgstr "Ar yra pasirinktame užsakymo skyriuje"
 
 #. module: product
 #: model:ir.model.fields,field_description:product.field_product_pricelist_item__is_pricelist_required
@@ -2119,8 +2059,20 @@ msgid "Is public document"
 msgstr "Yra viešas dokumentas"
 
 #. module: product
+#. odoo-python
+#: code:addons/product/models/product_product.py:0
+msgid ""
+"It is not possible to import different values for the same attribute: %s"
+msgstr ""
+
+#. module: product
 #: model:ir.model.fields.selection,name:product.selection__res_config_settings__product_weight_in_lbs__0
 msgid "Kilograms (kg)"
+msgstr ""
+
+#. module: product
+#: model:product.attribute.value,name:product.pav_size_l
+msgid "L"
 msgstr ""
 
 #. module: product
@@ -2288,6 +2240,11 @@ msgstr "Logistika"
 msgid ""
 "Looking for a custom bamboo stain to match existing furniture? Contact us "
 "for a quote."
+msgstr ""
+
+#. module: product
+#: model:product.attribute.value,name:product.pav_size_m
+msgid "M"
 msgstr ""
 
 #. module: product
@@ -2645,6 +2602,8 @@ msgid ""
 "On the product %(product)s you cannot transform the attribute %"
 "(attribute_src)s into the attribute %(attribute_dest)s."
 msgstr ""
+"Produkte „ %(product)s “ negalima pakeisti atributo „ %(attribute_src)s “ į "
+"atributą „ %(attribute_dest)s “."
 
 #. module: product
 #. odoo-javascript
@@ -2788,7 +2747,7 @@ msgstr ""
 #. odoo-javascript
 #: code:addons/product/static/src/js/pricelist_report/product_pricelist_report.js:0
 msgid "Please select some products first."
-msgstr ""
+msgstr "Pirmiausia pasirinkite keletą produktų."
 
 #. module: product
 #. odoo-python
@@ -2880,7 +2839,7 @@ msgstr "Kainoraštis"
 #: model:ir.model.fields,help:product.field_product_pricelist_item__applied_on
 #: model:ir.model.fields,help:product.field_product_pricelist_item__display_applied_on
 msgid "Pricelist Item applicable on selected option"
-msgstr "Kainoraščio įrašas, galiojantis pasirinktam pasirinkimui"
+msgstr "Kainoraščio pozicija, taikoma pasirinktam variantui"
 
 #. module: product
 #: model:ir.model.fields,field_description:product.field_product_pricelist__name
@@ -3184,6 +3143,12 @@ msgid "Product Unit of Measure"
 msgstr "Produkto matavimo vienetas"
 
 #. module: product
+#: model:ir.model.fields,field_description:product.field_product_product__import_attribute_values
+#: model:ir.model.fields,field_description:product.field_product_template__import_attribute_values
+msgid "Product Values"
+msgstr ""
+
+#. module: product
 #: model:ir.model,name:product.model_product_product
 #: model:ir.model.fields,field_description:product.field_product_supplierinfo__product_id
 #: model:ir.model.fields.selection,name:product.selection__product_pricelist_item__applied_on__0_product_variant
@@ -3363,6 +3328,8 @@ msgid ""
 "Register the prices requested by your vendors for each product, based on the "
 "quantity and the period."
 msgstr ""
+"Įregistruokite tiekėjų nurodytas kiekvieno produkto kainas, atsižvelgdami į "
+"kiekį ir laikotarpį."
 
 #. module: product
 #: model:ir.model.fields,field_description:product.field_product_attribute__product_tmpl_ids
@@ -3447,6 +3414,11 @@ msgstr "Eilutės"
 #: model:ir.model.fields,field_description:product.field_product_pricelist_item__rule_tip
 msgid "Rule Tip"
 msgstr "Patarimas taisyklei"
+
+#. module: product
+#: model:product.attribute.value,name:product.pav_size_s
+msgid "S"
+msgstr ""
 
 #. module: product
 #: model:ir.model.fields,field_description:product.field_product_product__sale_ok
@@ -3566,6 +3538,12 @@ msgstr ""
 #. module: product
 #: model:product.attribute.value,name:product.pav_brand_sony
 msgid "Sony"
+msgstr ""
+
+#. module: product
+#. odoo-python
+#: code:addons/product/report/product_pricelist_report.py:0
+msgid "Sorry, you are not allowed to access this document."
 msgstr ""
 
 #. module: product
@@ -3764,6 +3742,15 @@ msgid "The display type used in the Product Configurator."
 msgstr ""
 
 #. module: product
+#. odoo-python
+#: code:addons/product/models/product_product.py:0
+msgid ""
+"The exitings product has different attribute value. \"%(imported_values)s\" "
+"is not equivalent to \"%(existing_values)s\" for \"%(external_id)s\", \"%"
+"(id)s\""
+msgstr ""
+
+#. module: product
 #: model_terms:product.template,website_description:product.product_product_4_product_template
 msgid ""
 "The minimum height is 65 cm, and for standing work the maximum height "
@@ -3784,6 +3771,10 @@ msgid ""
 "combo product. This heuristic ensures that whatever product the user chooses "
 "in a combo, it will always be the same price."
 msgstr ""
+"Mažiausia kaina iš šio rinkinio produktų. Ši vertė bus naudojama "
+"proporcingai paskirstyti šio rinkinio kainą, atsižvelgiant į kitus rinkinio "
+"produktus. Ši taisyklė užtikrina, kad, kokį produktą vartotojas bebūtų "
+"pasirinkęs rinkinyje, jo kaina visada bus vienoda."
 
 #. module: product
 #: model:ir.model.fields,help:product.field_product_category__product_count
@@ -3844,6 +3835,8 @@ msgid ""
 "The value %(value)s is not defined for the attribute %(attribute)s on the "
 "product %(product)s."
 msgstr ""
+"Reikšmė „ %(value)s “ nėra apibrėžta atributui „ %(attribute)s “ produkto „ %"
+"(product)s “ atveju."
 
 #. module: product
 #. odoo-python
@@ -3960,6 +3953,22 @@ msgstr ""
 #. odoo-python
 #: code:addons/product/wizard/product_label_layout.py:0
 msgid "Unable to find report template for %s format"
+msgstr ""
+
+#. module: product
+#. odoo-python
+#: code:addons/product/models/product_product.py:0
+msgid ""
+"Unable to import products with attribute value without attribute name "
+"(defined as: attribute:value): %s"
+msgstr ""
+
+#. module: product
+#. odoo-python
+#: code:addons/product/models/product_product.py:0
+msgid ""
+"Unable to import products with attribute values but without name of product "
+"set"
 msgstr ""
 
 #. module: product
@@ -4490,6 +4499,7 @@ msgid ""
 "You cannot change the product of the value %(value)s set on product %"
 "(product)s."
 msgstr ""
+"Negalima keisti produkto „ %(value)s “, nustatyto produktui „ %(product)s “."
 
 #. module: product
 #. odoo-python
@@ -4498,6 +4508,7 @@ msgid ""
 "You cannot change the value of the value %(value)s set on product %"
 "(product)s."
 msgstr ""
+"Negalima keisti reikšmės „ %(value)s “, nustatytos produkto „ %(product)s “."
 
 #. module: product
 #. odoo-python
@@ -4749,6 +4760,24 @@ msgstr "iki"
 #: code:addons/product/static/src/js/pricelist_report/product_pricelist_report.xml:0
 msgid "xlsx"
 msgstr ""
+
+#~ msgid "10"
+#~ msgstr "10"
+
+#~ msgid "100"
+#~ msgstr "100"
+
+#~ msgid "40"
+#~ msgstr "40"
+
+#~ msgid "41"
+#~ msgstr "41"
+
+#~ msgid "42"
+#~ msgstr "42"
+
+#~ msgid "85"
+#~ msgstr "85"
 
 #~ msgid ""
 #~ "You cannot assign the Main Pricelist as Other Pricelist in PriceList Item"

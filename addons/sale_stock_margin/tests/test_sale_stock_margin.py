@@ -3,7 +3,7 @@
 import datetime
 from freezegun import freeze_time
 
-from odoo import fields
+from odoo import Command, fields
 from odoo.tests import Form, tagged
 from odoo.addons.stock_account.tests.common import TestStockValuationCommon
 
@@ -67,6 +67,29 @@ class TestSaleStockMargin(TestStockValuationCommon):
     #########
     # TESTS #
     #########
+
+    def test_margin_split_done_move_line(self):
+        """Splitting the move line of a done delivery (move quantity and
+        move lines saved together, as the detailed operations form does)
+        must keep the move value and the SO line cost unchanged."""
+        self._make_in_move(self.product_avco, 20, 100)
+        sale_order = self._create_sale_order()
+        order_line = self._create_sale_order_line(sale_order, self.product_avco, 10, 150)
+        sale_order.action_confirm()
+        picking = sale_order.picking_ids
+        picking.button_validate()
+        picking.move_ids.write({
+            'quantity': 10,
+            'move_line_ids': [
+                Command.create({
+                    'product_id': self.product_avco.id,
+                    'quantity': 6,
+                }),
+                Command.update(picking.move_ids.move_line_ids.id, {'quantity': 4}),
+            ]
+        })
+        self.assertRecordValues(picking.move_ids, [{'quantity': 10, 'value': 1000}])
+        self.assertRecordValues(order_line, [{'qty_delivered': 10, 'purchase_price': 100, 'margin': 500}])
 
     def test_sale_stock_margin_1(self):
         sale_order = self._create_sale_order()
@@ -258,6 +281,7 @@ class TestSaleStockMargin(TestStockValuationCommon):
             'currency_id': new_company_currency.id,
         })
         self.env.user.company_id = new_company.id
+        self.env = self.env.user.with_company(new_company.id).env
 
         self.pricelist.currency_id = new_company_currency.id
 
@@ -629,3 +653,56 @@ class TestSaleStockMargin(TestStockValuationCommon):
             # purchase_unit_from_delivery = line.move_ids(done)._get_price_unit = (2 * 32.5 + 1 * 32.5) / (2 + 1) = 32.5
             self.assertEqual(sol3.purchase_price, 32.5, "purchase_price = 2 * 32.5 + 1 * 32.5) / (2 + 1) = 32.5")
             self.assertEqual(sol3.margin, -32.5, "margin = SOL qty * sale price - purchase_price * qty_delivered = (0 - 32.5) * 1 = -32.5")
+
+    def test_dropship_fifo_purchase_price(self):
+        """ Check that when the product is dropshipped, the purchase_price used is based on the unit
+        price of the purchase order.
+        """
+        try:
+            dropship_route = self.env.ref('stock_dropshipping.route_drop_shipping')
+        except ValueError:
+            self.skipTest('This test requires the following module: stock_dropshipping')
+
+        self.product_fifo_auto.write({
+            'seller_ids': [Command.create({'partner_id': self.vendor.id, 'price': 20})],
+            'route_ids': [Command.link(dropship_route.id)]
+        })
+        # create and confirm SO and PO
+        so = self.env['sale.order'].create({
+            'partner_id': self.customer.id,
+            'order_line': [Command.create({
+                'product_id': self.product_fifo_auto.id,
+                'product_uom_qty': 1.0,
+            })],
+        })
+        so.action_confirm()
+        po = self.env['purchase.order'].search([
+            ('origin', '=', so.name),
+            ('partner_id', '=', self.vendor.id),
+        ], limit=1)
+        po.button_confirm()
+
+        # untill dropship validation, purchase price of the sale order line is the product's standard price
+        self.assertEqual(self.product_fifo_auto.standard_price, 10)
+        self.assertEqual(so.order_line.purchase_price, 10)
+
+        # after dropship validation, purchase price of the sale order line is the PO's unit cost
+        so.picking_ids.button_validate()
+        self.assertEqual(po.order_line.price_unit, 20)
+        self.assertEqual(so.order_line.purchase_price, 20)
+
+    def test_fifo_return_and_redelivery_purchase_price(self):
+        """ A FIFO delivery valued at 1000 is returned, then the return is returned to the customer
+        and consumes the receipt at 2. The cost of the 10 delivered units is the one of the second
+        delivery, as the first one is cancelled by its return.
+        """
+        self._make_in_move(self.product_fifo_auto, 10, 1000)
+        self._make_in_move(self.product_fifo_auto, 10, 2)
+        sale_order = self._create_sale_order()
+        order_line = self._create_sale_order_line(sale_order, self.product_fifo_auto, 10)
+        sale_order.action_confirm()
+        delivery = sale_order.picking_ids
+        delivery.button_validate()
+        return_move = self._make_return(delivery.move_ids, 10)
+        self._make_return(return_move, 10)
+        self.assertRecordValues(order_line, [{'qty_delivered': 10, 'purchase_price': 2}])

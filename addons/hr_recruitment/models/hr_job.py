@@ -205,6 +205,7 @@ class HrJob(models.Model):
             for job, count in self.env['hr.employee'].sudo()._read_group(
                 domain=[
                     ('job_id', 'in', self.ids),
+                    ('company_id', 'in', self.env.companies.ids),
                 ],
                 groupby=['job_id'],
                 aggregates=['__count'],
@@ -347,6 +348,12 @@ class HrJob(models.Model):
     def _creation_subtype(self):
         return self.env.ref('hr_recruitment.mt_job_new')
 
+    def _get_attachments_domain(self):
+        return ['|',
+            '&', ('res_model', '=', 'hr.job'), ('res_id', 'in', self.ids),
+            '&', ('res_model', '=', 'hr.applicant'), ('res_id', 'in', self.application_ids.ids),
+        ]
+
     def action_open_attachments(self):
         return {
             'type': 'ir.actions.act_window',
@@ -362,10 +369,7 @@ class HrJob(models.Model):
                 (self.env.ref('hr_recruitment.ir_attachment_hr_recruitment_list_view').id, 'list')
             ],
             'search_view_id': self.env.ref('hr_recruitment.ir_attachment_view_search_inherit_hr_recruitment').ids,
-            'domain': ['|',
-                '&', ('res_model', '=', 'hr.job'), ('res_id', 'in', self.ids),
-                '&', ('res_model', '=', 'hr.applicant'), ('res_id', 'in', self.application_ids.ids),
-            ],
+            'domain': self._get_attachments_domain(),
         }
 
     def action_open_activities(self):
@@ -409,6 +413,7 @@ class HrJob(models.Model):
             'res_model': res_model,
             'view_mode': 'list,kanban,form',
             'views': [(False, 'list'), (False, 'kanban'), (False, 'form')],
+            'domain': [('company_id', 'in', self.env.companies.ids)],
             'context': {
                 'default_job_id': self.id,
                 'search_default_group_job': 1,

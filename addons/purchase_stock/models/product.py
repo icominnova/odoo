@@ -111,7 +111,7 @@ class ProductProduct(models.Model):
 
         move_domain = Domain([
             ('product_id', 'in', self.ids),
-            ('state', 'in', ['assigned', 'confirmed', 'partially_available', 'done']),
+            ('state', 'in', ['waiting', 'assigned', 'confirmed', 'partially_available', 'done']),
             ('date', '>=', start_date),
             ('date', '<', limit_date),
         ])
@@ -143,17 +143,23 @@ class ProductProduct(models.Model):
         warehouse_id = self.env.context.get('warehouse_id')
         if not warehouse_id:
             return Domain.OR([
-                [('location_dest_usage', 'in', ['customer', 'production'])],
-                [('location_final_id.usage', 'in', ['customer', 'production'])],
+                [('location_dest_usage', 'in', ['customer', 'production', 'transit'])],
+                Domain.AND([
+                    [('location_final_id.usage', 'in', ['customer', 'production'])],
+                    [('move_dest_ids', '=', False)],
+                ]),
             ])
         else:
             return Domain.AND([
                 [('location_id.warehouse_id', '=', warehouse_id)],
                 Domain.OR([
                     [('location_dest_id.warehouse_id', '!=', warehouse_id)],
-                    [('location_final_id.warehouse_id', '!=', warehouse_id)]
+                    Domain.AND([
+                        [('location_final_id.warehouse_id', '!=', warehouse_id)],
+                        [('move_dest_ids', '=', False)],
+                    ]),
                 ]),  # includes moves going to customer or production
-                [('location_dest_id.usage', '!=', 'inventory')]  # exclude scrap
+                [('location_dest_id.usage', 'not in', ['inventory', 'supplier'])]  # exclude scrap and vendor returns
             ])
 
     def _get_quantity_in_progress(self, location_ids=False, warehouse_ids=False):
@@ -214,7 +220,8 @@ class ProductProduct(models.Model):
         return rfq_domain & Domain.OR(domains or [Domain.TRUE])
 
     def _get_monthly_demand_range(self, based_on):
-        start_date = limit_date = datetime.now()
+        start_date = datetime.now()
+        limit_date = datetime.combine(start_date.date(), datetime.max.time())
 
         if not based_on or based_on == 'actual_demand' or based_on == '30_days':
             start_date = start_date - relativedelta(days=30)  # Default monthly demand

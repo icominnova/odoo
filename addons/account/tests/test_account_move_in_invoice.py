@@ -8,6 +8,7 @@ from odoo.exceptions import ValidationError, UserError
 from datetime import date
 
 from collections import defaultdict
+from unittest.mock import patch
 
 @tagged('post_install', '-at_install')
 class TestAccountMoveInInvoiceOnchanges(AccountTestInvoicingCommon):
@@ -942,6 +943,41 @@ class TestAccountMoveInInvoiceOnchanges(AccountTestInvoicingCommon):
             'amount_total': 1127.95,
         })
 
+    def test_biggest_tax_rounding_with_invoice_address(self):
+        """
+        Test that we can post an invoice with partner_id != commercial_partner_id
+        and a cash rounding with the 'biggest tax' strategy
+        """
+        original_write = self.env.registry['account.move.line'].write
+
+        def _patch_write(self, vals):
+            # Some extension of the write method call the super() before using self
+            # In our case, the rounding line was deleted during the sync_tax_lines process
+            # leading to a MissingError
+            res = original_write(self, vals)
+            self.filtered(lambda line: line.move_id.move_type == 'in_invoice')
+            return res
+
+        self.env['res.config.settings'].write({'group_sale_delivery_address': True})
+
+        invoice_address = self.env['res.partner'].create({
+            'name': 'test invoice address',
+            'type': 'invoice',
+            'parent_id': self.partner_a.id,
+        })
+
+        invoice = self._create_invoice(
+            move_type='in_invoice',
+            partner_id=invoice_address,
+            invoice_cash_rounding_id=self.cash_rounding_b,
+            invoice_line_ids=[
+                self._prepare_invoice_line(price_unit=100.03, tax_ids=self.company_data['default_tax_sale'])
+            ]
+        )
+
+        with patch.object(self.env.registry['account.move.line'], 'write', _patch_write):
+            invoice.action_post()
+
     def test_in_invoice_line_onchange_currency_1(self):
         self.other_currency.rounding = 0.001
 
@@ -1126,10 +1162,18 @@ class TestAccountMoveInInvoiceOnchanges(AccountTestInvoicingCommon):
             self.env.user.group_ids -= self.env.ref('purchase.group_purchase_user')
         copy_invoice = self.invoice.copy()
 
+        banks = self.env['res.partner.bank'].create([{
+            'acc_number': f'ACCOUNT{i}',
+            'partner_id': copy_invoice.partner_id.id,
+            'allow_out_payment': True,
+        } for i in range(2)])
+
         move_form = Form(self.invoice)
         move_form.invoice_line_ids.remove(0)
         move_form.invoice_line_ids.remove(0)
+        move_form.partner_bank_id = banks[1]
         move_form.invoice_vendor_bill_id = copy_invoice
+        self.assertEqual(move_form.partner_bank_id, banks[1], "The currency didn't change, so the bank shouldn't be recomputed")
         move_form.save()
 
         self.assertInvoiceValues(self.invoice, [
@@ -1146,6 +1190,7 @@ class TestAccountMoveInInvoiceOnchanges(AccountTestInvoicingCommon):
         bank1 = self.env['res.partner.bank'].create({
             'acc_number': 'BE43798822936101',
             'partner_id': self.company_data['company'].partner_id.id,
+            'allow_out_payment': True,
         })
 
         move_reversal = self.env['account.move.reversal'].with_context(active_model="account.move", active_ids=self.invoice.ids).create({
@@ -2963,3 +3008,73 @@ class TestAccountMoveInInvoiceOnchanges(AccountTestInvoicingCommon):
         moves.invoice_line_ids._compute_tax_ids()
         self.assertEqual(invoice.invoice_line_ids.tax_ids, account_tax)
         self.assertEqual(receipt.invoice_line_ids.tax_ids, account_tax)
+
+    def test_reverse_and_create_invoice_copied_main_attachment(self):
+        attachment_vals = [{'name': 'Attachment', 'mimetype': 'text/plain', 'res_model': 'account.move', 'datas': b''}]
+        attachment = self.env['ir.attachment'].create(attachment_vals)
+        move1, move2 = self.env['account.move'].create([
+            {
+                'move_type': 'in_invoice',
+                'partner_id': self.partner_a.id,
+                'invoice_date': '2019-01-01',
+                'invoice_line_ids': [Command.create({
+                    'product_id': self.product_a.id,
+                    'quantity': 1,
+                    'price_unit': 100.00,
+                    'discount': 10,
+                })],
+                'attachment_ids': [Command.set(attachment.ids)],
+                'message_main_attachment_id': attachment.id,
+            },
+            {
+                'move_type': 'in_invoice',
+                'partner_id': self.partner_a.id,
+                'invoice_date': '2019-01-01',
+                'invoice_line_ids': [Command.create({
+                    'product_id': self.product_a.id,
+                    'quantity': 1,
+                    'price_unit': 100.00,
+                    'discount': 10,
+                })],
+            },
+        ])
+        (move1 + move2).action_post()
+
+        move1_reversal = self._reverse_invoice(move1, is_modify=True)
+        self.assertRecordValues(move1_reversal.message_main_attachment_id, attachment_vals)
+        move2_reversal = self._reverse_invoice(move2, is_modify=True)
+        self.assertFalse(move2_reversal.message_main_attachment_id)
+
+    def test_in_invoice_show_journal_single_journal(self):
+        self.env['account.journal'].search([
+            ('company_id', '=', self.company_data['company'].id),
+            ('type', '=', 'purchase'),
+            ('id', '!=', self.company_data['default_journal_purchase'].id),
+        ]).action_archive()
+        move_form = Form(self.env['account.move'].with_context(default_move_type='in_invoice'))
+        self.assertFalse(move_form.show_journal)
+
+    def test_in_invoice_onchange_keep_imported_discount_precision(self):
+        """ Test that an imported bill can have discounts more precise than the decimal precision.
+            Editing should compute the taxes on the stored discounts
+        """
+        tax_21 = self.percent_tax(21.0)
+        with self.env['account.move']._disable_discount_precision():
+            bill = self.env['account.move'].create({
+                'move_type': 'in_invoice',
+                'partner_id': self.partner_a.id,
+                'invoice_date': '2019-01-01',
+                'invoice_line_ids': [Command.create({
+                    'name': 'line',
+                    'quantity': 100.0,
+                    'price_unit': 1000.0,
+                    'discount': 9.996,
+                    'tax_ids': [Command.set(tax_21.ids)],
+                })],
+            })
+
+        with Form(bill) as bill_form:
+            with bill_form.invoice_line_ids.edit(0) as line_form:
+                line_form.name = 'edited line'
+        bill.action_post()
+        self.assertRecordValues(bill, [{'amount_untaxed': 90004.0, 'amount_tax': 18900.84, 'amount_total': 108904.84}])

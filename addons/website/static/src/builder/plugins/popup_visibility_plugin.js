@@ -1,4 +1,5 @@
 import { Plugin } from "@html_editor/plugin";
+import { selectElements } from "@html_editor/utils/dom_traversal";
 import { registry } from "@web/core/registry";
 import { patch } from "@web/core/utils/patch";
 
@@ -20,6 +21,28 @@ export class PopupVisibilityPlugin extends Plugin {
         clean_for_save_handlers: this.cleanForSave.bind(this),
         on_restore_containers_handlers: this.hidePopupsWithoutTarget.bind(this),
         on_reveal_target_handlers: this.hidePopupsWithoutTarget.bind(this),
+        attribute_change_processors: ({ target, attributeName, value }) => {
+            // On hide/show of the popup, the `style` attribute of the modal in
+            // the popup is changed. This also happens with the option
+            // "Backdrop" on the popup. When reverting/re-applying steps that
+            // are supposed to change the option, we do not want to also change
+            // whether the popup is hidden of not. Here, we keep the `display`
+            // property in the `style` attribute unchanged when the history
+            // revert/re-apply a step that modified it.
+            if (attributeName === "style" && target.matches(".s_popup > .modal")) {
+                const re = /display: .*?;/;
+                const currentDisplay = target.attributes.style?.value.match(re)?.[0] ?? "";
+                value = re.test(value) ? value.replace(re, currentDisplay) : value + currentDisplay;
+            }
+            return value;
+        },
+        on_cloned_handlers: ({ cloneEl }) => {
+            // The clone of an open popup is displayed but has no Bootstrap
+            // instance backing it: create one in the shown state.
+            if (cloneEl.matches(".s_popup") && cloneEl.querySelector(".modal.show")) {
+                this.onTargetShow(cloneEl);
+            }
+        },
     };
 
     setup() {
@@ -81,6 +104,14 @@ export class PopupVisibilityPlugin extends Plugin {
             this.window.Modal.getOrCreateInstance(modalEl)._hideModal();
             this.window.Modal.getInstance(modalEl).dispose();
         }
+
+        // Delete all empty popups upon save
+        for (const popupEl of selectElements(rootEl, ".s_popup")) {
+            const isPopupEmpty = !popupEl.querySelector(".oe_structure > *:not(.s_popup_close)");
+            if (isPopupEmpty) {
+                popupEl.remove();
+            }
+        }
     }
 
     /**
@@ -89,7 +120,7 @@ export class PopupVisibilityPlugin extends Plugin {
      * @param {HTMLElement} targetEl the element
      */
     hidePopupsWithoutTarget(targetEl) {
-        const openPopupEls = this.editable.querySelectorAll(".s_popup:not([data-invisible='1']");
+        const openPopupEls = this.editable.querySelectorAll(".s_popup:not([data-invisible='1'])");
         if (!openPopupEls.length) {
             return;
         }

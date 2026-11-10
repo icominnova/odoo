@@ -1,14 +1,14 @@
 /** @odoo-module */
 
 import { EventBus } from "@odoo/owl";
-import { getCurrentDimensions, getDocument, getWindow } from "@web/../lib/hoot-dom/helpers/dom";
+import { _getCurrentDimensions, _getDocument, _getWindow } from "@web/../lib/hoot-dom/helpers/dom";
 import {
-    mockedCancelAnimationFrame,
-    mockedClearInterval,
-    mockedClearTimeout,
-    mockedRequestAnimationFrame,
-    mockedSetInterval,
-    mockedSetTimeout,
+    _mockedCancelAnimationFrame,
+    _mockedClearInterval,
+    _mockedClearTimeout,
+    _mockedRequestAnimationFrame,
+    _mockedSetInterval,
+    _mockedSetTimeout,
 } from "@web/../lib/hoot-dom/helpers/time";
 import { interactor } from "../../hoot-dom/hoot_dom_utils";
 import { MockEventTarget, strictEqual, waitForDocument } from "../hoot_utils";
@@ -203,6 +203,11 @@ function getWatchedEventTargets(view) {
         // Other event targets
         EventBus.prototype,
         MockEventTarget.prototype,
+        view.BaseAudioContext.prototype,
+        view.MediaDevices.prototype,
+        view.MediaStreamTrack.prototype,
+        view.RTCDataChannel.prototype,
+        view.RTCPeerConnection.prototype,
     ];
 }
 
@@ -244,23 +249,23 @@ function matchesQueryPart(mediaQueryString) {
     } else if (key) {
         switch (key) {
             case "max-height": {
-                match = getCurrentDimensions().height <= $parseFloat(value);
+                match = _getCurrentDimensions().height <= $parseFloat(value);
                 break;
             }
             case "max-width": {
-                match = getCurrentDimensions().width <= $parseFloat(value);
+                match = _getCurrentDimensions().width <= $parseFloat(value);
                 break;
             }
             case "min-height": {
-                match = getCurrentDimensions().height >= $parseFloat(value);
+                match = _getCurrentDimensions().height >= $parseFloat(value);
                 break;
             }
             case "min-width": {
-                match = getCurrentDimensions().width >= $parseFloat(value);
+                match = _getCurrentDimensions().width >= $parseFloat(value);
                 break;
             }
             case "orientation": {
-                const { width, height } = getCurrentDimensions();
+                const { width, height } = _getCurrentDimensions();
                 match = value === "landscape" ? width > height : width < height;
                 break;
             }
@@ -380,7 +385,7 @@ function onAnchorHrefClick(ev) {
     const [, hash] = href.split("#");
     if (hash) {
         // Scroll to the target element if the href is/has a hash
-        getDocument().getElementById(hash)?.scrollIntoView();
+        _getDocument().getElementById(hash)?.scrollIntoView();
     }
 }
 
@@ -428,6 +433,18 @@ class MockMediaQueryList extends MockEventTarget {
     }
 }
 
+class MockMutationObserver extends MutationObserver {
+    disconnect() {
+        activeMutationObservers.delete(this);
+        return super.disconnect(...arguments);
+    }
+
+    observe() {
+        activeMutationObservers.add(this);
+        return super.observe(...arguments);
+    }
+}
+
 const DEFAULT_MEDIA_VALUES = {
     "display-mode": "browser",
     pointer: "fine",
@@ -446,6 +463,8 @@ const R_OWL_SYNTHETIC_LISTENER = /\bnativeToSyntheticEvent\b/;
 const originalDescriptors = new WeakMap();
 const originalTouchFunctions = getTouchTargets(globalThis).map(getTouchDescriptors);
 
+/** @type {Set<MockMutationObserver>} */
+const activeMutationObservers = new Set();
 /** @type {Set<MockMediaQueryList>} */
 const mediaQueryLists = new Set();
 const mockConsole = new MockConsole();
@@ -486,36 +505,37 @@ const WINDOW_MOCK_DESCRIPTORS = {
     Animation: { value: MockAnimation },
     Blob: { value: MockBlob },
     BroadcastChannel: { value: MockBroadcastChannel },
-    cancelAnimationFrame: { value: mockedCancelAnimationFrame, writable: false },
-    clearInterval: { value: mockedClearInterval, writable: false },
-    clearTimeout: { value: mockedClearTimeout, writable: false },
+    cancelAnimationFrame: { value: _mockedCancelAnimationFrame, writable: false },
+    clearInterval: { value: _mockedClearInterval, writable: false },
+    clearTimeout: { value: _mockedClearTimeout, writable: false },
     ClipboardItem: { value: MockClipboardItem },
     console: { value: mockConsole, writable: false },
     crypto: { value: mockCrypto, writable: false },
     Date: { value: MockDate, writable: false },
     fetch: { value: interactor("server", mockedFetch).as("fetch"), writable: false },
     history: { value: mockHistory },
-    innerHeight: { get: () => getCurrentDimensions().height },
-    innerWidth: { get: () => getCurrentDimensions().width },
+    innerHeight: { get: () => _getCurrentDimensions().height },
+    innerWidth: { get: () => _getCurrentDimensions().width },
     isSecureContext: { value: true, writable: false },
     Intl: { value: MockIntl },
     localStorage: { value: mockLocalStorage, writable: false },
     matchMedia: { value: mockedMatchMedia },
     MessageChannel: { value: MockMessageChannel },
     MessagePort: { value: MockMessagePort },
+    MutationObserver: { value: MockMutationObserver },
     navigator: { value: mockNavigator },
     Notification: { value: MockNotification },
-    outerHeight: { get: () => getCurrentDimensions().height },
-    outerWidth: { get: () => getCurrentDimensions().width },
+    outerHeight: { get: () => _getCurrentDimensions().height },
+    outerWidth: { get: () => _getCurrentDimensions().width },
     Request: { value: MockRequest, writable: false },
-    requestAnimationFrame: { value: mockedRequestAnimationFrame, writable: false },
+    requestAnimationFrame: { value: _mockedRequestAnimationFrame, writable: false },
     Response: { value: MockResponse, writable: false },
     scroll: { value: mockedWindowScroll },
     scrollBy: { value: mockedWindowScrollBy },
     scrollTo: { value: mockedWindowScrollTo },
     sessionStorage: { value: mockSessionStorage, writable: false },
-    setInterval: { value: mockedSetInterval, writable: false },
-    setTimeout: { value: mockedSetTimeout, writable: false },
+    setInterval: { value: _mockedSetInterval, writable: false },
+    setTimeout: { value: _mockedSetTimeout, writable: false },
     SharedWorker: { value: MockSharedWorker },
     URL: { value: MockURL },
     WebSocket: { value: MockWebSocket },
@@ -529,7 +549,7 @@ const WINDOW_MOCK_DESCRIPTORS = {
 //-----------------------------------------------------------------------------
 
 export function cleanupWindow() {
-    const view = getWindow();
+    const view = _getWindow();
 
     // Storages
     mockLocalStorage.clear();
@@ -557,10 +577,15 @@ export function cleanupWindow() {
 
     // Touch
     restoreTouch(view);
+
+    // Mutation observers
+    for (const observer of activeMutationObservers) {
+        observer.disconnect();
+    }
 }
 
 export function getTitle() {
-    const doc = getDocument();
+    const doc = _getDocument();
     const titleDescriptor = findOriginalDescriptor(doc, "title");
     if (titleDescriptor) {
         return titleDescriptor.get.call(doc);
@@ -570,7 +595,7 @@ export function getTitle() {
 }
 
 export function getViewPortHeight() {
-    const view = getWindow();
+    const view = _getWindow();
     const heightDescriptor = findOriginalDescriptor(view, "innerHeight");
     if (heightDescriptor) {
         return heightDescriptor.get.call(view);
@@ -580,7 +605,7 @@ export function getViewPortHeight() {
 }
 
 export function getViewPortWidth() {
-    const view = getWindow();
+    const view = _getWindow();
     const titleDescriptor = findOriginalDescriptor(view, "innerWidth");
     if (titleDescriptor) {
         return titleDescriptor.get.call(view);
@@ -620,7 +645,7 @@ export function mockPreventDefault(event) {
  */
 export function mockTouch(setTouch) {
     ensureTest("mockTouch");
-    const objects = getTouchTargets(getWindow());
+    const objects = getTouchTargets(_getWindow());
     if (setTouch) {
         for (const object of objects) {
             const descriptors = {};
@@ -644,9 +669,9 @@ export function mockTouch(setTouch) {
 }
 
 /**
- * @param {typeof globalThis} [view=getWindow()]
+ * @param {typeof globalThis} [view=_getWindow()]
  */
-export function patchWindow(view = getWindow()) {
+export function patchWindow(view = _getWindow()) {
     // Window (doesn't need to be ready)
     applyPropertyDescriptors(view, WINDOW_MOCK_DESCRIPTORS);
 
@@ -664,7 +689,7 @@ export function patchWindow(view = getWindow()) {
  * @param {string} value
  */
 export function setTitle(value) {
-    const doc = getDocument();
+    const doc = _getDocument();
     const titleDescriptor = findOriginalDescriptor(doc, "title");
     if (titleDescriptor) {
         titleDescriptor.set.call(doc, value);
@@ -674,7 +699,7 @@ export function setTitle(value) {
 }
 
 export function setupWindow() {
-    const view = getWindow();
+    const view = _getWindow();
 
     // Listeners
     view.addEventListener("click", onAnchorHrefClick);
@@ -682,9 +707,9 @@ export function setupWindow() {
 }
 
 /**
- * @param {typeof globalThis} [view=getWindow()]
+ * @param {typeof globalThis} [view=_getWindow()]
  */
-export function watchAddedNodes(view = getWindow()) {
+export function watchAddedNodes(view = _getWindow()) {
     const observer = new MutationObserver(observeAddedNodes);
     observer.observe(view.document.head, { childList: true });
 
@@ -694,10 +719,12 @@ export function watchAddedNodes(view = getWindow()) {
 }
 
 /**
- * @param {typeof globalThis} [view=getWindow()]
+ * @param {typeof globalThis} [view=_getWindow()]
  */
-export function watchListeners(view = getWindow()) {
-    const targets = getWatchedEventTargets(view);
+export function watchListeners(view = _getWindow()) {
+    const targets = getRunner().headless
+        ? [view.EventTarget.prototype]
+        : getWatchedEventTargets(view);
     for (const target of targets) {
         target.addEventListener = mockedAddEventListener;
         target.removeEventListener = mockedRemoveEventListener;
@@ -723,13 +750,13 @@ export function watchListeners(view = getWindow()) {
  *  afterEach(watchKeys(window, ["odoo"]));
  */
 export function watchKeys(target, whiteList) {
-    const acceptedKeys = new Set([...$ownKeys(target), ...(whiteList || [])]);
+    const acceptedKeys = new Set($ownKeys(target).concat(whiteList || []));
 
     return function checkKeys() {
-        const keysDiff = $ownKeys(target).filter(
-            (key) => $isNaN($parseFloat(key)) && !acceptedKeys.has(key)
-        );
-        for (const key of keysDiff) {
+        for (const key of $ownKeys(target)) {
+            if (!$isNaN($parseFloat(key)) || acceptedKeys.has(key)) {
+                continue;
+            }
             const descriptor = $getOwnPropertyDescriptor(target, key);
             if (descriptor.configurable) {
                 delete target[key];

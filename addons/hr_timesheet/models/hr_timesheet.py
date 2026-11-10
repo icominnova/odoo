@@ -66,7 +66,7 @@ class AccountAnalyticLine(models.Model):
     parent_task_id = fields.Many2one('project.task', related='task_id.parent_id', store=True, index='btree_not_null')
     project_id = fields.Many2one(
         'project.project', 'Project', domain=_domain_project_id, index=True,
-        compute='_compute_project_id', store=True, readonly=False)
+        compute='_compute_project_id', inverse='_inverse_project_id', store=True, readonly=False)
     user_id = fields.Many2one(compute='_compute_user_id', store=True, readonly=False)
     employee_id = fields.Many2one('hr.employee', "Employee", domain=_domain_employee_id, context={'active_test': False},
         index=True, help="Define an 'hourly cost' on the employee to track the cost of their time.")
@@ -142,6 +142,11 @@ class AccountAnalyticLine(models.Model):
                 continue
             line.project_id = line.task_id.project_id
 
+    def _inverse_project_id(self):
+        for line in self:
+            if line.task_id.project_id != line.project_id:
+                line.sudo().task_id = False
+
     @api.depends('project_id')
     def _compute_task_id(self):
         self.filtered(lambda t: not t.project_id).task_id = False
@@ -182,18 +187,20 @@ class AccountAnalyticLine(models.Model):
                 )
             else:
                 minutes = round(line.unit_amount * 60)
-                hours, minutes = divmod(minutes, 60)
+                hours, minutes = divmod(abs(round(minutes)), 60)
                 if minutes:
                     line.calendar_display_name = self.env._(
-                        "%(project_name)s (%(hours)sh%(minutes)s)",
+                        "%(project_name)s (%(sign)s%(hours)sh%(minutes)s)",
                         project_name=line.project_id.display_name,
+                        sign='-' if line.unit_amount < 0 else '',
                         hours=hours,
                         minutes=minutes,
                     )
                 else:
                     line.calendar_display_name = self.env._(
-                        "%(project_name)s (%(hours)sh)",
+                        "%(project_name)s (%(sign)s%(hours)sh)",
                         project_name=line.project_id.display_name,
+                        sign='-' if line.unit_amount < 0 else '',
                         hours=hours,
                     )
 

@@ -1,5 +1,6 @@
 import { expect, test } from "@odoo/hoot";
 import {
+    advanceTime,
     clear,
     click,
     edit,
@@ -38,6 +39,7 @@ import {
     mountWithCleanup,
     mountWithSearch,
     onRpc,
+    patchWithCleanup,
     removeFacet,
     selectGroup,
     serverState,
@@ -46,7 +48,7 @@ import {
     validateSearch,
 } from "@web/../tests/web_test_helpers";
 import { cookie } from "@web/core/browser/cookie";
-import { SearchBar } from "@web/search/search_bar/search_bar";
+import { SearchBar, DROPDOWN_CLOSE_DELAY } from "@web/search/search_bar/search_bar";
 import { useSearchBarToggler } from "@web/search/search_bar/search_bar_toggler";
 class Partner extends models.Model {
     name = fields.Char();
@@ -531,6 +533,44 @@ test("update suggested filters in autocomplete menu with Japanese IME", async ()
     expect(`.o_searchview_autocomplete`).toHaveCount(1);
     expect(queryFirst`.o_searchview_autocomplete .o-dropdown-item`).toHaveText(
         `Search Foo for: ${TEST}`
+    );
+});
+
+test("intermediate Backspace events from iOS Korean IME shouldn't close autocomplete", async () => {
+    // This test simulates the behavior of the iOS Korean IME during composition.
+    // On iOS, `isComposing` is not set, but the IME sends a Backspace before
+    // rewriting the composing syllable. Our component (SearchBar) must handle
+    // this without closing the autocomplete dropdown.
+
+    // Typing 'ㄱ' followed by 'ㅏ' produces the precomposed syllable '가'.
+    const COMPOSED_SYLLABLE = "가";
+
+    await mountWithSearch(SearchBar, {
+        resModel: "partner",
+        searchMenuTypes: [],
+        searchViewId: false,
+    });
+
+    await click(".o_searchview input");
+
+    // User types the initial consonant 'ㄱ'
+    await press("ㄱ");
+
+    // Wait search autocomplete
+    await animationFrame();
+
+    // User types the second character 'ㅏ'
+    // iOS sends Backspace to remove previous char and inserts the precomposed syllable
+    await press("Backspace");
+    await press("가");
+
+    // Autocomplete should remain open even after composition with backspace.
+    await animationFrame();
+    await advanceTime(DROPDOWN_CLOSE_DELAY);
+    await animationFrame();
+    expect(queryFirst`.o_searchview input`).toHaveValue(COMPOSED_SYLLABLE);
+    expect(`.o_searchview_autocomplete .o-dropdown-item:first`).toHaveText(
+        `Search Foo for: ${COMPOSED_SYLLABLE}`
     );
 });
 
@@ -1079,6 +1119,8 @@ test("search a property", async () => {
 
     // search for a partner, and expand the many2many property
     await contains(`.o_searchview_input`).clear();
+    // wait for autocomplete to close to make sure it updates its state
+    await advanceTime(DROPDOWN_CLOSE_DELAY);
     await editSearch("Bo");
     await contains(".o_expand").click();
     await contains(".o_searchview_autocomplete .o-dropdown-item:nth-child(3) .o_expand").click();
@@ -1995,4 +2037,40 @@ test("search on full query without waiting for display synchronisation", async (
     expect(".o-dropdown-item:first").toHaveText("Search Foo for: 01234");
     await keyDown("Enter");
     expect(searchBar.env.searchModel.domain).toEqual([["foo", "ilike", "0123456"]]);
+});
+
+test("default non existent many2one", async () => {
+    patchWithCleanup(console, {
+        error: (msg) => {
+            expect.step(`console.error: "${msg}"`);
+        },
+    });
+    Partner._records = [];
+    onRpc("partner", "read", ({ args }) => {
+        expect.step(`partner read`);
+        expect(args).toEqual([45, ["display_name"]]);
+    });
+    onRpc("partner", "web_search_read", ({ kwargs }) => {
+        expect(kwargs.domain).toEqual([["bar", "!=", false]]);
+        expect.step(`web_search_read`);
+    });
+
+    const searchBar = await mountWithSearch(SearchBar, {
+        resModel: "partner",
+        searchViewId: false,
+        searchViewArch: `
+            <search>
+                <field name="bar"/>
+            </search>
+        `,
+        context: {
+            search_default_bar: [45],
+        },
+    });
+    expect.verifySteps([
+        "partner read",
+        `console.error: "The autocomplete value for bar has not been found: the record with id 45 doesn't seem to exist"`,
+    ]);
+    expect(searchBar.env.searchModel.domain).toEqual([]);
+    expect(".o_searchview_facet").toHaveCount(0);
 });

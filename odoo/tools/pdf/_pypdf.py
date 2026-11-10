@@ -1,10 +1,12 @@
 from typing import Dict, Any
 
-import pypdf
-from pypdf import errors, filters, generic, PdfReader as _Reader, PdfWriter as _Writer
-from pypdf.generic import create_string_object
+from pypdf import errors, filters, generic, PageObject, PdfReader as _Reader, PdfWriter as _Writer
+from pypdf.annotations import Link
+from pypdf.generic import create_string_object, Fit
+from pypdf import __version__  # noqa: F401
 
 __all__ = [
+    "PageObject",
     "PdfReader",
     "PdfWriter",
     "create_string_object",
@@ -14,8 +16,20 @@ __all__ = [
 ]
 
 
-pypdf.PageObject.mergePage = lambda self, page2: self.merge_page(page2)
-pypdf.PageObject.mediaBox = property(lambda self: self.mediabox)
+# setters, so that the aliases below stay assignable like the attributes they shadow
+def _set_media_box(self, value):
+    self.mediabox = value
+
+
+def _set_crop_box(self, value):
+    self.cropbox = value
+
+
+PageObject.mergePage = lambda self, page2: self.merge_page(page2)
+PageObject.compressContentStreams = lambda self: self.compress_content_streams()
+PageObject.rotateClockwise = lambda self, angle: self.rotate(angle)
+PageObject.mediaBox = property(lambda self: self.mediabox, _set_media_box)
+PageObject.cropBox = property(lambda self: self.cropbox, _set_crop_box)
 # use lambdas (rather than copying) to allow overrides of the base method
 generic.PdfObject.getObject = lambda self: self.get_object()
 generic.StreamObject.getData = lambda self: self.get_data()
@@ -25,6 +39,24 @@ generic.RectangleObject.getHeight = lambda self: self.height
 
 
 class PdfReader(_Reader):
+    def cache_indirect_object(self, generation, idnum, obj):
+        if isinstance(obj, generic.IndirectObject):
+            if self.strict:
+                raise errors.PdfReadError(f"Object {idnum} {generation} is an indirect reference.")
+            self.resolved_objects[generation, idnum] = obj
+            return obj
+        return super().cache_indirect_object(generation, idnum, obj)
+
+    def get_object(self, indirect_reference):
+        obj = super().get_object(indirect_reference)
+        seen = set()
+        while isinstance(obj, generic.IndirectObject) and obj.pdf is self:
+            if (obj.idnum, obj.generation) in seen or len(seen) >= 10:
+                return generic.NullObject()  # reference loop
+            seen.add((obj.idnum, obj.generation))
+            obj = super().get_object(obj)
+        return obj
+
     @property
     def isEncrypted(self):
         return self.is_encrypted
@@ -41,6 +73,10 @@ class PdfReader(_Reader):
 
     def getDocumentInfo(self):
         return self.metadata
+
+    @property
+    def outlines(self):
+        return self.outline
 
     def getFormTextFields(self):
         return self.get_form_text_fields()
@@ -61,8 +97,8 @@ class PdfWriter(_Writer):
     def addPage(self, page):
         return self.add_page(page)
 
-    def appendPagesFromReader(self, reader):
-        return self.append_pages_from_reader(reader)
+    def appendPagesFromReader(self, reader, after_page_append=None):
+        return self.append_pages_from_reader(reader, after_page_append)
 
     def addBlankPage(self, width=None, height=None):
         return self.add_blank_page(width=width, height=height)
@@ -79,5 +115,39 @@ class PdfWriter(_Writer):
     def getFields(self, *args, **kwargs):
         return self.get_fields(*args, **kwargs)
 
-    def _addObject(self, *args, **kwargs):
-        return self._add_object(*args, **kwargs)
+    def _addObject(self, obj):
+        # PyPDF2 remaps the references of another PDF's object on write, pypdf needs it cloned
+        try:
+            ref = obj.indirect_reference
+        except AttributeError:
+            ref = None
+        if ref is not None and ref.pdf is not self:
+            return obj.clone(self).indirect_reference
+        return self._add_object(obj)
+
+    def addLink(self, pagenum, pagedest, rect, border=None, fit='/Fit', *args):
+        return self.add_annotation(
+            page_number=pagenum,
+            annotation=Link(
+                rect=rect,
+                border=border,
+                target_page_index=pagedest,
+                fit=Fit(fit, args),
+            ),
+        )
+
+    def addBookmark(
+        self, title, pagenum, parent=None, color=None, bold=False, italic=False, fit='/Fit', *args,
+    ):
+        return self.add_outline_item(
+            title,
+            pagenum,
+            parent=parent,
+            color=color,
+            bold=bold,
+            italic=italic,
+            fit=Fit(fit, args),
+        )
+
+    def setPageMode(self, mode):
+        self.page_mode = mode

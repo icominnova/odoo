@@ -1,4 +1,5 @@
 import { Component, onWillStart, useState } from "@odoo/owl";
+import { ConfirmationDialog } from "@web/core/confirmation_dialog/confirmation_dialog";
 import { Dropdown } from "@web/core/dropdown/dropdown";
 import { DropdownItem } from "@web/core/dropdown/dropdown_item";
 import { useDropdownState } from "@web/core/dropdown/dropdown_hooks";
@@ -6,7 +7,6 @@ import { deserializeDateTime } from "@web/core/l10n/dates";
 import { rpc, ConnectionLostError } from "@web/core/network/rpc";
 import { registry } from "@web/core/registry";
 import { useService } from "@web/core/utils/hooks";
-import { isIosApp } from "@web/core/browser/feature_detection";
 import { _t } from "@web/core/l10n/translation";
 const { DateTime } = luxon;
 
@@ -19,10 +19,12 @@ export class ActivityMenu extends Component {
         this.ui = useService("ui");
         this.lazySession = useService("lazy_session");
         this.notification = useService("notification");
+        this.dialogService = useService("dialog");
         this.employee = false;
         this.state = useState({
             checkedIn: false,
-            isDisplayed: false
+            isDisplayed: false,
+            gettingPosition: false,
         });
         this.date_formatter = registry.category("formatters").get("float_time")
         this.dropdown = useDropdownState();
@@ -83,32 +85,42 @@ export class ActivityMenu extends Component {
                 throw error;
             }
         } finally {
-            this._attendanceInProgress = false;
+            this.state.gettingPosition = false;
         }
     };
 
+    confirmChecking() {
+        this.dialogService.add(ConfirmationDialog, {
+            body: _t("Unable to get a valid location. Do you want to proceed with your check-in/out anyway?"),
+            confirmLabel: _t("Proceed Anyway"),
+            confirm: async () => await this.checking(),
+            cancel: () => { this._attendanceInProgress = false; },
+        });
+    }
+
     async signInOut() {
         this.dropdown.close();
-        if (this._attendanceInProgress) {
+        if (this.state.gettingPosition) {
             return;
         }
-        this._attendanceInProgress = true;
+        this.state.gettingPosition = true;
 
         const trackingEnabled = this.employee && this.employee.device_tracking_enabled;
-        if (trackingEnabled && !isIosApp() && navigator.geolocation && navigator.onLine) {
-            // iOS app lacks permissions to call `getCurrentPosition`
+        if (trackingEnabled && navigator.geolocation && navigator.onLine) {
             navigator.geolocation.getCurrentPosition(
                 async ({coords: {latitude, longitude}}) => {
                     await this.checking(latitude,longitude);
                 },
-                async () => {
-                    await this.checking();
+                () => {
+                    this.confirmChecking();
                 },
                 {
                     enableHighAccuracy: true,
                     timeout: 10000,
                 }
             );
+        } else if (trackingEnabled) {
+            this.confirmChecking();
         } else {
             await this.checking();
         }

@@ -1,3 +1,4 @@
+from unittest.mock import patch
 from odoo.tests import common, tagged
 from odoo.addons.partner_autocomplete.tests.common import MockIAPPartnerAutocomplete
 
@@ -59,3 +60,53 @@ class TestResCompany(common.TransactionCase, MockIAPPartnerAutocomplete):
 
         company_1.website = "http://www.cwi.nl:80/%7Eguido/Python.html"
         self.assertEqual(company_1._get_company_domain(), "cwi.nl")
+
+    def test_enrich_by_duns_with_incorrect_vat(self):
+        """
+        Ensure the VAT number is removed when the partner autocomplete return an incorrect VAT number
+        """
+        if self.env['ir.module.module']._get('base_vat').state != 'installed':
+            self.skipTest("The module base vat is required to run this test.")
+
+        # Mock the company details from the JS call `enrichCompany(company)`
+        be_company_data = {
+            'city': 'Brussels',
+            'duns': 'BE1234567',
+            'name': 'Test BE Company',
+            'country_id': {
+                'id': self.ref('base.be'), 'display_name': 'Belgium'
+            },
+            'query': 'BE Comp',
+            'description': 'Belgium'
+        }
+
+        original_method = self.env.registry['iap.autocomplete.api']._request_partner_autocomplete
+
+        def patched_request(self_api, endpoint, params, timeout=15):
+            response, error = original_method(self_api, endpoint, params, timeout=timeout)
+
+            response = {'request_code': 200, 'total_cost': 0, 'credit_error': True, 'data': {'vat': 'BE1234567'}}
+            return response, error
+
+        with patch.object(self.env.registry['iap.autocomplete.api'], '_request_partner_autocomplete', patched_request):
+            result = self.env['res.partner'].with_context(enriched_company_data=be_company_data).enrich_by_duns('BE1234567')
+            self.assertEqual(result.get('vat'), '')
+
+    def test_enrich_with_industry_id(self):
+        """Test that the industry ID is extracted from the enrichment data."""
+        company = self.env['res.company'].create({
+            'name': "Test Company 1",
+            'email': 'demo@testmail.com',
+        })
+        contact = self.env['res.partner'].create({
+            'name': "Test Contact",
+            'parent_id': company.partner_id.id,
+        })
+
+        industry = self.env.ref('base.res_partner_industry_Q')
+        company_data = {'industry_id': {'display_name': industry.display_name, 'id': industry.id}}
+
+        with patch.object(self.env.registry['res.partner'], 'enrich_by_domain', return_value=company_data):
+            self.assertTrue(company._enrich())
+
+        self.assertRecordValues(company.partner_id | contact, [{'industry_id': industry.id}] * 2)

@@ -499,7 +499,7 @@ class TestBaseAPIPerformance(BaseMailPerformance):
                 'default_template_id': test_template.id,
             }).create({})
 
-        with self.assertQueryCount(admin=67, employee=67), self.mock_mail_gateway():
+        with self.assertQueryCount(admin=69, employee=69), self.mock_mail_gateway():
             composer._action_send_mail()
 
         self.assertEqual(len(self._new_mails), 10)
@@ -531,7 +531,7 @@ class TestBaseAPIPerformance(BaseMailPerformance):
         test_record, test_template = self._create_test_records()
         test_template.write({'attachment_ids': [(5, 0)]})
 
-        with self.assertQueryCount(admin=27, employee=27):  # tm: 20/20
+        with self.assertQueryCount(admin=29, employee=29):  # tm: 22/22
             composer = self.env['mail.compose.message'].with_context({
                 'default_composition_mode': 'comment',
                 'default_model': test_record._name,
@@ -558,7 +558,7 @@ class TestBaseAPIPerformance(BaseMailPerformance):
     def test_mail_composer_w_template_attachments(self):
         test_record, test_template = self._create_test_records()
 
-        with self.assertQueryCount(admin=28, employee=28):  # tm: 21/21
+        with self.assertQueryCount(admin=30, employee=30):  # tm: 23/23
             composer = self.env['mail.compose.message'].with_context({
                 'default_composition_mode': 'comment',
                 'default_model': test_record._name,
@@ -587,7 +587,7 @@ class TestBaseAPIPerformance(BaseMailPerformance):
         test_template.write({'attachment_ids': [(5, 0)]})
 
         customer = self.env['res.partner'].browse(self.customer.ids)
-        with self.assertQueryCount(admin=38, employee=38):  # tm 29/29
+        with self.assertQueryCount(admin=40, employee=40):  # tm 29/29
             composer_form = Form(
                 self.env['mail.compose.message'].with_context({
                     'default_composition_mode': 'comment',
@@ -617,7 +617,7 @@ class TestBaseAPIPerformance(BaseMailPerformance):
         test_record, test_template = self._create_test_records()
 
         customer = self.env['res.partner'].browse(self.customer.ids)
-        with self.assertQueryCount(admin=40, employee=40):  # tm 31/31
+        with self.assertQueryCount(admin=42, employee=42):  # tm 31/31
             composer_form = Form(
                 self.env['mail.compose.message'].with_context({
                     'default_composition_mode': 'comment',
@@ -954,7 +954,7 @@ class TestMailAPIPerformance(BaseMailPerformance):
     @warmup
     def test_message_get_default_recipients(self):
         record = self.test_records_recipients[0].with_env(self.env)
-        with self.assertQueryCount(employee=7):
+        with self.assertQueryCount(employee=9):
             defaults = record._message_get_default_recipients()
         self.assertDictEqual(defaults, {record.id: {
             'email_cc': '', 'email_to': 'only.email.1@test.example.com', 'partner_ids': [],
@@ -964,7 +964,7 @@ class TestMailAPIPerformance(BaseMailPerformance):
     @warmup
     def test_message_get_default_recipients_batch(self):
         records = self.test_records_recipients.with_env(self.env)
-        with self.assertQueryCount(employee=9):
+        with self.assertQueryCount(employee=11):
             defaults = records._message_get_default_recipients()
         self.assertDictEqual(defaults, {
             records[0].id: {
@@ -993,7 +993,7 @@ class TestMailAPIPerformance(BaseMailPerformance):
     @warmup
     def test_message_get_suggested_recipients(self):
         record = self.test_records_recipients[0].with_env(self.env)
-        with self.assertQueryCount(employee=23):  # tm: 16
+        with self.assertQueryCount(employee=25):  # tm: 16
             recipients = record._message_get_suggested_recipients(no_create=False)
         new_partner = self.env['res.partner'].search([('email_normalized', '=', 'only.email.1@test.example.com')])
         self.assertEqual(len(new_partner), 1)
@@ -1008,7 +1008,7 @@ class TestMailAPIPerformance(BaseMailPerformance):
     @warmup
     def test_message_get_suggested_recipients_batch(self):
         records = self.test_records_recipients.with_env(self.env)
-        with self.assertQueryCount(employee=32):  # tm: 25
+        with self.assertQueryCount(employee=34):  # tm: 25
             _recipients = records._message_get_suggested_recipients_batch(no_create=False)
 
     @mute_logger('odoo.tests', 'odoo.addons.mail.models.mail_mail', 'odoo.models.unlink')
@@ -1120,7 +1120,7 @@ class TestMailAPIPerformance(BaseMailPerformance):
     def test_partner_find_from_emails(self):
         """ Test '_partner_find_from_emails', notably to check batch optimization """
         records = self.test_records_recipients.with_user(self.env.user)
-        with self.assertQueryCount(employee=27):  # tm: 20
+        with self.assertQueryCount(employee=29):  # tm: 20
             partners = records._partner_find_from_emails(
                 {record: [record.email_from, record.partner_id.email, record.user_id.email] for record in records},
                 avoid_alias=True,
@@ -1687,6 +1687,7 @@ class TestMessageToStorePerformance(BaseMailPerformance):
                                 "mail.thread": self._filter_threads_fields(
                                     {
                                         "display_name": "Test",
+                                        "has_mail_thread": True,
                                         "id": record.id,
                                         "model": "mail.test.simple",
                                         "module_icon": "/base/static/description/icon.png",
@@ -1716,7 +1717,11 @@ class TestMessageToStorePerformance(BaseMailPerformance):
                                     },
                                 ),
                                 "res.users": self._filter_users_fields(
-                                    {"id": self.env.user.id, "share": False},
+                                    {
+                                        "id": self.env.user.id,
+                                        "partner_id": self.env.user.partner_id.id,
+                                        "share": False,
+                                    },
                                 ),
                             },
                         },
@@ -1800,6 +1805,7 @@ class TestMessageToStorePerformance(BaseMailPerformance):
                                 "mail.thread": self._filter_threads_fields(
                                     {
                                         "display_name": "Test",
+                                        "has_mail_thread": True,
                                         "id": record.id,
                                         "model": "mail.test.simple",
                                         "module_icon": "/base/static/description/icon.png",
@@ -1829,7 +1835,11 @@ class TestMessageToStorePerformance(BaseMailPerformance):
                                     },
                                 ),
                                 "res.users": self._filter_users_fields(
-                                    {"id": self.env.user.id, "share": False},
+                                    {
+                                        "id": self.env.user.id,
+                                        "partner_id": self.env.user.partner_id.id,
+                                        "share": False,
+                                    },
                                 ),
                             },
                         },
@@ -1880,12 +1890,8 @@ class BaseMailPostPerformance(BaseMailPerformance):
             cls.user_admin.partner_id + cls.user_employee.partner_id +
             cls.user_follower_emp_email.partner_id +
             cls.user_follower_emp_inbox.partner_id +
-            cls.user_follower_portal.partner_id +
-            cls.partner_follower +
             cls.user_emp_inbox.partner_id +
-            cls.user_emp_email.partner_id +
-            cls.partner +
-            cls.customers
+            cls.user_emp_email.partner_id,
         )
 
         # be sure not to be annoyed by ocn / mobile
@@ -1951,7 +1957,11 @@ class TestPerformance(BaseMailPostPerformance):
         self.assertEqual(attachments.mapped('res_id'), [ticket.id for i in range(3)])
         self.assertTrue(new_message.body.startswith('<p>Test body <img src="/web/image/'))
         self.assertEqual(new_message.notified_partner_ids, recipients + followers)
-        self.assertEqual(self.push_to_end_point_mocked.call_count, 6, "Everyone has a device")
+        self.assertEqual(
+            self.push_to_end_point_mocked.call_count,
+            4,
+            "Mentioned/Subscribed internal users with a device",
+        )
 
     @mute_logger('odoo.tests', 'odoo.addons.mail.models.mail_mail', 'odoo.models.unlink')
     @users('employee')
@@ -1998,4 +2008,8 @@ class TestPerformance(BaseMailPostPerformance):
             self.assertEqual(attachments.mapped('res_id'), [ticket.id for i in range(3)])
             self.assertTrue(new_message.body.startswith('<p>Test body <img src="/web/image/'))
             self.assertEqual(new_message.notified_partner_ids, recipients + followers)
-        self.assertEqual(self.push_to_end_point_mocked.call_count, 6 * 10, "Everyone has a device * record count")
+        self.assertEqual(
+            self.push_to_end_point_mocked.call_count,
+            4 * 10,
+            "Mentioned/Subscribed internal users with a device * record count",
+        )

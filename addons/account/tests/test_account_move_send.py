@@ -2,6 +2,7 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 import json
 
+from contextlib import contextmanager
 from datetime import date
 from unittest.mock import patch
 
@@ -10,6 +11,7 @@ from odoo.addons.account.tests.common import AccountTestInvoicingCommon
 from odoo.addons.mail.tests.common import MailCommon
 from odoo.exceptions import UserError
 from odoo.tests import users, warmup, tagged, Form
+from odoo.tests.test_cursor import TestCursor
 from odoo.tools import formataddr, mute_logger
 
 
@@ -401,8 +403,16 @@ class TestAccountComposerPerformance(AccountTestInvoicingCommon, MailCommon):
         test_customer = self.test_customers[0].with_env(self.env)
         move_template = self.move_template.with_env(self.env)
 
-        extra_dynamic_report = self.env.ref('account.action_account_original_vendor_bill')
-        move_template.report_template_ids += extra_dynamic_report
+        extra_dynamic_report = self.env.ref('account.action_account_original_vendor_bill').sudo().copy({
+            'name': 'Invoice PDF 2',
+            'print_report_name': "'CUSTOM_%s' % object.name",
+        })
+
+        extra_dynamic_report_no_filename = self.env.ref('account.action_account_original_vendor_bill').sudo().copy({
+            'name': 'Invoice PDF 3'
+        })
+
+        move_template.report_template_ids += (extra_dynamic_report + extra_dynamic_report_no_filename)
 
         composer = self.env['account.move.send.wizard'].with_context(active_model='account.move', active_ids=test_move.ids).create({
             'sending_methods': ['email'],
@@ -424,7 +434,8 @@ class TestAccountComposerPerformance(AccountTestInvoicingCommon, MailCommon):
                     {'name': 'AttFileName_00.txt', 'raw': b'AttContent_00', 'type': 'text/plain'},
                     {'name': 'AttFileName_01.txt', 'raw': b'AttContent_01', 'type': 'text/plain'},
                     {'name': f'{test_move.name}.pdf', 'type': 'application/pdf'},
-                    {'name': f'{extra_dynamic_report.name.lower()}_{test_move.name}.pdf', 'type': 'application/pdf'},
+                    {'name': 'CUSTOM_INVOICE_00.pdf', 'type': 'application/pdf'},
+                    {'name': 'invoice pdf 3_INVOICE_00.pdf', 'type': 'application/pdf'},
                 ],
                 'body_content': f'TemplateBody for {test_move.name}',
                 'email_from': self.user_account_other.email_formatted,
@@ -476,6 +487,17 @@ class TestAccountComposerPerformance(AccountTestInvoicingCommon, MailCommon):
             author=self.user_account_other.partner_id,
             content='access_token=',
         )
+
+    def test_invoice_email_subtitle_from_sale_order(self):
+        """ Test email notification subtitle for Invoice created from Sale Order. """
+        self.ensure_installed('sale')
+        self.product_a.taxes_id = False
+        self.env.user.group_ids |= self.env.ref('sales_team.group_sale_salesman')
+        sale_order = self._create_sale_order_one_line(product_id=self.product_a.id, partner_id=self.partner_a.id)
+        invoice = sale_order._create_invoices()
+        context = invoice._notify_by_email_prepare_rendering_context(message=self.env['mail.message'])
+        self.assertEqual(context.get('subtitles')[0], f"{invoice.display_name} - {self.partner_a.name}")
+        self.assertIn('1,000', context.get('subtitles')[1])
 
 
 class TestAccountMoveSendCommon(AccountTestInvoicingCommon):
@@ -707,11 +729,21 @@ class TestAccountMoveSend(TestAccountMoveSendCommon):
         wizard.action_send_and_print()
         with self.enter_registry_test_mode():
             self.env.ref('account.ir_cron_account_move_send').method_direct_trigger()
-        # invoices are generated, but only partner_b got an email, without raising any errors
+        # invoices are generated, but only partner_b got an email
         self.assertTrue(invoice1.invoice_pdf_report_id)
         self.assertFalse(self._get_mail_message(invoice1, limit=None).partner_ids)
+        # invoice1 has no applicable sending method (missing email), so it is flagged as generated but not sent
+        self.assertIn('Invoice generated but not sent.', self._get_mail_message(invoice1).body)
         self.assertTrue(invoice2.invoice_pdf_report_id)
         self.assertTrue(self._get_mail_message(invoice2, limit=None).partner_ids)
+
+    def test_invoice_multi_cron_disabled_alert(self):
+        invoice1 = self.init_invoice("out_invoice", partner=self.partner_a, amounts=[1000], post=True)
+        invoice2 = self.init_invoice("out_invoice", partner=self.partner_b, amounts=[1000], post=True)
+        self.env.ref('account.ir_cron_account_move_send').active = False
+        wizard = self.create_send_and_print(invoice1 + invoice2)
+        self.assertTrue('account_send_cron_archived' in wizard.alerts)
+        self.assertEqual(wizard.alerts['account_send_cron_archived']['level'], 'warning')
 
     def test_invoice_multi_with_edi(self):
         invoice1 = self.init_invoice("out_invoice", partner=self.partner_a, amounts=[1000], post=True)
@@ -1132,7 +1164,7 @@ class TestAccountMoveSend(TestAccountMoveSendCommon):
     def test_get_sending_settings(self):
         invoice = self.init_invoice("out_invoice", amounts=[1000], post=True)
         wizard = self.create_send_and_print(invoice, sending_methods=['email'])
-        
+
         expected_results = {
             'sending_methods': ['email'],
             'invoice_edi_format': False,
@@ -1250,3 +1282,124 @@ class TestAccountMoveSend(TestAccountMoveSendCommon):
                 'name': attachments_data[0][2]['name'],
                 'raw': attachments_data[0][2]['raw'],
             }])
+
+    def test_invoice_send_reply_to_persistence(self):
+        """ Test that the reply_to set on the mail template is correctly
+        propagated through the wizard to the final mail message. """
+        invoice = self.init_invoice("out_invoice", amounts=[1000], post=True)
+        custom_reply_to = "custom_reply_address@example.com"
+
+        template = self.env.ref('account.email_template_edi_invoice')
+        template.reply_to = custom_reply_to
+
+        wizard = self.create_send_and_print(
+            invoice,
+            sending_methods=['email'],
+            template_id=template.id
+        )
+
+        wizard.action_send_and_print()
+
+        message = self._get_mail_message(invoice)
+        self.assertEqual(message.reply_to, custom_reply_to)
+
+    @contextmanager
+    def _send_after_commit(self):
+        """ Allow the sending to be postponed after commit, and run the post-commit hooks when leaving.
+        Everything happens in registry test mode: the cursor opened by the hook is a TestCursor on top of
+        the test cursor, so its commit only releases a savepoint and nothing is ever committed for real.
+        """
+        with (
+            self.enter_registry_test_mode(),
+            patch.object(self.registry['account.move'], '_can_commit', return_value=True),
+        ):
+            yield
+            self.env.flush_all()  # as done by the commit
+            self.env.cr.postcommit.run()
+
+    def test_generate_and_send_invoices_post_commit(self):
+        """ The invoice must only be sent once the current transaction is committed,
+        in a new cursor, with all the records given as arguments bound to that cursor. """
+        invoice = self.init_invoice("out_invoice", amounts=[1000], post=True)
+        template = self.env.ref('account.email_template_edi_invoice').copy({'subject': "Sent after commit"}).sudo()
+
+        AccountMoveSend = self.registry['account.move.send']
+        generate_and_send_invoices = AccountMoveSend._generate_and_send_invoices
+        calls = []
+
+        def spy(self, moves, **kwargs):
+            calls.append((self, moves, kwargs))
+            return generate_and_send_invoices(self, moves, **kwargs)
+
+        with patch.object(AccountMoveSend, '_generate_and_send_invoices', spy), self._send_after_commit():
+            self.env['account.move.send']._generate_and_send_invoices_post_commit(
+                invoice,
+                sending_methods=['email'],
+                mail_template=template,
+            )
+            self.assertFalse(calls, "Nothing should be sent before the commit")
+            self.assertFalse(invoice.invoice_pdf_report_id)
+            self.assertFalse(invoice.is_move_sent)
+            self.assertTrue(invoice.sending_data, "The invoice must be flagged for the cron in the current transaction")
+
+        self.assertEqual(len(calls), 1)
+        send, moves, kwargs = calls[0]
+        self.assertEqual(moves, invoice)
+        self.assertEqual(kwargs['mail_template'], template)
+        new_cr = send.env.cr
+        self.assertIsInstance(new_cr, TestCursor)
+        self.assertNotEqual(self.env.cr, new_cr)
+        self.assertIs(moves.env.cr, new_cr)
+        self.assertIs(kwargs['mail_template'].env.cr, new_cr)
+        self.assertTrue(kwargs['mail_template'].env.su, "The sudo flag must be kept on the new cursor")
+
+        self.env.invalidate_all()
+        self.assertTrue(invoice.invoice_pdf_report_id)
+        self.assertTrue(invoice.message_ids.filtered(lambda m: m.subject == "Sent after commit"))
+        self.assertTrue(invoice.is_move_sent)
+        self.assertFalse(invoice.sending_data)
+
+    def test_generate_and_send_invoices_post_commit_error(self):
+        """ An error while sending after the commit must be logged and rolled back,
+        not raised: the transaction that triggered the sending is already committed.
+        The invoice is left to the sending cron. """
+        invoice = self.init_invoice("out_invoice", amounts=[1000], post=True)
+
+        def failing_hook(self, invoice, invoice_data):
+            invoice.ref = "Should be rolled back"
+            raise ValueError("Sending failed")
+
+        with (
+            self.assertLogs('odoo.addons.account.tools.after_commit', level='ERROR'),
+            patch.object(self.registry['account.move.send'], '_hook_invoice_document_before_pdf_report_render', failing_hook),
+            self._send_after_commit(),
+        ):
+            self.env['account.move.send']._generate_and_send_invoices_post_commit(invoice, sending_methods=['email'])
+
+        self.env.invalidate_all()
+        self.assertFalse(invoice.ref)
+        self.assertFalse(invoice.invoice_pdf_report_id)
+        self.assertFalse(invoice.is_move_sent)
+        self.assertTrue(invoice.sending_data)
+
+    def test_generate_and_send_invoices_post_commit_locked(self):
+        """ An invoice locked by another transaction is not sent after the commit,
+        but left to the sending cron. """
+        invoice = self.init_invoice("out_invoice", amounts=[1000], post=True)
+
+        with (
+            patch.object(self.registry['account.move'], 'try_lock_for_update', lambda self, **kwargs: self.browse()),
+            self._send_after_commit(),
+        ):
+            self.env['account.move.send']._generate_and_send_invoices_post_commit(invoice, sending_methods=['email'])
+
+        self.env.invalidate_all()
+        self.assertFalse(invoice.invoice_pdf_report_id)
+        self.assertFalse(invoice.is_move_sent)
+        self.assertTrue(invoice.sending_data)
+
+        with self.enter_registry_test_mode():
+            self.env.ref('account.ir_cron_account_move_send').method_direct_trigger()
+        self.assertTrue(invoice.invoice_pdf_report_id)
+        self.assertTrue(invoice.is_move_sent)
+        self.assertFalse(invoice.sending_data)

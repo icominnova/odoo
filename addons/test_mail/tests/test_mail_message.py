@@ -4,6 +4,7 @@ import contextlib
 
 from markupsafe import Markup
 
+from odoo import Command
 from odoo.addons.base.models.ir_mail_server import MailDeliveryException
 from odoo.addons.mail.tests.common import mail_new_test_user, MailCommon
 from odoo.addons.mail.tools.discuss import Store
@@ -277,6 +278,33 @@ class TestMessageValues(MailCommon):
         formatted = Store().add(message).get_result()["mail.message"][0]
         self.assertEqual(formatted['record_name'], record_nothread.name)
 
+    def test_message_fetch_search_attachment_name(self):
+        """ Searching messages of a thread by attachment name matches the
+        attachments linked to the thread or to one of its messages, and not
+        the ones linked to another record. """
+        record, other_record = self.env["mail.test.simple"].create([{"name": "Searched"}, {"name": "Other"}])
+        msg_on_thread, msg_on_message, msg_on_other = (
+            record.message_post(body=f"Message {idx}", message_type="comment") for idx in range(3)
+        )
+        attachments = self.env["ir.attachment"].create([
+            {
+                "datas": "aGVsbG8=",
+                "name": f"report_{res_model}.pdf",
+                "res_id": res_id,
+                "res_model": res_model,
+            }
+            for res_model, res_id in [
+                (record._name, record.id),
+                (msg_on_message._name, msg_on_message.id),
+                (other_record._name, other_record.id),
+            ]
+        ])
+        for message, attachment in zip(msg_on_thread + msg_on_message + msg_on_other, attachments):
+            message.attachment_ids = [Command.link(attachment.id)]
+
+        res = self.Message._message_fetch(domain=None, thread=record, search_term="report")
+        self.assertEqual(res["messages"], msg_on_thread + msg_on_message)
+
     def test_records_by_message(self):
         record1 = self.env["mail.test.simple"].create({"name": "Test1"})
         record2 = self.env["mail.test.simple"].create({"name": "Test1"})
@@ -323,10 +351,11 @@ class TestMessageValues(MailCommon):
             'body': 'taratata <img src="data:image/png;base64,iV/+OkI=" width="2"> <img src="data:image/png;base64,iV/+OkI=" width="2">',
         })
         self.assertEqual(len(msg.attachment_ids), 1)
+        attachment = msg.attachment_ids[0]
         self.assertEqual(
             msg.body,
-            '<p>taratata <img src="/web/image/{attachment.id}?access_token={attachment.access_token}" alt="image0" width="2"> '
-            '<img src="/web/image/{attachment.id}?access_token={attachment.access_token}" alt="image0" width="2"></p>'.format(attachment=msg.attachment_ids[0])
+            f'<p>taratata <img src="/web/image/{attachment.id}?access_token={attachment.access_token}" alt="image0" data-attachment-id="{attachment.id}" width="2"> '
+            f'<img src="/web/image/{attachment.id}?access_token={attachment.access_token}" alt="image0" data-attachment-id="{attachment.id}" width="2"></p>'
         )
 
     @mute_logger('odoo.models.unlink', 'odoo.addons.mail.models.models')

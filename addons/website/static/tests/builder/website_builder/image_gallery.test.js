@@ -4,7 +4,7 @@ import {
     waitForEndOfOperation,
 } from "@html_builder/../tests/helpers";
 import { expect, test } from "@odoo/hoot";
-import { click, queryAll, queryOne, waitFor } from "@odoo/hoot-dom";
+import { animationFrame, click, queryAll, queryOne, waitFor } from "@odoo/hoot-dom";
 import { contains, dataURItoBlob, onRpc, patchWithCleanup } from "@web/../tests/web_test_helpers";
 import { uniqueId } from "@web/core/utils/functions";
 import {
@@ -107,6 +107,18 @@ test.skip("Remove all images in gallery", async () => {
     expect(".o_select_media_dialog").toHaveCount(1);
 });
 
+test("Rapidly remove an image from the gallery", async () => {
+    await setupWbsiteBuilderWithImageWall();
+    const initialCount = queryAll(":iframe .o_masonry_col img").length;
+    await click(":iframe .o_masonry_col img[data-index='1']");
+    await waitFor("[data-container-title='Image'] .oe_snippet_remove");
+    click("[data-container-title='Image'] .oe_snippet_remove");
+    click("[data-container-title='Image'] .oe_snippet_remove");
+    await animationFrame();
+    expect(":iframe .o_masonry_col img[data-index='1']").toHaveCount(0);
+    expect(":iframe .o_masonry_col img").toHaveCount(initialCount - 1);
+});
+
 test("Change gallery layout", async () => {
     const { waitSidebarUpdated } = await setupWbsiteBuilderWithImageWall();
 
@@ -157,7 +169,8 @@ test("Change gallery layout when images have a link", async () => {
     await contains("[data-label='Media'] button[data-action-id='setLink']").click();
 
     await contains("[data-label='Your URL'] [data-action-id='setUrl'] > input").fill(
-        "http://odoo.com"
+        "http://odoo.com",
+        { confirm: "blur" }
     );
     expect(":iframe section a[href='http://odoo.com'] > img[data-index='1']").toHaveCount(1);
 

@@ -2,7 +2,7 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 from collections import defaultdict
-from odoo import _, models
+from odoo import _, models, api
 from odoo.tools import float_compare
 import base64
 
@@ -93,7 +93,7 @@ class PosOrder(models.Model):
         coupon_new_id_map = {k: k for k in coupon_data.keys() if k > 0}
 
         # Create the coupons that were awarded by the order.
-        coupons_to_create = {k: v for k, v in coupon_data.items() if k < 0}
+        coupons_to_create = {k: v for k, v in coupon_data.items() if k < 0 and (v.get('points') or v.get('line_codes'))}
         coupon_create_vals = [{
             'program_id': p['program_id'],
             'partner_id': get_partner_id(p.get('partner_id', self.partner_id.id)),
@@ -138,15 +138,20 @@ class PosOrder(models.Model):
                 coupon_per_report[report.id].append(coupon.id)
 
         # Adding loyalty history lines
-        loyalty_points = [
-            {
+        loyalty_points = []
+        for coupon_id, coupon_vals in coupon_data.items():
+            if 'points_earned' in coupon_vals and 'points_spent' in coupon_vals:
+                won = coupon_vals['points_earned']
+                spent = coupon_vals['points_spent']
+            else:
+                won = coupon_vals['points'] if coupon_vals['points'] > 0 else 0
+                spent = -coupon_vals['points'] if coupon_vals['points'] < 0 else 0
+            loyalty_points.append({
                 'order_id': self.id,
                 'card_id': coupon_id,
-                'spent': -coupon_vals['points'] if coupon_vals['points'] < 0 else 0,
-                'won': coupon_vals['points'] if coupon_vals['points'] > 0 else 0,
-            }
-            for coupon_id, coupon_vals in coupon_data.items()
-        ]
+                'spent': spent,
+                'won': won,
+            })
         coupon_updates = [
             {
                 'id': coupon.id,
@@ -242,6 +247,30 @@ class PosOrder(models.Model):
             coupon_data.pop(key, None)
 
         return updated_gift_cards
+
+    @api.model
+    def read_pos_orders(self, domain=False):
+        data = super().read_pos_orders(domain)
+
+        histories = self.env['loyalty.history'].search([
+            ('order_model', '=', 'pos.order'),
+            ('card_id.source_pos_order_id', 'in', [order["id"] for order in data["pos.order"]]),
+            ('card_id.program_id.program_type', '=', 'next_order_coupons'),
+        ])
+        if not histories:
+            return data
+
+        coupon_data = defaultdict(list)
+        for history in histories:
+            coupon_data[history.card_id.source_pos_order_id.id].append({
+                'program_name': history.card_id.program_id.name,
+                'expiration_date': history.card_id.expiration_date,
+                'code': history.card_id.code,
+            })
+        for order in data["pos.order"]:
+            order["new_coupon_info"] = coupon_data.get(order["id"], [])
+
+        return data
 
     def _check_existing_loyalty_cards(self, coupon_data):
         coupon_key_to_modify = []

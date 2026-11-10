@@ -20,6 +20,7 @@ import { CustomInnerSnippet } from "./custom_inner_snippet";
  * @typedef {((arg: { droppedEl: HTMLElement, dragState: DragState, x, y }) => void)[]} on_snippet_move_handlers
  * @typedef {((arg: { droppedEl: HTMLElement, dragState: DragState }) => void)[]} on_snippet_out_dropzone_handlers
  * @typedef {((arg: { droppedEl: HTMLElement, dragState: DragState }) => void)[]} on_snippet_over_dropzone_handlers
+ * @typedef {((arg: { snippetEl: HTMLElement, dropzoneEl: HTMLElement }) => void)[]} on_snippet_inserted_handlers
  */
 
 export class BlockTab extends Component {
@@ -71,7 +72,6 @@ export class BlockTab extends Component {
                 this.cancelDragAndDrop = this.shared.history.makeSavePoint();
                 this.dragState = {};
                 let snippetEl;
-                const baseSectionEl = snippet.content.cloneNode(true);
                 this.state.ongoingInsertion = true;
                 await new Promise((resolve) => {
                     this.snippetModel.openSnippetDialog(
@@ -80,11 +80,22 @@ export class BlockTab extends Component {
                             onSelect: (snippet) => {
                                 snippetEl = snippet.content.cloneNode(true);
 
-                                // Add the dropzones corresponding to a section and
-                                // make them invisible.
-                                const selectors = this.shared.dropzone.getSelectors(baseSectionEl);
-                                const dropzoneEls =
-                                    this.shared.dropzone.activateDropzones(selectors);
+                                // Add the dropzones corresponding to the snippet
+                                // and make them invisible.
+                                const selectors = this.shared.dropzone.getSelectors(snippetEl);
+                                let dropzoneEls = this.shared.dropzone.activateDropzones(selectors);
+
+                                // If no dropzone is left after the filter, then
+                                // allow the drop by click inside [data-snippet]
+                                // elements
+                                const filteredDropzoneEls = dropzoneEls.filter(
+                                    (dropzoneEl) =>
+                                        !dropzoneEl.closest("[data-snippet]:not(:has(> .modal))")
+                                );
+                                dropzoneEls = filteredDropzoneEls.length
+                                    ? filteredDropzoneEls
+                                    : dropzoneEls;
+
                                 this.editable
                                     .querySelectorAll(".oe_drop_zone")
                                     .forEach((dropzoneEl) => dropzoneEl.classList.add("invisible"));
@@ -108,6 +119,11 @@ export class BlockTab extends Component {
                                 // Insert the selected snippet.
                                 closestDropzoneEl.after(snippetEl);
                                 this.shared.dropzone.removeDropzones();
+
+                                this.env.editor.dispatchTo(
+                                    "on_snippet_inserted_handlers",
+                                    snippetEl
+                                );
                                 return snippetEl;
                             },
                             onClose: () => {
@@ -397,8 +413,13 @@ export class BlockTab extends Component {
                 // If the snippet was dropped outside of a dropzone, find the
                 // dropzone that is the nearest to the dropping point.
                 if (!currentDropzoneEl) {
-                    const blockTabLeft = this.blockTabRef.el.getBoundingClientRect().left;
-                    if (y > 3 && x + helper.getBoundingClientRect().height < blockTabLeft) {
+                    const blockTabRect = this.blockTabRef.el.getBoundingClientRect();
+                    const helperWidth = helper.getBoundingClientRect().width;
+                    const isRTL = document.body.classList.contains("o_rtl");
+                    const isOutOfBlockTab = isRTL
+                        ? blockTabRect.left + blockTabRect.width < x - helperWidth / 2
+                        : x + helperWidth / 2 < blockTabRect.left;
+                    if (y > 3 && isOutOfBlockTab) {
                         const closestDropzoneEl = closest(dropzoneEls, { x, y });
                         if (closestDropzoneEl) {
                             currentDropzoneEl = closestDropzoneEl;
@@ -421,6 +442,7 @@ export class BlockTab extends Component {
                             dragState: this.dragState,
                         });
                     }
+
                     // The dragged element may have changed, so get it again.
                     draggedEl = this.dragState.draggedEl;
 
@@ -437,6 +459,8 @@ export class BlockTab extends Component {
                     // Replay the drop.
                     currentDropzoneEl.after(draggedEl);
                     this.shared.dropzone.removeDropzones();
+
+                    this.env.editor.dispatchTo("on_snippet_inserted_handlers", draggedEl);
 
                     // Process the dropped element.
                     if (!isSnippetGroup) {

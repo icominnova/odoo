@@ -1,14 +1,16 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 import json
+import logging
 from importlib import metadata
 from io import StringIO
+from http import HTTPStatus
 from socket import gethostbyname
 from unittest.mock import patch
 
 import odoo
 from odoo.http import content_disposition, root
-from odoo.tests import tagged
+from odoo.tests import Like, tagged
 from odoo.tests.common import HOST, BaseCase, get_db_name, new_test_user
 from odoo.tools import config, file_path, mute_logger, parse_version
 
@@ -161,6 +163,13 @@ class TestHttpMisc(TestHttpBase):
         self.assertEqual(res.headers.get('Content-Type'), 'application/json; charset=utf-8')
         self.assertEqual(set(res.json()), {'version', 'version_info'})
 
+    def test_misc10_request_uri_too_long(self):
+        # Depending on the Werkzeug version, the request can be rejected before
+        # headers are parsed or reach Odoo's routing.
+        with mute_logger('werkzeug'):
+            response = self.url_open('/' + 'a' * 95536)
+        self.assertIn(response.status_code, (HTTPStatus.NOT_FOUND, HTTPStatus.REQUEST_URI_TOO_LONG))
+
 
 @tagged('post_install', '-at_install')
 class TestHttpCors(TestHttpBase):
@@ -170,7 +179,7 @@ class TestHttpCors(TestHttpBase):
         self.assertEqual(res_opt.headers.get('Access-Control-Allow-Origin'), '*')
         self.assertEqual(res_opt.headers.get('Access-Control-Allow-Methods'), 'GET, POST')
         self.assertEqual(res_opt.headers.get('Access-Control-Max-Age'), '86400')  # one day
-        self.assertEqual(res_opt.headers.get('Access-Control-Allow-Headers'), 'Origin, X-Requested-With, Content-Type, Accept, Authorization')
+        self.assertEqual(res_opt.headers.get('Access-Control-Allow-Headers'), 'Origin, X-Requested-With, Content-Type, Accept, Authorization, Range')
 
         res_get = self.url_open('/test_http/cors_http_default')
         self.assertEqual(res_get.status_code, 200)
@@ -183,7 +192,7 @@ class TestHttpCors(TestHttpBase):
         self.assertEqual(res_opt.headers.get('Access-Control-Allow-Origin'), '*')
         self.assertEqual(res_opt.headers.get('Access-Control-Allow-Methods'), 'GET, PUT')
         self.assertEqual(res_opt.headers.get('Access-Control-Max-Age'), '86400')  # one day
-        self.assertEqual(res_opt.headers.get('Access-Control-Allow-Headers'), 'Origin, X-Requested-With, Content-Type, Accept, Authorization')
+        self.assertEqual(res_opt.headers.get('Access-Control-Allow-Headers'), 'Origin, X-Requested-With, Content-Type, Accept, Authorization, Range')
 
         res_post = self.url_open('/test_http/cors_http_methods')
         self.assertEqual(res_post.status_code, 200)
@@ -196,7 +205,7 @@ class TestHttpCors(TestHttpBase):
         self.assertEqual(res_opt.headers.get('Access-Control-Allow-Origin'), '*')
         self.assertEqual(res_opt.headers.get('Access-Control-Allow-Methods'), 'POST')
         self.assertEqual(res_opt.headers.get('Access-Control-Max-Age'), '86400')  # one day
-        self.assertEqual(res_opt.headers.get('Access-Control-Allow-Headers'), 'Origin, X-Requested-With, Content-Type, Accept, Authorization')
+        self.assertEqual(res_opt.headers.get('Access-Control-Allow-Headers'), 'Origin, X-Requested-With, Content-Type, Accept, Authorization, Range')
 
         res_post = self.url_open('/test_http/cors_json', data=json.dumps({'params': {}}), headers=CT_JSON)
         self.assertEqual(res_post.status_code, 200)
@@ -308,3 +317,32 @@ class TestContentDisposition(BaseCase):
         ]
         for filename, pct_encoded, hint in assertions:
             self.assertEqual(content_disposition(filename), f"attachment; filename*=UTF-8''{pct_encoded}", f'{hint} should be percent encoded')
+
+
+@tagged('-at_install', 'post_install')
+class TestFragmentToQueryString(TestHttpBase):
+    def test_fragment_to_query_string(self):
+        # This tests several behavior of `fragment_to_query_string`.
+        # To avoid starting a chrome headless client for each test,
+        # we plug the controllers into each other via
+        # `request.redirect`.
+        # The real tests happens in the controllers.
+        fake_success = "console.log('test successful')"
+        test_start = '/test_http/f2qs/step1/no-operation-to-perform?race=Asgard'
+        with self.assertLogs(
+            'odoo.addons.test_http.controllers.test_fragment_to_query_string',
+            logging.INFO,
+        ) as capture:
+            self.browser_js(test_start, fake_success)
+
+        # Ensure all controllers ran
+        self.assertEqual(
+            [
+                Like('...step 1: passed...'),
+                Like('...step 2: passed...'),
+                Like('...step 3: passed...'),
+                Like('...step 4: passed...'),
+            ],
+            capture.output,
+            "It seems all the controller testing fragment_to_query_string weren't run.",
+        )

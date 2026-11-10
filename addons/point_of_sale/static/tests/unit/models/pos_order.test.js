@@ -1,6 +1,10 @@
 import { test, expect } from "@odoo/hoot";
+import { freezeTime } from "@odoo/hoot-dom";
 import { getFilledOrder, setupPosEnv } from "../utils";
 import { definePosModels } from "../data/generate_model_definitions";
+import { serializeDateTime } from "@web/core/l10n/dates";
+
+const { DateTime } = luxon;
 
 definePosModels();
 
@@ -60,6 +64,27 @@ test("updateLastOrderChange", async () => {
     expect(order.last_order_preparation_change.internal_note).toBe("Internal note");
 });
 
+test("updateLastOrderChange with device clock behind the server", async () => {
+    const store = await setupPosEnv();
+    const order = await getFilledOrder(store);
+    freezeTime();
+    const now = DateTime.now();
+
+    // Version stamped by the server, 5 minutes ahead of the device clock
+    const serverDate = serializeDateTime(now.plus({ minutes: 5 }));
+    order.last_order_preparation_change.metadata = { serverDate };
+    order.updateLastOrderChange();
+    // Otherwise the server considers the change as outdated and discards it
+    expect(order.last_order_preparation_change.metadata.serverDate).toBe(serverDate);
+
+    // Server version older than the device clock: the device date is used
+    order.last_order_preparation_change.metadata = {
+        serverDate: serializeDateTime(now.minus({ minutes: 5 })),
+    };
+    order.updateLastOrderChange();
+    expect(order.last_order_preparation_change.metadata.serverDate).toBe(serializeDateTime(now));
+});
+
 test("removeOrderline", async () => {
     const store = await setupPosEnv();
     const order = await getFilledOrder(store);
@@ -81,8 +106,15 @@ test("addPaymentline", async () => {
     const cashPaymentMethod = store.models["pos.payment.method"].get(1);
     // Test that the payment line is correctly created
     const result = order.addPaymentline(cashPaymentMethod);
-    expect(result.data.payment_method_id.id).toBe(cashPaymentMethod.id);
-    expect(result.data.amount).toBe(17.85);
+    const cashPaymentLine = result.data;
+    expect(cashPaymentLine.payment_method_id.id).toBe(cashPaymentMethod.id);
+    expect(cashPaymentLine.amount).toBe(17.85);
+    // Update the cash payment line amount to 10 to confirm that the second created cash payment
+    // line will take the remaining amount to pay (7.85)
+    cashPaymentLine.setAmount(10);
+    const result2 = order.addPaymentline(cashPaymentMethod);
+    expect(result2.data.payment_method_id.id).toBe(cashPaymentMethod.id);
+    expect(result2.data.amount).toBe(7.85);
 });
 
 test("getTotalDiscount", async () => {
@@ -106,6 +138,84 @@ test("getTotalDiscount", async () => {
     expect(taxTotalsWDiscount.base_amount).toBe(10.2);
     expect(taxTotalsWDiscount.total_amount).toBe(12.03);
     expect(taxTotalsWDiscount.tax_amount_currency).toBe(1.83);
+});
+
+test("preventRoundingErrorsCombo", async () => {
+    const store = await setupPosEnv();
+    store.models["product.product"].get(7).taxes_id = [1];
+    store.models["product.product"].get(7).lst_price = 50;
+    store.models["product.product"].get(8).taxes_id = [1];
+    store.models["product.product"].get(9).taxes_id = [1];
+    store.models["pos.preset"].get(1).pricelist_id = false;
+    store.models["product.combo"].get(1).qty_free = 3;
+    store.models["product.combo"].get(1).base_price = 10;
+    const comboProduct1 = store.models["product.combo.item"].get(1);
+    const comboProduct2 = store.models["product.combo.item"].get(2);
+    comboProduct2.extra_price = 0;
+    const template = store.models["product.template"].get(7);
+    const order = store.addNewOrder();
+    const order2 = store.addNewOrder();
+    const order3 = store.addNewOrder();
+
+    // 3 of the same product
+    await store.addLineToOrder(
+        {
+            product_tmpl_id: template,
+            payload: [[{ combo_item_id: comboProduct1, qty: 3 }]],
+            qty: 1,
+        },
+        order
+    );
+    order.setOrderPrices();
+    expect(order.amount_total).toBe(57.5);
+    expect(order.lines[1].qty).toBe(2);
+    expect(order.lines[1].price_unit).toBe(16.67);
+    expect(order.lines[2].qty).toBe(1);
+    expect(Math.round(order.lines[2].price_unit * 100) / 100).toBe(16.66);
+
+    // 2 different products
+    await store.addLineToOrder(
+        {
+            product_tmpl_id: template,
+            payload: [
+                [
+                    { combo_item_id: comboProduct1, qty: 1 },
+                    { combo_item_id: comboProduct2, qty: 2 },
+                ],
+            ],
+            qty: 1,
+        },
+        order2
+    );
+    order2.setOrderPrices();
+    expect(order2.amount_total).toBe(57.5);
+    expect(order2.lines[1].price_unit).toBe(16.67);
+    expect(order2.lines[1].qty).toBe(1);
+    expect(order2.lines[2].price_unit).toBe(16.67);
+    expect(order2.lines[2].qty).toBe(1);
+    expect(Math.round(order2.lines[3].price_unit * 100) / 100).toBe(16.66);
+    expect(order2.lines[3].qty).toBe(1);
+
+    // 3 of the same product and 3 of the same extra items
+    await store.addLineToOrder(
+        {
+            product_tmpl_id: template,
+            payload: [
+                [{ combo_item_id: comboProduct1, qty: 3 }],
+                [{ combo_item_id: comboProduct1, qty: 3 }],
+            ],
+            qty: 1,
+        },
+        order3
+    );
+    order3.setOrderPrices();
+    expect(order3.amount_total).toBe(92);
+    expect(order3.lines[1].qty).toBe(2);
+    expect(order3.lines[1].price_unit).toBe(16.67);
+    expect(Math.round(order3.lines[2].price_unit * 100) / 100).toBe(16.66);
+    expect(order3.lines[2].qty).toBe(1);
+    expect(order3.lines[3].qty).toBe(3);
+    expect(order3.lines[3].price_unit).toBe(10);
 });
 
 test("customer requirements", async () => {
@@ -378,4 +488,83 @@ test("priceDoesntChangeWhenChangingPreset", async () => {
     order4.setPreset(otherPreset);
     order4.setOrderPrices();
     expect(order4.amount_total).toBe(total);
+});
+
+test("priceDoesntChangeWhenChangingPresetMultipleQuantity", async () => {
+    const store = await setupPosEnv();
+    store.models["pos.preset"].get(1).pricelist_id = false;
+    const otherPreset = store.models["pos.preset"].get(2);
+    store.models["product.combo"].get(1).qty_free = 2;
+    const comboProduct1 = store.models["product.combo.item"].get(1);
+    const comboProductExtra = store.models["product.combo.item"].get(2);
+    const comboProduct2 = store.models["product.combo.item"].get(3);
+    const template = store.models["product.template"].get(7);
+
+    const recomputeComboData = async (payload, expected_total) => {
+        const order = store.addNewOrder();
+        await store.addLineToOrder(
+            {
+                product_tmpl_id: template,
+                payload: payload,
+                qty: 1,
+            },
+            order
+        );
+        order.lines[0].setQuantity(10);
+        order.setOrderPrices();
+        expect(order.amount_total).toBe(expected_total);
+        order.setPreset(otherPreset);
+        order.setOrderPrices();
+        expect(order.amount_total).toBe(expected_total);
+    };
+
+    await recomputeComboData(
+        [[{ combo_item_id: comboProduct1, qty: 2 }], [{ combo_item_id: comboProduct2, qty: 2 }]],
+        23750
+    );
+    await recomputeComboData([[{ combo_item_id: comboProduct1, qty: 2 }]], 18750);
+    await recomputeComboData(
+        [
+            [{ combo_item_id: comboProduct1, qty: 2 }],
+            [{ combo_item_id: comboProductExtra, qty: 2 }],
+        ],
+        22125
+    );
+    await recomputeComboData(
+        [[{ combo_item_id: comboProduct1, qty: 2 }], [{ combo_item_id: comboProduct1, qty: 2 }]],
+        21250
+    );
+});
+
+test("Ignore attribute always extra price with combo", async () => {
+    const store = await setupPosEnv();
+    store.models["pos.preset"].get(1).pricelist_id = false;
+    const combo = store.models["product.combo"].get(1);
+    const comboItem = store.models["product.combo.item"].get(1);
+    comboItem.product_id = store.models["product.product"].get(52);
+    const comboTemplate = store.models["product.template"].get(7);
+    const comboProduct = store.models["product.product"].get(7);
+    comboTemplate.combo_ids = [combo.id];
+
+    const order = store.addNewOrder();
+    await store.addLineToOrder(
+        {
+            product_tmpl_id: comboTemplate,
+            payload: [
+                [
+                    {
+                        combo_item_id: comboItem,
+                        configuration: {
+                            attribute_value_ids: [6],
+                        },
+                        qty: 1,
+                    },
+                ],
+            ],
+            qty: 1,
+        },
+        order
+    );
+    order.setOrderPrices();
+    expect(order.amount_total).toBe(comboProduct.lst_price);
 });

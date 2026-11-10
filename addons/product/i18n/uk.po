@@ -5,16 +5,19 @@
 # Translators:
 # Bohdan Lisnenko, 2022
 # Martin Trigaux, 2022
-# Alina Lisnenko <alina.lisnenko@erp.co.ua>, 2023
-# "Tiffany Chang (tic)" <tic@odoo.com>, 2025.
-# Weblate <noreply-mt-weblate@weblate.org>, 2025.
+# Alina Lisnenko <alina.lisnenko@erp.co.ua>, 2023, 2026.
+# "Tiffany Chang (tic)" <tic@odoo.com>, 2025, 2026.
+# Weblate <noreply-mt-weblate@weblate.org>, 2025, 2026.
+# Lohushchenko <nadiia.lohushchenko@self-erp.com>, 2026.
+# Odoo Translation Bot <c3p@odoo.com>, 2026.
+# Vlad Patenko <vlad.patenko@gmail.com>, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-01-25 18:36+0000\n"
-"PO-Revision-Date: 2025-11-08 21:55+0000\n"
-"Last-Translator: Weblate <noreply-mt-weblate@weblate.org>\n"
+"POT-Creation-Date: 2026-10-24 17:38+0000\n"
+"PO-Revision-Date: 2026-10-13 12:33+0000\n"
+"Last-Translator: Vlad Patenko <vlad.patenko@gmail.com>\n"
 "Language-Team: Ukrainian <https://translate.odoo.com/projects/odoo-19/"
 "product/uk/>\n"
 "Language: uk\n"
@@ -25,7 +28,7 @@ msgstr ""
 "11 ? 0 : n % 1 == 0 && n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 12 || n % "
 "100 > 14) ? 1 : n % 1 == 0 && (n % 10 ==0 || (n % 10 >=5 && n % 10 <=9) || "
 "(n % 100 >=11 && n % 100 <=14 )) ? 2: 3);\n"
-"X-Generator: Weblate 5.12.2\n"
+"X-Generator: Weblate 2026.8.1\n"
 
 #. module: product
 #. odoo-python
@@ -50,16 +53,6 @@ msgstr "К-сть варіантів товару"
 #: model:ir.model.fields,field_description:product.field_product_category__product_count
 msgid "# Products"
 msgstr "К-сть товарів"
-
-#. module: product
-#: model_terms:ir.ui.view,arch_db:product.report_pricelist_page
-msgid "$14.00"
-msgstr "$14.00"
-
-#. module: product
-#: model_terms:ir.ui.view,arch_db:product.report_pricelist_page
-msgid "$15.00"
-msgstr "$15.00"
 
 #. module: product
 #. odoo-python
@@ -155,6 +148,13 @@ msgid ""
 "        - Never: Variants are never created for the attribute.\n"
 "        Note: this cannot be changed once the attribute is used on a product."
 msgstr ""
+"- Миттєво: Усі можливі варіанти створюються одразу після додавання атрибута "
+"та його значень до товару.\n"
+"- Динамічно: Кожен варіант створюється лише тоді, коли відповідні атрибути "
+"та значення додаються до замовлення на продаж.\n"
+"- Ніколи: Варіанти для цього атрибута ніколи не створюються.\n"
+"Примітка: це налаштування не можна змінити після того, як атрибут було "
+"використано у товарі."
 
 #. module: product
 #: model:product.attribute.value,name:product.pav_duration_month_1
@@ -167,39 +167,9 @@ msgid "1 year"
 msgstr "1 рік"
 
 #. module: product
-#: model_terms:ir.ui.view,arch_db:product.report_packagingbarcode
-msgid "10"
-msgstr "10"
-
-#. module: product
 #: model_terms:ir.ui.view,arch_db:product.report_pricelist_page
 msgid "10 Units"
 msgstr "10 одиниць"
-
-#. module: product
-#: model:product.attribute.value,name:product.pav_height_100
-msgid "100"
-msgstr "100"
-
-#. module: product
-#: model:product.attribute.value,name:product.pav_length_120
-msgid "120"
-msgstr ""
-
-#. module: product
-#: model_terms:ir.ui.view,arch_db:product.report_packagingbarcode
-msgid "123456789012"
-msgstr "123456789012"
-
-#. module: product
-#: model:product.attribute.value,name:product.pav_length_140
-msgid "140"
-msgstr ""
-
-#. module: product
-#: model:product.attribute.value,name:product.pav_length_160
-msgid "160"
-msgstr ""
 
 #. module: product
 #: model:product.template,description_sale:product.product_product_4_product_template
@@ -227,11 +197,6 @@ msgid "3 years"
 msgstr "3 роки"
 
 #. module: product
-#: model:product.attribute.value,name:product.pav_shoe_size_39
-msgid "39"
-msgstr ""
-
-#. module: product
 #: model:product.attribute.value,name:product.pav_size_3xl
 msgid "3XL"
 msgstr ""
@@ -252,31 +217,6 @@ msgid "4 x 7 with price"
 msgstr "4 x 7 з ціною"
 
 #. module: product
-#: model:product.attribute.value,name:product.pav_shoe_size_40
-msgid "40"
-msgstr "40"
-
-#. module: product
-#: model:product.attribute.value,name:product.pav_shoe_size_41
-msgid "41"
-msgstr ""
-
-#. module: product
-#: model:product.attribute.value,name:product.pav_shoe_size_42
-msgid "42"
-msgstr "42"
-
-#. module: product
-#: model:product.attribute.value,name:product.pav_shoe_size_43
-msgid "43"
-msgstr ""
-
-#. module: product
-#: model:product.attribute.value,name:product.pav_height_45
-msgid "45"
-msgstr "45"
-
-#. module: product
 #: model:product.attribute.value,name:product.pav_size_4xl
 msgid "4XL"
 msgstr ""
@@ -292,11 +232,6 @@ msgid "6 months"
 msgstr ""
 
 #. module: product
-#: model:product.attribute.value,name:product.pav_height_85
-msgid "85"
-msgstr "85"
-
-#. module: product
 #: model_terms:product.template,website_description:product.product_product_4_product_template
 msgid ""
 "<a href=\"/contactus\" class=\"mb-2 btn btn-primary "
@@ -306,7 +241,7 @@ msgstr ""
 #. module: product
 #: model_terms:ir.ui.view,arch_db:product.product_pricelist_item_form_view
 msgid "<b>Tip: want to round at 9.99?</b>"
-msgstr ""
+msgstr "<b>Підказка: бажаєте округлити до 9.99?</b>"
 
 #. module: product
 #: model_terms:ir.ui.view,arch_db:product.product_pricelist_item_form_view
@@ -572,7 +507,7 @@ msgstr ""
 #. odoo-python
 #: code:addons/product/models/product_attribute_value.py:0
 msgid "Add to all products"
-msgstr ""
+msgstr "Додати до всіх товарів"
 
 #. module: product
 #: model:ir.model.fields.selection,name:product.selection__update_product_attribute_value__mode__add
@@ -582,7 +517,7 @@ msgstr ""
 #. module: product
 #: model_terms:ir.ui.view,arch_db:product.product_attribute_view_form
 msgid "Add to products"
-msgstr ""
+msgstr "Додати до товарів"
 
 #. module: product
 #: model:ir.model.fields,help:product.field_product_product__uom_ids
@@ -642,7 +577,7 @@ msgstr "Усі файли завантажено"
 #. module: product
 #: model_terms:ir.ui.view,arch_db:product.product_pricelist_item_form_view
 msgid "All products"
-msgstr ""
+msgstr "Всі товари"
 
 #. module: product
 #: model_terms:ir.ui.view,arch_db:product.product_pricelist_item_form_view
@@ -680,12 +615,12 @@ msgstr "Застосувати на"
 #. module: product
 #: model_terms:ir.ui.view,arch_db:product.product_pricelist_item_form_view
 msgid "Apply To"
-msgstr ""
+msgstr "Застосувати для"
 
 #. module: product
 #: model_terms:ir.ui.view,arch_db:product.product_pricelist_view
 msgid "Apply on"
-msgstr "Подати заявку на"
+msgstr "Застосувати на"
 
 #. module: product
 #: model_terms:ir.ui.view,arch_db:product.product_attribute_view_form
@@ -848,7 +783,7 @@ msgstr "Базується на"
 #. module: product
 #: model_terms:ir.ui.view,arch_db:product.product_pricelist_item_form_view
 msgid "Based price"
-msgstr ""
+msgstr "Базова ціна"
 
 #. module: product
 #: model:res.groups,name:product.group_product_pricelist
@@ -1531,6 +1466,12 @@ msgid "Drawers"
 msgstr "Шухляди"
 
 #. module: product
+#. odoo-python
+#: code:addons/product/models/product_product.py:0
+msgid "Duplicate values in attribute values are not allowed: %s"
+msgstr ""
+
+#. module: product
 #: model:product.attribute,name:product.pa_duration
 msgid "Duration"
 msgstr "Тривалість"
@@ -1766,7 +1707,7 @@ msgstr ""
 #: model:ir.model.fields,help:product.field_product_product__sequence
 #: model:ir.model.fields,help:product.field_product_template__sequence
 msgid "Gives the sequence order when displaying a product list"
-msgstr "Дає порядок послідовності при відображенні списку товарів."
+msgstr "Дає порядок послідовності при відображенні списку товарів"
 
 #. module: product
 #: model:product.attribute.value,name:product.pav_fabric_glass
@@ -2128,9 +2069,21 @@ msgid "Is public document"
 msgstr "Є публічним документом"
 
 #. module: product
+#. odoo-python
+#: code:addons/product/models/product_product.py:0
+msgid ""
+"It is not possible to import different values for the same attribute: %s"
+msgstr ""
+
+#. module: product
 #: model:ir.model.fields.selection,name:product.selection__res_config_settings__product_weight_in_lbs__0
 msgid "Kilograms (kg)"
 msgstr ""
+
+#. module: product
+#: model:product.attribute.value,name:product.pav_size_l
+msgid "L"
+msgstr "л"
 
 #. module: product
 #: model:product.attribute.value,name:product.pav_brand_loreal
@@ -2302,6 +2255,11 @@ msgstr ""
 "Зв'яжіться з нами для отримання пропозиції."
 
 #. module: product
+#: model:product.attribute.value,name:product.pav_size_m
+msgid "M"
+msgstr ""
+
+#. module: product
 #: model:ir.model.fields,help:product.field_product_template_attribute_value__exclude_for
 msgid ""
 "Make this attribute value not compatible with other values of the product or "
@@ -2380,7 +2338,7 @@ msgstr "Тип Mime"
 #. module: product
 #: model_terms:ir.ui.view,arch_db:product.product_pricelist_item_form_view
 msgid "Min Qty"
-msgstr ""
+msgstr "Мін к-сть"
 
 #. module: product
 #: model_terms:ir.ui.view,arch_db:product.product_pricelist_item_form_view
@@ -2420,7 +2378,7 @@ msgstr ""
 #. module: product
 #: model:ir.model.fields.selection,name:product.selection__product_attribute__display_type__multi
 msgid "Multi-checkbox"
-msgstr ""
+msgstr "Множинний вибір"
 
 #. module: product
 #: model:ir.model.constraint,message:product.constraint_product_attribute_check_multi_checkbox_no_variant
@@ -2535,7 +2493,7 @@ msgstr ""
 #. odoo-javascript
 #: code:addons/product/static/src/product_catalog/kanban_renderer.xml:0
 msgid "No products could be found."
-msgstr "Неможливо знайти жоден товар"
+msgstr "Неможливо знайти жоден товар."
 
 #. module: product
 #. odoo-javascript
@@ -2828,7 +2786,7 @@ msgstr "Вкажіть товар, для якого потрібно засто
 #: code:addons/product/models/product_pricelist_item.py:0
 msgid ""
 "Please specify the product variant for which this rule should be applied"
-msgstr "Визначте варіант товару для якого це правило потрібно застосувати."
+msgstr "Визначте варіант товару для якого це правило потрібно застосувати"
 
 #. module: product
 #: model:ir.model.fields.selection,name:product.selection__res_config_settings__product_weight_in_lbs__1
@@ -2870,7 +2828,7 @@ msgstr "Правила ціни"
 #. module: product
 #: model_terms:ir.ui.view,arch_db:product.product_pricelist_item_form_view
 msgid "Price Type"
-msgstr ""
+msgstr "Тип ціни"
 
 #. module: product
 #: model:ir.model.fields,help:product.field_product_product__list_price
@@ -2903,7 +2861,7 @@ msgstr "Прайс-лист"
 #: model:ir.model.fields,help:product.field_product_pricelist_item__applied_on
 #: model:ir.model.fields,help:product.field_product_pricelist_item__display_applied_on
 msgid "Pricelist Item applicable on selected option"
-msgstr "Вартість пункту, що застосовується до вибраної опції"
+msgstr "Позиція прайслиста, що застосовується для вибраної опції"
 
 #. module: product
 #: model:ir.model.fields,field_description:product.field_product_pricelist__name
@@ -3207,6 +3165,12 @@ msgid "Product Unit of Measure"
 msgstr "Одиниця вимірювання товару"
 
 #. module: product
+#: model:ir.model.fields,field_description:product.field_product_product__import_attribute_values
+#: model:ir.model.fields,field_description:product.field_product_template__import_attribute_values
+msgid "Product Values"
+msgstr ""
+
+#. module: product
 #: model:ir.model,name:product.model_product_product
 #: model:ir.model.fields,field_description:product.field_product_supplierinfo__product_id
 #: model:ir.model.fields.selection,name:product.selection__product_pricelist_item__applied_on__0_product_variant
@@ -3460,7 +3424,7 @@ msgstr ""
 #. module: product
 #: model_terms:ir.ui.view,arch_db:product.product_pricelist_item_form_view
 msgid "Round off to"
-msgstr ""
+msgstr "Округлити до"
 
 #. module: product
 #: model:ir.model.fields,field_description:product.field_product_label_layout__rows
@@ -3471,6 +3435,11 @@ msgstr "Рядки"
 #: model:ir.model.fields,field_description:product.field_product_pricelist_item__rule_tip
 msgid "Rule Tip"
 msgstr "Порада правила"
+
+#. module: product
+#: model:product.attribute.value,name:product.pav_size_s
+msgid "S"
+msgstr ""
 
 #. module: product
 #: model:ir.model.fields,field_description:product.field_product_product__sale_ok
@@ -3500,7 +3469,7 @@ msgstr "Продажна ціна"
 #. module: product
 #: model_terms:ir.ui.view,arch_db:product.product_pricelist_view
 msgid "Sales Prices"
-msgstr ""
+msgstr "Ціна продажу"
 
 #. module: product
 #: model:ir.model.fields,field_description:product.field_product_product__lst_price
@@ -3555,6 +3524,10 @@ msgid ""
 "Rounding is applied after the discount and before the surcharge.\n"
 "To have prices that end in 9.99, round off to 10.00 and set an extra at -0.01"
 msgstr ""
+"Встановлює ціну так, щоб вона була кратною цьому значенню.\n"
+"Округлення застосовується після знижки та перед націнкою.\n"
+"Щоб отримати ціни, які закінчуються на 9.99, округліть до 10.00 і встановіть "
+"додаткову плату -0.01"
 
 #. module: product
 #: model:product.attribute,name:product.pa_shoe_size
@@ -3590,6 +3563,12 @@ msgstr ""
 #. module: product
 #: model:product.attribute.value,name:product.pav_brand_sony
 msgid "Sony"
+msgstr ""
+
+#. module: product
+#. odoo-python
+#: code:addons/product/report/product_pricelist_report.py:0
+msgid "Sorry, you are not allowed to access this document."
 msgstr ""
 
 #. module: product
@@ -3797,6 +3776,15 @@ msgid "The display type used in the Product Configurator."
 msgstr "Тип відображення використовується у конфігураторі товару."
 
 #. module: product
+#. odoo-python
+#: code:addons/product/models/product_product.py:0
+msgid ""
+"The exitings product has different attribute value. \"%(imported_values)s\" "
+"is not equivalent to \"%(existing_values)s\" for \"%(external_id)s\", \"%"
+"(id)s\""
+msgstr ""
+
+#. module: product
 #: model_terms:product.template,website_description:product.product_product_4_product_template
 msgid ""
 "The minimum height is 65 cm, and for standing work the maximum height "
@@ -3882,7 +3870,7 @@ msgid ""
 "The value %(value)s is not defined for the attribute %(attribute)s on the "
 "product %(product)s."
 msgstr ""
-"Значення %(value)s не визначене для атрибута  %(attribute)s на товарі %"
+"Значення %(value)s не визначене для атрибута %(attribute)s на товарі %"
 "(product)s."
 
 #. module: product
@@ -4006,6 +3994,22 @@ msgid "Unable to find report template for %s format"
 msgstr "Не вдалося знайти шаблон звіту для формату %s"
 
 #. module: product
+#. odoo-python
+#: code:addons/product/models/product_product.py:0
+msgid ""
+"Unable to import products with attribute value without attribute name "
+"(defined as: attribute:value): %s"
+msgstr ""
+
+#. module: product
+#. odoo-python
+#: code:addons/product/models/product_product.py:0
+msgid ""
+"Unable to import products with attribute values but without name of product "
+"set"
+msgstr ""
+
+#. module: product
 #: model:product.attribute.value,name:product.pav_brand_underarmour
 msgid "Under Armour"
 msgstr ""
@@ -4061,7 +4065,7 @@ msgstr "Одиниці вимірювання"
 #. module: product
 #: model:ir.model.fields,field_description:product.field_res_config_settings__group_uom
 msgid "Units of Measure & Packagings"
-msgstr ""
+msgstr "Одиниці виміру та Упаковки"
 
 #. module: product
 #: model_terms:ir.ui.view,arch_db:product.product_attribute_view_form
@@ -4112,6 +4116,8 @@ msgid ""
 "Use the discount rules and activate the discount settings in order to show "
 "discount to customer."
 msgstr ""
+"Використовуйте правила знижок та активуйте налаштування знижок, щоб показати "
+"знижку клієнту."
 
 #. module: product
 #. odoo-python
@@ -4204,7 +4210,7 @@ msgstr "Підрахунок варіанту"
 #. module: product
 #: model:ir.model.fields,field_description:product.field_product_attribute__create_variant
 msgid "Variant Creation"
-msgstr ""
+msgstr "Створення варіанту"
 
 #. module: product
 #: model:ir.model.fields,field_description:product.field_product_product__image_variant_1920
@@ -4332,7 +4338,7 @@ msgstr "Віртуальний дизайн інтер'єру"
 #: model_terms:ir.ui.view,arch_db:product.product_pricelist_view
 #: model_terms:ir.ui.view,arch_db:product.product_template_form_view
 msgid "Visible to all"
-msgstr ""
+msgstr "Видно всім"
 
 #. module: product
 #: model:ir.model.fields,field_description:product.field_product_tag__visible_to_customers
@@ -4795,7 +4801,7 @@ msgstr ""
 #. module: product
 #: model_terms:ir.ui.view,arch_db:product.product_pricelist_item_form_view
 msgid "round off to 10.00 and set an extra at -0.01"
-msgstr ""
+msgstr "округліть до 10.00 та встановіть додаткову плату -0.01"
 
 #. module: product
 #. odoo-python
@@ -4819,6 +4825,33 @@ msgstr "до"
 #: code:addons/product/static/src/js/pricelist_report/product_pricelist_report.xml:0
 msgid "xlsx"
 msgstr ""
+
+#~ msgid "$14.00"
+#~ msgstr "$14.00"
+
+#~ msgid "$15.00"
+#~ msgstr "$15.00"
+
+#~ msgid "10"
+#~ msgstr "10"
+
+#~ msgid "100"
+#~ msgstr "100"
+
+#~ msgid "123456789012"
+#~ msgstr "123456789012"
+
+#~ msgid "40"
+#~ msgstr "40"
+
+#~ msgid "42"
+#~ msgstr "42"
+
+#~ msgid "45"
+#~ msgstr "45"
+
+#~ msgid "85"
+#~ msgstr "85"
 
 #~ msgid ""
 #~ "You cannot assign the Main Pricelist as Other Pricelist in PriceList Item"

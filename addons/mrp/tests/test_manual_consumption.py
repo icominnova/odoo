@@ -221,6 +221,27 @@ class TestManualConsumption(TestMrpCommon):
         self.assertEqual(components[0].stock_quant_ids.reserved_quantity, 3.0)
         self.assertRecordValues(mo.move_raw_ids, [{'quantity': 3.0, 'picked': True}, {'quantity': 2.0, 'picked': True}])
 
+    def test_manual_consumption_with_lot_name(self):
+        """
+        Check that validation of consumption moves can rely on lot names for lot creation (relevant in the barcode flow).
+        """
+        self.product_2.tracking = 'lot'
+        self.product_1.is_storable = True
+        self.env['stock.quant']._update_available_quantity(self.product_2, self.stock_location, 2)
+        self.env['stock.quant']._update_available_quantity(self.product_1, self.stock_location, 4)
+        mo = self.env['mrp.production'].create({
+            'bom_id': self.bom_1.id,
+            'product_qty': 4,
+        })
+        mo.action_confirm()
+        mo.action_assign()
+        move = mo.move_raw_ids.filtered(lambda m: m.product_id == self.product_2)
+        move.manual_consumption = True
+        move.move_line_ids.write({'lot_name': 'LOT001', 'picked': True})
+        mo.button_mark_done()
+        self.assertEqual(mo.state, 'done')
+        self.assertEqual(move.move_line_ids.lot_id.name, 'LOT001')
+
     def test_reservation_state_with_manual_consumption(self):
         """
         Check that the reservation state of an MO is not influenced by moves without demand.
@@ -306,6 +327,38 @@ class TestManualConsumption(TestMrpCommon):
             {"manual_consumption": True, "picked": True, "lot_ids": lots[1].ids},
         ])
 
+    def test_consumption_on_new_move_lines(self):
+        """
+        Test to ensure that from 'Details' wizard, when removing all the move_lines and then
+        adding new ones, the move is still properly consumed
+        """
+        bom = self.bom_4
+        component = bom.bom_line_ids.product_id
+        component.write({
+            "is_storable": True,
+            "tracking": "lot",
+        })
+
+        lot = self.env["stock.lot"].create({"name": "lot_1", "product_id": component.id})
+        self.env["stock.quant"]._update_available_quantity(component, self.stock_location, 5, lot_id=lot)
+
+        mo = self.env["mrp.production"].create({"bom_id": bom.id, "product_qty": 1})
+        mo.action_confirm()
+
+        self.assertRecordValues(mo.move_raw_ids, [
+            {"manual_consumption": False, "picked": False},
+        ])
+
+        with Form.from_action(self.env, mo.move_raw_ids[0].action_show_details()) as wiz_form:
+            wiz_form.move_line_ids.remove(0)
+            with wiz_form.move_line_ids.new() as line:
+                line.quantity = 2
+            wiz_form.save()
+
+        self.assertRecordValues(mo.move_raw_ids, [
+            {"manual_consumption": True, "picked": True},
+        ])
+
     def test_manual_consumption_is_false_if_quantity_was_unchanged(self):
         """
         Check that a move's `manual_consumption` field is only set if the
@@ -354,3 +407,22 @@ class TestManualConsumption(TestMrpCommon):
         move = details_form.save()
         # Quantity was modified, so `manual_consumption` should be set
         self.assertTrue(move.manual_consumption)
+
+    def test_manually_created_move_line_gets_production_id_on_done(self):
+        """
+        A `stock.move.line` added manually to a component move must
+        have `production_id` set.
+        """
+        bom = self.bom_4
+        mo = self.env['mrp.production'].create([{
+            'product_id': bom.product_id.id,
+            'product_qty': 1,
+            'bom_id': bom.id,
+        }])
+        move = mo.move_raw_ids[0]
+        self.env['stock.move.line'].create([{
+            'move_id': move.id,
+            'product_id': move.product_id.id,
+            'quantity': 1,
+        }])
+        self.assertEqual(move.move_line_ids.mapped('production_id').id, mo.id)

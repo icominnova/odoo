@@ -154,7 +154,7 @@ from http import HTTPStatus
 from io import BytesIO
 from os.path import join as opj
 from pathlib import Path
-from urllib.parse import urlparse
+from urllib.parse import urlparse, urlsplit
 from zlib import adler32
 
 import babel.core
@@ -241,7 +241,6 @@ def get_default_session():
         'uid': None,
         'session_token': None,
         '_trace': [],
-        'create_time': time.time(),
     }
 
 DEFAULT_MAX_CONTENT_LENGTH = 128 * 1024 * 1024  # 128MiB
@@ -310,6 +309,16 @@ SESSION_LIFETIME = 60 * 60 * 24 * 7
 # The default duration (3h) before a session is rotated, changing the
 # session id (also on the cookie) but keeping the same content.
 SESSION_ROTATION_INTERVAL = 60 * 60 * 3
+
+# The header to pass in a request to skip the soft session rotation
+SESSION_ROTATION_INTERVAL_HEADER_SKIP = "X-Odoo-Skip-Session-Rotation-Interval"
+
+# URL paths for which automatic session rotation is disabled.
+SESSION_ROTATION_EXCLUDED_PATHS = (
+    '/websocket/on_closed',
+    '/websocket/peek_notifications',
+    '/websocket/update_bus_presence',
+)
 
 # After a session is rotated, the session should be kept for a couple of
 # seconds to account for network delay between multiple requests which are
@@ -469,6 +478,33 @@ def serialize_exception(exception, *, message=None, arguments=None):
     }
 
 
+def fragment_to_query_string(func):
+    """
+    Decorate a controller method to force the client to write fragment into the query
+    in case there isn't any query.
+    """
+    @functools.wraps(func)
+    def wrapper(self, *a, **kw):
+        if not (kw.keys() - {'debug'}):
+            return Response("""<!DOCTYPE html>
+            <html><head><script>
+                (function() {
+                    const url = window.location;
+                    const fragment = url.hash.substring(1);  // remove the leading "#"
+                    let new_url = url.pathname + url.search;
+                    if(fragment.length !== 0) {
+                        const separator = url.search ? (url.search === '?' ? '' : '&') : '?';
+                        new_url = url.pathname + url.search + separator + fragment;
+                    }
+                    if (new_url == url.pathname) {
+                        new_url = '/';
+                    }
+                    window.location = new_url;
+                })()
+            </script></head><body></body></html>""")
+        return func(self, *a, **kw)
+    return wrapper
+
 # =========================================================
 # File Streaming
 # =========================================================
@@ -538,8 +574,21 @@ class Stream:
     @classmethod
     def from_binary_field(cls, record, field_name):
         """ Create a :class:`~Stream`: from a binary field. """
-        data_b64 = record[field_name]
-        data = base64.b64decode(data_b64) if data_b64 else b''
+        data = record[field_name] or b''
+
+        # Image fields enforce base64 encoding. Binary fields don't
+        # enforce anything: raw bytes are fine, expected even.
+        # People nonetheless write base64 encoded bytes inside binary
+        # fields, and expect automatic decoding when read, crazy!
+        with contextlib.suppress(ValueError):
+            data = base64.b64decode(
+                # Some libs add linefeed every X (where X < 79) char in
+                # the base64, for email mime. validate=True would raise
+                # an error for those linefeeds so stip them.
+                data.replace(b'\r', b'').replace(b'\n', b''),
+                validate=True,
+            )
+
         return cls(
             type='data',
             data=data,
@@ -1426,6 +1475,70 @@ def make_request_wrap_methods(attr):
     return getter, setter
 
 
+class Authorization(Proxy):
+    _wrapped__ = werkzeug.datastructures.Authorization
+
+    if hasattr(_wrapped__, 'to_header'):
+        to_header = ProxyFunc(str)
+    password = ProxyAttr(str)
+    token = ProxyAttr(str)
+    type = ProxyAttr(str)
+    username = ProxyAttr(str)
+    algorithm = ProxyAttr(str)
+    cnonce = ProxyAttr(str)
+    nc = ProxyAttr(str)
+    nonce = ProxyAttr(str)
+    opaque = ProxyAttr(str)
+    qop = ProxyAttr(str)
+    realm = ProxyAttr(str)
+    response = ProxyAttr(str)
+    uri = ProxyAttr(str)
+    userhash = ProxyAttr(str)
+
+    __contains__ = ProxyFunc(bool)
+    __getitem__ = ProxyFunc()
+    get = ProxyFunc()
+
+    @property
+    def parameters(self):
+        authorization = self._wrapped__
+        parameters = (
+            authorization
+            if isinstance(authorization, dict)
+            else authorization.parameters
+        )
+        return dict(parameters)
+
+    def __bool__(self):
+        return bool(self._wrapped__)
+
+    def __eq__(self, other):
+        if isinstance(other, Authorization):
+            other = other._wrapped__
+        return self._wrapped__ == other
+
+    def __hash__(self):
+        return hash(self._wrapped__)
+
+    def __iter__(self):
+        return iter(self.parameters)
+
+    def __len__(self):
+        return len(self.parameters)
+
+    def copy(self):
+        return self.parameters
+
+    def items(self):
+        return self.parameters.items()
+
+    def keys(self):
+        return self.parameters.keys()
+
+    def values(self):
+        return self.parameters.values()
+
+
 class HTTPRequest:
     def __init__(self, environ):
         httprequest = werkzeug.wrappers.Request(environ)
@@ -1446,10 +1559,23 @@ class HTTPRequest:
     def __enter__(self):
         return self
 
+    @property
+    def authorization(self):
+        authorization = self.__wrapped.authorization
+        if authorization is None:
+            return None
+        return Authorization(authorization)
+
+    @authorization.setter
+    def authorization(self, value):
+        if isinstance(value, Authorization):
+            value = value._wrapped__
+        self.__wrapped.authorization = value
+
 
 HTTPREQUEST_ATTRIBUTES = [
     '__str__', '__repr__', '__exit__',
-    'accept_charsets', 'accept_languages', 'accept_mimetypes', 'access_route', 'args', 'authorization', 'base_url',
+    'accept_charsets', 'accept_languages', 'accept_mimetypes', 'access_route', 'args', 'base_url',
     'charset', 'content_encoding', 'content_length', 'content_md5', 'content_type', 'cookies', 'data', 'date',
     'encoding_errors', 'files', 'form', 'full_path', 'get_data', 'get_json', 'headers', 'host', 'host_url', 'if_match',
     'if_modified_since', 'if_none_match', 'if_range', 'if_unmodified_since', 'is_json', 'is_secure', 'json',
@@ -2052,7 +2178,8 @@ class Request:
         if isinstance(location, URL):
             location = location.to_url()
         if local:
-            location = '/' + url_parse(location).replace(scheme='', netloc='').to_url().lstrip('/\\')
+            location = url_parse(location).replace(scheme='', netloc='').to_url().lstrip('/\\')
+            location = '/' + urlsplit(location).geturl().lstrip('/\\')
         if self.db:
             return self.env['ir.http']._redirect(location, code)
         return werkzeug.utils.redirect(location, code, Response=Response)
@@ -2123,7 +2250,12 @@ class Request:
 
         if sess.should_rotate:
             root.session_store.rotate(sess, env)  # it saves
-        elif sess.uid and time.time() >= sess['create_time'] + SESSION_ROTATION_INTERVAL:
+        elif (
+            sess.uid
+            and time.time() >= sess['create_time'] + SESSION_ROTATION_INTERVAL
+            and request.httprequest.path not in SESSION_ROTATION_EXCLUDED_PATHS
+            and not request.httprequest.headers.get(SESSION_ROTATION_INTERVAL_HEADER_SKIP)
+        ):
             root.session_store.rotate(sess, env, True)
         elif sess.is_dirty:
             root.session_store.save(sess)
@@ -2288,11 +2420,6 @@ class Request:
     def _update_served_exception(self, exc):
         if isinstance(exc, HTTPException) and exc.code is None:
             return exc  # bubble up to _serve_db
-        if (
-            'werkzeug' in config['dev_mode']
-            and self.dispatcher.routing_type != JsonRPCDispatcher.routing_type
-        ):
-            return exc  # bubble up to werkzeug.debug.DebuggedApplication
         if not hasattr(exc, 'error_response'):
             if isinstance(exc, AccessDenied):
                 exc.suppress_traceback()
@@ -2307,7 +2434,7 @@ class Request:
         provided a response, a generic 404 - Not Found page is returned.
         """
         self.params = self.get_http_params()
-        self.registry['ir.http']._auth_method_public()
+        self.registry['ir.http']._authenticate_explicit('public')
         response = self.registry['ir.http']._serve_fallback()
         if response:
             self.registry['ir.http']._post_dispatch(response)
@@ -2378,7 +2505,7 @@ class Dispatcher(ABC):
         if cors and self.request.httprequest.method == 'OPTIONS':
             set_header('Access-Control-Max-Age', CORS_MAX_AGE)
             set_header('Access-Control-Allow-Headers',
-                       'Origin, X-Requested-With, Content-Type, Accept, Authorization')
+                       'Origin, X-Requested-With, Content-Type, Accept, Authorization, Range')
             werkzeug.exceptions.abort(Response(status=204))
 
         if 'max_content_length' in routing:
@@ -2678,8 +2805,9 @@ class Application:
         """
 
         netloc, path = urlparse(url)[1:3]
+        path = os.path.normpath(os.path.normcase(path))
         try:
-            path_netloc, module, static, resource = path.split('/', 3)
+            path_netloc, module, static, resource = path.split(os.sep, 3)
         except ValueError:
             return None
 

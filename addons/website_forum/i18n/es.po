@@ -6,16 +6,16 @@
 # Leonardo J. Caballero G. <leonardocaballero@gmail.com>, 2022
 # Martin Trigaux, 2022
 # Pedro M. Baeza <pedro.baeza@tecnativa.com>, 2023
-# "Dylan Kiss (dyki)" <dyki@odoo.com>, 2025.
-# Weblate <noreply-mt-weblate@weblate.org>, 2025.
-# "Noemi Pla Garcia (nopl)" <nopl@odoo.com>, 2025.
+# "Dylan Kiss (dyki)" <dyki@odoo.com>, 2025, 2026.
+# Weblate <noreply-mt-weblate@weblate.org>, 2025, 2026.
+# "Noemi Pla Garcia (nopl)" <nopl@odoo.com>, 2025, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-01-25 18:37+0000\n"
-"PO-Revision-Date: 2025-12-23 14:43+0000\n"
-"Last-Translator: \"Noemi Pla Garcia (nopl)\" <nopl@odoo.com>\n"
+"POT-Creation-Date: 2026-10-30 17:40+0000\n"
+"PO-Revision-Date: 2026-08-02 13:48+0000\n"
+"Last-Translator: \"Dylan Kiss (dyki)\" <dyki@odoo.com>\n"
 "Language-Team: Spanish <https://translate.odoo.com/projects/odoo-19/"
 "website_forum/es/>\n"
 "Language: es\n"
@@ -24,7 +24,7 @@ msgstr ""
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=3; plural=(n == 1) ? 0 : ((n != 0 && n % 1000000 == "
 "0) ? 1 : 2);\n"
-"X-Generator: Weblate 5.14.3\n"
+"X-Generator: Weblate 2026.6.1\n"
 
 #. module: website_forum
 #. odoo-javascript
@@ -254,28 +254,6 @@ msgid ""
 msgstr ""
 "<a class=\"btn btn-primary forum_register_url o_translate_inline\" href=\"/"
 "web/login\">Registrarse</a>"
-
-#. module: website_forum
-#: model_terms:ir.ui.view,arch_db:website_forum.404
-msgid ""
-"<a class=\"btn-link o_translate_inline\" t-attf-href=\"/forum\"><i "
-"class=\"oi oi-arrow-right display-inline-block\"/> Return to questions list</"
-"a>"
-msgstr ""
-"<a class=\"btn-link o_translate_inline\" t-attf-href=\"/forum\"><i "
-"class=\"oi oi-arrow-right display-inline-block\"/> Volver a la lista de "
-"preguntas</a>"
-
-#. module: website_forum
-#: model_terms:ir.ui.view,arch_db:website_forum.forum_all_oe_structure_forum_all_top
-msgid ""
-"<a class=\"mb-2 o_translate_inline\" t-attf-href=\"/profile/users\" data-bs-"
-"original-title=\"\" title=\"\" target=\"_blank\">Meet our community members</"
-"a>"
-msgstr ""
-"<a class=\"mb-2 o_translate_inline\" t-attf-href=\"/profile/users\" data-bs-"
-"original-title=\"\" title=\"\" target=\"_blank\">Conoce a los miembros de "
-"nuestra comunidad</a>"
 
 #. module: website_forum
 #: model_terms:ir.ui.view,arch_db:website_forum.post_display
@@ -676,6 +654,15 @@ msgstr "<i class=\"fa fa-users fa-fw opacity-50\"/> Personas"
 #: model_terms:ir.ui.view,arch_db:website_forum.user_profile_content
 msgid "<i class=\"oi oi-arrow-right d-inline-block\"/> Go to Forums"
 msgstr "<i class=\"oi oi-arrow-right d-inline-block\"/> Ir a Foros"
+
+#. module: website_forum
+#: model_terms:ir.ui.view,arch_db:website_forum.404
+msgid ""
+"<i class=\"oi oi-arrow-right display-inline-block\"/> Return to questions "
+"list"
+msgstr ""
+"<i class=\"oi oi-arrow-right display-inline-block\"/> Volver a la lista de "
+"preguntas"
 
 #. module: website_forum
 #: model_terms:ir.ui.view,arch_db:website_forum.post_dropdown
@@ -2474,6 +2461,11 @@ msgid "Mark as spam"
 msgstr "Marcar como spam"
 
 #. module: website_forum
+#: model_terms:ir.ui.view,arch_db:website_forum.forum_all_oe_structure_forum_all_top
+msgid "Meet our community members"
+msgstr "Conoce a los miembros de la comunidad"
+
+#. module: website_forum
 #: model:ir.model.fields,field_description:website_forum.field_forum_forum__message_has_error
 #: model:ir.model.fields,field_description:website_forum.field_forum_post__message_has_error
 #: model:ir.model.fields,field_description:website_forum.field_forum_tag__message_has_error
@@ -2713,6 +2705,12 @@ msgstr "Publicación ofensiva"
 #: model_terms:ir.ui.view,arch_db:website_forum.moderation_queue
 msgid "Offensive Posts"
 msgstr "Publicaciones ofensivas"
+
+#. module: website_forum
+#. odoo-javascript
+#: code:addons/website_forum/static/src/interactions/website_forum.js:0
+msgid "Oh no! Please sign in to perform this action"
+msgstr ""
 
 #. module: website_forum
 #. odoo-javascript
@@ -3892,7 +3890,7 @@ msgstr "Mensaje de bienvenida"
 #: code:addons/website_forum/models/forum_forum.py:0
 #: model_terms:forum.forum,welcome_message:website_forum.forum_help
 msgid "Welcome!"
-msgstr "¡Bienvenido!"
+msgstr "¡Te damos la bienvenida!"
 
 #. module: website_forum
 #: model_terms:forum.forum,faq:website_forum.forum_help
@@ -4336,6 +4334,24 @@ msgstr "se puede ver su biografía como información"
 #: model_terms:ir.ui.view,arch_db:website_forum.follow
 msgid "your email..."
 msgstr "su correo electrónico..."
+
+#~ msgid ""
+#~ "<a class=\"btn-link o_translate_inline\" t-attf-href=\"/forum\"><i "
+#~ "class=\"oi oi-arrow-right display-inline-block\"/> Return to questions "
+#~ "list</a>"
+#~ msgstr ""
+#~ "<a class=\"btn-link o_translate_inline\" t-attf-href=\"/forum\"><i "
+#~ "class=\"oi oi-arrow-right display-inline-block\"/> Volver a la lista de "
+#~ "preguntas</a>"
+
+#~ msgid ""
+#~ "<a class=\"mb-2 o_translate_inline\" t-attf-href=\"/profile/users\" data-"
+#~ "bs-original-title=\"\" title=\"\" target=\"_blank\">Meet our community "
+#~ "members</a>"
+#~ msgstr ""
+#~ "<a class=\"mb-2 o_translate_inline\" t-attf-href=\"/profile/users\" data-"
+#~ "bs-original-title=\"\" title=\"\" target=\"_blank\">Conoce a los miembros "
+#~ "de nuestra comunidad</a>"
 
 #~ msgid "%d karma required to unlink a comment."
 #~ msgstr "%d karma requerido para quitar el enlace a un comentario."

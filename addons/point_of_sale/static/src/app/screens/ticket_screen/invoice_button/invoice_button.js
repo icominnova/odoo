@@ -40,6 +40,7 @@ export class InvoiceButton extends Component {
             if (accountMoveId) {
                 await this.invoiceService.downloadPdf(accountMoveId);
             }
+            return order;
         } catch (error) {
             if (error instanceof Error) {
                 throw error;
@@ -96,11 +97,12 @@ export class InvoiceButton extends Component {
 
         // Part 2: Invoice the order.
         // FIXME POSREF timeout
-        await this.pos.data.silentCall("pos.order", "action_pos_order_invoice", [orderId]);
+        await this.pos.data.call("pos.order", "action_pos_order_invoice", [orderId]);
 
         // Part 3: Download invoice.
         await this._downloadInvoice(orderId);
         this.props.onInvoiceOrder(orderId);
+        return true;
     }
     async click() {
         if (this.lock) {

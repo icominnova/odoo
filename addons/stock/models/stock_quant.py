@@ -100,7 +100,7 @@ class StockQuant(models.Model):
     inventory_quantity_auto_apply = fields.Float(
         'Inventoried Quantity', digits='Product Unit',
         compute='_compute_inventory_quantity_auto_apply',
-        inverse='_set_inventory_quantity', groups='stock.group_stock_manager'
+        inverse='_set_inventory_quantity', groups='stock.group_stock_user'
     )
     inventory_diff_quantity = fields.Float(
         'Difference', compute='_compute_inventory_diff_quantity', store=True,
@@ -263,6 +263,7 @@ class StockQuant(models.Model):
         quants = self.env['stock.quant']
         is_inventory_mode = self._is_inventory_mode()
         allowed_fields = self._get_inventory_fields_create()
+        quants_to_apply = self.env['stock.quant']
         for vals in vals_list:
             if is_inventory_mode and any(f in vals for f in ['inventory_quantity', 'inventory_quantity_auto_apply']):
                 if any(field for field in vals if not field.startswith('x_') and field not in allowed_fields):
@@ -277,7 +278,7 @@ class StockQuant(models.Model):
                 package_id = self.env['stock.package'].browse(vals.get('package_id'))
                 owner_id = self.env['res.partner'].browse(vals.get('owner_id'))
                 quant = self.env['stock.quant']
-                if not self.env.context.get('import_file'):
+                if not self.env.context.get('import_quant_lines'):
                     # Merge quants later, to make sure one line = one record during batch import
                     quant = self._gather(product, location, lot_id=lot_id, package_id=package_id, owner_id=owner_id, strict=True)
                 if lot_id:
@@ -294,8 +295,10 @@ class StockQuant(models.Model):
                 else:
                     quant = self.sudo().create(vals)
                     _add_to_cache(quant)
-                if auto_apply:
-                    quant.write({'inventory_quantity_auto_apply': inventory_quantity})
+                # mimicking the behavior in `_set_inventory_quantity` to prevent empty moves from being generated
+                if auto_apply and quant.quantity != inventory_quantity:
+                    quant.inventory_quantity = inventory_quantity
+                    quants_to_apply |= quant
                 else:
                     # Set the `inventory_quantity` field to create the necessary move.
                     quant.inventory_quantity = inventory_quantity
@@ -310,16 +313,21 @@ class StockQuant(models.Model):
                 quants |= quant
                 if self._is_inventory_mode() and quant.company_id:
                     quant._check_company()
+        if quants_to_apply:
+            quants_to_apply.filtered(lambda q: not q.is_outdated).action_apply_inventory()
         return quants
 
     def _load_records_create(self, values):
-        """ Add default location if import file did not fill it"""
+        """ Add default location if import file did not fill it, and keep one quant
+        per line only when importing quants directly"""
         company_user = self.env.company
         warehouse = self.env['stock.warehouse'].search([('company_id', '=', company_user.id)], limit=1)
         for value in values:
             if 'location_id' not in value:
                 value['location_id'] = warehouse.lot_stock_id.id
-        return super(StockQuant, self.with_context(inventory_mode=True))._load_records_create(values)
+        return super(StockQuant, self.with_context(
+            inventory_mode=True, import_quant_lines=self.env.context.get('import_file'),
+        ))._load_records_create(values)
 
     def _load_records_write(self, values):
         """ Only allowed fields should be modified """
@@ -552,7 +560,8 @@ class StockQuant(models.Model):
         self.inventory_quantity = 0
         if self.env.context.get('inventory_report_mode'):
             self._apply_inventory()
-        self.user_id = self.env.user.id
+        else:
+            self.user_id = self.env.user.id
 
     @api.depends('location_id', 'lot_id', 'package_id', 'owner_id')
     def _compute_display_name(self):
@@ -849,7 +858,7 @@ class StockQuant(models.Model):
 
         # do full packaging reservation when it's needed
         if self.env.context.get('packaging_uom_id') and product_id.product_tmpl_id.categ_id.packaging_reserve_method == "full":
-            available_quantity = self.env.context.get('packaging_uom_id')._check_qty(available_quantity, product_id.uom_id, "DOWN")
+            available_quantity = self.env.context.get('packaging_uom_id')._check_qty(min(quantity, available_quantity), product_id.uom_id, "DOWN")
 
         quantity = min(quantity, available_quantity)
 
@@ -996,22 +1005,31 @@ class StockQuant(models.Model):
         # Consider the inventory_quantity as set => recompute the inventory_diff_quantity if needed
         self.inventory_quantity_set = True
         move_vals = []
+        default_loss_locations = {}
+        quants_with_missing_loss_locations = self.filtered(lambda quant: not quant.product_id.with_company(quant.company_id).property_stock_inventory)
+        if quants_with_missing_loss_locations:
+            for company in quants_with_missing_loss_locations.mapped('company_id'):
+                loss_location_id = self.env['ir.default'].with_company(company)._get_model_defaults(
+                    'product.template').get('property_stock_inventory')
+                default_loss_locations[company.id] = self.env['stock.location'].browse(loss_location_id)
         for quant in self:
             # if inventory applied from product's inverse_qty and the inventory_diff_quantity is 0,
             # we skip creating a move with 0 quantity.
             if quant.env.context.get('from_inverse_qty') and quant.product_uom_id.compare(quant.inventory_diff_quantity, 0) == 0:
                 continue
+            inventory_location = quant.product_id.with_company(quant.company_id).property_stock_inventory or\
+                default_loss_locations.get(quant.company_id.id)
             # Create and validate a move so that the quant matches its `inventory_quantity`.
             if quant.product_uom_id.compare(quant.inventory_diff_quantity, 0) > 0:
                 move_vals.append(
                     quant._get_inventory_move_values(quant.inventory_diff_quantity,
-                                                     quant.product_id.with_company(quant.company_id).property_stock_inventory,
+                                                     inventory_location,
                                                      quant.location_id, package_dest_id=quant.package_id))
             else:
                 move_vals.append(
                     quant._get_inventory_move_values(-quant.inventory_diff_quantity,
                                                      quant.location_id,
-                                                     quant.product_id.with_company(quant.company_id).property_stock_inventory,
+                                                     inventory_location,
                                                      package_id=quant.package_id))
         moves = self.env['stock.move'].with_context(inventory_mode=False).create(move_vals)
         moves.with_context(ignore_dest_packages=True)._action_done()
@@ -1309,9 +1327,13 @@ class StockQuant(models.Model):
         ctx.pop('group_by', None)
 
         action = self.env['ir.actions.act_window']._for_xml_id('stock.stock_quant_action')
-
+        action["domain"] = [
+            '|',
+            ('product_id.company_id', 'parent_of', ctx.get('allowed_company_ids', [])),
+            ('product_id.company_id', '=', False)
+        ]
         form_view = self.env.ref('stock.view_stock_quant_form_editable').id
-        if self.env.context.get('inventory_mode') and self.env.user.has_group('stock.group_stock_manager'):
+        if self.env.context.get('inventory_mode') and self.env.user.has_group('stock.group_stock_user'):
             action['view_id'] = self.env.ref('stock.view_stock_quant_tree_editable').id
         else:
             action['view_id'] = self.env.ref('stock.view_stock_quant_tree').id
